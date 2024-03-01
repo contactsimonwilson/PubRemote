@@ -1,0 +1,22 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "files.associations": {
+      "*.h": "c",
+      "*.c": "c"
+    },
+    "editor.tabSize": 2,
+    "files.eol": "\n",
+    "[c]": {
+      "editor.autoIndent": "full",
+      "editor.wordBasedSuggestions": "off",
+      "editor.suggest.insertMode": "replace",
+      "editor.semanticHighlighting.enabled": true,
+      "editor.foldingStrategy": "auto",
+      "editor.formatOnSaveMode": "file",
+      "editor.formatOnSave": true,
+      "editor.wrappingStrategy": "advanced",
+      "editor.formatOnPaste": false
+    },
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: Microsoft, IndentWidth: 2, ColumnLimit: 120, IndentPPDirectives: BeforeHash, BraceWrapping: { AfterControlStatement: false, AfterFunction: false, AfterClass: false, AfterStruct: false, AfterEnum: false } }",
+  }
+  
