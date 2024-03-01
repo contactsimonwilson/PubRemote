@@ -1,8 +1,7 @@
-#include "Receiver.h"
-
-#include "Peers.h"
-#include "Time.h"
+#include "receiver.h"
 #include "esp_log.h"
+#include "peers.h"
+#include "time.h"
 
 void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) {
   ESP_LOGI(RECEIVER_TAG, "RECEIVED");

@@ -1,9 +1,9 @@
-#include "RemoteInputs.h"
-#include "Time.h"
+#include "remoteinputs.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "rom/gpio.h"
+#include "time.h"
 #include <driver/adc.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>

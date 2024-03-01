@@ -1,3 +1,4 @@
+#include "driver/adc.h"
 #include "driver/touch_pad.h"
 #include "driver/touch_sensor.h"
 #include "driver/touch_sensor_common.h"
@@ -9,15 +10,15 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "hal/touch_sensor_types.h"
+#include "lvgl.h"
 #include "nvs_flash.h"
-#include "remote/Peers.h"
-#include "remote/Receiver.h"
-#include "remote/Remote.h"
-#include "remote/RemoteInputs.h"
-#include "remote/Time.h"
-#include "remote/Transmitter.h"
+#include "remote/peers.h"
+#include "remote/receiver.h"
+#include "remote/remote.h"
+#include "remote/remoteinputs.h"
+#include "remote/time.h"
+#include "remote/transmitter.h"
 #include "soc/touch_sensor_channel.h"
-#include <driver/adc.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -53,7 +54,13 @@ void IRAM_ATTR touch_isr() {
 }
 // TODO CRC checks on data
 
+// Display buffer for LVGL
+// static lv_disp_draw_buf_t disp_buf;
+// static lv_color_t buf[LV_HOR_RES_MAX * 10];
+
 void app_main(void) {
+  lv_init();
+
   // ESPNOW init
   init_espnow();
   uint8_t mac[6];
