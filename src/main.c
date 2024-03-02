@@ -1,4 +1,6 @@
 #include "driver/adc.h"
+#include "driver/ledc.h"
+#include "driver/spi_master.h"
 #include "driver/touch_pad.h"
 #include "driver/touch_sensor.h"
 #include "driver/touch_sensor_common.h"
@@ -10,8 +12,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "hal/touch_sensor_types.h"
-#include "lvgl.h"
 #include "nvs_flash.h"
+#include "remote/display.h"
 #include "remote/peers.h"
 #include "remote/receiver.h"
 #include "remote/remote.h"
@@ -19,6 +21,7 @@
 #include "remote/time.h"
 #include "remote/transmitter.h"
 #include "soc/touch_sensor_channel.h"
+#include <hal/ledc_types.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -52,14 +55,11 @@ void IRAM_ATTR touch_isr() {
   // Add code to execute upon wake-up here
   ESP_LOGI(TAG, "Wake");
 }
+
 // TODO CRC checks on data
 
-// Display buffer for LVGL
-// static lv_disp_draw_buf_t disp_buf;
-// static lv_color_t buf[LV_HOR_RES_MAX * 10];
-
 void app_main(void) {
-  lv_init();
+  init_display();
 
   // ESPNOW init
   init_espnow();
