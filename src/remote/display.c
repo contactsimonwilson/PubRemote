@@ -1,11 +1,9 @@
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "esp_err.h"
-// #include "esp_lcd_gc9a01.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_vendor.h"
-#include "esp_lcd_touch_cst816s.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
@@ -15,7 +13,15 @@
 #include <stdio.h>
 // https://github.com/espressif/esp-idf/blob/master/examples/peripherals/lcd/spi_lcd_touch/main/spi_lcd_touch_example_main.c
 
-static const char *TAG = "example";
+#if USE_GC9A01
+  #include "esp_lcd_gc9a01.h"
+#endif
+
+#if USE_CST816S
+  #include "esp_lcd_touch_cst816s.h"
+#endif
+
+#define DISPLAY_TAG "PUBMOTE_DISPLAY"
 
 // Using SPI2 in the example
 #define LCD_HOST SPI2_HOST
@@ -35,14 +41,12 @@ static const char *TAG = "example";
 #define EXAMPLE_PIN_NUM_BK_LIGHT 2
 #define EXAMPLE_PIN_NUM_TOUCH_CS 15
 
-// The pixel number in horizontal and vertical
-#if CONFIG_EXAMPLE_LCD_CONTROLLER_ILI9341
-  #define EXAMPLE_LCD_H_RES 240
-  #define EXAMPLE_LCD_V_RES 320
-#elif CONFIG_EXAMPLE_LCD_CONTROLLER_GC9A01
-  #define EXAMPLE_LCD_H_RES 240
-  #define EXAMPLE_LCD_V_RES 240
+#if USE_GC9A01
+  #define TOUCH_ENABLED 1
+#else
+  #define TOUCH_ENABLED 0
 #endif
+
 // Bit number used to represent command and parameter
 #define EXAMPLE_LCD_CMD_BITS 8
 #define EXAMPLE_LCD_PARAM_BITS 8
@@ -55,7 +59,7 @@ static const char *TAG = "example";
 
 static SemaphoreHandle_t lvgl_mux = NULL;
 
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
 esp_lcd_touch_handle_t tp = NULL;
 #endif
 
@@ -87,7 +91,7 @@ static void example_lvgl_port_update_callback(lv_disp_drv_t *drv) {
     // Rotate LCD display
     esp_lcd_panel_swap_xy(panel_handle, false);
     esp_lcd_panel_mirror(panel_handle, true, false);
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
     // Rotate LCD touch
     esp_lcd_touch_set_mirror_y(tp, false);
     esp_lcd_touch_set_mirror_x(tp, false);
@@ -97,7 +101,7 @@ static void example_lvgl_port_update_callback(lv_disp_drv_t *drv) {
     // Rotate LCD display
     esp_lcd_panel_swap_xy(panel_handle, true);
     esp_lcd_panel_mirror(panel_handle, true, true);
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
     // Rotate LCD touch
     esp_lcd_touch_set_mirror_y(tp, false);
     esp_lcd_touch_set_mirror_x(tp, false);
@@ -107,7 +111,7 @@ static void example_lvgl_port_update_callback(lv_disp_drv_t *drv) {
     // Rotate LCD display
     esp_lcd_panel_swap_xy(panel_handle, false);
     esp_lcd_panel_mirror(panel_handle, false, true);
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
     // Rotate LCD touch
     esp_lcd_touch_set_mirror_y(tp, false);
     esp_lcd_touch_set_mirror_x(tp, false);
@@ -117,7 +121,7 @@ static void example_lvgl_port_update_callback(lv_disp_drv_t *drv) {
     // Rotate LCD display
     esp_lcd_panel_swap_xy(panel_handle, true);
     esp_lcd_panel_mirror(panel_handle, false, false);
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
     // Rotate LCD touch
     esp_lcd_touch_set_mirror_y(tp, false);
     esp_lcd_touch_set_mirror_x(tp, false);
@@ -126,7 +130,7 @@ static void example_lvgl_port_update_callback(lv_disp_drv_t *drv) {
   }
 }
 
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
 static void example_lvgl_touch_cb(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   uint16_t touchpad_x[1] = {0};
   uint16_t touchpad_y[1] = {0};
@@ -200,7 +204,7 @@ void init_display(void) {
       .miso_io_num = TFT_MISO,
       .quadwp_io_num = -1,
       .quadhd_io_num = -1,
-      .max_transfer_sz = EXAMPLE_LCD_H_RES * 80 * sizeof(uint16_t),
+      .max_transfer_sz = LV_HOR_RES * 80 * sizeof(uint16_t),
   };
   ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
@@ -226,16 +230,15 @@ void init_display(void) {
       .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
       .bits_per_pixel = 16,
   };
-#if CONFIG_EXAMPLE_LCD_CONTROLLER_ILI9341
-  ESP_LOGI(TAG, "Install ILI9341 panel driver");
-  ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(io_handle, &panel_config, &panel_handle));
-#elif CONFIG_EXAMPLE_LCD_CONTROLLER_GC9A01
+
+#if CONFIG_EXAMPLE_LCD_CONTROLLER_GC9A01
   ESP_LOGI(TAG, "Install GC9A01 panel driver");
   ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(io_handle, &panel_config, &panel_handle));
 #endif
 
   ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
   ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
+
 #if CONFIG_EXAMPLE_LCD_CONTROLLER_GC9A01
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, true));
 #endif
@@ -244,15 +247,15 @@ void init_display(void) {
   // user can flush pre-defined pattern to the screen before we turn on the screen or backlight
   ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
 
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
   esp_lcd_panel_io_spi_config_t tp_io_config = ESP_LCD_TOUCH_IO_SPI_STMPE610_CONFIG(EXAMPLE_PIN_NUM_TOUCH_CS);
   // Attach the TOUCH to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &tp_io_config, &tp_io_handle));
 
   esp_lcd_touch_config_t tp_cfg = {
-      .x_max = EXAMPLE_LCD_H_RES,
-      .y_max = EXAMPLE_LCD_V_RES,
+      .x_max = LV_HOR_RES,
+      .y_max = LV_VER_RES,
       .rst_gpio_num = -1,
       .int_gpio_num = -1,
       .flags =
@@ -263,11 +266,11 @@ void init_display(void) {
           },
   };
 
-  #if CONFIG_EXAMPLE_LCD_TOUCH_CONTROLLER_STMPE610
-  ESP_LOGI(TAG, "Initialize touch controller STMPE610");
+  #if USE_CST816S
+  ESP_LOGI(TAG, "Initialize touch controller CST816S");
   ESP_ERROR_CHECK(esp_lcd_touch_new_spi_stmpe610(tp_io_handle, &tp_cfg, &tp));
-  #endif // CONFIG_EXAMPLE_LCD_TOUCH_CONTROLLER_STMPE610
-#endif   // CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+  #endif
+#endif // TOUCH_ENABLED
 
   ESP_LOGI(TAG, "Turn on LCD backlight");
   gpio_set_level(TFT_BL, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
@@ -276,12 +279,12 @@ void init_display(void) {
   lv_init();
   // alloc draw buffers used by LVGL
   // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
-  lv_color_t *buf1 = heap_caps_malloc(EXAMPLE_LCD_H_RES * 20 * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t *buf1 = heap_caps_malloc(LV_HOR_RES * 20 * sizeof(lv_color_t), MALLOC_CAP_DMA);
   assert(buf1);
-  lv_color_t *buf2 = heap_caps_malloc(EXAMPLE_LCD_H_RES * 20 * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t *buf2 = heap_caps_malloc(LV_HOR_RES * 20 * sizeof(lv_color_t), MALLOC_CAP_DMA);
   assert(buf2);
   // initialize LVGL draw buffers
-  lv_disp_draw_buf_init(&disp_buf, buf1, buf2, EXAMPLE_LCD_H_RES * 20);
+  lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LV_HOR_RES * 20);
 
   ESP_LOGI(TAG, "Register display driver to LVGL");
   lv_disp_drv_init(&disp_drv);
@@ -300,7 +303,7 @@ void init_display(void) {
   ESP_ERROR_CHECK(esp_timer_create(&lvgl_tick_timer_args, &lvgl_tick_timer));
   ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_tick_timer, EXAMPLE_LVGL_TICK_PERIOD_MS * 1000));
 
-#if CONFIG_EXAMPLE_LCD_TOUCH_ENABLED
+#if TOUCH_ENABLED
   static lv_indev_drv_t indev_drv; // Input device driver (Touch)
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
