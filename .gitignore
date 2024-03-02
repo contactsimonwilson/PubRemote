@@ -7,3 +7,4 @@ backup/
 cache/
 autosave/
 managed_components/
+.DS_Store

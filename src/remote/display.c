@@ -10,8 +10,10 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "lvgl.h"
+#include "ui/ui.h"
 #include <stdio.h>
 // https://github.com/espressif/esp-idf/blob/master/examples/peripherals/lcd/spi_lcd_touch/main/spi_lcd_touch_example_main.c
+// https://github.com/espressif/esp-bsp/tree/master/components/lcd/esp_lcd_gc9a01
 
 #if USE_GC9A01
   #include "esp_lcd_gc9a01.h"
@@ -41,8 +43,8 @@
 #define EXAMPLE_PIN_NUM_BK_LIGHT 2
 #define EXAMPLE_PIN_NUM_TOUCH_CS 15
 
-#if USE_GC9A01
-  #define TOUCH_ENABLED 1
+#if USE_CST816S
+  #define TOUCH_ENABLED 0
 #else
   #define TOUCH_ENABLED 0
 #endif
@@ -170,7 +172,7 @@ void example_lvgl_unlock(void) {
 }
 
 static void example_lvgl_port_task(void *arg) {
-  ESP_LOGI(TAG, "Starting LVGL task");
+  ESP_LOGI(DISPLAY_TAG, "Starting LVGL task");
   uint32_t task_delay_ms = EXAMPLE_LVGL_TASK_MAX_DELAY_MS;
   while (1) {
     // Lock the mutex due to the LVGL APIs are not thread-safe
@@ -193,11 +195,11 @@ void init_display(void) {
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // contains callback functions
 
-  ESP_LOGI(TAG, "Turn off LCD backlight");
+  ESP_LOGI(DISPLAY_TAG, "Turn off LCD backlight");
   gpio_config_t bk_gpio_config = {.mode = GPIO_MODE_OUTPUT, .pin_bit_mask = 1ULL << EXAMPLE_PIN_NUM_BK_LIGHT};
   ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
 
-  ESP_LOGI(TAG, "Initialize SPI bus");
+  ESP_LOGI(DISPLAY_TAG, "Initialize SPI bus");
   spi_bus_config_t buscfg = {
       .sclk_io_num = TFT_CLK,
       .mosi_io_num = TFT_MOSI,
@@ -208,7 +210,7 @@ void init_display(void) {
   };
   ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
-  ESP_LOGI(TAG, "Install panel IO");
+  ESP_LOGI(DISPLAY_TAG, "Install panel IO");
   esp_lcd_panel_io_handle_t io_handle = NULL;
   esp_lcd_panel_io_spi_config_t io_config = {
       .dc_gpio_num = TFT_DC,
@@ -226,20 +228,20 @@ void init_display(void) {
 
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_panel_dev_config_t panel_config = {
-      .reset_gpio_num = EXAMPLE_PIN_NUM_LCD_RST,
-      .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
+      .reset_gpio_num = TFT_RST,
+      .rgb_endian = LCD_RGB_ENDIAN_BGR,
       .bits_per_pixel = 16,
   };
 
-#if CONFIG_EXAMPLE_LCD_CONTROLLER_GC9A01
-  ESP_LOGI(TAG, "Install GC9A01 panel driver");
+#if USE_GC9A01
+  ESP_LOGI(DISPLAY_TAG, "Install GC9A01 panel driver");
   ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(io_handle, &panel_config, &panel_handle));
 #endif
 
   ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
   ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
 
-#if CONFIG_EXAMPLE_LCD_CONTROLLER_GC9A01
+#if USE_GC9A01
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, true));
 #endif
   ESP_ERROR_CHECK(esp_lcd_panel_mirror(panel_handle, true, false));
@@ -249,7 +251,7 @@ void init_display(void) {
 
 #if TOUCH_ENABLED
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
-  esp_lcd_panel_io_spi_config_t tp_io_config = ESP_LCD_TOUCH_IO_SPI_STMPE610_CONFIG(EXAMPLE_PIN_NUM_TOUCH_CS);
+  esp_lcd_panel_io_spi_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_CST816S_CONFIG(EXAMPLE_PIN_NUM_TOUCH_CS);
   // Attach the TOUCH to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &tp_io_config, &tp_io_handle));
 
@@ -267,15 +269,15 @@ void init_display(void) {
   };
 
   #if USE_CST816S
-  ESP_LOGI(TAG, "Initialize touch controller CST816S");
-  ESP_ERROR_CHECK(esp_lcd_touch_new_spi_stmpe610(tp_io_handle, &tp_cfg, &tp));
+  ESP_LOGI(DISPLAY_TAG, "Initialize touch controller CST816S");
+  ESP_ERROR_CHECK(esp_lcd_touch_new_spi_cst816s(tp_io_handle, &tp_cfg, &tp));
   #endif
 #endif // TOUCH_ENABLED
 
-  ESP_LOGI(TAG, "Turn on LCD backlight");
+  ESP_LOGI(DISPLAY_TAG, "Turn on LCD backlight");
   gpio_set_level(TFT_BL, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
 
-  ESP_LOGI(TAG, "Initialize LVGL library");
+  ESP_LOGI(DISPLAY_TAG, "Initialize LVGL library");
   lv_init();
   // alloc draw buffers used by LVGL
   // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
@@ -286,7 +288,7 @@ void init_display(void) {
   // initialize LVGL draw buffers
   lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LV_HOR_RES * 20);
 
-  ESP_LOGI(TAG, "Register display driver to LVGL");
+  ESP_LOGI(DISPLAY_TAG, "Register display driver to LVGL");
   lv_disp_drv_init(&disp_drv);
   disp_drv.hor_res = LV_HOR_RES;
   disp_drv.ver_res = LV_VER_RES;
@@ -296,7 +298,7 @@ void init_display(void) {
   disp_drv.user_data = panel_handle;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
-  ESP_LOGI(TAG, "Install LVGL tick timer");
+  ESP_LOGI(DISPLAY_TAG, "Install LVGL tick timer");
   // Tick interface for LVGL (using esp_timer to generate 2ms periodic event)
   const esp_timer_create_args_t lvgl_tick_timer_args = {.callback = &example_increase_lvgl_tick, .name = "lvgl_tick"};
   esp_timer_handle_t lvgl_tick_timer = NULL;
@@ -316,14 +318,14 @@ void init_display(void) {
 
   lvgl_mux = xSemaphoreCreateRecursiveMutex();
   assert(lvgl_mux);
-  ESP_LOGI(TAG, "Create LVGL task");
+  ESP_LOGI(DISPLAY_TAG, "Create LVGL task");
   xTaskCreate(example_lvgl_port_task, "LVGL", EXAMPLE_LVGL_TASK_STACK_SIZE, NULL, EXAMPLE_LVGL_TASK_PRIORITY, NULL);
 
-  ESP_LOGI(TAG, "Display LVGL Meter Widget");
+  ESP_LOGI(DISPLAY_TAG, "Display UI");
   // Lock the mutex due to the LVGL APIs are not thread-safe
   if (example_lvgl_lock(-1)) {
-    example_lvgl_demo_ui(disp);
-    // Release the mutex
+    ui_init();
+    //   Release the mutex
     example_lvgl_unlock();
   }
 }
