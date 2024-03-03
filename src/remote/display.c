@@ -295,9 +295,6 @@ void init_display(void) {
   #endif
 #endif // TOUCH_ENABLED
 
-  ESP_LOGI(DISPLAY_TAG, "Turn on LCD backlight");
-  gpio_set_level(TFT_BL, BACKLIGHT_ON_LEVEL);
-
   ESP_LOGI(DISPLAY_TAG, "Initialize LVGL library");
   lv_init();
   // alloc draw buffers used by LVGL
@@ -352,5 +349,9 @@ void init_display(void) {
     ui_init();
     //   Release the mutex
     LVGL_unlock();
+
+    vTaskDelay(pdMS_TO_TICKS(200));
+    ESP_LOGI(DISPLAY_TAG, "Turn on LCD backlight");
+    gpio_set_level(TFT_BL, BACKLIGHT_ON_LEVEL);
   }
 }

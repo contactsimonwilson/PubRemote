@@ -15,6 +15,11 @@ extern "C" {
 #include "ui_helpers.h"
 #include "ui_events.h"
 
+// SCREEN: ui_SplashScreen
+void ui_SplashScreen_screen_init(void);
+void ui_event_SplashScreen(lv_event_t * e);
+extern lv_obj_t * ui_SplashScreen;
+extern lv_obj_t * ui_Image1;
 // SCREEN: ui_StatsScreen
 void ui_StatsScreen_screen_init(void);
 extern lv_obj_t * ui_StatsScreen;

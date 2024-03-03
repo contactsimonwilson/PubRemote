@@ -9,6 +9,13 @@
 ///////////////////// VARIABLES ////////////////////
 
 
+// SCREEN: ui_SplashScreen
+void ui_SplashScreen_screen_init(void);
+void ui_event_SplashScreen(lv_event_t * e);
+lv_obj_t * ui_SplashScreen;
+lv_obj_t * ui_Image1;
+
+
 // SCREEN: ui_StatsScreen
 void ui_StatsScreen_screen_init(void);
 lv_obj_t * ui_StatsScreen;
@@ -42,6 +49,14 @@ lv_obj_t * ui____initial_actions0;
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
+void ui_event_SplashScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 500, 1000, &ui_StatsScreen_screen_init);
+    }
+}
 void ui_event_BatteryDisplay(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -59,7 +74,8 @@ void ui_init(void)
     lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                                true, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
+    ui_SplashScreen_screen_init();
     ui_StatsScreen_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
-    lv_disp_load_scr(ui_StatsScreen);
+    lv_disp_load_scr(ui_SplashScreen);
 }

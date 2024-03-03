@@ -1,4 +1,5 @@
-SET(SOURCES ui_StatsScreen.c
+SET(SOURCES ui_SplashScreen.c
+    ui_StatsScreen.c
     ui.c
     ui_comp_hook.c
     ui_helpers.c
