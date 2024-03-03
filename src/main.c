@@ -80,7 +80,7 @@ void app_main(void) {
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
 
   ESP_LOGI(TAG, "Registered RX callback. Creating tasks");
-  xTaskCreate(send_data_task, "send_data_task", 2048, NULL, 2, NULL);
+  xTaskCreate(transmitter_task, "transmitter_task", 2048, NULL, 2, NULL);
 
   // Remote inputs init
   register_button_isr();

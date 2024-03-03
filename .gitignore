@@ -8,3 +8,4 @@ cache/
 autosave/
 managed_components/
 .DS_Store
+sdkconfig.*.old

@@ -12,7 +12,7 @@
 #define TRANSMITTER_TAG "PUBMOTE_TRANSMITTER"
 
 // Function to send ESP-NOW data
-void send_data_task(void *pvParameters) {
+void transmitter_task(void *pvParameters) {
   ESP_LOGI(TRANSMITTER_TAG, "TX task started");
   u_int8_t my_data[20] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}; // Example data
 #define TEST_TIME 50000

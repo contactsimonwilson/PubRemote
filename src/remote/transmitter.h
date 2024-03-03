@@ -20,7 +20,7 @@ typedef struct {
   uint16_t *results;
 } LatencyTestResults;
 
-void send_data_task(void *pvParameters);
+void transmitter_task(void *pvParameters);
 
 void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status);
 #endif
