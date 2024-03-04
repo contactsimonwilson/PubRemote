@@ -19,9 +19,10 @@ void transmitter_task(void *pvParameters) {
   static LatencyTestResults results;
   results.size = 0;
   results.results = malloc(TEST_TIME / TRANSMIT_TIME * sizeof(uint16_t));
+  int64_t newTime = get_current_time_ms();
 
   for (int i = 0; i < TEST_TIME; i += TRANSMIT_TIME) {
-    int64_t newTime = get_current_time_ms();
+    newTime = get_current_time_ms();
 
 // Check if the last command was sent less than 1000ms ago
 #define COMMAND_TIMEOUT 1000
@@ -30,7 +31,7 @@ void transmitter_task(void *pvParameters) {
       continue;
     }
 
-    esp_err_t result = esp_now_send(PEER_MAC_ADDRESS, (uint8_t *)&my_data, sizeof(my_data));
+    esp_err_t result = esp_now_send(&PEER_MAC_ADDRESS, (uint8_t *)&my_data, sizeof(my_data));
 
     if (result != ESP_OK) {
       // Handle error if needed

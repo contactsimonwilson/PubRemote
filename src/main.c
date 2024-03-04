@@ -80,12 +80,12 @@ void app_main(void) {
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
 
   ESP_LOGI(TAG, "Registered RX callback. Creating tasks");
-  xTaskCreate(transmitter_task, "transmitter_task", 2048, NULL, 2, NULL);
+  xTaskCreate(transmitter_task, "transmitter_task", 4096, NULL, 2, NULL);
 
   // Remote inputs init
   register_button_isr();
-  xTaskCreate(button_task, "button_task", 2048, NULL, 4, &buttonTaskHandle);
-  xTaskCreate(throttle_task, "throttle_task", 2048, NULL, 3, NULL);
+  xTaskCreate(button_task, "button_task", 4096, NULL, 4, &buttonTaskHandle);
+  xTaskCreate(throttle_task, "throttle_task", 4096, NULL, 3, NULL);
 
   // // Testing
   // touch_pad_config(TOUCH_PAD_NUM0, 500);

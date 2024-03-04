@@ -17,6 +17,9 @@
 
 uint8_t THROTTLE_VALUE = 128;
 
+// TODO - Use button component?
+// https://docs.espressif.com/projects/esp-iot-solution/en/latest/input_device/button.html
+
 // Global for Task Handle
 TaskHandle_t buttonTaskHandle = NULL;
 

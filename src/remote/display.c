@@ -1,5 +1,6 @@
 #include "driver/gpio.h"
 #include "driver/i2c.h"
+#include "driver/ledc.h"
 #include "driver/spi_master.h"
 #include "esp_err.h"
 #include "esp_lcd_panel_io.h"
@@ -10,6 +11,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
+#include "hal/ledc_types.h"
 #include "lvgl.h"
 #include "ui/ui.h"
 #include <stdio.h>
@@ -27,18 +29,15 @@
   #include "esp_lcd_touch_cst816s.h"
 #endif
 
+#ifndef DISP_BL_PWM
+  #define DISP_BL_PWM 0
+#endif
+
 #define DISPLAY_TAG "PUBMOTE_DISPLAY"
 
-// Using SPI2 in the example
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////// Please update the following configuration according to your LCD spec //////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
-#define BACKLIGHT_ON_LEVEL TFT_BL_HIGH_LEVEL
-#define BACKLIGHT_OFF_LEVEL !BACKLIGHT_ON_LEVEL
 
 #if USE_CST816S
   #define TOUCH_ENABLED 1
@@ -50,6 +49,7 @@
 #define LCD_CMD_BITS 8
 #define LCD_PARAM_BITS 8
 
+// LVGL
 #define LVGL_TICK_PERIOD_MS 2
 #define LVGL_TASK_MAX_DELAY_MS 500
 #define LVGL_TASK_MIN_DELAY_MS 1
@@ -186,19 +186,53 @@ static void LVGL_port_task(void *arg) {
   }
 }
 
+static void set_bl_level(u_int8_t level) {
+#if DISP_BL_PWM
+  ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, level);
+  ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+#else
+  gpio_set_level(DISP_BL, level > 0 ? 1 : 0);
+#endif
+}
+
+static void init_backlight(void) {
+#if DISP_BL_PWM
+  ESP_LOGI(DISPLAY_TAG, "Configure LCD backlight");
+  // Configure PWM channel
+  ledc_timer_config_t timer_config = {
+      .speed_mode = LEDC_LOW_SPEED_MODE,
+      .timer_num = LEDC_TIMER_0,
+      .duty_resolution = LEDC_TIMER_8_BIT, // Resolution up to 256
+      .freq_hz = 1000,                     // 1 kHz frequency
+  };
+  ledc_timer_config(&timer_config);
+
+  ledc_channel_config_t channel_config = {
+      .gpio_num = DISP_BL,
+      .speed_mode = LEDC_LOW_SPEED_MODE,
+      .channel = LEDC_CHANNEL_0,
+      .timer_sel = LEDC_TIMER_0,
+  };
+  ledc_channel_config(&channel_config);
+#else
+  gpio_config_t bk_gpio_config = {.mode = GPIO_MODE_OUTPUT, .pin_bit_mask = 1ULL << DISP_BL};
+  ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
+#endif
+}
+
 void init_display(void) {
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // contains callback functions
 
   ESP_LOGI(DISPLAY_TAG, "Turn off LCD backlight");
-  gpio_config_t bk_gpio_config = {.mode = GPIO_MODE_OUTPUT, .pin_bit_mask = 1ULL << TFT_BL};
-  ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
+  init_backlight();
+  set_bl_level(0);
 
   ESP_LOGI(DISPLAY_TAG, "Initialize SPI bus");
   spi_bus_config_t buscfg = {
-      .sclk_io_num = TFT_CLK,
-      .mosi_io_num = TFT_MOSI,
-      .miso_io_num = TFT_MISO,
+      .sclk_io_num = DISP_CLK,
+      .mosi_io_num = DISP_MOSI,
+      .miso_io_num = DISP_MISO,
       .quadwp_io_num = -1,
       .quadhd_io_num = -1,
       .max_transfer_sz = LV_HOR_RES * 80 * sizeof(uint16_t),
@@ -208,8 +242,8 @@ void init_display(void) {
   ESP_LOGI(DISPLAY_TAG, "Install panel IO");
   esp_lcd_panel_io_handle_t io_handle = NULL;
   esp_lcd_panel_io_spi_config_t io_config = {
-      .dc_gpio_num = TFT_DC,
-      .cs_gpio_num = TFT_CS,
+      .dc_gpio_num = DISP_DC,
+      .cs_gpio_num = DISP_CS,
       .pclk_hz = LCD_PIXEL_CLOCK_HZ,
       .lcd_cmd_bits = LCD_CMD_BITS,
       .lcd_param_bits = LCD_PARAM_BITS,
@@ -223,7 +257,7 @@ void init_display(void) {
 
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_panel_dev_config_t panel_config = {
-      .reset_gpio_num = TFT_RST,
+      .reset_gpio_num = DISP_RST,
       .rgb_endian = LCD_RGB_ENDIAN_BGR,
       .bits_per_pixel = 16,
   };
@@ -316,8 +350,8 @@ void init_display(void) {
   disp_drv.user_data = panel_handle;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
-#ifdef TFT_ROTATE
-  lv_disp_set_rotation(disp, TFT_ROTATE);
+#ifdef DISP_ROTATE
+  lv_disp_set_rotation(disp, DISP_ROTATE);
 #endif
 
   ESP_LOGI(DISPLAY_TAG, "Install LVGL tick timer");
@@ -347,11 +381,11 @@ void init_display(void) {
   // Lock the mutex due to the LVGL APIs are not thread-safe
   if (LVGL_lock(-1)) {
     ui_init();
-    //   Release the mutex
+    // Release the mutex
     LVGL_unlock();
 
+    // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));
-    ESP_LOGI(DISPLAY_TAG, "Turn on LCD backlight");
-    gpio_set_level(TFT_BL, BACKLIGHT_ON_LEVEL);
+    set_bl_level(128);
   }
 }
