@@ -9,11 +9,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define TRANSMITTER_TAG "PUBMOTE_TRANSMITTER"
+static const char *TAG = "PUBMOTE-TRANSMITTER";
 
 // Function to send ESP-NOW data
-void transmitter_task(void *pvParameters) {
-  ESP_LOGI(TRANSMITTER_TAG, "TX task started");
+static void transmitter_task(void *pvParameters) {
+  ESP_LOGI(TAG, "TX task started");
   u_int8_t my_data[20] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}; // Example data
 #define TEST_TIME 50000
   static LatencyTestResults results;
@@ -35,19 +35,25 @@ void transmitter_task(void *pvParameters) {
 
     if (result != ESP_OK) {
       // Handle error if needed
-      ESP_LOGE(TRANSMITTER_TAG, "Error sending data: %d", result);
+      ESP_LOGE(TAG, "Error sending data: %d", result);
     }
 
     LAST_COMMAND_TIME = newTime;
-    ESP_LOGI(TRANSMITTER_TAG, "Sent command");
+    ESP_LOGI(TAG, "Sent command");
     vTaskDelay(TRANSMIT_FREQUENCY);
   }
 
-  ESP_LOGI(TRANSMITTER_TAG, "TX task ended");
+  ESP_LOGI(TAG, "TX task ended");
   // terminate self
   vTaskDelete(NULL);
 }
 
-void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  ESP_LOGI(TRANSMITTER_TAG, "SENT");
+static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  ESP_LOGI(TAG, "SENT");
+}
+
+void init_transmitter() {
+  ESP_LOGI(TAG, "Registered RX callback. Creating tasks");
+  ESP_ERROR_CHECK(esp_now_register_send_cb(on_data_sent));
+  xTaskCreate(transmitter_task, "transmitter_task", 4096, NULL, 2, NULL);
 }

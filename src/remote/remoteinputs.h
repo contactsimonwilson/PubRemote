@@ -5,19 +5,7 @@
 #include <freertos/task.h>
 #include <stdio.h>
 
-typedef enum {
-  BUTTON_NONE,
-  BUTTON_CLICK,
-  BUTTON_DOUBLE_CLICK,
-  BUTTON_LONG_PRESS,
-} ButtonState;
-
-extern u_int8_t THROTTLE_VALUE;
-extern ButtonState BUTTON_STATE;
-extern TaskHandle_t buttonTaskHandle;
-
-void throttle_task(void *pvParameters);
-void button_task(void *pvParameters);
-void register_button_isr();
+void init_throttle();
+void init_buttons();
 
 #endif

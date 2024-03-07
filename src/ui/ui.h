@@ -19,27 +19,50 @@ extern "C" {
 void ui_SplashScreen_screen_init(void);
 void ui_event_SplashScreen(lv_event_t * e);
 extern lv_obj_t * ui_SplashScreen;
-extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_SplashScreenLogo;
 // SCREEN: ui_StatsScreen
 void ui_StatsScreen_screen_init(void);
 extern lv_obj_t * ui_StatsScreen;
 extern lv_obj_t * ui_DutyCycle;
 extern lv_obj_t * ui_LeftSensor;
 extern lv_obj_t * ui_RightSensor;
-extern lv_obj_t * ui_Content;
-extern lv_obj_t * ui_Head;
+extern lv_obj_t * ui_StatsScreenContent;
+extern lv_obj_t * ui_StatsScreenHeader;
 extern lv_obj_t * ui_Logo;
 extern lv_obj_t * ui_Time;
-extern lv_obj_t * ui_Body;
+extern lv_obj_t * ui_StatsScreenBody;
 extern lv_obj_t * ui_PrimaryStat;
 extern lv_obj_t * ui_PrimaryStatUnit;
 extern lv_obj_t * ui_SecondaryStats;
 extern lv_obj_t * ui_ConnectionState;
 extern lv_obj_t * ui_DistanceStats;
 extern lv_obj_t * ui_TempStats;
-extern lv_obj_t * ui_Footer;
+extern lv_obj_t * ui_StatsScreenFooter;
 void ui_event_BatteryDisplay(lv_event_t * e);
 extern lv_obj_t * ui_BatteryDisplay;
+// SCREEN: ui_PairingScreen
+void ui_PairingScreen_screen_init(void);
+extern lv_obj_t * ui_PairingScreen;
+extern lv_obj_t * ui_PairingScreenContent;
+extern lv_obj_t * ui_PairingScreenHeader;
+extern lv_obj_t * ui_PairingScreenBody;
+extern lv_obj_t * ui_Label2;
+extern lv_obj_t * ui_Label1;
+extern lv_obj_t * ui_PairingScreenFooter;
+void ui_event_PairingScreenMainActionButton(lv_event_t * e);
+extern lv_obj_t * ui_PairingScreenMainActionButton;
+extern lv_obj_t * ui_PairingScreenMainActionButtonLabel;
+// SCREEN: ui_CalibrationScreen
+void ui_CalibrationScreen_screen_init(void);
+extern lv_obj_t * ui_CalibrationScreen;
+extern lv_obj_t * ui_CalibrationScreenContent;
+extern lv_obj_t * ui_CalibrationScreenheader;
+extern lv_obj_t * ui_CalibrationScreenBody;
+extern lv_obj_t * ui_Label4;
+extern lv_obj_t * ui_CalibrationScreenFooter;
+void ui_event_CalibrationScreenMainActionButton(lv_event_t * e);
+extern lv_obj_t * ui_CalibrationScreenMainActionButton;
+extern lv_obj_t * ui_CalibrationScreenMainActionButtonLabel;
 extern lv_obj_t * ui____initial_actions0;
 
 

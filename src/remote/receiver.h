@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-#define RECEIVER_TAG "PUBMOTE_RECEIVER"
+void init_receiver();
 
-void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len);
 #endif

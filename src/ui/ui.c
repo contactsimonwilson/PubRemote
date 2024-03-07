@@ -13,7 +13,7 @@
 void ui_SplashScreen_screen_init(void);
 void ui_event_SplashScreen(lv_event_t * e);
 lv_obj_t * ui_SplashScreen;
-lv_obj_t * ui_Image1;
+lv_obj_t * ui_SplashScreenLogo;
 
 
 // SCREEN: ui_StatsScreen
@@ -22,20 +22,47 @@ lv_obj_t * ui_StatsScreen;
 lv_obj_t * ui_DutyCycle;
 lv_obj_t * ui_LeftSensor;
 lv_obj_t * ui_RightSensor;
-lv_obj_t * ui_Content;
-lv_obj_t * ui_Head;
+lv_obj_t * ui_StatsScreenContent;
+lv_obj_t * ui_StatsScreenHeader;
 lv_obj_t * ui_Logo;
 lv_obj_t * ui_Time;
-lv_obj_t * ui_Body;
+lv_obj_t * ui_StatsScreenBody;
 lv_obj_t * ui_PrimaryStat;
 lv_obj_t * ui_PrimaryStatUnit;
 lv_obj_t * ui_SecondaryStats;
 lv_obj_t * ui_ConnectionState;
 lv_obj_t * ui_DistanceStats;
 lv_obj_t * ui_TempStats;
-lv_obj_t * ui_Footer;
+lv_obj_t * ui_StatsScreenFooter;
 void ui_event_BatteryDisplay(lv_event_t * e);
 lv_obj_t * ui_BatteryDisplay;
+
+
+// SCREEN: ui_PairingScreen
+void ui_PairingScreen_screen_init(void);
+lv_obj_t * ui_PairingScreen;
+lv_obj_t * ui_PairingScreenContent;
+lv_obj_t * ui_PairingScreenHeader;
+lv_obj_t * ui_PairingScreenBody;
+lv_obj_t * ui_Label2;
+lv_obj_t * ui_Label1;
+lv_obj_t * ui_PairingScreenFooter;
+void ui_event_PairingScreenMainActionButton(lv_event_t * e);
+lv_obj_t * ui_PairingScreenMainActionButton;
+lv_obj_t * ui_PairingScreenMainActionButtonLabel;
+
+
+// SCREEN: ui_CalibrationScreen
+void ui_CalibrationScreen_screen_init(void);
+lv_obj_t * ui_CalibrationScreen;
+lv_obj_t * ui_CalibrationScreenContent;
+lv_obj_t * ui_CalibrationScreenheader;
+lv_obj_t * ui_CalibrationScreenBody;
+lv_obj_t * ui_Label4;
+lv_obj_t * ui_CalibrationScreenFooter;
+void ui_event_CalibrationScreenMainActionButton(lv_event_t * e);
+lv_obj_t * ui_CalibrationScreenMainActionButton;
+lv_obj_t * ui_CalibrationScreenMainActionButtonLabel;
 lv_obj_t * ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -65,6 +92,23 @@ void ui_event_BatteryDisplay(lv_event_t * e)
         toggleFooterDisplayMode(e);
     }
 }
+void ui_event_PairingScreenMainActionButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_StatsScreen_screen_init);
+    }
+}
+void ui_event_CalibrationScreenMainActionButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        CompleteCalibration(e);
+        _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_StatsScreen_screen_init);
+    }
+}
 
 ///////////////////// SCREENS ////////////////////
 
@@ -76,6 +120,8 @@ void ui_init(void)
     lv_disp_set_theme(dispp, theme);
     ui_SplashScreen_screen_init();
     ui_StatsScreen_screen_init();
+    ui_PairingScreen_screen_init();
+    ui_CalibrationScreen_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_SplashScreen);
 }

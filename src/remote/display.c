@@ -33,7 +33,7 @@
   #define DISP_BL_PWM 0
 #endif
 
-#define DISPLAY_TAG "PUBMOTE_DISPLAY"
+static const char *TAG = "PUBMOTE_DISPLAY";
 
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
@@ -167,7 +167,7 @@ void LVGL_unlock(void) {
 }
 
 static void LVGL_port_task(void *arg) {
-  ESP_LOGI(DISPLAY_TAG, "Starting LVGL task");
+  ESP_LOGI(TAG, "Starting LVGL task");
   uint32_t task_delay_ms = LVGL_TASK_MAX_DELAY_MS;
   while (1) {
     // Lock the mutex due to the LVGL APIs are not thread-safe
@@ -186,7 +186,7 @@ static void LVGL_port_task(void *arg) {
   }
 }
 
-static void set_bl_level(u_int8_t level) {
+void set_bl_level(u_int8_t level) {
 #if DISP_BL_PWM
   ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, level);
   ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
@@ -197,7 +197,7 @@ static void set_bl_level(u_int8_t level) {
 
 static void init_backlight(void) {
 #if DISP_BL_PWM
-  ESP_LOGI(DISPLAY_TAG, "Configure LCD backlight");
+  ESP_LOGI(TAG, "Configure LCD backlight");
   // Configure PWM channel
   ledc_timer_config_t timer_config = {
       .speed_mode = LEDC_LOW_SPEED_MODE,
@@ -224,11 +224,11 @@ void init_display(void) {
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // contains callback functions
 
-  ESP_LOGI(DISPLAY_TAG, "Turn off LCD backlight");
+  ESP_LOGI(TAG, "Turn off LCD backlight");
   init_backlight();
   set_bl_level(0);
 
-  ESP_LOGI(DISPLAY_TAG, "Initialize SPI bus");
+  ESP_LOGI(TAG, "Initialize SPI bus");
   spi_bus_config_t buscfg = {
       .sclk_io_num = DISP_CLK,
       .mosi_io_num = DISP_MOSI,
@@ -239,7 +239,7 @@ void init_display(void) {
   };
   ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
-  ESP_LOGI(DISPLAY_TAG, "Install panel IO");
+  ESP_LOGI(TAG, "Install panel IO");
   esp_lcd_panel_io_handle_t io_handle = NULL;
   esp_lcd_panel_io_spi_config_t io_config = {
       .dc_gpio_num = DISP_DC,
@@ -263,7 +263,7 @@ void init_display(void) {
   };
 
 #if USE_GC9A01
-  ESP_LOGI(DISPLAY_TAG, "Install GC9A01 panel driver");
+  ESP_LOGI(TAG, "Install GC9A01 panel driver");
   ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(io_handle, &panel_config, &panel_handle));
 #endif
 
@@ -290,7 +290,7 @@ void init_display(void) {
       .scl_pullup_en = GPIO_PULLUP_ENABLE,
       .master.clk_speed = 400000,
   };
-  ESP_LOGI(DISPLAY_TAG, "Initializing I2C for display touch");
+  ESP_LOGI(TAG, "Initializing I2C for display touch");
   /* Initialize I2C */
   ESP_ERROR_CHECK(i2c_param_config(TP_I2C_NUM, &i2c_conf));
   ESP_ERROR_CHECK(i2c_driver_install(TP_I2C_NUM, i2c_conf.mode, 0, 0, 0));
@@ -324,12 +324,12 @@ void init_display(void) {
           },
   };
 
-  ESP_LOGI(DISPLAY_TAG, "Initialize touch controller CST816S");
+  ESP_LOGI(TAG, "Initialize touch controller CST816S");
   ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_cst816s(tp_io_handle, &tp_cfg, &tp));
   #endif
 #endif // TOUCH_ENABLED
 
-  ESP_LOGI(DISPLAY_TAG, "Initialize LVGL library");
+  ESP_LOGI(TAG, "Initialize LVGL library");
   lv_init();
   // alloc draw buffers used by LVGL
   // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
@@ -340,7 +340,7 @@ void init_display(void) {
   // initialize LVGL draw buffers
   lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LV_HOR_RES * 20);
 
-  ESP_LOGI(DISPLAY_TAG, "Register display driver to LVGL");
+  ESP_LOGI(TAG, "Register display driver to LVGL");
   lv_disp_drv_init(&disp_drv);
   disp_drv.hor_res = LV_HOR_RES;
   disp_drv.ver_res = LV_VER_RES;
@@ -354,7 +354,7 @@ void init_display(void) {
   lv_disp_set_rotation(disp, DISP_ROTATE);
 #endif
 
-  ESP_LOGI(DISPLAY_TAG, "Install LVGL tick timer");
+  ESP_LOGI(TAG, "Install LVGL tick timer");
   // Tick interface for LVGL (using esp_timer to generate 2ms periodic event)
   const esp_timer_create_args_t lvgl_tick_timer_args = {.callback = &increase_lvgl_tick, .name = "lvgl_tick"};
   esp_timer_handle_t lvgl_tick_timer = NULL;
@@ -374,10 +374,10 @@ void init_display(void) {
 
   lvgl_mux = xSemaphoreCreateRecursiveMutex();
   assert(lvgl_mux);
-  ESP_LOGI(DISPLAY_TAG, "Create LVGL task");
+  ESP_LOGI(TAG, "Create LVGL task");
   xTaskCreate(LVGL_port_task, "LVGL", LVGL_TASK_STACK_SIZE, NULL, LVGL_TASK_PRIORITY, NULL);
 
-  ESP_LOGI(DISPLAY_TAG, "Display UI");
+  ESP_LOGI(TAG, "Display UI");
   // Lock the mutex due to the LVGL APIs are not thread-safe
   if (LVGL_lock(-1)) {
     ui_init();

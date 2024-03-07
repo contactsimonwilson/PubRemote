@@ -3,4 +3,5 @@
 void display_task(void *pvParameters);
 
 void init_display();
+void set_bl_level(u_int8_t level);
 #endif
