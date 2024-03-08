@@ -15,10 +15,11 @@ static const char *TAG = "PUBMOTE-REMOTEINPUTS";
 #define BUTTON_PIN GPIO_NUM_0
 
 uint8_t THROTTLE_VALUE = 128;
+RemoteDataUnion remote_data;
 
 void throttle_task(void *pvParameters) {
   // TODO - IMPLEMENT ADC CONTINUOUS READING
-
+  remote_data.data.js_y = 0.69f;
   ESP_LOGI(TAG, "Throttle task ended");
   // terminate self
   vTaskDelete(NULL);

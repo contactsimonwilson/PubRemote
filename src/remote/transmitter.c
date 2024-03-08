@@ -5,6 +5,7 @@
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "peers.h"
+#include "remoteinputs.h"
 #include "time.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -31,7 +32,7 @@ static void transmitter_task(void *pvParameters) {
       continue;
     }
 
-    esp_err_t result = esp_now_send(&PEER_MAC_ADDRESS, (uint8_t *)&my_data, sizeof(my_data));
+    esp_err_t result = esp_now_send(&PEER_MAC_ADDRESS, (uint8_t *)&remote_data.bytes, sizeof(remote_data.bytes));
 
     if (result != ESP_OK) {
       // Handle error if needed
