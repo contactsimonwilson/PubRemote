@@ -21,20 +21,6 @@ typedef union {
   uint8_t bytes[sizeof(remote_data_t)];
 } RemoteDataUnion;
 
-typedef enum {
-  BUTTON_NONE,
-  BUTTON_CLICK,
-  BUTTON_DOUBLE_CLICK,
-  BUTTON_LONG_PRESS,
-} ButtonState;
-
-extern u_int8_t THROTTLE_VALUE;
-extern ButtonState BUTTON_STATE;
-extern TaskHandle_t buttonTaskHandle;
 extern RemoteDataUnion remote_data;
-
-void throttle_task(void *pvParameters);
-void button_task(void *pvParameters);
-void register_button_isr();
 
 #endif
