@@ -1,5 +1,6 @@
 #ifndef __TRANSMITTER_H
 #define __TRANSMITTER_H
+#include <stdint.h>
 #include <stdio.h>
 
 #include "esp_now.h"
