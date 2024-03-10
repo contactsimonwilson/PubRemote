@@ -2,6 +2,7 @@ SET(SOURCES ui_SplashScreen.c
     ui_StatsScreen.c
     ui_PairingScreen.c
     ui_CalibrationScreen.c
+    ui_SettingsScreen.c
     ui.c
     ui_comp_hook.c
     ui_helpers.c

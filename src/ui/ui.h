@@ -63,6 +63,18 @@ extern lv_obj_t * ui_CalibrationScreenFooter;
 void ui_event_CalibrationScreenMainActionButton(lv_event_t * e);
 extern lv_obj_t * ui_CalibrationScreenMainActionButton;
 extern lv_obj_t * ui_CalibrationScreenMainActionButtonLabel;
+// SCREEN: ui_SettingsScreen
+void ui_SettingsScreen_screen_init(void);
+extern lv_obj_t * ui_SettingsScreen;
+extern lv_obj_t * ui_SettingsScreenContent;
+extern lv_obj_t * ui_SettingsScreenHeader;
+extern lv_obj_t * ui_SettingsScreenBody;
+extern lv_obj_t * ui_BrightnessLabel;
+extern lv_obj_t * ui_BrightnessSlider;
+extern lv_obj_t * ui_SettingsScreenFooter;
+void ui_event_SettingsScreenMainActionButton(lv_event_t * e);
+extern lv_obj_t * ui_SettingsScreenMainActionButton;
+extern lv_obj_t * ui_SettingsScreenMainActionButtonLabel;
 extern lv_obj_t * ui____initial_actions0;
 
 

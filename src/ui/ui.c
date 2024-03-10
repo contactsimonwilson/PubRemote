@@ -63,6 +63,20 @@ lv_obj_t * ui_CalibrationScreenFooter;
 void ui_event_CalibrationScreenMainActionButton(lv_event_t * e);
 lv_obj_t * ui_CalibrationScreenMainActionButton;
 lv_obj_t * ui_CalibrationScreenMainActionButtonLabel;
+
+
+// SCREEN: ui_SettingsScreen
+void ui_SettingsScreen_screen_init(void);
+lv_obj_t * ui_SettingsScreen;
+lv_obj_t * ui_SettingsScreenContent;
+lv_obj_t * ui_SettingsScreenHeader;
+lv_obj_t * ui_SettingsScreenBody;
+lv_obj_t * ui_BrightnessLabel;
+lv_obj_t * ui_BrightnessSlider;
+lv_obj_t * ui_SettingsScreenFooter;
+void ui_event_SettingsScreenMainActionButton(lv_event_t * e);
+lv_obj_t * ui_SettingsScreenMainActionButton;
+lv_obj_t * ui_SettingsScreenMainActionButtonLabel;
 lv_obj_t * ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -109,6 +123,14 @@ void ui_event_CalibrationScreenMainActionButton(lv_event_t * e)
         _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_StatsScreen_screen_init);
     }
 }
+void ui_event_SettingsScreenMainActionButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_StatsScreen_screen_init);
+    }
+}
 
 ///////////////////// SCREENS ////////////////////
 
@@ -122,6 +144,7 @@ void ui_init(void)
     ui_StatsScreen_screen_init();
     ui_PairingScreen_screen_init();
     ui_CalibrationScreen_screen_init();
+    ui_SettingsScreen_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_SplashScreen);
 }
