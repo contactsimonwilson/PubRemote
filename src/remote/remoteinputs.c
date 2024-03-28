@@ -3,12 +3,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "iot_button.h"
+#include "remote/router.h"
 #include "rom/gpio.h"
 #include "time.h"
 #include <driver/adc.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
+#include <ui/ui.h>
 
 static const char *TAG = "PUBMOTE-REMOTEINPUTS";
 // Configuration
@@ -35,6 +37,7 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
+  router_show_screen("calibration");
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {

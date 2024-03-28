@@ -5884,7 +5884,7 @@
           {
             "disabled": false,
             "nid": -2125361272,
-            "strtype": "SCREEN/EventHandler",
+            "strtype": "_event/EventHandler",
             "strval": "GESTURE_RIGHT(GESTURE)",
             "childs": [
               {
@@ -13383,7 +13383,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 187,
+    "backup_cnt": 189,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",

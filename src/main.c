@@ -10,8 +10,11 @@
 #include "remote/receiver.h"
 #include "remote/remote.h"
 #include "remote/remoteinputs.h"
+#include "remote/router.h"
+#include "remote/screen.h"
 #include "remote/time.h"
 #include "remote/transmitter.h"
+#include "ui/ui.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -19,8 +22,6 @@ static const char *TAG = "PUBMOTE-MAIN";
 
 uint8_t PEER_MAC_ADDRESS[6] = {72, 49, 183, 171, 63, 137};
 int64_t LAST_COMMAND_TIME = 0;
-
-// TODO CRC checks on data
 
 void app_main(void) {
   init_display();
@@ -42,4 +43,9 @@ void app_main(void) {
   // Remote inputs init
   init_buttons();
   init_throttle();
+  RemoteScreen stats_screen = {.name = "stats", .screen_obj = ui_StatsScreen};
+  RemoteScreen calibration_screen = {.name = "calibration", .screen_obj = ui_CalibrationScreen};
+  router_register_screen(&stats_screen);
+  router_register_screen(&calibration_screen);
+  // router_show_screen("calibration");
 }

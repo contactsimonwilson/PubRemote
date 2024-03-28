@@ -386,6 +386,6 @@ void init_display(void) {
 
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));
-    set_bl_level(128);
+    set_bl_level(200);
   }
 }
