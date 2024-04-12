@@ -4,6 +4,7 @@
 #include "esp_wifi.h"
 #include "peers.h"
 #include "time.h"
+#include <string.h>
 
 static const char *TAG = "PUBMOTE-RECEIVER";
 
@@ -12,6 +13,47 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
   int64_t deltaTime = get_current_time_ms() - LAST_COMMAND_TIME;
   LAST_COMMAND_TIME = 0;
   ESP_LOGI(TAG, "RTT: %lld", deltaTime);
+
+  if (len == 28) {
+    uint8_t mode = data[0];
+    uint8_t fault_code = data[1];
+    float pitch_angle = (int16_t)((data[2] << 8) | data[3]) / 10.0;
+    float roll_angle = (int16_t)((data[4] << 8) | data[5]) / 10.0;
+    uint8_t state = data[6];
+    uint8_t switch_state = data[7];
+    float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
+    int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
+    float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
+    float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
+    float duty_cycle_now = (float)data[16] / 100.0 - 0.5;
+    float distance_abs;
+    memcpy(&distance_abs, &data[17], sizeof(float));
+    float fet_temp_filtered = (float)data[21] / 2.0;
+    float motor_temp_filtered = (float)data[22] / 2.0;
+    uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
+    float battery_level = (float)data[27] / 2.0;
+
+    // Print the extracted values
+    ESP_LOGI(TAG, "Mode: %d", mode);
+    ESP_LOGI(TAG, "Fault Code: %d", fault_code);
+    ESP_LOGI(TAG, "Pitch Angle: %.1f", pitch_angle);
+    ESP_LOGI(TAG, "Roll Angle: %.1f", roll_angle);
+    ESP_LOGI(TAG, "State: %d", state);
+    ESP_LOGI(TAG, "Switch State: %d", switch_state);
+    ESP_LOGI(TAG, "Input Voltage Filtered: %.1f", input_voltage_filtered);
+    ESP_LOGI(TAG, "RPM: %d", rpm);
+    ESP_LOGI(TAG, "Speed: %.1f", speed);
+    ESP_LOGI(TAG, "Total Current: %.1f", tot_current);
+    ESP_LOGI(TAG, "Duty Cycle Now: %.2f", duty_cycle_now);
+    ESP_LOGI(TAG, "Distance Absolute: %.2f", distance_abs);
+    ESP_LOGI(TAG, "FET Temperature Filtered: %.1f", fet_temp_filtered);
+    ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
+    ESP_LOGI(TAG, "Odometer: %lu", odometer);
+    ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
+  }
+  else {
+    ESP_LOGI(TAG, "Invalid data length");
+  }
 }
 
 void init_receiver() {
