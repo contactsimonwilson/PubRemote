@@ -164,7 +164,7 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_y(ui_ConnectionState, 33);
   lv_obj_set_align(ui_ConnectionState, LV_ALIGN_CENTER);
   lv_label_set_long_mode(ui_ConnectionState, LV_LABEL_LONG_DOT);
-  lv_label_set_text(ui_ConnectionState, "Connected");
+  lv_label_set_text(ui_ConnectionState, "Disconnected");
   lv_obj_add_flag(ui_ConnectionState, LV_OBJ_FLAG_SCROLL_ONE); /// Flags
   lv_obj_clear_flag(ui_ConnectionState,
                     LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
