@@ -9,3 +9,4 @@ autosave/
 managed_components/
 .DS_Store
 sdkconfig.*.old
+assets/ui_font_Open_Sans_Bold_14.bin
