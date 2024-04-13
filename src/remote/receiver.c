@@ -1,6 +1,7 @@
 #include "receiver.h"
 #include "esp_log.h"
 #include "esp_now.h"
+#include "esp_timer.h"
 #include "esp_wifi.h"
 #include "peers.h"
 #include "time.h"
@@ -9,6 +10,21 @@
 
 static const char *TAG = "PUBMOTE-RECEIVER";
 
+#define TIMEOUT_DURATION_MS 10000     // 10 seconds
+#define RECONNECTING_DURATION_MS 1000 // 1 seconds
+
+esp_timer_handle_t connection_timeout_timer;
+esp_timer_handle_t reconnecting_timer;
+
+static void connection_timeout_callback(void *arg) {
+  lv_label_set_text(ui_ConnectionState, "Disconnected");
+}
+
+static void reconnecting_timer_callback(void *arg) {
+  lv_label_set_text(ui_ConnectionState, "Reconnecting");
+  esp_timer_start_once(connection_timeout_timer, TIMEOUT_DURATION_MS * 1000);
+}
+
 static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) {
   ESP_LOGI(TAG, "RECEIVED");
   int64_t deltaTime = get_current_time_ms() - LAST_COMMAND_TIME;
@@ -16,6 +32,12 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
   ESP_LOGI(TAG, "RTT: %lld", deltaTime);
 
   if (len == 28) {
+    // Reset the timers
+    esp_timer_stop(connection_timeout_timer);
+    esp_timer_stop(reconnecting_timer);
+    lv_label_set_text(ui_ConnectionState, "Connected");
+    // Restart the connection timeout timer
+    esp_timer_start_once(reconnecting_timer, RECONNECTING_DURATION_MS * 1000);
     uint8_t mode = data[0];
     uint8_t fault_code = data[1];
     float pitch_angle = (int16_t)((data[2] << 8) | data[3]) / 10.0;
@@ -52,7 +74,9 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
       lv_arc_set_value(ui_RightSensor, 1);
       break;
     default:
+      break;
     }
+
     char *formattedString;
     asprintf(&formattedString, "%.0f%%", battery_level);
     lv_label_set_text(ui_BatteryDisplay, formattedString);
@@ -64,7 +88,6 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     lv_label_set_text(ui_PrimaryStat, formattedString);
     free(formattedString);
     lv_arc_set_value(ui_DutyCycle, duty_cycle_now);
-    lv_label_set_text(ui_ConnectionState, "Connected");
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
     // ESP_LOGI(TAG, "Fault Code: %d", fault_code);
@@ -91,4 +114,17 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
 void init_receiver() {
   ESP_LOGI(TAG, "Registered RX callback");
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
+
+  // Create and start the connection timeout timer
+  esp_timer_create_args_t connection_timeout_args = {.callback = connection_timeout_callback,
+                                                     .arg = NULL,
+                                                     .dispatch_method = ESP_TIMER_TASK,
+                                                     .name = "ConnectionTimeoutTimer"};
+  ESP_ERROR_CHECK(esp_timer_create(&connection_timeout_args, &connection_timeout_timer));
+  // Create the reconnecting timer
+  esp_timer_create_args_t reconnecting_timer_args = {.callback = reconnecting_timer_callback,
+                                                     .arg = NULL,
+                                                     .dispatch_method = ESP_TIMER_TASK,
+                                                     .name = "ReconnectingTimer"};
+  ESP_ERROR_CHECK(esp_timer_create(&reconnecting_timer_args, &reconnecting_timer));
 }
