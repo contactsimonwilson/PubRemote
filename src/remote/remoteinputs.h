@@ -5,8 +5,9 @@
 #include <freertos/task.h>
 #include <stdio.h>
 
-void init_throttle();
+void init_thumbstick();
 void init_buttons();
+void reset_button_state();
 
 typedef struct {
   float js_y;

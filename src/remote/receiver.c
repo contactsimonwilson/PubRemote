@@ -5,6 +5,7 @@
 #include "peers.h"
 #include "time.h"
 #include <string.h>
+#include <ui/ui.h>
 
 static const char *TAG = "PUBMOTE-RECEIVER";
 
@@ -33,23 +34,54 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
     float battery_level = (float)data[27] / 2.0;
 
+    switch (switch_state) {
+    case 0:
+      lv_arc_set_value(ui_LeftSensor, 0);
+      lv_arc_set_value(ui_RightSensor, 0);
+      break;
+    case 1:
+      lv_arc_set_value(ui_LeftSensor, 1);
+      lv_arc_set_value(ui_RightSensor, 0);
+      break;
+    case 2:
+      lv_arc_set_value(ui_LeftSensor, 0);
+      lv_arc_set_value(ui_RightSensor, 1);
+      break;
+    case 3:
+      lv_arc_set_value(ui_LeftSensor, 1);
+      lv_arc_set_value(ui_RightSensor, 1);
+      break;
+    default:
+    }
+    char *formattedString;
+    asprintf(&formattedString, "%.0f%%", battery_level);
+    lv_label_set_text(ui_BatteryDisplay, formattedString);
+    asprintf(&formattedString, "Mot: %.0fC | Cont: %.0fC", motor_temp_filtered, fet_temp_filtered);
+    lv_label_set_text(ui_TempStats, formattedString);
+    asprintf(&formattedString, "Trip: %.0fkm | Rem: -69km", distance_abs);
+    lv_label_set_text(ui_DistanceStats, formattedString);
+    asprintf(&formattedString, "%.1f", speed);
+    lv_label_set_text(ui_PrimaryStat, formattedString);
+    free(formattedString);
+    lv_arc_set_value(ui_DutyCycle, duty_cycle_now);
+    lv_label_set_text(ui_ConnectionState, "Connected");
     // Print the extracted values
-    ESP_LOGI(TAG, "Mode: %d", mode);
-    ESP_LOGI(TAG, "Fault Code: %d", fault_code);
-    ESP_LOGI(TAG, "Pitch Angle: %.1f", pitch_angle);
-    ESP_LOGI(TAG, "Roll Angle: %.1f", roll_angle);
-    ESP_LOGI(TAG, "State: %d", state);
-    ESP_LOGI(TAG, "Switch State: %d", switch_state);
-    ESP_LOGI(TAG, "Input Voltage Filtered: %.1f", input_voltage_filtered);
-    ESP_LOGI(TAG, "RPM: %d", rpm);
-    ESP_LOGI(TAG, "Speed: %.1f", speed);
-    ESP_LOGI(TAG, "Total Current: %.1f", tot_current);
-    ESP_LOGI(TAG, "Duty Cycle Now: %.2f", duty_cycle_now);
-    ESP_LOGI(TAG, "Distance Absolute: %.2f", distance_abs);
-    ESP_LOGI(TAG, "FET Temperature Filtered: %.1f", fet_temp_filtered);
-    ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
-    ESP_LOGI(TAG, "Odometer: %lu", odometer);
-    ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
+    // ESP_LOGI(TAG, "Mode: %d", mode);
+    // ESP_LOGI(TAG, "Fault Code: %d", fault_code);
+    // ESP_LOGI(TAG, "Pitch Angle: %.1f", pitch_angle);
+    // ESP_LOGI(TAG, "Roll Angle: %.1f", roll_angle);
+    // ESP_LOGI(TAG, "State: %d", state);
+    // ESP_LOGI(TAG, "Switch State: %d", switch_state);
+    // ESP_LOGI(TAG, "Input Voltage Filtered: %.1f", input_voltage_filtered);
+    // ESP_LOGI(TAG, "RPM: %d", rpm);
+    // ESP_LOGI(TAG, "Speed: %.1f", speed);
+    // ESP_LOGI(TAG, "Total Current: %.1f", tot_current);
+    // ESP_LOGI(TAG, "Duty Cycle Now: %.2f", duty_cycle_now);
+    // ESP_LOGI(TAG, "Distance Absolute: %.2f", distance_abs);
+    // ESP_LOGI(TAG, "FET Temperature Filtered: %.1f", fet_temp_filtered);
+    // ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
+    // ESP_LOGI(TAG, "Odometer: %lu", odometer);
+    // ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
   }
   else {
     ESP_LOGI(TAG, "Invalid data length");

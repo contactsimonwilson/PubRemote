@@ -15,15 +15,9 @@ static const char *TAG = "PUBMOTE-TRANSMITTER";
 // Function to send ESP-NOW data
 static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "TX task started");
-  u_int8_t my_data[20] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}; // Example data
-#define TEST_TIME 50000
-  static LatencyTestResults results;
-  results.size = 0;
-  results.results = malloc(TEST_TIME / TRANSMIT_TIME * sizeof(uint16_t));
-  int64_t newTime = get_current_time_ms();
 
-  for (int i = 0; i < TEST_TIME; i += TRANSMIT_TIME) {
-    newTime = get_current_time_ms();
+  while (1) {
+    int64_t newTime = get_current_time_ms();
 
 // Check if the last command was sent less than 1000ms ago
 #define COMMAND_TIMEOUT 1000
@@ -33,7 +27,6 @@ static void transmitter_task(void *pvParameters) {
     }
 
     esp_err_t result = esp_now_send(&PEER_MAC_ADDRESS, (uint8_t *)&remote_data.bytes, sizeof(remote_data.bytes));
-
     if (result != ESP_OK) {
       // Handle error if needed
       ESP_LOGE(TAG, "Error sending data: %d", result);
@@ -44,8 +37,8 @@ static void transmitter_task(void *pvParameters) {
     vTaskDelay(TRANSMIT_FREQUENCY);
   }
 
+  // The task will not reach this point as it runs indefinitely
   ESP_LOGI(TAG, "TX task ended");
-  // terminate self
   vTaskDelete(NULL);
 }
 
