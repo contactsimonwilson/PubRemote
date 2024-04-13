@@ -1631,7 +1631,6 @@
               {
                 "nid": -1970319926,
                 "strtype": "ARC/Value",
-                "integer": 1,
                 "InheritedType": 6
               },
               {
@@ -2065,7 +2064,7 @@
                       {
                         "nid": 1989610623,
                         "strtype": "OBJECT/Name",
-                        "strval": "Time",
+                        "strval": "TimeDisplay",
                         "InheritedType": 10
                       },
                       {
@@ -2323,7 +2322,7 @@
                       {
                         "nid": 1833167162,
                         "strtype": "LABEL/Text",
-                        "strval": "8:35PM",
+                        "strval": "",
                         "InheritedType": 10
                       },
                       {
@@ -2662,8 +2661,7 @@
                     "InheritedType": 11
                   }
                 ],
-                "saved_objtypeKey": "CONTAINER",
-                "tree_closed": true
+                "saved_objtypeKey": "CONTAINER"
               },
               {
                 "guid": "GUID8263425-220892S780341",
@@ -3276,8 +3274,7 @@
                         "InheritedType": 2
                       }
                     ],
-                    "saved_objtypeKey": "LABEL",
-                    "tree_closed": true
+                    "saved_objtypeKey": "LABEL"
                   },
                   {
                     "guid": "GUID11764824-714695S994341",
@@ -3548,7 +3545,7 @@
                           {
                             "nid": -1587441653,
                             "strtype": "LABEL/Text",
-                            "strval": "Connected",
+                            "strval": "Disconnected",
                             "InheritedType": 10
                           },
                           {
@@ -3834,7 +3831,7 @@
                           {
                             "nid": 510154044,
                             "strtype": "LABEL/Text",
-                            "strval": "Trip: 4.5km | Rem: 2km",
+                            "strval": "Trip: 0.0km | Rem: 0.0km",
                             "InheritedType": 10
                           },
                           {
@@ -4120,7 +4117,7 @@
                           {
                             "nid": -765345910,
                             "strtype": "LABEL/Text",
-                            "strval": "Mot: 55C | Cont: 65C",
+                            "strval": "Mot: 0C | Cont: 0C",
                             "InheritedType": 10
                           },
                           {
@@ -4725,8 +4722,7 @@
                     "InheritedType": 11
                   }
                 ],
-                "saved_objtypeKey": "CONTAINER",
-                "tree_closed": true
+                "saved_objtypeKey": "CONTAINER"
               },
               {
                 "guid": "GUID68226417-225986S119341",
@@ -4998,7 +4994,7 @@
                       {
                         "nid": -1617195481,
                         "strtype": "LABEL/Text",
-                        "strval": "69%",
+                        "strval": "0%",
                         "InheritedType": 10
                       },
                       {
@@ -5044,7 +5040,6 @@
                       {
                         "disabled": false,
                         "nid": -215020449,
-                        "flags": 1048576,
                         "strtype": "_event/EventHandler",
                         "strval": "LONG_PRESSED",
                         "childs": [
@@ -5378,8 +5373,7 @@
                     "InheritedType": 11
                   }
                 ],
-                "saved_objtypeKey": "CONTAINER",
-                "tree_closed": true
+                "saved_objtypeKey": "CONTAINER"
               }
             ],
             "locked": true,
@@ -13383,7 +13377,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 189,
+    "backup_cnt": 194,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",

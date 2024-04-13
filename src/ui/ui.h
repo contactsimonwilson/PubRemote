@@ -29,7 +29,7 @@ extern lv_obj_t * ui_RightSensor;
 extern lv_obj_t * ui_StatsScreenContent;
 extern lv_obj_t * ui_StatsScreenHeader;
 extern lv_obj_t * ui_Logo;
-extern lv_obj_t * ui_Time;
+extern lv_obj_t * ui_TimeDisplay;
 extern lv_obj_t * ui_StatsScreenBody;
 extern lv_obj_t * ui_PrimaryStat;
 extern lv_obj_t * ui_PrimaryStatUnit;
