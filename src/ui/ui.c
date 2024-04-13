@@ -25,7 +25,7 @@ lv_obj_t * ui_RightSensor;
 lv_obj_t * ui_StatsScreenContent;
 lv_obj_t * ui_StatsScreenHeader;
 lv_obj_t * ui_Logo;
-lv_obj_t * ui_Time;
+lv_obj_t * ui_TimeDisplay;
 lv_obj_t * ui_StatsScreenBody;
 lv_obj_t * ui_PrimaryStat;
 lv_obj_t * ui_PrimaryStatUnit;
