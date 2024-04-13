@@ -23,7 +23,7 @@
 #include <string.h>
 
 #define BUZZER_GPIO GPIO_NUM_21
-#define LED_POWER_GPIO GPIO_NUM_17
+#define LED_POWER_GPIO GPIO_NUM_33
 #define LED_GPIO GPIO_NUM_18
 #define LEDC_CHANNEL LEDC_CHANNEL_0
 #define LEDC_TIMER LEDC_TIMER_0
@@ -104,7 +104,7 @@ void app_main(void) {
   init_transmitter();
   // Remote inputs init
   init_buttons();
-  init_throttle();
+  init_thumbstick();
   RemoteScreen stats_screen = {.name = "stats", .screen_obj = ui_StatsScreen};
   RemoteScreen calibration_screen = {.name = "calibration", .screen_obj = ui_CalibrationScreen};
   router_register_screen(&stats_screen);

@@ -2,6 +2,7 @@
 #include "adc.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "iot_button.h"
@@ -15,27 +16,25 @@
 
 static const char *TAG = "PUBMOTE-REMOTEINPUTS";
 // Configuration
-#define BUTTON_PIN GPIO_NUM_0
 #define JOYSTICK_BUTTON_PIN GPIO_NUM_15
-// #define BUTTON_PIN GPIO_NUM_15
-#define Y_STICK_CHANNEL ADC_CHANNEL_5 // Assuming the Hall sensor is connected to GPIO0
+#define X_STICK_CHANNEL ADC_CHANNEL_6 // GPIO 17
+#define Y_STICK_CHANNEL ADC_CHANNEL_5 // GPIO 16
 
-uint8_t THROTTLE_VALUE = 128;
 RemoteDataUnion remote_data;
 
-uint8_t convert_adc_to_throttle(int adc_value) {
-  // 0 - 4095 -> 0 - 255
-  return (uint8_t)(adc_value / 16);
+float convert_adc_to_axis(int adc_value) {
+  // 0 - 4095 -> 1.0 to -1.0
+  return (float)(2047 - adc_value) / 2047.0f;
 }
 
-void throttle_task(void *pvParameters) {
+void thumbstick_task(void *pvParameters) {
   // Configure the ADC
-  adc_oneshot_unit_handle_t adc1_handle;
+  adc_oneshot_unit_handle_t adc2_handle;
   adc_oneshot_unit_init_cfg_t init_config = {
       .unit_id = ADC_UNIT_2,
       .ulp_mode = ADC_ULP_MODE_DISABLE,
   };
-  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc1_handle));
+  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc2_handle));
 
   // Calibration
   //-------------ADC2 Calibration Init---------------//
@@ -47,31 +46,40 @@ void throttle_task(void *pvParameters) {
       .bitwidth = ADC_BITWIDTH_12,
       .atten = ADC_ATTEN_DB_12,
   };
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, Y_STICK_CHANNEL, &channel_config));
-
-  // TODO - IMPLEMENT ADC CONTINUOUS READING
-  remote_data.data.js_y = 0.69f;
-  remote_data.data.js_x = 0.69f;
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc2_handle, X_STICK_CHANNEL, &channel_config));
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc2_handle, Y_STICK_CHANNEL, &channel_config));
 
   while (1) {
-    int hall_value = 1337;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, Y_STICK_CHANNEL, &hall_value));
-    THROTTLE_VALUE = convert_adc_to_throttle(hall_value);
-    // printf("Throttle value: %d\n", THROTTLE_VALUE);
-    vTaskDelay(pdMS_TO_TICKS(10));
+    int x_value, y_value;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, X_STICK_CHANNEL, &x_value));
+    ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, Y_STICK_CHANNEL, &y_value));
+
+    remote_data.data.js_x = convert_adc_to_axis(x_value);
+    remote_data.data.js_y = convert_adc_to_axis(y_value);
+
+    // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
+    // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
+
+    vTaskDelay(pdMS_TO_TICKS(100)); // Increase the delay to 100ms for better clarity in the output
   }
 
-  ESP_LOGI(TAG, "Throttle task ended");
-  // terminate self
+  ESP_LOGI(TAG, "Thumbstick task ended");
   vTaskDelete(NULL);
 }
 
-void init_throttle() {
-  xTaskCreate(throttle_task, "throttle_task", 4096, NULL, 2, NULL);
+void init_thumbstick() {
+  xTaskCreate(thumbstick_task, "thumbstick_task", 4096, NULL, 2, NULL);
 }
 
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
+  remote_data.data.bt_c = 1;
+
+  // Start a timer to reset the button state after a certain duration
+  esp_timer_handle_t reset_timer;
+  esp_timer_create_args_t timer_args = {.callback = reset_button_state, .name = "reset_button_timer"};
+  ESP_ERROR_CHECK(esp_timer_create(&timer_args, &reset_timer));
+  ESP_ERROR_CHECK(esp_timer_start_once(reset_timer, 1000000)); // 1000ms delay
 }
 
 static void button_double_click_cb(void *arg, void *usr_data) {
@@ -83,6 +91,10 @@ static void button_long_press_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON LONG PRESSS");
 }
 
+void reset_button_state() {
+  remote_data.data.bt_c = 0;
+}
+
 void init_buttons() {
   // create gpio button
   button_config_t gpio_btn_cfg = {
@@ -92,7 +104,7 @@ void init_buttons() {
       .gpio_button_config =
           {
               .gpio_num = JOYSTICK_BUTTON_PIN,
-              .active_level = 0,
+              .active_level = 1,
           },
   };
   button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
