@@ -4,6 +4,7 @@
 #include "esp_timer.h"
 #include "esp_wifi.h"
 #include "peers.h"
+#include "powermanagement.h"
 #include "time.h"
 #include <string.h>
 #include <ui/ui.h>
@@ -35,6 +36,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     // Reset the timers
     esp_timer_stop(connection_timeout_timer);
     esp_timer_stop(reconnecting_timer);
+    start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
     lv_label_set_text(ui_ConnectionState, "Connected");
     // Restart the connection timeout timer
     esp_timer_start_once(reconnecting_timer, RECONNECTING_DURATION_MS * 1000);
@@ -115,13 +117,11 @@ void init_receiver() {
   ESP_LOGI(TAG, "Registered RX callback");
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
 
-  // Create and start the connection timeout timer
   esp_timer_create_args_t connection_timeout_args = {.callback = connection_timeout_callback,
                                                      .arg = NULL,
                                                      .dispatch_method = ESP_TIMER_TASK,
                                                      .name = "ConnectionTimeoutTimer"};
   ESP_ERROR_CHECK(esp_timer_create(&connection_timeout_args, &connection_timeout_timer));
-  // Create the reconnecting timer
   esp_timer_create_args_t reconnecting_timer_args = {.callback = reconnecting_timer_callback,
                                                      .arg = NULL,
                                                      .dispatch_method = ESP_TIMER_TASK,

@@ -13,6 +13,7 @@
 #include "freertos/task.h"
 #include "hal/ledc_types.h"
 #include "lvgl.h"
+#include "powermanagement.h"
 #include "ui/ui.h"
 #include <stdio.h>
 
@@ -220,6 +221,32 @@ static void init_backlight(void) {
 #endif
 }
 
+bool my_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
+  uint16_t touchpad_x[1] = {0};
+  uint16_t touchpad_y[1] = {0};
+  uint8_t touchpad_cnt = 0;
+
+  /* Read touch controller data */
+  esp_lcd_touch_read_data(drv->user_data);
+
+  /* Get coordinates */
+  bool touchpad_pressed = esp_lcd_touch_get_coordinates(drv->user_data, touchpad_x, touchpad_y, NULL, &touchpad_cnt, 1);
+
+  if (touchpad_pressed && touchpad_cnt > 0) {
+    data->point.x = touchpad_x[0];
+    data->point.y = touchpad_y[0];
+    data->state = LV_INDEV_STATE_PR;
+
+    // ESP_LOGI(TAG, "Touch event at X: %d, Y: %d\n", data->point.x, data->point.y);
+    start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+  }
+  else {
+    data->state = LV_INDEV_STATE_REL;
+  }
+
+  return false;
+}
+
 void init_display(void) {
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // contains callback functions
@@ -366,7 +393,7 @@ void init_display(void) {
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.disp = disp;
-  indev_drv.read_cb = LVGL_touch_cb;
+  indev_drv.read_cb = my_input_read; // Use the my_input_read function
   indev_drv.user_data = tp;
 
   lv_indev_drv_register(&indev_drv);
