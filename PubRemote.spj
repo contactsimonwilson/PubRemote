@@ -301,7 +301,7 @@
                 "childs": [],
                 "nid": 126237365,
                 "strtype": "IMAGE/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Image",
+                "strval": "lv.PART.MAIN, Rectangle, Image, Transform",
                 "InheritedType": 11
               }
             ],
@@ -938,7 +938,7 @@
                 ],
                 "nid": 1725060361,
                 "strtype": "ARC/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Pad, Arc",
+                "strval": "lv.PART.MAIN, Rectangle, Pad, Arc, Transform",
                 "InheritedType": 11
               },
               {
@@ -1317,7 +1317,7 @@
                 ],
                 "nid": 147378128,
                 "strtype": "ARC/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Pad, Arc",
+                "strval": "lv.PART.MAIN, Rectangle, Pad, Arc, Transform",
                 "InheritedType": 11
               },
               {
@@ -1714,7 +1714,7 @@
                 ],
                 "nid": 1265702533,
                 "strtype": "ARC/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Pad, Arc",
+                "strval": "lv.PART.MAIN, Rectangle, Pad, Arc, Transform",
                 "InheritedType": 11
               },
               {
@@ -2085,7 +2085,7 @@
                         "childs": [],
                         "nid": -206128501,
                         "strtype": "IMAGE/Style_main",
-                        "strval": "lv.PART.MAIN, Rectangle, Image",
+                        "strval": "lv.PART.MAIN, Rectangle, Image, Transform",
                         "InheritedType": 11
                       }
                     ],
@@ -2404,7 +2404,7 @@
                         ],
                         "nid": -650802536,
                         "strtype": "LABEL/Style_main",
-                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -2697,7 +2697,7 @@
                     ],
                     "nid": 532349100,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -3013,7 +3013,7 @@
                             ],
                             "nid": -397310822,
                             "strtype": "LABEL/Style_main",
-                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                             "InheritedType": 11
                           },
                           {
@@ -3324,7 +3324,7 @@
                         ],
                         "nid": -1984095559,
                         "strtype": "LABEL/Style_main",
-                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -3619,7 +3619,7 @@
                             "childs": [],
                             "nid": -1070136283,
                             "strtype": "LABEL/Style_main",
-                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                             "InheritedType": 11
                           },
                           {
@@ -3911,7 +3911,7 @@
                             "childs": [],
                             "nid": -680217617,
                             "strtype": "LABEL/Style_main",
-                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                             "InheritedType": 11
                           },
                           {
@@ -4203,7 +4203,7 @@
                             "childs": [],
                             "nid": 1368317248,
                             "strtype": "LABEL/Style_main",
-                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                             "InheritedType": 11
                           },
                           {
@@ -4525,7 +4525,7 @@
                         ],
                         "nid": 53823262,
                         "strtype": "PANEL/Style_main",
-                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -4800,7 +4800,7 @@
                     "childs": [],
                     "nid": -2957420,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -5124,7 +5124,7 @@
                         ],
                         "nid": -1557522580,
                         "strtype": "LABEL/Style_main",
-                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -5463,7 +5463,7 @@
                     "childs": [],
                     "nid": 787411574,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -5757,7 +5757,7 @@
                 ],
                 "nid": 1116871429,
                 "strtype": "CONTAINER/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                 "InheritedType": 11
               },
               {
@@ -6290,7 +6290,7 @@
                     "childs": [],
                     "nid": -1411825463,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -6603,7 +6603,7 @@
                         ],
                         "nid": 629523193,
                         "strtype": "LABEL/Style_main",
-                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -6895,7 +6895,7 @@
                         "childs": [],
                         "nid": 972011757,
                         "strtype": "LABEL/Style_main",
-                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -7169,7 +7169,7 @@
                     "childs": [],
                     "nid": 1251354318,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -7471,7 +7471,7 @@
                             "childs": [],
                             "nid": 631772989,
                             "strtype": "LABEL/Style_main",
-                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                             "InheritedType": 11
                           },
                           {
@@ -7745,7 +7745,7 @@
                         "childs": [],
                         "nid": 1409745922,
                         "strtype": "BUTTON/Style_main",
-                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text ",
+                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -8108,7 +8108,7 @@
                     ],
                     "nid": 1020939395,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -8383,7 +8383,7 @@
                 "childs": [],
                 "nid": 410406527,
                 "strtype": "CONTAINER/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                 "InheritedType": 11
               },
               {
@@ -8916,7 +8916,7 @@
                     "childs": [],
                     "nid": -1206576542,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -9229,7 +9229,7 @@
                         ],
                         "nid": -971262233,
                         "strtype": "LABEL/Style_main",
-                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -9502,7 +9502,7 @@
                     "childs": [],
                     "nid": 1372329543,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -9804,7 +9804,7 @@
                             "childs": [],
                             "nid": -533505913,
                             "strtype": "LABEL/Style_main",
-                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                             "InheritedType": 11
                           },
                           {
@@ -10105,7 +10105,7 @@
                         "childs": [],
                         "nid": -1830721519,
                         "strtype": "BUTTON/Style_main",
-                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text ",
+                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -10506,7 +10506,7 @@
                     ],
                     "nid": 845294739,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -10781,7 +10781,7 @@
                 "childs": [],
                 "nid": 1335440103,
                 "strtype": "CONTAINER/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                 "InheritedType": 11
               },
               {
@@ -11287,7 +11287,7 @@
                     "childs": [],
                     "nid": 1771190170,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -11585,7 +11585,7 @@
                         "childs": [],
                         "nid": 1746226115,
                         "strtype": "LABEL/Style_main",
-                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                        "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -11858,7 +11858,7 @@
                     "childs": [],
                     "nid": -1760417002,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -12123,7 +12123,7 @@
                     "childs": [],
                     "nid": 658561191,
                     "strtype": "SLIDER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -12434,7 +12434,7 @@
                             "childs": [],
                             "nid": 2095845632,
                             "strtype": "LABEL/Style_main",
-                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad",
+                            "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                             "InheritedType": 11
                           },
                           {
@@ -12708,7 +12708,7 @@
                         "childs": [],
                         "nid": -1648917923,
                         "strtype": "BUTTON/Style_main",
-                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text ",
+                        "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                         "InheritedType": 11
                       },
                       {
@@ -13071,7 +13071,7 @@
                     ],
                     "nid": 702019710,
                     "strtype": "CONTAINER/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                    "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                     "InheritedType": 11
                   },
                   {
@@ -13346,7 +13346,7 @@
                 "childs": [],
                 "nid": -1956835219,
                 "strtype": "CONTAINER/Style_main",
-                "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
+                "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
                 "InheritedType": 11
               },
               {
@@ -13635,7 +13635,7 @@
     "description": "",
     "board": "ESP32-S3-USB-OTG",
     "board_version": "1.0.0",
-    "editor_version": "1.4.1",
+    "editor_version": "1.4.2",
     "image": "",
     "force_export_images": false,
     "flat_export": true,
