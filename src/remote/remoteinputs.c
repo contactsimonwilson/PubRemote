@@ -2,10 +2,12 @@
 #include "adc.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_log.h"
+#include "esp_sleep.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "iot_button.h"
+#include "powermanagement.h"
 #include "remote/router.h"
 #include "rom/gpio.h"
 #include "time.h"
@@ -13,14 +15,12 @@
 #include <freertos/queue.h>
 #include <freertos/task.h>
 #include <ui/ui.h>
-
 static const char *TAG = "PUBMOTE-REMOTEINPUTS";
-// Configuration
-#define JOYSTICK_BUTTON_PIN GPIO_NUM_15
-#define X_STICK_CHANNEL ADC_CHANNEL_6 // GPIO 17
-#define Y_STICK_CHANNEL ADC_CHANNEL_5 // GPIO 16
 
 RemoteDataUnion remote_data;
+
+#define X_STICK_DEADZONE 250
+#define Y_STICK_DEADZONE 250
 
 float convert_adc_to_axis(int adc_value) {
   // 0 - 4095 -> 1.0 to -1.0
@@ -53,12 +53,20 @@ void thumbstick_task(void *pvParameters) {
     int x_value, y_value;
     ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, X_STICK_CHANNEL, &x_value));
     ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, Y_STICK_CHANNEL, &y_value));
-
-    remote_data.data.js_x = convert_adc_to_axis(x_value);
-    remote_data.data.js_y = convert_adc_to_axis(y_value);
-
-    // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
-    // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
+    remote_data.data.js_x = 0;
+    remote_data.data.js_y = 0;
+    if (x_value > 2047 + X_STICK_DEADZONE || x_value < 2047 - X_STICK_DEADZONE) {
+      start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+      remote_data.data.js_x = convert_adc_to_axis(x_value);
+      printf("Thumbstick x value: %d\n", x_value);
+      // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
+    }
+    if (y_value > 2047 + Y_STICK_DEADZONE || y_value < 2047 - Y_STICK_DEADZONE) {
+      start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+      remote_data.data.js_y = convert_adc_to_axis(y_value);
+      printf("Thumbstick y value: %d\n", y_value);
+      // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
+    }
 
     vTaskDelay(pdMS_TO_TICKS(100)); // Increase the delay to 100ms for better clarity in the output
   }
@@ -73,6 +81,7 @@ void init_thumbstick() {
 
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
+  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
   remote_data.data.bt_c = 1;
 
   // Start a timer to reset the button state after a certain duration
@@ -84,11 +93,13 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
+  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
   router_show_screen("calibration");
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON LONG PRESSS");
+  esp_deep_sleep_start();
 }
 
 void reset_button_state() {
