@@ -15,6 +15,9 @@ static const char *TAG = "PUBMOTE-RECEIVER";
 
 esp_timer_handle_t connection_timeout_timer;
 esp_timer_handle_t reconnecting_timer;
+int pairing_state = 0;
+int32_t secret_code = 0;
+uint8_t remote_addr[6] = {0, 0, 0, 0, 0, 0};
 
 static void connection_timeout_callback(void *arg) {
   lv_label_set_text(ui_ConnectionState, "Disconnected");
@@ -31,7 +34,44 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
   LAST_COMMAND_TIME = 0;
   ESP_LOGI(TAG, "RTT: %lld", deltaTime);
 
-  if (len == 28) {
+  if (pairing_state == 1 && len == 6) {
+    memcpy(remote_addr, data, 6);
+    ESP_LOGI(TAG, "Got Pairing request from VESC Express");
+    ESP_LOGI(TAG, "packet Length: %d", len);
+    ESP_LOGI(TAG, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", data[0], data[1], data[2], data[3], data[4], data[5]);
+    // ESP_LOGI(TAG, "Incorrect MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2],
+    //          mac_addr[3], mac_addr[4], mac_addr[5]);
+    uint8_t TEST[1] = {420};
+    esp_now_peer_info_t peerInfo = {};
+    // uint8_t PEER_MAC_ADDRESS_BROADCAST[6] = {255, 255, 255, 255, 255, 255};
+    peerInfo.channel = 1; // Set the channel number (0-14)
+    peerInfo.encrypt = false;
+    memcpy(peerInfo.peer_addr, remote_addr, sizeof(remote_addr));
+    // ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
+    if (!esp_now_is_peer_exist(&peerInfo)) {
+      esp_now_add_peer(&peerInfo);
+    }
+
+    esp_err_t result = esp_now_send(&remote_addr, (uint8_t *)&TEST, sizeof(TEST));
+    if (result != ESP_OK) {
+      // Handle error if needed
+      ESP_LOGE(TAG, "Error sending data: %d", result);
+    }
+    else {
+      ESP_LOGI(TAG, "Sent response back to VESC Express");
+      pairing_state++;
+    }
+  }
+  else if (pairing_state == 2 && len == 4) {
+    // grab secret code
+    ESP_LOGI(TAG, "Grabbing secret code");
+    ESP_LOGI(TAG, "packet Length: %d", len);
+    secret_code = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+    ESP_LOGI(TAG, "Secret Code: %li", secret_code);
+    pairing_state = 0;
+  }
+
+  if (pairing_state == 0 && len == 32) {
     // Reset the timers
     esp_timer_stop(connection_timeout_timer);
     esp_timer_stop(reconnecting_timer);
@@ -55,6 +95,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     float motor_temp_filtered = (float)data[22] / 2.0;
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
     float battery_level = (float)data[27] / 2.0;
+    int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
 
     switch (switch_state) {
     case 0:

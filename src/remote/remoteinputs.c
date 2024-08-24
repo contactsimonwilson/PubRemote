@@ -22,6 +22,13 @@ static const char *TAG = "PUBMOTE-REMOTEINPUTS";
 
 RemoteDataUnion remote_data;
 
+// For PS5 Hall
+// float convert_adc_to_axis(int adc_value) {
+//   // 0 - 4095 -> 1.0 to -1.0
+//   return (float)(2047 - adc_value) / 2047.0f;
+// }
+
+// For Switch
 float convert_adc_to_axis(int adc_value) {
   // 0 - 4095 -> 1.0 to -1.0
   return (float)(2047 - adc_value) / 2047.0f;
@@ -56,6 +63,8 @@ void thumbstick_task(void *pvParameters) {
 
     remote_data.data.js_x = convert_adc_to_axis(x_value);
     remote_data.data.js_y = convert_adc_to_axis(y_value);
+    // printf("Thumbstick x-axis raw value: %d\n", x_value);
+    // printf("Thumbstick y-axis raw value: %d\n", y_value);
 
     // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
@@ -84,7 +93,7 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
-  router_show_screen("calibration");
+  // router_show_screen("calibration");
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {

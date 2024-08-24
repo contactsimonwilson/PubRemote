@@ -5,17 +5,18 @@
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "peers.h"
+#include "receiver.h"
 #include "remoteinputs.h"
 #include "time.h"
 #include <stdbool.h>
 #include <stdio.h>
-
+#include <string.h>
 static const char *TAG = "PUBMOTE-TRANSMITTER";
 
 // Function to send ESP-NOW data
 static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "TX task started");
-
+  uint8_t combined_data[sizeof(int32_t) + sizeof(remote_data.bytes)];
   while (1) {
     int64_t newTime = get_current_time_ms();
 
@@ -25,15 +26,25 @@ static void transmitter_task(void *pvParameters) {
       vTaskDelay(TRANSMIT_FREQUENCY);
       continue;
     }
+    if (pairing_state == 0) {
+      // Create a new buffer to hold both secret_Code and remote_data.bytes
+      // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
+      // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
+      // Copy secret_Code to the beginning of the buffer
+      memcpy(combined_data, &secret_code, sizeof(int32_t));
 
-    esp_err_t result = esp_now_send(&PEER_MAC_ADDRESS, (uint8_t *)&remote_data.bytes, sizeof(remote_data.bytes));
-    if (result != ESP_OK) {
-      // Handle error if needed
-      ESP_LOGE(TAG, "Error sending data: %d", result);
+      // Copy remote_data.bytes after secret_Code
+      memcpy(combined_data + sizeof(int32_t), remote_data.bytes, sizeof(remote_data.bytes));
+
+      esp_err_t result = esp_now_send(&remote_addr, combined_data, sizeof(combined_data));
+      if (result != ESP_OK) {
+        // Handle error if needed
+        ESP_LOGE(TAG, "Error sending data: %d", result);
+      }
+
+      LAST_COMMAND_TIME = newTime;
+      ESP_LOGI(TAG, "Sent command");
     }
-
-    LAST_COMMAND_TIME = newTime;
-    ESP_LOGI(TAG, "Sent command");
     vTaskDelay(TRANSMIT_FREQUENCY);
   }
 

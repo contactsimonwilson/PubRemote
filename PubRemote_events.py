@@ -6,3 +6,7 @@ def toggleFooterDisplayMode(event_struct):
 def CompleteCalibration(event_struct):
     return
 
+
+def StartPairing(event_struct):
+    return
+
