@@ -11,7 +11,6 @@ extern "C" {
 #endif
 
 void toggleFooterDisplayMode(lv_event_t * e);
-void CompleteCalibration(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

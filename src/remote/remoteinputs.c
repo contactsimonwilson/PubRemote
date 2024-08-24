@@ -22,6 +22,13 @@ RemoteDataUnion remote_data;
 #define X_STICK_DEADZONE 250
 #define Y_STICK_DEADZONE 250
 
+// For PS5 Hall
+// float convert_adc_to_axis(int adc_value) {
+//   // 0 - 4095 -> 1.0 to -1.0
+//   return (float)(2047 - adc_value) / 2047.0f;
+// }
+
+// For Switch
 float convert_adc_to_axis(int adc_value) {
   // 0 - 4095 -> 1.0 to -1.0
   return (float)(2047 - adc_value) / 2047.0f;
@@ -68,6 +75,12 @@ void thumbstick_task(void *pvParameters) {
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
     }
 
+    // printf("Thumbstick x-axis raw value: %d\n", x_value);
+    // printf("Thumbstick y-axis raw value: %d\n", y_value);
+
+    // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
+    // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
+
     vTaskDelay(pdMS_TO_TICKS(100)); // Increase the delay to 100ms for better clarity in the output
   }
 
@@ -94,7 +107,7 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
   start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
-  router_show_screen("calibration");
+  // router_show_screen("calibration");
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {
