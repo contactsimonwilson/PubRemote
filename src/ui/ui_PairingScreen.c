@@ -5,12 +5,12 @@
 
 #include "ui.h"
 
-void ui_ConnectionScreen_screen_init(void)
+void ui_PairingScreen_screen_init(void)
 {
-ui_ConnectionScreen = lv_obj_create(NULL);
-lv_obj_clear_flag( ui_ConnectionScreen, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+ui_PairingScreen = lv_obj_create(NULL);
+lv_obj_clear_flag( ui_PairingScreen, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
-ui_PairingScreenContent = lv_obj_create(ui_ConnectionScreen);
+ui_PairingScreenContent = lv_obj_create(ui_PairingScreen);
 lv_obj_remove_style_all(ui_PairingScreenContent);
 lv_obj_set_width( ui_PairingScreenContent, lv_pct(100));
 lv_obj_set_height( ui_PairingScreenContent, lv_pct(100));
@@ -35,12 +35,12 @@ lv_obj_set_flex_flow(ui_PairingScreenBody,LV_FLEX_FLOW_COLUMN);
 lv_obj_set_flex_align(ui_PairingScreenBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 lv_obj_clear_flag( ui_PairingScreenBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
-ui_Label2 = lv_label_create(ui_PairingScreenBody);
-lv_obj_set_width( ui_Label2, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_Label2, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_align( ui_Label2, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label2,"1337");
-lv_obj_set_style_text_font(ui_Label2, &ui_font_Open_Sans_Bold_48, LV_PART_MAIN| LV_STATE_DEFAULT);
+ui_Label4 = lv_label_create(ui_PairingScreenBody);
+lv_obj_set_width( ui_Label4, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_Label4, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_align( ui_Label4, LV_ALIGN_CENTER );
+lv_label_set_text(ui_Label4,"1337");
+lv_obj_set_style_text_font(ui_Label4, &ui_font_Open_Sans_Bold_48, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Label1 = lv_label_create(ui_PairingScreenBody);
 lv_obj_set_width( ui_Label1, LV_SIZE_CONTENT);  /// 1
@@ -77,5 +77,6 @@ lv_obj_set_align( ui_PairingScreenMainActionButtonLabel, LV_ALIGN_CENTER );
 lv_label_set_text(ui_PairingScreenMainActionButtonLabel,"Cancel");
 
 lv_obj_add_event_cb(ui_PairingScreenMainActionButton, ui_event_PairingScreenMainActionButton, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(ui_PairingScreen, ui_event_PairingScreen, LV_EVENT_ALL, NULL);
 
 }

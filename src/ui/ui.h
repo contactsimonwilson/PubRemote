@@ -41,41 +41,43 @@ extern lv_obj_t *ui_TempStats;
 extern lv_obj_t *ui_StatsScreenFooter;
 void ui_event_BatteryDisplay( lv_event_t * e);
 extern lv_obj_t *ui_BatteryDisplay;
+// SCREEN: ui_PairingScreen
+void ui_PairingScreen_screen_init(void);
+void ui_event_PairingScreen( lv_event_t * e);
+extern lv_obj_t *ui_PairingScreen;
+extern lv_obj_t *ui_PairingScreenContent;
+extern lv_obj_t *ui_PairingScreenHeader;
+extern lv_obj_t *ui_PairingScreenBody;
+extern lv_obj_t *ui_Label4;
+extern lv_obj_t *ui_Label1;
+extern lv_obj_t *ui_PairingScreenFooter;
+void ui_event_PairingScreenMainActionButton( lv_event_t * e);
+extern lv_obj_t *ui_PairingScreenMainActionButton;
+extern lv_obj_t *ui_PairingScreenMainActionButtonLabel;
 // SCREEN: ui_SettingsScreen
 void ui_SettingsScreen_screen_init(void);
+void ui_event_SettingsScreen( lv_event_t * e);
 extern lv_obj_t *ui_SettingsScreen;
 extern lv_obj_t *ui_SettingsScreenContent;
 extern lv_obj_t *ui_SettingsScreenHeader;
 extern lv_obj_t *ui_SettingsScreenBody;
-extern lv_obj_t *ui_BrightnessSlider;
 extern lv_obj_t *ui_BrightnessLabel;
+void ui_event_BrightnessSlider( lv_event_t * e);
+extern lv_obj_t *ui_BrightnessSlider;
 extern lv_obj_t *ui_SettingsScreenFooter;
 void ui_event_SettingsScreenMainActionButton( lv_event_t * e);
 extern lv_obj_t *ui_SettingsScreenMainActionButton;
 extern lv_obj_t *ui_SettingsScreenMainActionButtonLabel;
 // SCREEN: ui_CalibrationScreen
 void ui_CalibrationScreen_screen_init(void);
+void ui_event_CalibrationScreen( lv_event_t * e);
 extern lv_obj_t *ui_CalibrationScreen;
 extern lv_obj_t *ui_CalibrationScreenContent;
-extern lv_obj_t *ui_CalibrationScreenheader;
+extern lv_obj_t *ui_CalibrationScreenHeader;
 extern lv_obj_t *ui_CalibrationScreenBody;
-extern lv_obj_t *ui_Label4;
 extern lv_obj_t *ui_CalibrationScreenFooter;
-void ui_event_CalibrationScreenMainActionButton( lv_event_t * e);
 extern lv_obj_t *ui_CalibrationScreenMainActionButton;
 extern lv_obj_t *ui_CalibrationScreenMainActionButtonLabel;
-// SCREEN: ui_ConnectionScreen
-void ui_ConnectionScreen_screen_init(void);
-extern lv_obj_t *ui_ConnectionScreen;
-extern lv_obj_t *ui_PairingScreenContent;
-extern lv_obj_t *ui_PairingScreenHeader;
-extern lv_obj_t *ui_PairingScreenBody;
-extern lv_obj_t *ui_Label2;
-extern lv_obj_t *ui_Label1;
-extern lv_obj_t *ui_PairingScreenFooter;
-void ui_event_PairingScreenMainActionButton( lv_event_t * e);
-extern lv_obj_t *ui_PairingScreenMainActionButton;
-extern lv_obj_t *ui_PairingScreenMainActionButtonLabel;
 extern lv_obj_t *ui____initial_actions0;
 
 LV_IMG_DECLARE( ui_img_icon_png);   // assets/icon.png

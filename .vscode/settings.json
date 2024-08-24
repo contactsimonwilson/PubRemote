@@ -2,7 +2,10 @@
     "C_Cpp.intelliSenseEngine": "default",
     "files.associations": {
       "*.h": "c",
-      "*.c": "c"
+      "*.c": "c",
+      "array": "c",
+      "string": "c",
+      "string_view": "c"
     },
     "editor.tabSize": 2,
     "files.eol": "\n",

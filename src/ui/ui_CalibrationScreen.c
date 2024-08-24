@@ -19,30 +19,21 @@ lv_obj_set_flex_flow(ui_CalibrationScreenContent,LV_FLEX_FLOW_COLUMN);
 lv_obj_set_flex_align(ui_CalibrationScreenContent, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 lv_obj_clear_flag( ui_CalibrationScreenContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
-ui_CalibrationScreenheader = lv_obj_create(ui_CalibrationScreenContent);
-lv_obj_remove_style_all(ui_CalibrationScreenheader);
-lv_obj_set_width( ui_CalibrationScreenheader, 100);
-lv_obj_set_height( ui_CalibrationScreenheader, 50);
-lv_obj_set_align( ui_CalibrationScreenheader, LV_ALIGN_CENTER );
-lv_obj_clear_flag( ui_CalibrationScreenheader, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+ui_CalibrationScreenHeader = lv_obj_create(ui_CalibrationScreenContent);
+lv_obj_remove_style_all(ui_CalibrationScreenHeader);
+lv_obj_set_width( ui_CalibrationScreenHeader, 100);
+lv_obj_set_height( ui_CalibrationScreenHeader, 50);
+lv_obj_set_align( ui_CalibrationScreenHeader, LV_ALIGN_CENTER );
+lv_obj_clear_flag( ui_CalibrationScreenHeader, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
 ui_CalibrationScreenBody = lv_obj_create(ui_CalibrationScreenContent);
 lv_obj_remove_style_all(ui_CalibrationScreenBody);
-lv_obj_set_width( ui_CalibrationScreenBody, lv_pct(100));
+lv_obj_set_width( ui_CalibrationScreenBody, LV_SIZE_CONTENT);  /// 100
 lv_obj_set_height( ui_CalibrationScreenBody, LV_SIZE_CONTENT);   /// 50
 lv_obj_set_align( ui_CalibrationScreenBody, LV_ALIGN_CENTER );
 lv_obj_set_flex_flow(ui_CalibrationScreenBody,LV_FLEX_FLOW_COLUMN);
 lv_obj_set_flex_align(ui_CalibrationScreenBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 lv_obj_clear_flag( ui_CalibrationScreenBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-
-ui_Label4 = lv_label_create(ui_CalibrationScreenBody);
-lv_obj_set_width( ui_Label4, lv_pct(80));
-lv_obj_set_height( ui_Label4, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label4, 19 );
-lv_obj_set_y( ui_Label4, 38 );
-lv_obj_set_align( ui_Label4, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label4,"Move joystick/throttle to min and max values\n\nPress done when complete");
-lv_obj_set_style_text_align(ui_Label4, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_CalibrationScreenFooter = lv_obj_create(ui_CalibrationScreenContent);
 lv_obj_remove_style_all(ui_CalibrationScreenFooter);
@@ -60,6 +51,8 @@ lv_obj_set_style_pad_bottom(ui_CalibrationScreenFooter, 24, LV_PART_MAIN| LV_STA
 ui_CalibrationScreenMainActionButton = lv_btn_create(ui_CalibrationScreenFooter);
 lv_obj_set_width( ui_CalibrationScreenMainActionButton, 100);
 lv_obj_set_height( ui_CalibrationScreenMainActionButton, 37);
+lv_obj_set_x( ui_CalibrationScreenMainActionButton, lv_pct(-27) );
+lv_obj_set_y( ui_CalibrationScreenMainActionButton, lv_pct(-514) );
 lv_obj_set_align( ui_CalibrationScreenMainActionButton, LV_ALIGN_CENTER );
 lv_obj_add_flag( ui_CalibrationScreenMainActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
 lv_obj_clear_flag( ui_CalibrationScreenMainActionButton, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
@@ -67,9 +60,11 @@ lv_obj_clear_flag( ui_CalibrationScreenMainActionButton, LV_OBJ_FLAG_SCROLLABLE 
 ui_CalibrationScreenMainActionButtonLabel = lv_label_create(ui_CalibrationScreenMainActionButton);
 lv_obj_set_width( ui_CalibrationScreenMainActionButtonLabel, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_CalibrationScreenMainActionButtonLabel, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_x( ui_CalibrationScreenMainActionButtonLabel, 0 );
+lv_obj_set_y( ui_CalibrationScreenMainActionButtonLabel, -1 );
 lv_obj_set_align( ui_CalibrationScreenMainActionButtonLabel, LV_ALIGN_CENTER );
-lv_label_set_text(ui_CalibrationScreenMainActionButtonLabel,"Done");
+lv_label_set_text(ui_CalibrationScreenMainActionButtonLabel,"Calibrate");
 
-lv_obj_add_event_cb(ui_CalibrationScreenMainActionButton, ui_event_CalibrationScreenMainActionButton, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(ui_CalibrationScreen, ui_event_CalibrationScreen, LV_EVENT_ALL, NULL);
 
 }
