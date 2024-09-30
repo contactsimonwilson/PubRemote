@@ -28,12 +28,23 @@ lv_obj_clear_flag( ui_SettingsScreenHeader, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_
 
 ui_SettingsScreenBody = lv_obj_create(ui_SettingsScreenContent);
 lv_obj_remove_style_all(ui_SettingsScreenBody);
+lv_obj_set_height( ui_SettingsScreenBody, lv_pct(50));
 lv_obj_set_width( ui_SettingsScreenBody, LV_SIZE_CONTENT);  /// 100
-lv_obj_set_height( ui_SettingsScreenBody, LV_SIZE_CONTENT);   /// 50
 lv_obj_set_align( ui_SettingsScreenBody, LV_ALIGN_CENTER );
 lv_obj_set_flex_flow(ui_SettingsScreenBody,LV_FLEX_FLOW_COLUMN);
 lv_obj_set_flex_align(ui_SettingsScreenBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+lv_obj_add_flag( ui_SettingsScreenBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE );   /// Flags
 lv_obj_clear_flag( ui_SettingsScreenBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_pad_row(ui_SettingsScreenBody, 12, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_column(ui_SettingsScreenBody, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_BrightnessSlider = lv_slider_create(ui_SettingsScreenBody);
+lv_slider_set_value( ui_BrightnessSlider, 0, LV_ANIM_OFF);
+if (lv_slider_get_mode(ui_BrightnessSlider)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_BrightnessSlider, 0, LV_ANIM_OFF);
+lv_obj_set_width( ui_BrightnessSlider, 150);
+lv_obj_set_height( ui_BrightnessSlider, 10);
+lv_obj_set_align( ui_BrightnessSlider, LV_ALIGN_CENTER );
+
 
 ui_BrightnessLabel = lv_label_create(ui_SettingsScreenBody);
 lv_obj_set_width( ui_BrightnessLabel, LV_SIZE_CONTENT);  /// 1
@@ -42,14 +53,6 @@ lv_obj_set_x( ui_BrightnessLabel, 19 );
 lv_obj_set_y( ui_BrightnessLabel, 48 );
 lv_obj_set_align( ui_BrightnessLabel, LV_ALIGN_CENTER );
 lv_label_set_text(ui_BrightnessLabel,"Brightness");
-
-ui_BrightnessSlider = lv_slider_create(ui_SettingsScreenContent);
-lv_slider_set_value( ui_BrightnessSlider, 0, LV_ANIM_OFF);
-if (lv_slider_get_mode(ui_BrightnessSlider)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_BrightnessSlider, 0, LV_ANIM_OFF);
-lv_obj_set_width( ui_BrightnessSlider, 150);
-lv_obj_set_height( ui_BrightnessSlider, 10);
-lv_obj_set_align( ui_BrightnessSlider, LV_ALIGN_CENTER );
-
 
 ui_SettingsScreenFooter = lv_obj_create(ui_SettingsScreenContent);
 lv_obj_remove_style_all(ui_SettingsScreenFooter);
