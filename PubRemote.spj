@@ -588,7 +588,7 @@
                   {
                     "nid": 110891478,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -6163,7 +6163,7 @@
                   {
                     "nid": -2005820167,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -8838,7 +8838,7 @@
                   {
                     "nid": -320186631,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -8914,7 +8914,7 @@
                   {
                     "nid": 2116772246,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -8990,7 +8990,7 @@
                   {
                     "nid": 1112390259,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -11770,7 +11770,7 @@
                   {
                     "nid": -902682278,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -11846,7 +11846,7 @@
                   {
                     "nid": -1296133568,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -11922,7 +11922,7 @@
                   {
                     "nid": -1398444120,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -13920,7 +13920,7 @@
                   {
                     "nid": 342308407,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -13996,7 +13996,7 @@
                   {
                     "nid": -1093031220,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -14072,7 +14072,7 @@
                   {
                     "nid": -184746568,
                     "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 500,
+                    "integer": 200,
                     "InheritedType": 6
                   },
                   {
@@ -14128,7 +14128,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 278,
+    "backup_cnt": 279,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",

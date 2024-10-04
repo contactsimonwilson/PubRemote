@@ -96,14 +96,14 @@ lv_obj_t *ui____initial_actions0;
 void ui_event_SplashScreen( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
 if ( event_code == LV_EVENT_SCREEN_LOADED) {
-      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 500, 1000, &ui_StatsScreen_screen_init);
+      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 1000, &ui_StatsScreen_screen_init);
 }
 }
 void ui_event_StatsScreen( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_SettingsScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 500, 0, &ui_SettingsScreen_screen_init);
+      _ui_screen_change( &ui_SettingsScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_SettingsScreen_screen_init);
 }
 }
 void ui_event_BatteryDisplay( lv_event_t * e) {
@@ -116,15 +116,15 @@ void ui_event_PairingScreen( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 500, 0, &ui_StatsScreen_screen_init);
+      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_StatsScreen_screen_init);
 }
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_CalibrationScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0, &ui_CalibrationScreen_screen_init);
+      _ui_screen_change( &ui_CalibrationScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_CalibrationScreen_screen_init);
 }
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0, &ui_SettingsScreen_screen_init);
+      _ui_screen_change( &ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
 }
 }
 void ui_event_PairingScreenMainActionButton( lv_event_t * e) {
@@ -137,15 +137,15 @@ void ui_event_SettingsScreen( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_PairingScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0, &ui_PairingScreen_screen_init);
+      _ui_screen_change( &ui_PairingScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_PairingScreen_screen_init);
 }
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 500, 0, &ui_StatsScreen_screen_init);
+      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_StatsScreen_screen_init);
 }
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_CalibrationScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0, &ui_CalibrationScreen_screen_init);
+      _ui_screen_change( &ui_CalibrationScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_CalibrationScreen_screen_init);
 }
 }
 void ui_event_BrightnessSlider( lv_event_t * e) {
@@ -167,15 +167,15 @@ void ui_event_CalibrationScreen( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 500, 0, &ui_StatsScreen_screen_init);
+      _ui_screen_change( &ui_StatsScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_StatsScreen_screen_init);
 }
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0, &ui_SettingsScreen_screen_init);
+      _ui_screen_change( &ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_SettingsScreen_screen_init);
 }
 if ( event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT  ) {
 lv_indev_wait_release(lv_indev_get_act());
-      _ui_screen_change( &ui_PairingScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0, &ui_PairingScreen_screen_init);
+      _ui_screen_change( &ui_PairingScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_PairingScreen_screen_init);
 }
 }
 
