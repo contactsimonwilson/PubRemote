@@ -14,6 +14,8 @@ extern "C" {
 
 #include "ui_helpers.h"
 #include "ui_events.h"
+#include "ui_theme_manager.h"
+#include "ui_themes.h"
 
 // SCREEN: ui_SplashScreen
 void ui_SplashScreen_screen_init(void);
@@ -25,11 +27,11 @@ void ui_StatsScreen_screen_init(void);
 void ui_event_StatsScreen( lv_event_t * e);
 extern lv_obj_t *ui_StatsScreen;
 extern lv_obj_t *ui_DutyCycle;
+extern lv_obj_t *ui_Utilizaiton;
 extern lv_obj_t *ui_LeftSensor;
 extern lv_obj_t *ui_RightSensor;
 extern lv_obj_t *ui_StatsScreenContent;
 extern lv_obj_t *ui_StatsScreenHeader;
-extern lv_obj_t *ui_Logo;
 extern lv_obj_t *ui_TimeDisplay;
 extern lv_obj_t *ui_StatsScreenBody;
 extern lv_obj_t *ui_PrimaryStat;

@@ -3,6 +3,8 @@ SET(SOURCES ui_SplashScreen.c
     ui_PairingScreen.c
     ui_SettingsScreen.c
     ui_CalibrationScreen.c
+    ui_theme_manager.c
+    ui_themes.c
     ui.c
     ui_comp_hook.c
     ui_helpers.c
