@@ -10,3 +10,7 @@ def CompleteCalibration(event_struct):
 def StartPairing(event_struct):
     return
 
+
+def enter_deep_sleep(event_struct):
+    return
+

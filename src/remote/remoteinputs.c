@@ -81,7 +81,7 @@ void thumbstick_task(void *pvParameters) {
     // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
 
-    vTaskDelay(pdMS_TO_TICKS(100)); // Increase the delay to 100ms for better clarity in the output
+    vTaskDelay(pdMS_TO_TICKS(LOOP_RATE)); // Increase the delay to 100ms for better clarity in the output
   }
 
   ESP_LOGI(TAG, "Thumbstick task ended");
