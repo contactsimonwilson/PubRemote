@@ -16,6 +16,7 @@
 #include "remote/remoteinputs.h"
 #include "remote/router.h"
 #include "remote/screen.h"
+#include "remote/settings.h"
 #include "remote/time.h"
 #include "remote/transmitter.h"
 #include "ui/ui.h"
@@ -29,6 +30,7 @@ uint8_t PEER_MAC_ADDRESS[6] = {72, 49, 183, 171, 63, 137}; // Siwoz
 int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
+  init_nvs();
   init_power_management();
   init_led();
   init_buzzer();
@@ -51,7 +53,7 @@ void app_main(void) {
   init_buttons();
   init_thumbstick();
   RemoteScreen stats_screen = {.name = "stats", .screen_obj = ui_StatsScreen};
-  RemoteScreen calibration_screen = {.name = "calibration", .screen_obj = ui_CalibrationScreen};
+  // RemoteScreen calibration_screen = {.name = "calibration", .screen_obj = ui_CalibrationScreen};
   router_register_screen(&stats_screen);
-  router_register_screen(&calibration_screen);
+  // router_register_screen(&calibration_screen);
 }
