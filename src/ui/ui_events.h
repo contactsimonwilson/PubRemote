@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 void toggleFooterDisplayMode(lv_event_t * e);
+void enter_deep_sleep(lv_event_t * e);
 void StartPairing(lv_event_t * e);
 
 #ifdef __cplusplus

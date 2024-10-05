@@ -4,6 +4,7 @@ SET(SOURCES ui_SplashScreen.c
     ui_BrightnessScreen.c
     ui_PairingScreen.c
     ui_PowerScreen.c
+    ui_CalibrationScreen.c
     ui_theme_manager.c
     ui_themes.c
     ui.c

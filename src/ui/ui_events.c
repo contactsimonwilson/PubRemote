@@ -10,6 +10,11 @@ void toggleFooterDisplayMode(lv_event_t * e)
 	// Your code here
 }
 
+void enter_deep_sleep(lv_event_t * e)
+{
+	// Your code here
+}
+
 void StartPairing(lv_event_t * e)
 {
 	// Your code here

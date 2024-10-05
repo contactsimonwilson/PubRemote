@@ -100,20 +100,22 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_y(ui_StatsHeader, -16);
     lv_obj_set_align(ui_StatsHeader, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_StatsHeader, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_StatsHeader, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_align(ui_StatsHeader, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_StatsHeader, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_UnusedAlert = lv_label_create(ui_StatsHeader);
-    lv_obj_set_width(ui_UnusedAlert, lv_pct(100));
-    lv_obj_set_height(ui_UnusedAlert, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_UnusedAlert, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_UnusedAlert, LV_LABEL_LONG_DOT);
-    lv_label_set_text(ui_UnusedAlert, "");
-    lv_obj_set_style_text_align(ui_UnusedAlert, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui_UnusedAlert, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_UnusedAlert, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_UnusedAlert, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_UnusedAlert, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_MessageText = lv_label_create(ui_StatsHeader);
+    lv_obj_set_width(ui_MessageText, lv_pct(100));
+    lv_obj_set_height(ui_MessageText, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_MessageText, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_MessageText, LV_LABEL_LONG_DOT);
+    lv_label_set_text(ui_MessageText, "PUSHBACK ACTIVE");
+    lv_obj_add_flag(ui_MessageText, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_set_style_text_align(ui_MessageText, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_MessageText, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_MessageText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_MessageText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_MessageText, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_MessageText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_StatsBody = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsBody);
