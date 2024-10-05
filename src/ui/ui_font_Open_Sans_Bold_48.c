@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 48 px
  * Bpp: 4
- * Opts: --bpp 4 --size 48 --font /Users/simon/Repos/PubRemote/assets/OpenSans-Bold.ttf -o /Users/simon/Repos/PubRemote/assets/ui_font_Open_Sans_Bold_48.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
+ * Opts: --bpp 4 --size 48 --font C:/Repos/PubRemote/assets/OpenSans-Bold.ttf -o C:/Repos/PubRemote/assets\ui_font_Open_Sans_Bold_48.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
  ******************************************************************************/
 
 #include "ui.h"

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 14 px
  * Bpp: 4
- * Opts: --bpp 4 --size 14 --font /Users/simon/Repos/PubRemote/assets/OpenSans-Regular.ttf -o /Users/simon/Repos/PubRemote/assets/ui_font_Open_Sans_14.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
+ * Opts: --bpp 4 --size 14 --font C:/Repos/PubRemote/assets/OpenSans-Regular.ttf -o C:/Repos/PubRemote/assets\ui_font_Open_Sans_14.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
  ******************************************************************************/
 
 #include "ui.h"
