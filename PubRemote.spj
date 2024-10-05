@@ -2479,12 +2479,6 @@
                                 "InheritedType": 3
                               },
                               {
-                                "nid": -1335795573,
-                                "strtype": "_style/Text_Font",
-                                "strval": "Open_Sans_14",
-                                "InheritedType": 3
-                              },
-                              {
                                 "nid": 1528389384,
                                 "strtype": "_style/Padding",
                                 "intarray": [
@@ -3081,7 +3075,7 @@
                                   {
                                     "nid": 1175973441,
                                     "strtype": "_style/Text_Font",
-                                    "strval": "montserrat_14",
+                                    "strval": "Inter_14",
                                     "InheritedType": 3
                                   }
                                 ],
@@ -3392,7 +3386,7 @@
                               {
                                 "nid": 834072296,
                                 "strtype": "_style/Text_Font",
-                                "strval": "Open_Sans_Bold_48",
+                                "strval": "Inter_Bold_48",
                                 "InheritedType": 3
                               }
                             ],
@@ -4583,12 +4577,6 @@
                                 "strtype": "_style/Text_Align",
                                 "strval": "CENTER",
                                 "InheritedType": 3
-                              },
-                              {
-                                "nid": -1164309648,
-                                "strtype": "_style/Text_Font",
-                                "strval": "Open_Sans_14",
-                                "InheritedType": 3
                               }
                             ],
                             "InheritedType": 1
@@ -5201,7 +5189,7 @@
                               {
                                 "nid": 1109758047,
                                 "strtype": "_style/Text_Font",
-                                "strval": "Open_Sans_Bold_14",
+                                "strval": "Inter_Bold_14",
                                 "InheritedType": 3
                               },
                               {
@@ -5586,8 +5574,7 @@
                     "InheritedType": 11
                   }
                 ],
-                "saved_objtypeKey": "CONTAINER",
-                "tree_closed": true
+                "saved_objtypeKey": "CONTAINER"
               }
             ],
             "locked": false,
@@ -5862,6 +5849,12 @@
                           5
                         ],
                         "InheritedType": 7
+                      },
+                      {
+                        "nid": 885009666,
+                        "strtype": "_style/Text_Font",
+                        "strval": "Inter_14",
+                        "InheritedType": 3
                       }
                     ],
                     "InheritedType": 1
@@ -6829,8 +6822,7 @@
                         "InheritedType": 4
                       }
                     ],
-                    "saved_objtypeKey": "BUTTON",
-                    "tree_closed": true
+                    "saved_objtypeKey": "BUTTON"
                   },
                   {
                     "guid": "GUID74212888-334284S37843279",
@@ -9309,8 +9301,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "BUTTON",
-                    "tree_closed": true
+                    "saved_objtypeKey": "BUTTON"
                   }
                 ],
                 "locked": false,
@@ -9593,6 +9584,12 @@
                               0
                             ],
                             "InheritedType": 7
+                          },
+                          {
+                            "nid": 530491888,
+                            "strtype": "_style/Text_Font",
+                            "strval": "Inter_Bold_14",
+                            "InheritedType": 3
                           }
                         ],
                         "InheritedType": 1
@@ -9871,7 +9868,22 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": -1667624353,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 740810208,
+                        "strtype": "_style/Text_Font",
+                        "strval": "Inter_14",
+                        "InheritedType": 3
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": -1956835219,
                 "strtype": "CONTAINER/Style_main",
                 "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -11826,7 +11838,22 @@
                       },
                       {
                         "part": "lv.PART.MAIN",
-                        "childs": [],
+                        "childs": [
+                          {
+                            "nid": 1077431126,
+                            "strtype": "_style/StyleState",
+                            "strval": "DEFAULT",
+                            "childs": [
+                              {
+                                "nid": 1339636264,
+                                "strtype": "_style/Text_Font",
+                                "strval": "Inter_Bold_14",
+                                "InheritedType": 3
+                              }
+                            ],
+                            "InheritedType": 1
+                          }
+                        ],
                         "nid": -1608564139,
                         "strtype": "BUTTON/Style_main",
                         "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -12473,7 +12500,22 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": -129105767,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": -2003310371,
+                        "strtype": "_style/Text_Font",
+                        "strval": "Inter_14",
+                        "InheritedType": 3
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 621204207,
                 "strtype": "CONTAINER/Style_main",
                 "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -13292,7 +13334,7 @@
                               {
                                 "nid": -425222813,
                                 "strtype": "_style/Text_Font",
-                                "strval": "Open_Sans_Bold_48",
+                                "strval": "Inter_Bold_48",
                                 "InheritedType": 3
                               }
                             ],
@@ -13315,7 +13357,7 @@
                       {
                         "nid": -700535056,
                         "strtype": "OBJECT/Name",
-                        "strval": "PairingCodeLabe",
+                        "strval": "PairingCodeLabel",
                         "InheritedType": 10
                       },
                       {
@@ -14454,7 +14496,22 @@
                       },
                       {
                         "part": "lv.PART.MAIN",
-                        "childs": [],
+                        "childs": [
+                          {
+                            "nid": 1727269484,
+                            "strtype": "_style/StyleState",
+                            "strval": "DEFAULT",
+                            "childs": [
+                              {
+                                "nid": 1531885935,
+                                "strtype": "_style/Text_Font",
+                                "strval": "Inter_Bold_14",
+                                "InheritedType": 3
+                              }
+                            ],
+                            "InheritedType": 1
+                          }
+                        ],
                         "nid": -694283308,
                         "strtype": "BUTTON/Style_main",
                         "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -15101,7 +15158,22 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 1211512034,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": -850120587,
+                        "strtype": "_style/Text_Font",
+                        "strval": "Inter_14",
+                        "InheritedType": 3
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 1717563693,
                 "strtype": "CONTAINER/Style_main",
                 "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -15982,7 +16054,22 @@
                       },
                       {
                         "part": "lv.PART.MAIN",
-                        "childs": [],
+                        "childs": [
+                          {
+                            "nid": 2112811206,
+                            "strtype": "_style/StyleState",
+                            "strval": "DEFAULT",
+                            "childs": [
+                              {
+                                "nid": -1134863582,
+                                "strtype": "_style/Text_Font",
+                                "strval": "Inter_Bold_14",
+                                "InheritedType": 3
+                              }
+                            ],
+                            "InheritedType": 1
+                          }
+                        ],
                         "nid": 1152372033,
                         "strtype": "DROPDOWN/Style_main",
                         "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
@@ -15990,7 +16077,22 @@
                       },
                       {
                         "part": "lv.PART.INDICATOR",
-                        "childs": [],
+                        "childs": [
+                          {
+                            "nid": 1253235939,
+                            "strtype": "_style/StyleState",
+                            "strval": "DEFAULT",
+                            "childs": [
+                              {
+                                "nid": 1424675917,
+                                "strtype": "_style/Text_Font",
+                                "strval": "montserrat_14",
+                                "InheritedType": 3
+                              }
+                            ],
+                            "InheritedType": 1
+                          }
+                        ],
                         "nid": -916887232,
                         "strtype": "DROPDOWN/Style_indicator",
                         "strval": "lv.PART.INDICATOR, Text",
@@ -15998,7 +16100,22 @@
                       },
                       {
                         "part": " lv.PART.MAIN",
-                        "childs": [],
+                        "childs": [
+                          {
+                            "nid": -1418212686,
+                            "strtype": "_style/StyleState",
+                            "strval": "DEFAULT",
+                            "childs": [
+                              {
+                                "nid": 1926177614,
+                                "strtype": "_style/Text_Font",
+                                "strval": "Inter_14",
+                                "InheritedType": 3
+                              }
+                            ],
+                            "InheritedType": 1
+                          }
+                        ],
                         "nid": -1907816658,
                         "strtype": "DROPDOWN/Style_list_main",
                         "strval": "{\"python\":\"{0}.get_list()\",\"c\":\"lv_dropdown_get_list({0})\"} lv.PART.MAIN, Text, Rectangle, Pad",
@@ -17167,7 +17284,22 @@
                       },
                       {
                         "part": "lv.PART.MAIN",
-                        "childs": [],
+                        "childs": [
+                          {
+                            "nid": -1611572509,
+                            "strtype": "_style/StyleState",
+                            "strval": "DEFAULT",
+                            "childs": [
+                              {
+                                "nid": -1875584326,
+                                "strtype": "_style/Text_Font",
+                                "strval": "Inter_Bold_14",
+                                "InheritedType": 3
+                              }
+                            ],
+                            "InheritedType": 1
+                          }
+                        ],
                         "nid": 341807549,
                         "strtype": "BUTTON/Style_main",
                         "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -17814,7 +17946,22 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": -1048260690,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 1471666289,
+                        "strtype": "_style/Text_Font",
+                        "strval": "Inter_14",
+                        "InheritedType": 3
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": -472217076,
                 "strtype": "CONTAINER/Style_main",
                 "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -18156,7 +18303,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 309,
+    "backup_cnt": 321,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",

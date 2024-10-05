@@ -82,7 +82,7 @@ extern lv_obj_t * ui_PairingContent;
 extern lv_obj_t * ui_PairingHeader;
 extern lv_obj_t * ui_PairingBody;
 extern lv_obj_t * ui_PairingCode;
-extern lv_obj_t * ui_PairingCodeLabe;
+extern lv_obj_t * ui_PairingCodeLabel;
 extern lv_obj_t * ui_PairingFooter;
 void ui_event_PairingMainActionButton(lv_event_t * e);
 extern lv_obj_t * ui_PairingMainActionButton;
@@ -107,9 +107,9 @@ LV_IMG_DECLARE(ui_img_icon_png);    // assets/icon.png
 
 
 
-LV_FONT_DECLARE(ui_font_Open_Sans_14);
-LV_FONT_DECLARE(ui_font_Open_Sans_Bold_14);
-LV_FONT_DECLARE(ui_font_Open_Sans_Bold_48);
+LV_FONT_DECLARE(ui_font_Inter_14);
+LV_FONT_DECLARE(ui_font_Inter_Bold_14);
+LV_FONT_DECLARE(ui_font_Inter_Bold_48);
 
 
 

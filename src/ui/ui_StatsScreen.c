@@ -90,6 +90,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_right(ui_StatsContent, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_StatsContent, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_StatsContent, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_StatsContent, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_StatsHeader = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsHeader);
@@ -109,7 +110,6 @@ void ui_StatsScreen_screen_init(void)
     lv_label_set_long_mode(ui_UnusedAlert, LV_LABEL_LONG_DOT);
     lv_label_set_text(ui_UnusedAlert, "");
     lv_obj_set_style_text_align(ui_UnusedAlert, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_UnusedAlert, &ui_font_Open_Sans_14, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui_UnusedAlert, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_UnusedAlert, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_UnusedAlert, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -139,7 +139,7 @@ void ui_StatsScreen_screen_init(void)
     lv_label_set_long_mode(ui_PrimaryStat, LV_LABEL_LONG_DOT);
     lv_label_set_text(ui_PrimaryStat, "0.0");
     lv_obj_set_style_text_align(ui_PrimaryStat, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_PrimaryStat, &ui_font_Open_Sans_Bold_48, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_PrimaryStat, &ui_font_Inter_Bold_48, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PrimaryStatUnit = lv_label_create(ui_PrimaryStat);
     lv_obj_set_width(ui_PrimaryStatUnit, 40);
@@ -149,7 +149,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_PrimaryStatUnit, LV_ALIGN_CENTER);
     lv_label_set_text(ui_PrimaryStatUnit, "kph");
     lv_obj_add_flag(ui_PrimaryStatUnit, LV_OBJ_FLAG_FLOATING);     /// Flags
-    lv_obj_set_style_text_font(ui_PrimaryStatUnit, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_PrimaryStatUnit, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_SecondaryStats = lv_obj_create(ui_StatsBody);
     lv_obj_set_width(ui_SecondaryStats, lv_pct(100));
@@ -166,7 +166,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_top(ui_SecondaryStats, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_SecondaryStats, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_SecondaryStats, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_SecondaryStats, &ui_font_Open_Sans_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ConnectionState = lv_label_create(ui_SecondaryStats);
     lv_obj_set_width(ui_ConnectionState, lv_pct(100));
@@ -229,7 +228,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_BatteryDisplay, LV_ALIGN_CENTER);
     lv_label_set_long_mode(ui_BatteryDisplay, LV_LABEL_LONG_CLIP);
     lv_label_set_text(ui_BatteryDisplay, "0%");
-    lv_obj_set_style_text_font(ui_BatteryDisplay, &ui_font_Open_Sans_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_BatteryDisplay, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);

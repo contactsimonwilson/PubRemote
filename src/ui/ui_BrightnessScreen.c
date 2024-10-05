@@ -18,6 +18,7 @@ void ui_BrightnessScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_BrightnessContent, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_BrightnessContent, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_BrightnessContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_BrightnessContent, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BrightnessHeader = lv_obj_create(ui_BrightnessContent);
     lv_obj_remove_style_all(ui_BrightnessHeader);
@@ -80,6 +81,7 @@ void ui_BrightnessScreen_screen_init(void)
     lv_obj_set_align(ui_BrightnessMainActionButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_BrightnessMainActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_BrightnessMainActionButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_BrightnessMainActionButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BrightnessMainActionButtonLabel = lv_label_create(ui_BrightnessMainActionButton);
     lv_obj_set_width(ui_BrightnessMainActionButtonLabel, LV_SIZE_CONTENT);   /// 1

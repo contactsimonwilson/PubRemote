@@ -82,7 +82,7 @@ lv_obj_t * ui_PairingContent;
 lv_obj_t * ui_PairingHeader;
 lv_obj_t * ui_PairingBody;
 lv_obj_t * ui_PairingCode;
-lv_obj_t * ui_PairingCodeLabe;
+lv_obj_t * ui_PairingCodeLabel;
 lv_obj_t * ui_PairingFooter;
 void ui_event_PairingMainActionButton(lv_event_t * e);
 lv_obj_t * ui_PairingMainActionButton;

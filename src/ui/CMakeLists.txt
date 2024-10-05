@@ -11,8 +11,8 @@ SET(SOURCES ui_SplashScreen.c
     ui_helpers.c
     ui_events.c
     ui_img_icon_png.c
-    fonts/ui_font_Open_Sans_14.c
-    fonts/ui_font_Open_Sans_Bold_14.c
-    fonts/ui_font_Open_Sans_Bold_48.c)
+    fonts/ui_font_Inter_14.c
+    fonts/ui_font_Inter_Bold_14.c
+    fonts/ui_font_Inter_Bold_48.c)
 
 add_library(ui ${SOURCES})

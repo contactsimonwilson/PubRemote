@@ -18,6 +18,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_Content, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_Content, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_Content, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_Content, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_SettingsBody = lv_obj_create(ui_Content);
     lv_obj_remove_style_all(ui_SettingsBody);
@@ -34,6 +35,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_style_pad_bottom(ui_SettingsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_row(ui_SettingsBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(ui_SettingsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_SettingsBody, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_SettingsBackButton = lv_btn_create(ui_SettingsBody);
     lv_obj_set_height(ui_SettingsBackButton, 42);

@@ -18,6 +18,7 @@ void ui_PowerScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_PowerContent, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_PowerContent, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_PowerContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_PowerContent, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PowerHeader = lv_obj_create(ui_PowerContent);
     lv_obj_remove_style_all(ui_PowerHeader);
@@ -43,8 +44,11 @@ void ui_PowerScreen_screen_init(void)
     lv_obj_set_height(ui_AutoOffTime, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_AutoOffTime, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_AutoOffTime, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_AutoOffTime, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    lv_obj_set_style_text_font(ui_AutoOffTime, &lv_font_montserrat_14, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_AutoOffTime), &ui_font_Inter_14,  LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PowerLabel = lv_label_create(ui_PowerBody);
     lv_obj_set_width(ui_PowerLabel, LV_SIZE_CONTENT);   /// 1
@@ -75,6 +79,7 @@ void ui_PowerScreen_screen_init(void)
     lv_obj_set_align(ui_PowerMainActionButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_PowerMainActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_PowerMainActionButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_PowerMainActionButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PowerMainActionButtonLabel = lv_label_create(ui_PowerMainActionButton);
     lv_obj_set_width(ui_PowerMainActionButtonLabel, LV_SIZE_CONTENT);   /// 1
