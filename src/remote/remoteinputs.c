@@ -63,15 +63,17 @@ void thumbstick_task(void *pvParameters) {
     remote_data.data.js_x = 0;
     remote_data.data.js_y = 0;
     if (x_value > 2047 + X_STICK_DEADZONE || x_value < 2047 - X_STICK_DEADZONE) {
-      start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+      // TODO - RESTORE
+      // start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
       remote_data.data.js_x = convert_adc_to_axis(x_value);
-      printf("Thumbstick x value: %d\n", x_value);
+      // ESP_LOGI(TAG, "Thumbstick x value: %d", x_value);
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     }
     if (y_value > 2047 + Y_STICK_DEADZONE || y_value < 2047 - Y_STICK_DEADZONE) {
-      start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+      // TODO - RESTORE
+      // start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
       remote_data.data.js_y = convert_adc_to_axis(y_value);
-      printf("Thumbstick y value: %d\n", y_value);
+      // ESP_LOGI(TAG, "Thumbstick y value: %d", y_value);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
     }
 

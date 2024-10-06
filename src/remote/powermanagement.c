@@ -28,12 +28,12 @@ void check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
   while (gpio_get_level(GPIO_NUM_15) == 1) { // Check if button is still pressed
     if ((esp_timer_get_time() - pressStartTime) >= (REQUIRED_PRESS_TIME_MS * 1000)) {
-      printf("Button has been pressed for 2 seconds.\n");
+      ESP_LOGI(TAG, "Button has been pressed for 2 seconds.");
       // Perform the desired action after confirmation of long press
       // maybe show start up screen or buzzer, etc.?
       break;
     }
-    vTaskDelay(10 / portTICK_PERIOD_MS); // Delay to allow for time checking without busy waiting
+    vTaskDelay(pdMS_TO_TICKS(10)); // Delay to allow for time checking without busy waiting
   }
   while (gpio_get_level(GPIO_NUM_15) == 1)
     ; // wait for button release
@@ -90,7 +90,7 @@ void power_management_task(void *pvParameters) {
     int battery_value = 0;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BATTER_MONITOR_CHANNEL, &battery_value));
     BATTERY_VOLTAGE = convert_adc_to_battery_volts(battery_value);
-    printf("Battery volts: %.1f\n", BATTERY_VOLTAGE);
+    ESP_LOGI(TAG, "Battery volts: %.1f", BATTERY_VOLTAGE);
     // char str[20];
     // sprintf(str, "%.1f", BATTERY_VOLTAGE);
     //  lv_label_set_text(ui_PrimaryStat, str);
@@ -108,7 +108,7 @@ void init_power_management() {
   esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, 1); // 1 for high level
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: { // Wake-up caused by external signal using RTC_IO
-    printf("Woken up by external signal on EXT0.\n");
+    ESP_LOGI(TAG, "Woken up by external signal on EXT0.");
     // Proceed to check if the button is still pressed
     check_button_press();
     break;
@@ -122,7 +122,7 @@ void init_power_management() {
     // Handle other wake-up sources if necessary
     break;
   default:
-    printf("Not a deep sleep wakeup or other wake-up sources.\n");
+    ESP_LOGI(TAG, "Not a deep sleep wakeup or other wake-up sources.");
     break;
   }
   start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
