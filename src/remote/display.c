@@ -239,7 +239,7 @@ bool my_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
     data->state = LV_INDEV_STATE_PR;
 
     // ESP_LOGI(TAG, "Touch event at X: %d, Y: %d\n", data->point.x, data->point.y);
-    start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+    start_or_reset_deep_sleep_timer();
   }
   else {
     data->state = LV_INDEV_STATE_REL;

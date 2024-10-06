@@ -19,7 +19,11 @@ RemoteSettings settings = {
 };
 
 void save_bl_level() {
-  nvs_write_int("bl_level", settings.bl_level);
+  nvs_write_int(BL_LEVEL_KEY, settings.bl_level);
+}
+
+void save_auto_off_time() {
+  nvs_write_int(AUTO_OFF_TIME_KEY, settings.auto_off_time);
 }
 
 // Function to initialize NVS

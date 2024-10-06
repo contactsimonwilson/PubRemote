@@ -46,3 +46,11 @@ def brightness_screen_loaded(event_struct):
 def pairing_screen_loaded(event_struct):
     return
 
+
+def auto_off_select_change(event_struct):
+    return
+
+
+def power_screen_loaded(event_struct):
+    return
+

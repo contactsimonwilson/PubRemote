@@ -19,6 +19,8 @@ esp_err_t nvs_read_int(const char *key, int32_t *value);
 
 void save_bl_level();
 
+void save_auto_off_time();
+
 typedef struct {
   uint8_t bl_level;
   uint8_t auto_off_time;

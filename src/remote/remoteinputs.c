@@ -64,14 +64,14 @@ void thumbstick_task(void *pvParameters) {
     remote_data.data.js_y = 0;
     if (x_value > 2047 + X_STICK_DEADZONE || x_value < 2047 - X_STICK_DEADZONE) {
       // TODO - RESTORE
-      // start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+      // start_or_reset_deep_sleep_timer();
       remote_data.data.js_x = convert_adc_to_axis(x_value);
       // ESP_LOGI(TAG, "Thumbstick x value: %d", x_value);
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     }
     if (y_value > 2047 + Y_STICK_DEADZONE || y_value < 2047 - Y_STICK_DEADZONE) {
       // TODO - RESTORE
-      // start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+      // start_or_reset_deep_sleep_timer();
       remote_data.data.js_y = convert_adc_to_axis(y_value);
       // ESP_LOGI(TAG, "Thumbstick y value: %d", y_value);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
@@ -96,7 +96,7 @@ void init_thumbstick() {
 
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
-  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+  start_or_reset_deep_sleep_timer();
   remote_data.data.bt_c = 1;
 
   // Start a timer to reset the button state after a certain duration
@@ -108,7 +108,7 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
-  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+  start_or_reset_deep_sleep_timer();
   // router_show_screen("calibration");
 }
 

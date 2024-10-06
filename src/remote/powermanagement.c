@@ -12,6 +12,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
+#include <math.h>
 #include <ui/ui.h>
 static const char *TAG = "PUBMOTE-POWERMANAGEMENT";
 
@@ -45,13 +46,25 @@ void check_button_press() {
 
 esp_timer_handle_t deep_sleep_timer;
 
+static uint64_t get_sleep_timer_time_ms() {
+  return settings.auto_off_time * 60 * 1000;
+}
+
 static void deep_sleep_timer_callback(void *arg) {
   // Enter deep sleep mode when the deep sleep timer expires
   ESP_LOGI(TAG, "Deep sleep timer expired. Entering deep sleep mode.");
   esp_deep_sleep_start();
 }
 
-void start_or_reset_deep_sleep_timer(uint64_t duration_ms) {
+void start_or_reset_deep_sleep_timer() {
+  int duration_ms = get_sleep_timer_time_ms();
+
+  if (duration_ms == 0) {
+    ESP_LOGI(TAG, "Deep sleep timer disabled.");
+    deep_sleep_timer = NULL;
+    return;
+  }
+
   if (deep_sleep_timer == NULL) {
     esp_timer_create_args_t deep_sleep_timer_args = {.callback = deep_sleep_timer_callback,
                                                      .arg = NULL,
@@ -126,6 +139,6 @@ void init_power_management() {
     ESP_LOGI(TAG, "Not a deep sleep wakeup or other wake-up sources.");
     break;
   }
-  start_or_reset_deep_sleep_timer(settings.auto_off_time * 60 * 1000);
+  start_or_reset_deep_sleep_timer();
   xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
 }

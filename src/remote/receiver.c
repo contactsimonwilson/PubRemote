@@ -76,7 +76,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     // Reset the timers
     esp_timer_stop(connection_timeout_timer);
     esp_timer_stop(reconnecting_timer);
-    start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+    start_or_reset_deep_sleep_timer();
     lv_label_set_text(ui_ConnectionState, "Connected");
     // Restart the connection timeout timer
     esp_timer_start_once(reconnecting_timer, RECONNECTING_DURATION_MS * 1000);

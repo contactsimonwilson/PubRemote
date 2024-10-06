@@ -99,10 +99,12 @@ lv_obj_t * ui_PairingMainActionButtonLabel;
 
 // SCREEN: ui_PowerScreen
 void ui_PowerScreen_screen_init(void);
+void ui_event_PowerScreen(lv_event_t * e);
 lv_obj_t * ui_PowerScreen;
 lv_obj_t * ui_PowerContent;
 lv_obj_t * ui_PowerHeader;
 lv_obj_t * ui_PowerBody;
+void ui_event_AutoOffTime(lv_event_t * e);
 lv_obj_t * ui_AutoOffTime;
 lv_obj_t * ui_PowerLabel;
 lv_obj_t * ui_PowerFooter;
@@ -248,6 +250,22 @@ void ui_event_PairingMainActionButton(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+    }
+}
+void ui_event_PowerScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        power_screen_loaded(e);
+    }
+}
+void ui_event_AutoOffTime(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        auto_off_select_change(e);
     }
 }
 void ui_event_PowerMainActionButton(lv_event_t * e)

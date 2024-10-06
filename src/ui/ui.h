@@ -97,10 +97,12 @@ extern lv_obj_t * ui_PairingMainActionButton;
 extern lv_obj_t * ui_PairingMainActionButtonLabel;
 // SCREEN: ui_PowerScreen
 void ui_PowerScreen_screen_init(void);
+void ui_event_PowerScreen(lv_event_t * e);
 extern lv_obj_t * ui_PowerScreen;
 extern lv_obj_t * ui_PowerContent;
 extern lv_obj_t * ui_PowerHeader;
 extern lv_obj_t * ui_PowerBody;
+void ui_event_AutoOffTime(lv_event_t * e);
 extern lv_obj_t * ui_AutoOffTime;
 extern lv_obj_t * ui_PowerLabel;
 extern lv_obj_t * ui_PowerFooter;
