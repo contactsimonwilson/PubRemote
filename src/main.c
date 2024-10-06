@@ -30,7 +30,7 @@ uint8_t PEER_MAC_ADDRESS[6] = {72, 49, 183, 171, 63, 137}; // Siwoz
 int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
-  init_nvs();
+  init_settings();
   init_power_management();
   init_led();
   init_buzzer();

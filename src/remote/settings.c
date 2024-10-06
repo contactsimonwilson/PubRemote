@@ -1,3 +1,4 @@
+#include "settings.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
@@ -6,7 +7,12 @@
 static const char *TAG = "PUBMOTE-SETTINGS";
 
 // Define the NVS namespace
-#define STORAGE_NAMESPACE "settings"
+#define STORAGE_NAMESPACE "nvs"
+
+RemoteSettings settings = {
+    .bl_level = 200,
+    .auto_off_time = 2,
+};
 
 // Function to initialize NVS
 esp_err_t init_nvs() {
@@ -21,12 +27,22 @@ esp_err_t init_nvs() {
   return ESP_OK;
 }
 
+// Function to initialize settings object, reading from NVS
+esp_err_t init_settings() {
+  esp_err_t err = init_nvs();
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Error initializing NVS!");
+    return err;
+  }
+  return ESP_OK;
+}
+
 // Function to write an integer to NVS
 esp_err_t nvs_write_int(const char *key, int32_t value) {
   nvs_handle_t my_handle;
   esp_err_t err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle);
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+    ESP_LOGE(TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
     return err;
   }
 
@@ -56,7 +72,7 @@ esp_err_t nvs_read_int(const char *key, int32_t *value) {
   nvs_handle_t my_handle;
   esp_err_t err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &my_handle);
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
+    ESP_LOGE(TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
     return err;
   }
 
@@ -69,7 +85,7 @@ esp_err_t nvs_read_int(const char *key, int32_t *value) {
     ESP_LOGE(TAG, "The value is not initialized yet!");
     break;
   default:
-    ESP_LOGE(TAG, "Error (%s) reading!\n", esp_err_to_name(err));
+    ESP_LOGE(TAG, "Error (%s) reading!", esp_err_to_name(err));
   }
 
   nvs_close(my_handle);

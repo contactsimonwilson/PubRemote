@@ -5,6 +5,7 @@
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "remoteinputs.h"
+#include "settings.h"
 #include <esp_adc/adc_oneshot.h>
 #include <esp_err.h>
 #include <esp_sleep.h>
@@ -125,6 +126,6 @@ void init_power_management() {
     ESP_LOGI(TAG, "Not a deep sleep wakeup or other wake-up sources.");
     break;
   }
-  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+  start_or_reset_deep_sleep_timer(settings.auto_off_time * 60 * 1000);
   xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
 }

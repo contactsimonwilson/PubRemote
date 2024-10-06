@@ -14,6 +14,7 @@
 #include "hal/ledc_types.h"
 #include "lvgl.h"
 #include "powermanagement.h"
+#include "settings.h"
 #include "ui/ui.h"
 #include <stdio.h>
 
@@ -413,6 +414,6 @@ void init_display(void) {
 
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));
-    set_bl_level(200);
+    set_bl_level(settings.bl_level);
   }
 }

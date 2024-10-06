@@ -17361,7 +17361,7 @@
                       {
                         "nid": 1363302350,
                         "strtype": "DROPDOWN/Options",
-                        "strval": "Disabled\\n1 minute\\n5 minutes\\n60 minutes\\n",
+                        "strval": "Disabled\\n2 minutes\\n5 minutes\\n60 minutes\\n",
                         "InheritedType": 10
                       },
                       {
@@ -22371,7 +22371,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 355,
+    "backup_cnt": 371,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
