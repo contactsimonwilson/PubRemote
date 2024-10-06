@@ -40,8 +40,8 @@ extern lv_obj_t * ui_SecondaryStats;
 extern lv_obj_t * ui_ConnectionState;
 extern lv_obj_t * ui_DistanceStats;
 extern lv_obj_t * ui_TempStats;
+void ui_event_StatsFooter(lv_event_t * e);
 extern lv_obj_t * ui_StatsFooter;
-void ui_event_BatteryDisplay(lv_event_t * e);
 extern lv_obj_t * ui_BatteryDisplay;
 // SCREEN: ui_SettingsScreen
 void ui_SettingsScreen_screen_init(void);
@@ -70,10 +70,12 @@ extern lv_obj_t * ui_SettingsShutdownButton;
 extern lv_obj_t * ui_SettingsShutdownButtonLabel;
 // SCREEN: ui_BrightnessScreen
 void ui_BrightnessScreen_screen_init(void);
+void ui_event_BrightnessScreen(lv_event_t * e);
 extern lv_obj_t * ui_BrightnessScreen;
 extern lv_obj_t * ui_BrightnessContent;
 extern lv_obj_t * ui_BrightnessHeader;
 extern lv_obj_t * ui_BrightnessBody;
+void ui_event_BrightnessSlider(lv_event_t * e);
 extern lv_obj_t * ui_BrightnessSlider;
 extern lv_obj_t * ui_BrightnessLabel;
 extern lv_obj_t * ui_BrightnessFooter;
@@ -95,7 +97,6 @@ extern lv_obj_t * ui_PairingMainActionButton;
 extern lv_obj_t * ui_PairingMainActionButtonLabel;
 // SCREEN: ui_PowerScreen
 void ui_PowerScreen_screen_init(void);
-void ui_event_PowerScreen(lv_event_t * e);
 extern lv_obj_t * ui_PowerScreen;
 extern lv_obj_t * ui_PowerContent;
 extern lv_obj_t * ui_PowerHeader;

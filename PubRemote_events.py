@@ -14,3 +14,35 @@ def StartPairing(event_struct):
 def enter_deep_sleep(event_struct):
     return
 
+
+def brightness_slider_change(event_struct):
+    return
+
+
+def stats_footer_long_press(event_struct):
+    return
+
+
+def power_settings_save(event_struct):
+    return
+
+
+def calibration_settings_save(event_struct):
+    return
+
+
+def pairing_screen_load(event_struct):
+    return
+
+
+def brightness_save(event_struct):
+    return
+
+
+def brightness_screen_loaded(event_struct):
+    return
+
+
+def pairing_screen_loaded(event_struct):
+    return
+

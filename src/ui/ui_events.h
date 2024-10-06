@@ -10,9 +10,14 @@
 extern "C" {
 #endif
 
-void toggleFooterDisplayMode(lv_event_t * e);
+void stats_footer_long_press(lv_event_t * e);
 void enter_deep_sleep(lv_event_t * e);
-void StartPairing(lv_event_t * e);
+void brightness_screen_loaded(lv_event_t * e);
+void brightness_slider_change(lv_event_t * e);
+void brightness_save(lv_event_t * e);
+void pairing_screen_loaded(lv_event_t * e);
+void power_settings_save(lv_event_t * e);
+void calibration_settings_save(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

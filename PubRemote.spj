@@ -535,7 +535,7 @@
               {
                 "nid": 197477065,
                 "strtype": "_custom/name",
-                "strval": "SplashScreenLoaded",
+                "strval": "SplashScreenLoadEnd",
                 "InheritedType": 10
               },
               {
@@ -5216,71 +5216,6 @@
                         "strtype": "LABEL/Style_main",
                         "strval": "lv.PART.MAIN, Text, Rectangle, Pad, Transform",
                         "InheritedType": 11
-                      },
-                      {
-                        "disabled": false,
-                        "nid": -215020449,
-                        "strtype": "_event/EventHandler",
-                        "strval": "LONG_PRESSED",
-                        "childs": [
-                          {
-                            "nid": -143593222,
-                            "strtype": "_custom/name",
-                            "strval": "onFooterLongPress",
-                            "InheritedType": 10
-                          },
-                          {
-                            "nid": 1975648074,
-                            "strtype": "_custom/condition_C",
-                            "strval": "",
-                            "InheritedType": 10
-                          },
-                          {
-                            "nid": -582538953,
-                            "strtype": "_custom/condition_P",
-                            "strval": "",
-                            "InheritedType": 10
-                          },
-                          {
-                            "nid": -1985169684,
-                            "strtype": "_event/action",
-                            "strval": "CALL FUNCTION",
-                            "childs": [
-                              {
-                                "nid": -518087280,
-                                "strtype": "CALL FUNCTION/Name",
-                                "strval": "CALL FUNCTION",
-                                "InheritedType": 10
-                              },
-                              {
-                                "nid": -748781571,
-                                "strtype": "CALL FUNCTION/Call",
-                                "strval": "<{Function_name}>( event_struct )",
-                                "InheritedType": 10
-                              },
-                              {
-                                "nid": 1591431644,
-                                "strtype": "CALL FUNCTION/CallC",
-                                "strval": "<{Function_name}>( e );",
-                                "InheritedType": 10
-                              },
-                              {
-                                "nid": -1694440253,
-                                "strtype": "CALL FUNCTION/Function_name",
-                                "strval": "toggleFooterDisplayMode",
-                                "InheritedType": 10
-                              },
-                              {
-                                "nid": -1512261558,
-                                "strtype": "CALL FUNCTION/Dont_export_function",
-                                "strval": "False",
-                                "InheritedType": 2
-                              }
-                            ],
-                            "InheritedType": 10
-                          }
-                        ],
-                        "InheritedType": 4
                       }
                     ],
                     "saved_objtypeKey": "LABEL",
@@ -5577,6 +5512,71 @@
                     "strtype": "CONTAINER/Style_scrollbar",
                     "strval": "lv.PART.SCROLLBAR, Rectangle, Pad",
                     "InheritedType": 11
+                  },
+                  {
+                    "disabled": false,
+                    "nid": -869248742,
+                    "strtype": "CONTAINER/EventHandler",
+                    "strval": "LONG_PRESSED",
+                    "childs": [
+                      {
+                        "nid": -795324687,
+                        "strtype": "_event/name",
+                        "strval": "StatsFooterLongPress",
+                        "InheritedType": 10
+                      },
+                      {
+                        "nid": -1062769515,
+                        "strtype": "_event/condition_C",
+                        "strval": "",
+                        "InheritedType": 10
+                      },
+                      {
+                        "nid": 709582146,
+                        "strtype": "_event/condition_P",
+                        "strval": "",
+                        "InheritedType": 10
+                      },
+                      {
+                        "nid": -965003248,
+                        "strtype": "_event/action",
+                        "strval": "CALL FUNCTION",
+                        "childs": [
+                          {
+                            "nid": -1744760849,
+                            "strtype": "CALL FUNCTION/Name",
+                            "strval": "CALL FUNCTION",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": -802327044,
+                            "strtype": "CALL FUNCTION/Call",
+                            "strval": "<{Function_name}>( event_struct )",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": 1451092684,
+                            "strtype": "CALL FUNCTION/CallC",
+                            "strval": "<{Function_name}>( e );",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": -148416251,
+                            "strtype": "CALL FUNCTION/Function_name",
+                            "strval": "stats_footer_long_press",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": 580523209,
+                            "strtype": "CALL FUNCTION/Dont_export_function",
+                            "strval": "False",
+                            "InheritedType": 2
+                          }
+                        ],
+                        "InheritedType": 10
+                      }
+                    ],
+                    "InheritedType": 4
                   }
                 ],
                 "saved_objtypeKey": "CONTAINER"
@@ -6108,7 +6108,7 @@
               {
                 "nid": -1727822278,
                 "strtype": "_event/name",
-                "strval": "StatsNavigateToSettings",
+                "strval": "StatsSwipeDown",
                 "InheritedType": 10
               },
               {
@@ -6827,8 +6827,7 @@
                         "InheritedType": 4
                       }
                     ],
-                    "saved_objtypeKey": "BUTTON",
-                    "tree_closed": true
+                    "saved_objtypeKey": "BUTTON"
                   },
                   {
                     "guid": "GUID86357200-724807S6113280",
@@ -8347,7 +8346,7 @@
                           {
                             "nid": -4501220,
                             "strtype": "_event/name",
-                            "strval": "SettingsPairButtonPress",
+                            "strval": "SettingsPowerButtonPress",
                             "InheritedType": 10
                           },
                           {
@@ -11965,8 +11964,8 @@
                         "nid": 1491495069,
                         "strtype": "SLIDER/Range",
                         "intarray": [
-                          0,
-                          100
+                          10,
+                          255
                         ],
                         "InheritedType": 7
                       },
@@ -12009,6 +12008,71 @@
                         "strtype": "SLIDER/Style_knob",
                         "strval": "lv.PART.KNOB, Rectangle, Pad",
                         "InheritedType": 11
+                      },
+                      {
+                        "disabled": false,
+                        "nid": 1165650840,
+                        "strtype": "SLIDER/EventHandler",
+                        "strval": "VALUE_CHANGED",
+                        "childs": [
+                          {
+                            "nid": 348021728,
+                            "strtype": "_event/name",
+                            "strval": "BrightnessSliderChange",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": 1011559748,
+                            "strtype": "_event/condition_C",
+                            "strval": "",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": -989907888,
+                            "strtype": "_event/condition_P",
+                            "strval": "",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": -1850392885,
+                            "strtype": "_event/action",
+                            "strval": "CALL FUNCTION",
+                            "childs": [
+                              {
+                                "nid": 885783266,
+                                "strtype": "CALL FUNCTION/Name",
+                                "strval": "CALL FUNCTION",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 335111125,
+                                "strtype": "CALL FUNCTION/Call",
+                                "strval": "<{Function_name}>( event_struct )",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1158823458,
+                                "strtype": "CALL FUNCTION/CallC",
+                                "strval": "<{Function_name}>( e );",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": -1685508787,
+                                "strtype": "CALL FUNCTION/Function_name",
+                                "strval": "brightness_slider_change",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": -1276117096,
+                                "strtype": "CALL FUNCTION/Dont_export_function",
+                                "strval": "False",
+                                "InheritedType": 2
+                              }
+                            ],
+                            "InheritedType": 10
+                          }
+                        ],
+                        "InheritedType": 4
                       }
                     ],
                     "saved_objtypeKey": "SLIDER",
@@ -13198,7 +13262,7 @@
                           {
                             "nid": -1231475420,
                             "strtype": "_custom/name",
-                            "strval": "CancelPairing",
+                            "strval": "BrightnessSaveButtonPress",
                             "InheritedType": 10
                           },
                           {
@@ -13258,6 +13322,44 @@
                                 "nid": -269037044,
                                 "strtype": "CHANGE SCREEN/Delay",
                                 "InheritedType": 6
+                              }
+                            ],
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": 198268070,
+                            "strtype": "_event/action",
+                            "strval": "CALL FUNCTION",
+                            "childs": [
+                              {
+                                "nid": -1246570962,
+                                "strtype": "CALL FUNCTION/Name",
+                                "strval": "CALL FUNCTION",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 362210485,
+                                "strtype": "CALL FUNCTION/Call",
+                                "strval": "<{Function_name}>( event_struct )",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1220231757,
+                                "strtype": "CALL FUNCTION/CallC",
+                                "strval": "<{Function_name}>( e );",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": -1726129938,
+                                "strtype": "CALL FUNCTION/Function_name",
+                                "strval": "brightness_save",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 387326415,
+                                "strtype": "CALL FUNCTION/Dont_export_function",
+                                "strval": "False",
+                                "InheritedType": 2
                               }
                             ],
                             "InheritedType": 10
@@ -14079,6 +14181,71 @@
             "strtype": "SCREEN/Style_scrollbar",
             "strval": "lv.PART.SCROLLBAR, Rectangle, Pad",
             "InheritedType": 11
+          },
+          {
+            "disabled": false,
+            "nid": 1358981708,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_LOADED",
+            "childs": [
+              {
+                "nid": -759012093,
+                "strtype": "_event/name",
+                "strval": "BrightnessScreenLoaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": -777274192,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -130046589,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -1625049596,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": -533397613,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1418767360,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 2032935573,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1240177384,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "brightness_screen_loaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -144322901,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "False",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"
@@ -15230,27 +15397,7 @@
                   },
                   {
                     "part": "lv.PART.MAIN",
-                    "childs": [
-                      {
-                        "nid": -1313034958,
-                        "strtype": "_style/StyleState",
-                        "strval": "DEFAULT",
-                        "childs": [
-                          {
-                            "nid": -134428852,
-                            "strtype": "_style/Padding",
-                            "intarray": [
-                              0,
-                              0,
-                              12,
-                              0
-                            ],
-                            "InheritedType": 7
-                          }
-                        ],
-                        "InheritedType": 1
-                      }
-                    ],
+                    "childs": [],
                     "nid": 2084030884,
                     "strtype": "CONTAINER/Style_main",
                     "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -15856,7 +16003,7 @@
                           {
                             "nid": 1634052113,
                             "strtype": "_custom/name",
-                            "strval": "CancelPairing",
+                            "strval": "CancelPairingButtonPress",
                             "InheritedType": 10
                           },
                           {
@@ -16788,7 +16935,7 @@
                   {
                     "nid": -1058988039,
                     "strtype": "CALL FUNCTION/Function_name",
-                    "strval": "StartPairing",
+                    "strval": "pairing_screen_loaded",
                     "InheritedType": 10
                   },
                   {
@@ -18644,7 +18791,7 @@
                           {
                             "nid": -1685075765,
                             "strtype": "_custom/name",
-                            "strval": "CancelPairing",
+                            "strval": "PowerSaveButtonPress",
                             "InheritedType": 10
                           },
                           {
@@ -18704,6 +18851,44 @@
                                 "nid": 1613959142,
                                 "strtype": "CHANGE SCREEN/Delay",
                                 "InheritedType": 6
+                              }
+                            ],
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": -1490556710,
+                            "strtype": "_event/action",
+                            "strval": "CALL FUNCTION",
+                            "childs": [
+                              {
+                                "nid": -466745939,
+                                "strtype": "CALL FUNCTION/Name",
+                                "strval": "CALL FUNCTION",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1782891483,
+                                "strtype": "CALL FUNCTION/Call",
+                                "strval": "<{Function_name}>( event_struct )",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1523399044,
+                                "strtype": "CALL FUNCTION/CallC",
+                                "strval": "<{Function_name}>( e );",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": -1485955101,
+                                "strtype": "CALL FUNCTION/Function_name",
+                                "strval": "power_settings_save",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": -1096731868,
+                                "strtype": "CALL FUNCTION/Dont_export_function",
+                                "strval": "False",
+                                "InheritedType": 2
                               }
                             ],
                             "InheritedType": 10
@@ -19525,71 +19710,6 @@
             "strtype": "SCREEN/Style_scrollbar",
             "strval": "lv.PART.SCROLLBAR, Rectangle, Pad",
             "InheritedType": 11
-          },
-          {
-            "disabled": false,
-            "nid": 1382868879,
-            "strtype": "_event/EventHandler",
-            "strval": "SCREEN_LOADED",
-            "childs": [
-              {
-                "nid": -1394483294,
-                "strtype": "_event/name",
-                "strval": "PairingScreenLoaded",
-                "InheritedType": 10
-              },
-              {
-                "nid": -1931445597,
-                "strtype": "_event/condition_C",
-                "strval": "",
-                "InheritedType": 10
-              },
-              {
-                "nid": 189131951,
-                "strtype": "_event/condition_P",
-                "strval": "",
-                "InheritedType": 10
-              },
-              {
-                "nid": -1816126877,
-                "strtype": "_event/action",
-                "strval": "CALL FUNCTION",
-                "childs": [
-                  {
-                    "nid": 2041008770,
-                    "strtype": "CALL FUNCTION/Name",
-                    "strval": "CALL FUNCTION",
-                    "InheritedType": 10
-                  },
-                  {
-                    "nid": 107632458,
-                    "strtype": "CALL FUNCTION/Call",
-                    "strval": "<{Function_name}>( event_struct )",
-                    "InheritedType": 10
-                  },
-                  {
-                    "nid": 165324916,
-                    "strtype": "CALL FUNCTION/CallC",
-                    "strval": "<{Function_name}>( e );",
-                    "InheritedType": 10
-                  },
-                  {
-                    "nid": 900400265,
-                    "strtype": "CALL FUNCTION/Function_name",
-                    "strval": "StartPairing",
-                    "InheritedType": 10
-                  },
-                  {
-                    "nid": -1626766318,
-                    "strtype": "CALL FUNCTION/Dont_export_function",
-                    "strval": "False",
-                    "InheritedType": 2
-                  }
-                ],
-                "InheritedType": 10
-              }
-            ],
-            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"
@@ -21447,7 +21567,7 @@
                           {
                             "nid": 2039342737,
                             "strtype": "_custom/name",
-                            "strval": "CancelPairing",
+                            "strval": "CalibrationSaveButtonPress",
                             "InheritedType": 10
                           },
                           {
@@ -21507,6 +21627,44 @@
                                 "nid": 614770033,
                                 "strtype": "CHANGE SCREEN/Delay",
                                 "InheritedType": 6
+                              }
+                            ],
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": -62432417,
+                            "strtype": "_event/action",
+                            "strval": "CALL FUNCTION",
+                            "childs": [
+                              {
+                                "nid": -1434097467,
+                                "strtype": "CALL FUNCTION/Name",
+                                "strval": "CALL FUNCTION",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1173263446,
+                                "strtype": "CALL FUNCTION/Call",
+                                "strval": "<{Function_name}>( event_struct )",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1347257245,
+                                "strtype": "CALL FUNCTION/CallC",
+                                "strval": "<{Function_name}>( e );",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": -1959827254,
+                                "strtype": "CALL FUNCTION/Function_name",
+                                "strval": "calibration_settings_save",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 425116795,
+                                "strtype": "CALL FUNCTION/Dont_export_function",
+                                "strval": "False",
+                                "InheritedType": 2
                               }
                             ],
                             "InheritedType": 10
@@ -22371,7 +22529,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 371,
+    "backup_cnt": 432,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",

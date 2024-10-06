@@ -44,6 +44,7 @@ void ui_BrightnessScreen_screen_init(void)
     lv_obj_set_style_pad_column(ui_BrightnessBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BrightnessSlider = lv_slider_create(ui_BrightnessBody);
+    lv_slider_set_range(ui_BrightnessSlider, 10, 255);
     lv_slider_set_value(ui_BrightnessSlider, 0, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_BrightnessSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ui_BrightnessSlider, 0,
                                                                                                      LV_ANIM_OFF);
@@ -89,6 +90,8 @@ void ui_BrightnessScreen_screen_init(void)
     lv_obj_set_align(ui_BrightnessMainActionButtonLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_BrightnessMainActionButtonLabel, "Save");
 
+    lv_obj_add_event_cb(ui_BrightnessSlider, ui_event_BrightnessSlider, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_BrightnessMainActionButton, ui_event_BrightnessMainActionButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_BrightnessScreen, ui_event_BrightnessScreen, LV_EVENT_ALL, NULL);
 
 }

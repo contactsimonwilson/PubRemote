@@ -34,8 +34,8 @@ lv_obj_t * ui_SecondaryStats;
 lv_obj_t * ui_ConnectionState;
 lv_obj_t * ui_DistanceStats;
 lv_obj_t * ui_TempStats;
+void ui_event_StatsFooter(lv_event_t * e);
 lv_obj_t * ui_StatsFooter;
-void ui_event_BatteryDisplay(lv_event_t * e);
 lv_obj_t * ui_BatteryDisplay;
 
 
@@ -68,10 +68,12 @@ lv_obj_t * ui_SettingsShutdownButtonLabel;
 
 // SCREEN: ui_BrightnessScreen
 void ui_BrightnessScreen_screen_init(void);
+void ui_event_BrightnessScreen(lv_event_t * e);
 lv_obj_t * ui_BrightnessScreen;
 lv_obj_t * ui_BrightnessContent;
 lv_obj_t * ui_BrightnessHeader;
 lv_obj_t * ui_BrightnessBody;
+void ui_event_BrightnessSlider(lv_event_t * e);
 lv_obj_t * ui_BrightnessSlider;
 lv_obj_t * ui_BrightnessLabel;
 lv_obj_t * ui_BrightnessFooter;
@@ -97,7 +99,6 @@ lv_obj_t * ui_PairingMainActionButtonLabel;
 
 // SCREEN: ui_PowerScreen
 void ui_PowerScreen_screen_init(void);
-void ui_event_PowerScreen(lv_event_t * e);
 lv_obj_t * ui_PowerScreen;
 lv_obj_t * ui_PowerContent;
 lv_obj_t * ui_PowerHeader;
@@ -152,12 +153,12 @@ void ui_event_StatsScreen(lv_event_t * e)
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_SettingsScreen_screen_init);
     }
 }
-void ui_event_BatteryDisplay(lv_event_t * e)
+void ui_event_StatsFooter(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_LONG_PRESSED) {
-        toggleFooterDisplayMode(e);
+        stats_footer_long_press(e);
     }
 }
 void ui_event_SettingsBackButton(lv_event_t * e)
@@ -208,12 +209,29 @@ void ui_event_SettingsShutdownButton(lv_event_t * e)
         enter_deep_sleep(e);
     }
 }
+void ui_event_BrightnessScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        brightness_screen_loaded(e);
+    }
+}
+void ui_event_BrightnessSlider(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        brightness_slider_change(e);
+    }
+}
 void ui_event_BrightnessMainActionButton(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+        brightness_save(e);
     }
 }
 void ui_event_PairingScreen(lv_event_t * e)
@@ -221,7 +239,7 @@ void ui_event_PairingScreen(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_SCREEN_LOADED) {
-        StartPairing(e);
+        pairing_screen_loaded(e);
     }
 }
 void ui_event_PairingMainActionButton(lv_event_t * e)
@@ -232,20 +250,13 @@ void ui_event_PairingMainActionButton(lv_event_t * e)
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
     }
 }
-void ui_event_PowerScreen(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_SCREEN_LOADED) {
-        StartPairing(e);
-    }
-}
 void ui_event_PowerMainActionButton(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+        power_settings_save(e);
     }
 }
 void ui_event_CalibrationMainActionButton(lv_event_t * e)
@@ -254,6 +265,7 @@ void ui_event_CalibrationMainActionButton(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+        calibration_settings_save(e);
     }
 }
 

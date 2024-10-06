@@ -236,7 +236,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_top(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_BatteryDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(ui_BatteryDisplay, ui_event_BatteryDisplay, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_StatsFooter, ui_event_StatsFooter, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsScreen, ui_event_StatsScreen, LV_EVENT_ALL, NULL);
 
 }

@@ -88,6 +88,5 @@ void ui_PowerScreen_screen_init(void)
     lv_label_set_text(ui_PowerMainActionButtonLabel, "Save");
 
     lv_obj_add_event_cb(ui_PowerMainActionButton, ui_event_PowerMainActionButton, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_PowerScreen, ui_event_PowerScreen, LV_EVENT_ALL, NULL);
 
 }

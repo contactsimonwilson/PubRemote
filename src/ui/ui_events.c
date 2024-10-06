@@ -4,18 +4,38 @@
 // Project name: PubRemote
 
 #include "ui.h"
+#include <remote/display.h>
+#include <remote/settings.h>
 
-void toggleFooterDisplayMode(lv_event_t * e)
-{
-	// Your code here
+void stats_footer_long_press(lv_event_t *e) {
+  // Your code here
 }
 
-void enter_deep_sleep(lv_event_t * e)
-{
-	// Your code here
+void enter_deep_sleep(lv_event_t *e) {
+  // Your code here
 }
 
-void StartPairing(lv_event_t * e)
-{
-	// Your code here
+void brightness_screen_loaded(lv_event_t *e) {
+  lv_slider_set_value(ui_BrightnessSlider, settings.bl_level, LV_ANIM_OFF);
+}
+
+void brightness_slider_change(lv_event_t *e) {
+  settings.bl_level = lv_slider_get_value(ui_BrightnessSlider);
+  set_bl_level(settings.bl_level);
+}
+
+void brightness_save(lv_event_t *e) {
+  save_bl_level();
+}
+
+void pairing_screen_loaded(lv_event_t *e) {
+  // Your code here
+}
+
+void power_settings_save(lv_event_t *e) {
+  // Your code here
+}
+
+void calibration_settings_save(lv_event_t *e) {
+  // Your code here
 }

@@ -35,10 +35,6 @@ void ui_PairingScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_PairingBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_PairingBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_PairingBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_pad_left(ui_PairingBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_PairingBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_PairingBody, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_PairingBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PairingCode = lv_label_create(ui_PairingBody);
     lv_obj_set_width(ui_PairingCode, LV_SIZE_CONTENT);   /// 1

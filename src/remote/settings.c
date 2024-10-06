@@ -8,11 +8,19 @@ static const char *TAG = "PUBMOTE-SETTINGS";
 
 // Define the NVS namespace
 #define STORAGE_NAMESPACE "nvs"
+#define BL_LEVEL_KEY "bl_level"
+#define BL_LEVEL_DEFAULT 200
+#define AUTO_OFF_TIME_KEY "auto_off_time"
+#define AUTO_OFF_TIME_DEFAULT 2
 
 RemoteSettings settings = {
-    .bl_level = 200,
-    .auto_off_time = 2,
+    .bl_level = BL_LEVEL_DEFAULT,
+    .auto_off_time = AUTO_OFF_TIME_DEFAULT,
 };
+
+void save_bl_level() {
+  nvs_write_int("bl_level", settings.bl_level);
+}
 
 // Function to initialize NVS
 esp_err_t init_nvs() {
@@ -34,6 +42,11 @@ esp_err_t init_settings() {
     ESP_LOGE(TAG, "Error initializing NVS!");
     return err;
   }
+
+  settings.bl_level = nvs_read_int("bl_level", &settings.bl_level) == ESP_OK ? settings.bl_level : BL_LEVEL_DEFAULT;
+  settings.auto_off_time =
+      nvs_read_int("auto_off_time", &settings.auto_off_time) == ESP_OK ? settings.auto_off_time : AUTO_OFF_TIME_DEFAULT;
+
   return ESP_OK;
 }
 
