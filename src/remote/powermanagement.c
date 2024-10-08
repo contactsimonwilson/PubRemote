@@ -26,6 +26,11 @@ float BATTERY_VOLTAGE = 0;
 #define BATTER_MONITOR_CHANNEL ADC_CHANNEL_0 // Assuming the Hall sensor is connected to GPIO0
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
+
+void enter_sleep() {
+  esp_deep_sleep_start();
+}
+
 void check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
   while (gpio_get_level(GPIO_NUM_15) == 1) { // Check if button is still pressed
@@ -40,7 +45,7 @@ void check_button_press() {
   while (gpio_get_level(GPIO_NUM_15) == 1)
     ; // wait for button release
   if ((esp_timer_get_time() - pressStartTime) < (REQUIRED_PRESS_TIME_MS * 1000)) {
-    esp_deep_sleep_start(); // Go back to sleep if condition not met
+    enter_sleep(); // Go back to sleep if condition not met
   }
 }
 

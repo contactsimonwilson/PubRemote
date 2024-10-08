@@ -114,7 +114,7 @@ static void button_double_click_cb(void *arg, void *usr_data) {
 
 static void button_long_press_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON LONG PRESSS");
-  esp_deep_sleep_start();
+  enter_sleep();
 }
 
 void reset_button_state() {

@@ -5,6 +5,7 @@
 
 #include "ui.h"
 #include <remote/display.h>
+#include <remote/powermanagement.h>
 #include <remote/settings.h>
 
 void stats_footer_long_press(lv_event_t *e) {
@@ -12,7 +13,7 @@ void stats_footer_long_press(lv_event_t *e) {
 }
 
 void enter_deep_sleep(lv_event_t *e) {
-  // Your code here
+  enter_sleep();
 }
 
 void brightness_screen_loaded(lv_event_t *e) {
