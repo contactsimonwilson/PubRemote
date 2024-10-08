@@ -9,6 +9,10 @@ void ui_StatsScreen_screen_init(void)
 {
     ui_StatsScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_StatsScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_object_set_themeable_style_property(ui_StatsScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
+                                           _ui_theme_color_Background);
+    ui_object_set_themeable_style_property(ui_StatsScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,
+                                           _ui_theme_alpha_Background);
 
     ui_DutyCycle = lv_arc_create(ui_StatsScreen);
     lv_obj_set_width(ui_DutyCycle, lv_pct(100));

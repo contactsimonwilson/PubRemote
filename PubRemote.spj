@@ -512,7 +512,29 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": 765425435,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": -1871166692,
+                    "strtype": "_style/Bg_Color",
+                    "strval": "Background",
+                    "integer": -1760124031,
+                    "intarray": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "InheritedType": 7
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": 1360836672,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -5516,7 +5538,7 @@
                   {
                     "disabled": false,
                     "nid": -869248742,
-                    "strtype": "CONTAINER/EventHandler",
+                    "strtype": "_event/EventHandler",
                     "strval": "LONG_PRESSED",
                     "childs": [
                       {
@@ -6085,7 +6107,29 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": 1570191644,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": 386116289,
+                    "strtype": "_style/Bg_Color",
+                    "strval": "Background",
+                    "integer": -1760124031,
+                    "intarray": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "InheritedType": 7
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": -2049042113,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -8979,7 +9023,7 @@
                       {
                         "disabled": false,
                         "nid": -2076291771,
-                        "strtype": "BUTTON/EventHandler",
+                        "strtype": "_event/EventHandler",
                         "strval": "CLICKED",
                         "childs": [
                           {
@@ -10566,7 +10610,7 @@
                       {
                         "disabled": false,
                         "nid": -630399605,
-                        "strtype": "BUTTON/EventHandler",
+                        "strtype": "_event/EventHandler",
                         "strval": "CLICKED",
                         "childs": [
                           {
@@ -11433,7 +11477,29 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": -1787865383,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": -595753349,
+                    "strtype": "_style/Bg_Color",
+                    "strval": "Background",
+                    "integer": -1760124031,
+                    "intarray": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "InheritedType": 7
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": -2036465774,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -12012,7 +12078,7 @@
                       {
                         "disabled": false,
                         "nid": 1165650840,
-                        "strtype": "SLIDER/EventHandler",
+                        "strtype": "_event/EventHandler",
                         "strval": "VALUE_CHANGED",
                         "childs": [
                           {
@@ -14168,7 +14234,29 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": 1059365988,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": -349018416,
+                    "strtype": "_style/Bg_Color",
+                    "strval": "Background",
+                    "integer": -1760124031,
+                    "intarray": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "InheritedType": 7
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": 2031420664,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -14185,7 +14273,7 @@
           {
             "disabled": false,
             "nid": 1358981708,
-            "strtype": "SCREEN/EventHandler",
+            "strtype": "_event/EventHandler",
             "strval": "SCREEN_LOADED",
             "childs": [
               {
@@ -16871,7 +16959,29 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": -840395625,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": 1319315891,
+                    "strtype": "_style/Bg_Color",
+                    "strval": "Background",
+                    "integer": -1760124031,
+                    "intarray": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "InheritedType": 7
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": -1427729513,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -17617,7 +17727,7 @@
                       {
                         "disabled": false,
                         "nid": 1810401884,
-                        "strtype": "DROPDOWN/EventHandler",
+                        "strtype": "_event/EventHandler",
                         "strval": "VALUE_CHANGED",
                         "childs": [
                           {
@@ -19762,7 +19872,29 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": 714914785,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": -1924127911,
+                    "strtype": "_style/Bg_Color",
+                    "strval": "Background",
+                    "integer": -1760124031,
+                    "intarray": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "InheritedType": 7
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": -2134796441,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -19779,7 +19911,7 @@
           {
             "disabled": false,
             "nid": -752907057,
-            "strtype": "SCREEN/EventHandler",
+            "strtype": "_event/EventHandler",
             "strval": "SCREEN_LOADED",
             "childs": [
               {
@@ -22603,7 +22735,29 @@
           },
           {
             "part": "lv.PART.MAIN",
-            "childs": [],
+            "childs": [
+              {
+                "nid": -1058343759,
+                "strtype": "_style/StyleState",
+                "strval": "DEFAULT",
+                "childs": [
+                  {
+                    "nid": 54428914,
+                    "strtype": "_style/Bg_Color",
+                    "strval": "Background",
+                    "integer": -1760124031,
+                    "intarray": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "InheritedType": 7
+                  }
+                ],
+                "InheritedType": 1
+              }
+            ],
             "nid": 96495248,
             "strtype": "SCREEN/Style_main",
             "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -22659,7 +22813,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 442,
+    "backup_cnt": 444,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",

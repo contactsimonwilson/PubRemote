@@ -14,7 +14,7 @@ extern "C" {
 #define UI_THEME_COLOR_ACCENT 1
 #define UI_THEME_COLOR_SUCCESS 2
 #define UI_THEME_COLOR_ERROR 3
-#define UI_THEME_COLOR_WARN 4
+#define UI_THEME_COLOR_BACKGROUND 4
 
 #define UI_THEME_DEFAULT 0
 
@@ -30,8 +30,8 @@ extern const ui_theme_variable_t _ui_theme_alpha_Success[1];
 extern const ui_theme_variable_t _ui_theme_color_Error[1];
 extern const ui_theme_variable_t _ui_theme_alpha_Error[1];
 
-extern const ui_theme_variable_t _ui_theme_color_Warn[1];
-extern const ui_theme_variable_t _ui_theme_alpha_Warn[1];
+extern const ui_theme_variable_t _ui_theme_color_Background[1];
+extern const ui_theme_variable_t _ui_theme_alpha_Background[1];
 
 extern const uint32_t * ui_theme_colors[1];
 extern const uint8_t * ui_theme_alphas[1];
