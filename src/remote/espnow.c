@@ -5,7 +5,7 @@
 #include <esp_wifi_types.h>
 #include <nvs.h>
 
-static const char *TAG = "PUBMOTE-ESPNOW";
+static const char *TAG = "PUBREMOTE-ESPNOW";
 
 void init_espnow() {
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();

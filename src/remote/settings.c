@@ -4,7 +4,7 @@
 #include "nvs_flash.h"
 #include <stdio.h>
 
-static const char *TAG = "PUBMOTE-SETTINGS";
+static const char *TAG = "PUBREMOTE-SETTINGS";
 
 // Define the NVS namespace
 #define STORAGE_NAMESPACE "nvs"

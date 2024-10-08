@@ -11,7 +11,7 @@
 #include <led_strip_types.h>
 #include <nvs.h>
 
-static const char *TAG = "PUBMOTE-BUZZER";
+static const char *TAG = "PUBREMOTE-BUZZER";
 
 #define BUZZER_GPIO GPIO_NUM_21
 

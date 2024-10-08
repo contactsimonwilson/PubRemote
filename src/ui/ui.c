@@ -20,20 +20,18 @@ lv_obj_t * ui_SplashScreenLogo;
 void ui_StatsScreen_screen_init(void);
 void ui_event_StatsScreen(lv_event_t * e);
 lv_obj_t * ui_StatsScreen;
-lv_obj_t * ui_DutyCycle;
-lv_obj_t * ui_Utilizaiton;
+lv_obj_t * ui_SpeedDial;
+lv_obj_t * ui_UtilizationDial;
 lv_obj_t * ui_LeftSensor;
 lv_obj_t * ui_RightSensor;
 lv_obj_t * ui_StatsContent;
 lv_obj_t * ui_StatsHeader;
 lv_obj_t * ui_MessageText;
+void ui_event_StatsBody(lv_event_t * e);
 lv_obj_t * ui_StatsBody;
 lv_obj_t * ui_PrimaryStat;
 lv_obj_t * ui_PrimaryStatUnit;
-lv_obj_t * ui_SecondaryStats;
-lv_obj_t * ui_ConnectionState;
-lv_obj_t * ui_DistanceStats;
-lv_obj_t * ui_TempStats;
+lv_obj_t * ui_SecondaryStat;
 void ui_event_StatsFooter(lv_event_t * e);
 lv_obj_t * ui_StatsFooter;
 lv_obj_t * ui_BatteryDisplay;
@@ -153,6 +151,22 @@ void ui_event_StatsScreen(lv_event_t * e)
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM) {
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_SettingsScreen_screen_init);
+    }
+}
+void ui_event_StatsBody(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_LONG_PRESSED) {
+        stat_long_press(e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        stat_swipe_left(e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        stat_swipe_right(e);
     }
 }
 void ui_event_StatsFooter(lv_event_t * e)

@@ -35,7 +35,7 @@
   #define DISP_BL_PWM 0
 #endif
 
-static const char *TAG = "PUBMOTE_DISPLAY";
+static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0

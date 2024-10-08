@@ -14,7 +14,7 @@
 #include <freertos/task.h>
 #include <math.h>
 #include <ui/ui.h>
-static const char *TAG = "PUBMOTE-POWERMANAGEMENT";
+static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
 float convert_adc_to_battery_volts(int adc_value) {
   // 0 - 4095 -> 0 - 255

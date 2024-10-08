@@ -54,3 +54,15 @@ def auto_off_select_change(event_struct):
 def power_screen_loaded(event_struct):
     return
 
+
+def stat_long_press(event_struct):
+    return
+
+
+def stat_swipe_left(event_struct):
+    return
+
+
+def stat_swipe_right(event_struct):
+    return
+

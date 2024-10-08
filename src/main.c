@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char *TAG = "PUBMOTE-MAIN";
+static const char *TAG = "PUBREMOTE-MAIN";
 
 uint8_t PEER_MAC_ADDRESS[6] = {72, 49, 183, 171, 63, 137}; // Siwoz
 // uint8_t PEER_MAC_ADDRESS[6] = {60, 233, 14, 66, 213, 197};//Syler

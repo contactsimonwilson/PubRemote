@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-static const char *TAG = "PUBMOTE-TRANSMITTER";
+static const char *TAG = "PUBREMOTE-TRANSMITTER";
 
 // Function to send ESP-NOW data
 static void transmitter_task(void *pvParameters) {

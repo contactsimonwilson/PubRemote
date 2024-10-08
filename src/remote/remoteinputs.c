@@ -15,7 +15,7 @@
 #include <freertos/queue.h>
 #include <freertos/task.h>
 #include <ui/ui.h>
-static const char *TAG = "PUBMOTE-REMOTEINPUTS";
+static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 
 RemoteDataUnion remote_data;
 

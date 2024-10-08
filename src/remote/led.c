@@ -11,7 +11,7 @@
 #include <led_strip_types.h>
 #include <nvs.h>
 
-static const char *TAG = "PUBMOTE-LED";
+static const char *TAG = "PUBREMOTE-LED";
 
 #define LED_POWER_GPIO GPIO_NUM_33
 #define LED_GPIO GPIO_NUM_18

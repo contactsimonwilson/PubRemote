@@ -10,6 +10,9 @@
 extern "C" {
 #endif
 
+void stat_long_press(lv_event_t * e);
+void stat_swipe_left(lv_event_t * e);
+void stat_swipe_right(lv_event_t * e);
 void stats_footer_long_press(lv_event_t * e);
 void enter_deep_sleep(lv_event_t * e);
 void brightness_screen_loaded(lv_event_t * e);
