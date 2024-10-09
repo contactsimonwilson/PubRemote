@@ -14,22 +14,30 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
+#include <math.h>
 #include <ui/ui.h>
-static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 
-#define STICK_ADC_BITWIDTH ADC_BITWIDTH_12
-#define STICK_MAX_VAL ((1 << STICK_ADC_BITWIDTH) - 1)
-#define STICK_MID_VAL ((STICK_MAX_VAL / 2) - 1)
+static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 
 #ifndef JOYSTICK_BUTTON_LEVEL
   #define JOYSTICK_BUTTON_LEVEL 1
 #endif
 
 RemoteDataUnion remote_data;
+JoystickData joystick_data;
 
-float convert_adc_to_axis(int adc_value) {
-  // 0 - 4095 -> 1.0 to -1.0
-  return (float)(STICK_MID_VAL - adc_value) / STICK_MID_VAL;
+float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, float expo) {
+  float axis = 0;
+  if (adc_value > mid_val) {
+    axis = (float)(adc_value - mid_val) / (max_val - mid_val);
+  }
+  else {
+    axis = (float)(adc_value - mid_val) / (mid_val - min_val);
+  }
+  if (expo > 1) {
+    axis = pow(axis, expo);
+  }
+  return axis;
 }
 
 void thumbstick_task(void *pvParameters) {
@@ -58,20 +66,28 @@ void thumbstick_task(void *pvParameters) {
     int x_value, y_value;
     ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, X_STICK_CHANNEL, &x_value));
     ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, Y_STICK_CHANNEL, &y_value));
+    joystick_data.x = x_value;
+    joystick_data.y = y_value;
+
     remote_data.data.js_x = 0;
     remote_data.data.js_y = 0;
-    int16_t deadzone = settings.stick_calibration.deadzone;
+    int16_t deadband = settings.stick_calibration.deadband;
     int16_t x_center = settings.stick_calibration.x_center;
     int16_t y_center = settings.stick_calibration.y_center;
-    if (x_value > x_center + deadzone || x_value < x_center - deadzone) {
+    int16_t y_max = settings.stick_calibration.y_max;
+    int16_t x_max = settings.stick_calibration.x_max;
+    int16_t y_min = settings.stick_calibration.y_min;
+    int16_t x_min = settings.stick_calibration.x_min;
+    float expo = settings.stick_calibration.expo;
+    if (x_value > x_center + deadband || x_value < x_center - deadband) {
       start_or_reset_deep_sleep_timer();
-      remote_data.data.js_x = convert_adc_to_axis(x_value);
+      remote_data.data.js_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, expo);
       // ESP_LOGI(TAG, "Thumbstick x value: %d", x_value);
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     }
-    if (y_value > y_center + deadzone || y_value < y_center - deadzone) {
+    if (y_value > y_center + deadband || y_value < y_center - deadband) {
       start_or_reset_deep_sleep_timer();
-      remote_data.data.js_y = convert_adc_to_axis(y_value);
+      remote_data.data.js_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, expo);
       // ESP_LOGI(TAG, "Thumbstick y value: %d", y_value);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
     }

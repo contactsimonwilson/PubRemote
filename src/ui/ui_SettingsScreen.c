@@ -139,5 +139,6 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_add_event_cb(ui_SettingsCalibrateButton, ui_event_SettingsCalibrateButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsPairButton, ui_event_SettingsPairButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsShutdownButton, ui_event_SettingsShutdownButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SettingsScreen, ui_event_SettingsScreen, LV_EVENT_ALL, NULL);
 
 }

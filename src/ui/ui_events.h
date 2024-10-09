@@ -10,17 +10,23 @@
 extern "C" {
 #endif
 
+void stats_screen_loaded(lv_event_t * e);
+void stats_screen_unloaded(lv_event_t * e);
 void stat_long_press(lv_event_t * e);
 void stat_swipe_left(lv_event_t * e);
 void stat_swipe_right(lv_event_t * e);
 void stats_footer_long_press(lv_event_t * e);
+void settings_screen_loaded(lv_event_t * e);
+void settings_screen_unloaded(lv_event_t * e);
 void enter_deep_sleep(lv_event_t * e);
 void brightness_screen_loaded(lv_event_t * e);
+void brightness_screen_unloaded(lv_event_t * e);
 void brightness_slider_change(lv_event_t * e);
 void brightness_save(lv_event_t * e);
 void pairing_screen_loaded(lv_event_t * e);
 void pairing_screen_unloaded(lv_event_t * e);
 void power_screen_loaded(lv_event_t * e);
+void power_screen_unloaded(lv_event_t * e);
 void auto_off_select_change(lv_event_t * e);
 void power_settings_save(lv_event_t * e);
 void calibration_screen_loaded(lv_event_t * e);

@@ -39,6 +39,7 @@ lv_obj_t * ui_BatteryDisplay;
 
 // SCREEN: ui_SettingsScreen
 void ui_SettingsScreen_screen_init(void);
+void ui_event_SettingsScreen(lv_event_t * e);
 lv_obj_t * ui_SettingsScreen;
 lv_obj_t * ui_Content;
 lv_obj_t * ui_SettingsBody;
@@ -118,7 +119,7 @@ lv_obj_t * ui_CalibrationScreen;
 lv_obj_t * ui_CalibrationContent;
 lv_obj_t * ui_CalibrationHeader;
 lv_obj_t * ui_CalibrationBody;
-lv_obj_t * ui_PowerLabel1;
+lv_obj_t * ui_CalibrationDataLabel;
 lv_obj_t * ui_CalibrationOption;
 lv_obj_t * ui_CalibrationFooter;
 void ui_event_CalibrationMainActionButton(lv_event_t * e);
@@ -153,6 +154,12 @@ void ui_event_StatsScreen(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_SettingsScreen_screen_init);
     }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        stats_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        stats_screen_unloaded(e);
+    }
 }
 void ui_event_StatsBody(lv_event_t * e)
 {
@@ -176,6 +183,17 @@ void ui_event_StatsFooter(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_LONG_PRESSED) {
         stats_footer_long_press(e);
+    }
+}
+void ui_event_SettingsScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        settings_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        settings_screen_unloaded(e);
     }
 }
 void ui_event_SettingsBackButton(lv_event_t * e)
@@ -233,6 +251,9 @@ void ui_event_BrightnessScreen(lv_event_t * e)
     if(event_code == LV_EVENT_SCREEN_LOADED) {
         brightness_screen_loaded(e);
     }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        brightness_screen_unloaded(e);
+    }
 }
 void ui_event_BrightnessSlider(lv_event_t * e)
 {
@@ -276,6 +297,9 @@ void ui_event_PowerScreen(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_SCREEN_LOADED) {
         power_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        power_screen_unloaded(e);
     }
 }
 void ui_event_AutoOffTime(lv_event_t * e)

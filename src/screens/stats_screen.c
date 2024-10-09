@@ -1,4 +1,5 @@
 #include "screens/stats_screen.h"
+#include "esp_log.h"
 #include <core/lv_event.h>
 #include <remote/stats.h>
 
@@ -90,6 +91,13 @@ void update_stats_screen_display() {
 }
 
 // Event handlers
+void stats_screen_loaded(lv_event_t *e) {
+  ESP_LOGI(TAG, "Stats screen loaded");
+}
+
+void stats_screen_unloaded(lv_event_t *e) {
+  ESP_LOGI(TAG, "Stats screen unloaded");
+}
 
 void stat_long_press(lv_event_t *e) {
   change_stat_display(1);

@@ -43,6 +43,7 @@ extern lv_obj_t * ui_StatsFooter;
 extern lv_obj_t * ui_BatteryDisplay;
 // SCREEN: ui_SettingsScreen
 void ui_SettingsScreen_screen_init(void);
+void ui_event_SettingsScreen(lv_event_t * e);
 extern lv_obj_t * ui_SettingsScreen;
 extern lv_obj_t * ui_Content;
 extern lv_obj_t * ui_SettingsBody;
@@ -114,7 +115,7 @@ extern lv_obj_t * ui_CalibrationScreen;
 extern lv_obj_t * ui_CalibrationContent;
 extern lv_obj_t * ui_CalibrationHeader;
 extern lv_obj_t * ui_CalibrationBody;
-extern lv_obj_t * ui_PowerLabel1;
+extern lv_obj_t * ui_CalibrationDataLabel;
 extern lv_obj_t * ui_CalibrationOption;
 extern lv_obj_t * ui_CalibrationFooter;
 void ui_event_CalibrationMainActionButton(lv_event_t * e);

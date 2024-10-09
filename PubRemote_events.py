@@ -78,3 +78,27 @@ def calibration_screen_unloaded(event_struct):
 def calibration_screen_loaded(event_struct):
     return
 
+
+def stats_screen_loaded(event_struct):
+    return
+
+
+def stats_screen_unloaded(event_struct):
+    return
+
+
+def settings_screen_loaded(event_struct):
+    return
+
+
+def settings_screen_unloaded(event_struct):
+    return
+
+
+def brightness_screen_unloaded(event_struct):
+    return
+
+
+def power_screen_unloaded(event_struct):
+    return
+

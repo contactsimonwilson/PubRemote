@@ -5488,6 +5488,136 @@
               }
             ],
             "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": -621495887,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_LOADED",
+            "childs": [
+              {
+                "nid": -1074766802,
+                "strtype": "_event/name",
+                "strval": "StatsScreenLoaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1671741192,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 235282546,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -1882595335,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 1416113554,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1537816042,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1576255325,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -399080106,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "stats_screen_loaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1745500551,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": -2024055484,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_UNLOADED",
+            "childs": [
+              {
+                "nid": -1407433881,
+                "strtype": "_event/name",
+                "strval": "StatsScreenUnloaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": 2115589216,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 428189741,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1331343185,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": -694890197,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1223778576,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1039681494,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -201374454,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "stats_screen_unloaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -385474072,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"
@@ -10782,6 +10912,136 @@
             "strtype": "SCREEN/Style_scrollbar",
             "strval": "lv.PART.SCROLLBAR, Rectangle, Pad",
             "InheritedType": 11
+          },
+          {
+            "disabled": false,
+            "nid": 756458540,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_LOADED",
+            "childs": [
+              {
+                "nid": 1231839955,
+                "strtype": "_event/name",
+                "strval": "SettingsScreenLoaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1033264379,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 456884015,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -13201874,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": -631389307,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1669706909,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 378264324,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1675564164,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "settings_screen_loaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1051454279,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": 2076092549,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_UNLOADED",
+            "childs": [
+              {
+                "nid": -1121710924,
+                "strtype": "_event/name",
+                "strval": "SettingsScreenUnloaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": 392278060,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -1101318567,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -590021282,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 358102479,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -2023164122,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1890167305,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -334042058,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "settings_screen_unloaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 178996270,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"
@@ -13595,6 +13855,71 @@
                   },
                   {
                     "nid": -144322901,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": -1772992161,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_UNLOADED",
+            "childs": [
+              {
+                "nid": 1587077124,
+                "strtype": "_event/name",
+                "strval": "BrightnessScreenUnloaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": -699378147,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 268260866,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1496913425,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": -999445271,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1105124300,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -670084328,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -808619898,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "brightness_screen_unloaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1978044466,
                     "strtype": "CALL FUNCTION/Dont_export_function",
                     "strval": "True",
                     "InheritedType": 2
@@ -19307,6 +19632,71 @@
               }
             ],
             "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": -1384325865,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_UNLOADED",
+            "childs": [
+              {
+                "nid": 1595937581,
+                "strtype": "_event/name",
+                "strval": "PowerScreenUnloaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": -496921125,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 995309133,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1968781143,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": -1206755795,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1413183240,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 449225185,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 761145480,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "power_screen_unloaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1518509778,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"
@@ -19608,7 +19998,7 @@
                       {
                         "nid": -239211167,
                         "strtype": "OBJECT/Name",
-                        "strval": "PowerLabel1",
+                        "strval": "CalibrationDataLabel",
                         "InheritedType": 10
                       },
                       {
@@ -20173,7 +20563,7 @@
                       {
                         "nid": -1277811688,
                         "strtype": "DROPDOWN/Options",
-                        "strval": "Centering\\nY deadzone\\nX deadzone\\n",
+                        "strval": "Centering\\nY deadband\\nX deadband\\n",
                         "InheritedType": 10
                       },
                       {

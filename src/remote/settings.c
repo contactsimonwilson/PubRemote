@@ -2,6 +2,7 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
+#include "remote/adc.h"
 #include <stdio.h>
 
 static const char *TAG = "PUBREMOTE-SETTINGS";
@@ -11,6 +12,7 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 #define BL_LEVEL_KEY "bl_level"
 #define BL_LEVEL_DEFAULT 200
 #define AUTO_OFF_TIME_KEY "auto_off_time"
+#define EXPO_ADJUST_FACTOR 100
 
 static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 
@@ -18,7 +20,16 @@ RemoteSettings settings = {
     .bl_level = BL_LEVEL_DEFAULT,
     .auto_off_time = DEFAULT_AUTO_OFF_TIME,
     .stick_calibration =
-        {.x_min = 0, .x_max = 4095, .y_min = 0, .y_max = 4095, .x_center = 2047, .y_center = 2047, .deadzone = 250},
+        {
+            .x_min = STICK_MIN_VAL,
+            .x_max = STICK_MAX_VAL,
+            .y_min = STICK_MIN_VAL,
+            .y_max = STICK_MAX_VAL,
+            .x_center = STICK_MID_VAL,
+            .y_center = STICK_MID_VAL,
+            .deadband = STICK_DEADBAND,
+            .expo = STICK_EXPO,
+        },
 };
 
 static uint8_t get_auto_off_time_minutes() {
@@ -48,6 +59,17 @@ void save_auto_off_time() {
   nvs_write_int(AUTO_OFF_TIME_KEY, settings.auto_off_time);
 }
 
+void save_calibration() {
+  nvs_write_int("x_min", settings.stick_calibration.x_min);
+  nvs_write_int("x_max", settings.stick_calibration.x_max);
+  nvs_write_int("y_min", settings.stick_calibration.y_min);
+  nvs_write_int("y_max", settings.stick_calibration.y_max);
+  nvs_write_int("x_center", settings.stick_calibration.x_center);
+  nvs_write_int("y_center", settings.stick_calibration.y_center);
+  nvs_write_int("deadband", settings.stick_calibration.deadband);
+  nvs_write_int("expo", (int)(settings.stick_calibration.expo * EXPO_ADJUST_FACTOR));
+}
+
 // Function to initialize NVS
 esp_err_t init_nvs() {
   esp_err_t err = nvs_flash_init();
@@ -72,6 +94,38 @@ esp_err_t init_settings() {
   settings.bl_level = nvs_read_int("bl_level", &settings.bl_level) == ESP_OK ? settings.bl_level : BL_LEVEL_DEFAULT;
   settings.auto_off_time =
       nvs_read_int("auto_off_time", &settings.auto_off_time) == ESP_OK ? settings.auto_off_time : DEFAULT_AUTO_OFF_TIME;
+
+  settings.stick_calibration.x_min = nvs_read_int("x_min", &settings.stick_calibration.x_min) == ESP_OK
+                                         ? settings.stick_calibration.x_min
+                                         : STICK_MIN_VAL;
+  settings.stick_calibration.x_max = nvs_read_int("x_max", &settings.stick_calibration.x_max) == ESP_OK
+                                         ? settings.stick_calibration.x_max
+                                         : STICK_MAX_VAL;
+
+  settings.stick_calibration.y_min = nvs_read_int("y_min", &settings.stick_calibration.y_min) == ESP_OK
+                                         ? settings.stick_calibration.y_min
+                                         : STICK_MIN_VAL;
+
+  settings.stick_calibration.y_max = nvs_read_int("y_max", &settings.stick_calibration.y_max) == ESP_OK
+                                         ? settings.stick_calibration.y_max
+                                         : STICK_MAX_VAL;
+
+  settings.stick_calibration.x_center = nvs_read_int("x_center", &settings.stick_calibration.x_center) == ESP_OK
+                                            ? settings.stick_calibration.x_center
+                                            : STICK_MID_VAL;
+
+  settings.stick_calibration.y_center = nvs_read_int("y_center", &settings.stick_calibration.y_center) == ESP_OK
+                                            ? settings.stick_calibration.y_center
+                                            : STICK_MID_VAL;
+
+  settings.stick_calibration.deadband = nvs_read_int("deadband", &settings.stick_calibration.deadband) == ESP_OK
+                                            ? settings.stick_calibration.deadband
+                                            : STICK_DEADBAND;
+
+  int16_t expo = STICK_EXPO;
+
+  settings.stick_calibration.expo =
+      nvs_read_int("x_expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
 
   return ESP_OK;
 }
@@ -130,29 +184,3 @@ esp_err_t nvs_read_int(const char *key, int32_t *value) {
   nvs_close(my_handle);
   return err;
 }
-
-// void app_main(void) {
-//   // Initialize NVS
-//   esp_err_t err = nvs_init();
-//   if (err != ESP_OK) {
-//     printf("Error initializing NVS!\n");
-//     return;
-//   }
-
-//   // Write an integer
-//   err = nvs_write_int("my_key", 123);
-//   if (err != ESP_OK) {
-//     printf("Error writing to NVS!\n");
-//     return;
-//   }
-
-//   // Read the integer
-//   int32_t read_value;
-//   err = nvs_read_int("my_key", &read_value);
-//   if (err != ESP_OK) {
-//     printf("Error reading from NVS!\n");
-//     return;
-//   }
-
-//   // printf("Read value: %d\n", read_value);
-// }
