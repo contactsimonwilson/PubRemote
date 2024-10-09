@@ -52,7 +52,7 @@ void check_button_press() {
 esp_timer_handle_t deep_sleep_timer;
 
 static uint64_t get_sleep_timer_time_ms() {
-  return settings.auto_off_time * 60 * 1000;
+  return get_auto_off_ms();
 }
 
 static void deep_sleep_timer_callback(void *arg) {

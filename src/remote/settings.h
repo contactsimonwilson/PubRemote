@@ -21,10 +21,19 @@ void save_bl_level();
 
 void save_auto_off_time();
 
+typedef enum {
+  AUTO_OFF_DISABLED,
+  AUTO_OFF_2_MINUTES,
+  AUTO_OFF_5_MINUTES,
+  AUTO_OFF_60_MINUTES,
+} AutoOffOptions;
+
 typedef struct {
   uint8_t bl_level;
-  uint8_t auto_off_time;
+  AutoOffOptions auto_off_time;
 } RemoteSettings;
+
+uint64_t get_auto_off_ms();
 
 extern RemoteSettings settings;
 

@@ -11,12 +11,32 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 #define BL_LEVEL_KEY "bl_level"
 #define BL_LEVEL_DEFAULT 200
 #define AUTO_OFF_TIME_KEY "auto_off_time"
-#define AUTO_OFF_TIME_DEFAULT 2
+
+static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 
 RemoteSettings settings = {
     .bl_level = BL_LEVEL_DEFAULT,
-    .auto_off_time = AUTO_OFF_TIME_DEFAULT,
+    .auto_off_time = DEFAULT_AUTO_OFF_TIME,
 };
+
+static uint8_t get_auto_off_time_minutes() {
+  switch (settings.auto_off_time) {
+  case AUTO_OFF_DISABLED:
+    return 0;
+  case AUTO_OFF_2_MINUTES:
+    return 2;
+  case AUTO_OFF_5_MINUTES:
+    return 5;
+  case AUTO_OFF_60_MINUTES:
+    return 60;
+  default:
+    return 0;
+  }
+}
+
+uint64_t get_auto_off_ms() {
+  return get_auto_off_time_minutes() * 60 * 1000;
+}
 
 void save_bl_level() {
   nvs_write_int(BL_LEVEL_KEY, settings.bl_level);
@@ -49,7 +69,7 @@ esp_err_t init_settings() {
 
   settings.bl_level = nvs_read_int("bl_level", &settings.bl_level) == ESP_OK ? settings.bl_level : BL_LEVEL_DEFAULT;
   settings.auto_off_time =
-      nvs_read_int("auto_off_time", &settings.auto_off_time) == ESP_OK ? settings.auto_off_time : AUTO_OFF_TIME_DEFAULT;
+      nvs_read_int("auto_off_time", &settings.auto_off_time) == ESP_OK ? settings.auto_off_time : DEFAULT_AUTO_OFF_TIME;
 
   return ESP_OK;
 }

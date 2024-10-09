@@ -11,7 +11,6 @@ void power_screen_loaded(lv_event_t *e) {
 
 void auto_off_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_AutoOffTime);
-  // TODO - don't just use index value
   settings.auto_off_time = (uint8_t)(val & 0xFF);
 }
 
