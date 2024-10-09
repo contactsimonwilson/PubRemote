@@ -1,5 +1,31 @@
 # ChangeLog
 
+## v3.3.1 - 2024-8-8
+
+### Enhancements:
+
+* Add Button Event **BUTTON_PRESS_END**.
+
+## v3.3.0 - 2024-8-7
+
+### Enhancements:
+
+* Add Callback **button_power_save_cb_t** to support enter power save manually.
+* Increase the maximum polling interval supported by the button from 20ms to 50ms.
+
+## v3.2.3 - 2024-7-2
+
+* Fixed the issue where the GPIO button in low-power mode continuously woke up the CPU after being pressed, causing abnormal power consumption.
+
+## v3.2.2 - 2024-6-17
+
+* Fix the compilation error for chips that do not support ADC.
+
+## v3.2.1 - 2024-6-17
+
+### bugfix
+
+- Fixed ignored ADC button tied to GND. thanks `demianzenkov` for the fix.
 
 ## v3.2.0 - 2023-11-13
 

@@ -12,4 +12,6 @@ typedef struct {
 
 } RemoteScreen;
 
+bool is_screen_visible(lv_obj_t *screen);
+
 #endif

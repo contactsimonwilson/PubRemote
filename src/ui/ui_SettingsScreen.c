@@ -9,6 +9,10 @@ void ui_SettingsScreen_screen_init(void)
 {
     ui_SettingsScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_SettingsScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_object_set_themeable_style_property(ui_SettingsScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
+                                           _ui_theme_color_Background);
+    ui_object_set_themeable_style_property(ui_SettingsScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,
+                                           _ui_theme_alpha_Background);
 
     ui_Content = lv_obj_create(ui_SettingsScreen);
     lv_obj_remove_style_all(ui_Content);
@@ -135,5 +139,6 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_add_event_cb(ui_SettingsCalibrateButton, ui_event_SettingsCalibrateButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsPairButton, ui_event_SettingsPairButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsShutdownButton, ui_event_SettingsShutdownButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SettingsScreen, ui_event_SettingsScreen, LV_EVENT_ALL, NULL);
 
 }

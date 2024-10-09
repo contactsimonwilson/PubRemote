@@ -9,37 +9,42 @@ void ui_StatsScreen_screen_init(void)
 {
     ui_StatsScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_StatsScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_object_set_themeable_style_property(ui_StatsScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
+                                           _ui_theme_color_Background);
+    ui_object_set_themeable_style_property(ui_StatsScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,
+                                           _ui_theme_alpha_Background);
 
-    ui_DutyCycle = lv_arc_create(ui_StatsScreen);
-    lv_obj_set_width(ui_DutyCycle, lv_pct(100));
-    lv_obj_set_height(ui_DutyCycle, lv_pct(100));
-    lv_obj_set_align(ui_DutyCycle, LV_ALIGN_CENTER);
-    lv_arc_set_value(ui_DutyCycle, 0);
-    lv_obj_set_style_arc_color(ui_DutyCycle, lv_color_hex(0x414141), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui_DutyCycle, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui_DutyCycle, 16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_SpeedDial = lv_arc_create(ui_StatsScreen);
+    lv_obj_set_width(ui_SpeedDial, lv_pct(100));
+    lv_obj_set_height(ui_SpeedDial, lv_pct(100));
+    lv_obj_set_align(ui_SpeedDial, LV_ALIGN_CENTER);
+    lv_arc_set_value(ui_SpeedDial, 0);
+    lv_obj_set_style_arc_color(ui_SpeedDial, lv_color_hex(0x414141), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_opa(ui_SpeedDial, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_width(ui_SpeedDial, 16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_width(ui_DutyCycle, 16, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_width(ui_SpeedDial, 16, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_opa(ui_DutyCycle, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_opa(ui_SpeedDial, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
 
-    ui_Utilizaiton = lv_arc_create(ui_StatsScreen);
-    lv_obj_set_width(ui_Utilizaiton, lv_pct(100));
-    lv_obj_set_height(ui_Utilizaiton, lv_pct(100));
-    lv_obj_set_align(ui_Utilizaiton, LV_ALIGN_CENTER);
-    lv_arc_set_value(ui_Utilizaiton, 0);
-    lv_arc_set_mode(ui_Utilizaiton, LV_ARC_MODE_REVERSE);
-    lv_obj_set_style_pad_left(ui_Utilizaiton, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_Utilizaiton, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_Utilizaiton, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_Utilizaiton, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_color(ui_Utilizaiton, lv_color_hex(0x282828), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui_Utilizaiton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui_Utilizaiton, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_UtilizationDial = lv_arc_create(ui_StatsScreen);
+    lv_obj_set_width(ui_UtilizationDial, lv_pct(100));
+    lv_obj_set_height(ui_UtilizationDial, lv_pct(100));
+    lv_obj_set_align(ui_UtilizationDial, LV_ALIGN_CENTER);
+    lv_arc_set_range(ui_UtilizationDial, 0, 1);
+    lv_arc_set_value(ui_UtilizationDial, 0);
+    lv_arc_set_mode(ui_UtilizationDial, LV_ARC_MODE_REVERSE);
+    lv_obj_set_style_pad_left(ui_UtilizationDial, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_UtilizationDial, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_UtilizationDial, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_UtilizationDial, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_color(ui_UtilizationDial, lv_color_hex(0x282828), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_opa(ui_UtilizationDial, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_width(ui_UtilizationDial, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_arc_width(ui_Utilizaiton, 12, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_arc_width(ui_UtilizationDial, 12, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_opa(ui_Utilizaiton, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_opa(ui_UtilizationDial, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
 
     ui_LeftSensor = lv_arc_create(ui_StatsScreen);
     lv_obj_set_width(ui_LeftSensor, lv_pct(100));
@@ -127,10 +132,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_StatsBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_StatsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_StatsBody, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_pad_left(ui_StatsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_StatsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_StatsBody, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_StatsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PrimaryStat = lv_label_create(ui_StatsBody);
     lv_obj_set_width(ui_PrimaryStat, lv_pct(100));
@@ -153,61 +154,18 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_add_flag(ui_PrimaryStatUnit, LV_OBJ_FLAG_FLOATING);     /// Flags
     lv_obj_set_style_text_font(ui_PrimaryStatUnit, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_SecondaryStats = lv_obj_create(ui_StatsBody);
-    lv_obj_set_width(ui_SecondaryStats, lv_pct(100));
-    lv_obj_set_height(ui_SecondaryStats, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_SecondaryStats, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_SecondaryStats, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_SecondaryStats, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_scrollbar_mode(ui_SecondaryStats, LV_SCROLLBAR_MODE_ACTIVE);
-    lv_obj_set_style_bg_color(ui_SecondaryStats, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_SecondaryStats, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_SecondaryStats, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui_SecondaryStats, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_SecondaryStats, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_SecondaryStats, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_SecondaryStats, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui_SecondaryStats, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_ConnectionState = lv_label_create(ui_SecondaryStats);
-    lv_obj_set_width(ui_ConnectionState, lv_pct(100));
-    lv_obj_set_height(ui_ConnectionState, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_ConnectionState, -17);
-    lv_obj_set_y(ui_ConnectionState, 33);
-    lv_obj_set_align(ui_ConnectionState, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_ConnectionState, LV_LABEL_LONG_DOT);
-    lv_label_set_text(ui_ConnectionState, "Disconnected");
-    lv_obj_add_flag(ui_ConnectionState, LV_OBJ_FLAG_SCROLL_ONE);     /// Flags
-    lv_obj_clear_flag(ui_ConnectionState,
-                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+    ui_SecondaryStat = lv_label_create(ui_StatsBody);
+    lv_obj_set_width(ui_SecondaryStat, LV_SIZE_CONTENT);   /// 100
+    lv_obj_set_height(ui_SecondaryStat, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_SecondaryStat, -17);
+    lv_obj_set_y(ui_SecondaryStat, 33);
+    lv_obj_set_align(ui_SecondaryStat, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_SecondaryStat, LV_LABEL_LONG_DOT);
+    lv_label_set_text(ui_SecondaryStat, "Disconnected");
+    lv_obj_add_flag(ui_SecondaryStat, LV_OBJ_FLAG_SCROLL_ONE);     /// Flags
+    lv_obj_clear_flag(ui_SecondaryStat, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
                       LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_scrollbar_mode(ui_ConnectionState, LV_SCROLLBAR_MODE_OFF);
-
-    ui_DistanceStats = lv_label_create(ui_SecondaryStats);
-    lv_obj_set_width(ui_DistanceStats, lv_pct(100));
-    lv_obj_set_height(ui_DistanceStats, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_DistanceStats, -17);
-    lv_obj_set_y(ui_DistanceStats, 33);
-    lv_obj_set_align(ui_DistanceStats, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_DistanceStats, LV_LABEL_LONG_DOT);
-    lv_label_set_text(ui_DistanceStats, "Trip: 0.0km | Rem: 0.0km");
-    lv_obj_add_flag(ui_DistanceStats, LV_OBJ_FLAG_SCROLL_ONE);     /// Flags
-    lv_obj_clear_flag(ui_DistanceStats, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_scrollbar_mode(ui_DistanceStats, LV_SCROLLBAR_MODE_OFF);
-
-    ui_TempStats = lv_label_create(ui_SecondaryStats);
-    lv_obj_set_width(ui_TempStats, lv_pct(100));
-    lv_obj_set_height(ui_TempStats, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_TempStats, -17);
-    lv_obj_set_y(ui_TempStats, 33);
-    lv_obj_set_align(ui_TempStats, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_TempStats, LV_LABEL_LONG_DOT);
-    lv_label_set_text(ui_TempStats, "Mot: 0C | Cont: 0C");
-    lv_obj_add_flag(ui_TempStats, LV_OBJ_FLAG_SCROLL_ONE);     /// Flags
-    lv_obj_clear_flag(ui_TempStats, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_scrollbar_mode(ui_TempStats, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scrollbar_mode(ui_SecondaryStat, LV_SCROLLBAR_MODE_OFF);
 
     ui_StatsFooter = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsFooter);
@@ -236,7 +194,8 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_top(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_BatteryDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(ui_BatteryDisplay, ui_event_BatteryDisplay, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_StatsBody, ui_event_StatsBody, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_StatsFooter, ui_event_StatsFooter, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsScreen, ui_event_StatsScreen, LV_EVENT_ALL, NULL);
 
 }

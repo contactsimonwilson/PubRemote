@@ -14,6 +14,7 @@
 #include "hal/ledc_types.h"
 #include "lvgl.h"
 #include "powermanagement.h"
+#include "settings.h"
 #include "ui/ui.h"
 #include <stdio.h>
 
@@ -34,7 +35,7 @@
   #define DISP_BL_PWM 0
 #endif
 
-static const char *TAG = "PUBMOTE_DISPLAY";
+static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
@@ -238,7 +239,7 @@ bool my_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
     data->state = LV_INDEV_STATE_PR;
 
     // ESP_LOGI(TAG, "Touch event at X: %d, Y: %d\n", data->point.x, data->point.y);
-    start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+    start_or_reset_deep_sleep_timer();
   }
   else {
     data->state = LV_INDEV_STATE_REL;
@@ -413,6 +414,6 @@ void init_display(void) {
 
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));
-    set_bl_level(200);
+    set_bl_level(settings.bl_level);
   }
 }

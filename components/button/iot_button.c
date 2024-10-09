@@ -70,6 +70,9 @@ typedef struct Button {
 static button_dev_t *g_head_handle = NULL;
 static esp_timer_handle_t g_button_timer_handle = NULL;
 static bool g_is_timer_running = false;
+#if CONFIG_GPIO_BUTTON_SUPPORT_POWER_SAVE
+static button_power_save_config_t power_save_usr_cfg = {0};
+#endif
 
 #define TICKS_INTERVAL    CONFIG_BUTTON_PERIOD_TIME_MS
 #define DEBOUNCE_TICKS    CONFIG_BUTTON_DEBOUNCE_TICKS //MAX 8
@@ -186,6 +189,8 @@ static void button_handler(button_dev_t *btn)
             CALL_EVENT_CB(BUTTON_PRESS_REPEAT_DONE); // repeat hit
             btn->repeat = 0;
             btn->state = 0;
+            btn->event = (uint8_t)BUTTON_PRESS_END;
+            CALL_EVENT_CB(BUTTON_PRESS_END);
         }
         break;
 
@@ -193,11 +198,13 @@ static void button_handler(button_dev_t *btn)
         if (btn->button_level != btn->active_level) {
             btn->event = (uint8_t)BUTTON_PRESS_UP;
             CALL_EVENT_CB(BUTTON_PRESS_UP);
-            if (btn->ticks < SHORT_TICKS) {
+            if (btn->ticks < btn->short_press_ticks) {
                 btn->ticks = 0;
                 btn->state = 2; //repeat press
             } else {
                 btn->state = 0;
+                btn->event = (uint8_t)BUTTON_PRESS_END;
+                CALL_EVENT_CB(BUTTON_PRESS_END);
             }
         }
         break;
@@ -285,6 +292,8 @@ static void button_handler(button_dev_t *btn)
             CALL_EVENT_CB(BUTTON_PRESS_UP);
             btn->state = 0; //reset
             btn->long_press_hold_cnt = 0;
+            btn->event = (uint8_t)BUTTON_PRESS_END;
+            CALL_EVENT_CB(BUTTON_PRESS_END);
         }
         break;
     }
@@ -308,12 +317,19 @@ static void button_cb(void *args)
 #if CONFIG_GPIO_BUTTON_SUPPORT_POWER_SAVE
     if (enter_power_save_flag) {
         /*!< Stop esp timer for power save */
-        esp_timer_stop(g_button_timer_handle);
-        g_is_timer_running = false;
+        if (g_is_timer_running) {
+            esp_timer_stop(g_button_timer_handle);
+            g_is_timer_running = false;
+        }
         for (target = g_head_handle; target; target = target->next) {
             if (target->type == BUTTON_TYPE_GPIO && target->enable_power_save) {
                 button_gpio_intr_control((int)(target->hardware_data), true);
+                button_gpio_enable_gpio_wakeup((uint32_t)(target->hardware_data), target->active_level, true);
             }
+        }
+        /*!< Notify the user that the Button has entered power save mode by calling this callback function. */
+        if (power_save_usr_cfg.enter_power_save_cb) {
+            power_save_usr_cfg.enter_power_save_cb(power_save_usr_cfg.usr_data);
         }
     }
 #endif
@@ -327,6 +343,8 @@ static void IRAM_ATTR button_power_save_isr_handler(void* arg)
         g_is_timer_running = true;
     }
     button_gpio_intr_control((int)arg, false);
+    /*!< disable gpio wakeup not need active level*/
+    button_gpio_enable_gpio_wakeup((uint32_t)arg, 0, false);
 }
 #endif
 
@@ -418,12 +436,14 @@ button_handle_t iot_button_create(const button_config_t *config)
         }
 #endif
     } break;
+#if CONFIG_SOC_ADC_SUPPORTED
     case BUTTON_TYPE_ADC: {
         const button_adc_config_t *cfg = &(config->adc_button_config);
         ret = button_adc_init(cfg);
         BTN_CHECK(ESP_OK == ret, "adc button init failed", NULL);
         btn = button_create_com(1, button_adc_get_key_level, (void *)ADC_BUTTON_COMBINE(cfg->adc_channel, cfg->button_index), long_press_time, short_press_time);
     } break;
+#endif
     case BUTTON_TYPE_MATRIX: {
         const button_matrix_config_t *cfg = &(config->matrix_button_config);
         ret = button_matrix_init(cfg);
@@ -451,7 +471,7 @@ button_handle_t iot_button_create(const button_config_t *config)
     }
     BTN_CHECK(NULL != btn, "button create failed", NULL);
     btn->type = config->type;
-    if (!btn->enable_power_save) {
+    if (!btn->enable_power_save && !g_is_timer_running) {
         esp_timer_start_periodic(g_button_timer_handle, TICKS_INTERVAL * 1000U);
         g_is_timer_running = true;
     }
@@ -467,9 +487,11 @@ esp_err_t iot_button_delete(button_handle_t btn_handle)
     case BUTTON_TYPE_GPIO:
         ret = button_gpio_deinit((int)(btn->hardware_data));
         break;
+#if CONFIG_SOC_ADC_SUPPORTED
     case BUTTON_TYPE_ADC:
         ret = button_adc_deinit(ADC_BUTTON_SPLIT_CHANNEL(btn->hardware_data), ADC_BUTTON_SPLIT_INDEX(btn->hardware_data));
         break;
+#endif
     case BUTTON_TYPE_MATRIX:
         ret = button_matrix_deinit(MATRIX_BUTTON_SPLIT_ROW(btn->hardware_data), MATRIX_BUTTON_SPLIT_COL(btn->hardware_data));
         break;
@@ -755,3 +777,15 @@ esp_err_t iot_button_stop(void)
     g_is_timer_running = false;
     return ESP_OK;
 }
+
+#if CONFIG_GPIO_BUTTON_SUPPORT_POWER_SAVE
+esp_err_t iot_button_register_power_save_cb(const button_power_save_config_t *config)
+{
+    BTN_CHECK(g_head_handle, "No button registered", ESP_ERR_INVALID_STATE);
+    BTN_CHECK(config->enter_power_save_cb, "Enter power save callback is invalid", ESP_ERR_INVALID_ARG);
+
+    power_save_usr_cfg.enter_power_save_cb = config->enter_power_save_cb;
+    power_save_usr_cfg.usr_data = config->usr_data;
+    return ESP_OK;
+}
+#endif

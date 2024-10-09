@@ -18,8 +18,8 @@ const ui_theme_variable_t _ui_theme_alpha_Success[1] = {255};
 const ui_theme_variable_t _ui_theme_color_Error[1] = {0x000000};
 const ui_theme_variable_t _ui_theme_alpha_Error[1] = {255};
 
-const ui_theme_variable_t _ui_theme_color_Warn[1] = {0x000000};
-const ui_theme_variable_t _ui_theme_alpha_Warn[1] = {255};
+const ui_theme_variable_t _ui_theme_color_Background[1] = {0x000000};
+const ui_theme_variable_t _ui_theme_alpha_Background[1] = {255};
 uint8_t ui_theme_idx = UI_THEME_DEFAULT;
 
 

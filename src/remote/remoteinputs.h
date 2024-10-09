@@ -1,5 +1,6 @@
 #ifndef __REMOTEINPUTS_H
 #define __REMOTEINPUTS_H
+#include "adc.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
@@ -27,6 +28,12 @@ typedef union {
   uint8_t bytes[sizeof(remote_data_t)];
 } RemoteDataUnion;
 
+typedef struct {
+  uint16_t x;
+  uint16_t y;
+} JoystickData;
+
 extern RemoteDataUnion remote_data;
+extern JoystickData joystick_data;
 
 #endif

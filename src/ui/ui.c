@@ -20,27 +20,26 @@ lv_obj_t * ui_SplashScreenLogo;
 void ui_StatsScreen_screen_init(void);
 void ui_event_StatsScreen(lv_event_t * e);
 lv_obj_t * ui_StatsScreen;
-lv_obj_t * ui_DutyCycle;
-lv_obj_t * ui_Utilizaiton;
+lv_obj_t * ui_SpeedDial;
+lv_obj_t * ui_UtilizationDial;
 lv_obj_t * ui_LeftSensor;
 lv_obj_t * ui_RightSensor;
 lv_obj_t * ui_StatsContent;
 lv_obj_t * ui_StatsHeader;
 lv_obj_t * ui_MessageText;
+void ui_event_StatsBody(lv_event_t * e);
 lv_obj_t * ui_StatsBody;
 lv_obj_t * ui_PrimaryStat;
 lv_obj_t * ui_PrimaryStatUnit;
-lv_obj_t * ui_SecondaryStats;
-lv_obj_t * ui_ConnectionState;
-lv_obj_t * ui_DistanceStats;
-lv_obj_t * ui_TempStats;
+lv_obj_t * ui_SecondaryStat;
+void ui_event_StatsFooter(lv_event_t * e);
 lv_obj_t * ui_StatsFooter;
-void ui_event_BatteryDisplay(lv_event_t * e);
 lv_obj_t * ui_BatteryDisplay;
 
 
 // SCREEN: ui_SettingsScreen
 void ui_SettingsScreen_screen_init(void);
+void ui_event_SettingsScreen(lv_event_t * e);
 lv_obj_t * ui_SettingsScreen;
 lv_obj_t * ui_Content;
 lv_obj_t * ui_SettingsBody;
@@ -68,10 +67,12 @@ lv_obj_t * ui_SettingsShutdownButtonLabel;
 
 // SCREEN: ui_BrightnessScreen
 void ui_BrightnessScreen_screen_init(void);
+void ui_event_BrightnessScreen(lv_event_t * e);
 lv_obj_t * ui_BrightnessScreen;
 lv_obj_t * ui_BrightnessContent;
 lv_obj_t * ui_BrightnessHeader;
 lv_obj_t * ui_BrightnessBody;
+void ui_event_BrightnessSlider(lv_event_t * e);
 lv_obj_t * ui_BrightnessSlider;
 lv_obj_t * ui_BrightnessLabel;
 lv_obj_t * ui_BrightnessFooter;
@@ -102,6 +103,7 @@ lv_obj_t * ui_PowerScreen;
 lv_obj_t * ui_PowerContent;
 lv_obj_t * ui_PowerHeader;
 lv_obj_t * ui_PowerBody;
+void ui_event_AutoOffTime(lv_event_t * e);
 lv_obj_t * ui_AutoOffTime;
 lv_obj_t * ui_PowerLabel;
 lv_obj_t * ui_PowerFooter;
@@ -112,11 +114,12 @@ lv_obj_t * ui_PowerMainActionButtonLabel;
 
 // SCREEN: ui_CalibrationScreen
 void ui_CalibrationScreen_screen_init(void);
+void ui_event_CalibrationScreen(lv_event_t * e);
 lv_obj_t * ui_CalibrationScreen;
 lv_obj_t * ui_CalibrationContent;
 lv_obj_t * ui_CalibrationHeader;
 lv_obj_t * ui_CalibrationBody;
-lv_obj_t * ui_PowerLabel1;
+lv_obj_t * ui_CalibrationDataLabel;
 lv_obj_t * ui_CalibrationOption;
 lv_obj_t * ui_CalibrationFooter;
 void ui_event_CalibrationMainActionButton(lv_event_t * e);
@@ -151,13 +154,46 @@ void ui_event_StatsScreen(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_SettingsScreen_screen_init);
     }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        stats_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        stats_screen_unloaded(e);
+    }
 }
-void ui_event_BatteryDisplay(lv_event_t * e)
+void ui_event_StatsBody(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_LONG_PRESSED) {
-        toggleFooterDisplayMode(e);
+        stat_long_press(e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        stat_swipe_left(e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        stat_swipe_right(e);
+    }
+}
+void ui_event_StatsFooter(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_LONG_PRESSED) {
+        stats_footer_long_press(e);
+    }
+}
+void ui_event_SettingsScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        settings_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        settings_screen_unloaded(e);
     }
 }
 void ui_event_SettingsBackButton(lv_event_t * e)
@@ -208,12 +244,32 @@ void ui_event_SettingsShutdownButton(lv_event_t * e)
         enter_deep_sleep(e);
     }
 }
+void ui_event_BrightnessScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        brightness_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        brightness_screen_unloaded(e);
+    }
+}
+void ui_event_BrightnessSlider(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        brightness_slider_change(e);
+    }
+}
 void ui_event_BrightnessMainActionButton(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+        brightness_save(e);
     }
 }
 void ui_event_PairingScreen(lv_event_t * e)
@@ -221,7 +277,10 @@ void ui_event_PairingScreen(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_SCREEN_LOADED) {
-        StartPairing(e);
+        pairing_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        pairing_screen_unloaded(e);
     }
 }
 void ui_event_PairingMainActionButton(lv_event_t * e)
@@ -237,7 +296,18 @@ void ui_event_PowerScreen(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_SCREEN_LOADED) {
-        StartPairing(e);
+        power_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        power_screen_unloaded(e);
+    }
+}
+void ui_event_AutoOffTime(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        auto_off_select_change(e);
     }
 }
 void ui_event_PowerMainActionButton(lv_event_t * e)
@@ -246,6 +316,18 @@ void ui_event_PowerMainActionButton(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+        power_settings_save(e);
+    }
+}
+void ui_event_CalibrationScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        calibration_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        calibration_screen_unloaded(e);
     }
 }
 void ui_event_CalibrationMainActionButton(lv_event_t * e)
@@ -254,6 +336,7 @@ void ui_event_CalibrationMainActionButton(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+        calibration_settings_save(e);
     }
 }
 

@@ -15,19 +15,32 @@ typedef enum {
 
 typedef enum {
   CONNECTION_STATE_DISCONNECTED,
+  CONNECTION_STATE_RECONNECTING,
   CONNECTION_STATE_CONNECTED
 } ConnectionState;
 
+typedef enum {
+  SWITCH_STATE_OFF,
+  SWITCH_STATE_LEFT,
+  SWITCH_STATE_RIGHT,
+  SWITCH_STATE_BOTH
+} SwitchState;
+
 typedef struct {
   float speed;
+  float dutyCycle;
   SpeedUnit speedUnit;
   TempUnit tempUnit;
   float batteryVoltage;
   float batteryPercentage;
   uint8_t signalStrength;
+  SwitchState switchState;
   ConnectionState connectionState;
-} RemoteDisplayState;
+} RemoteStats;
 
-RemoteDisplayState displayState;
+extern RemoteStats remoteStats;
+
+void update_stats_display();
+void init_stats();
 
 #endif

@@ -5,27 +5,28 @@
 #include "esp_wifi.h"
 #include "peers.h"
 #include "powermanagement.h"
+#include "stats.h"
 #include "time.h"
 #include <string.h>
-#include <ui/ui.h>
 
-static const char *TAG = "PUBMOTE-RECEIVER";
+static const char *TAG = "PUBREMOTE-RECEIVER";
 
 #define TIMEOUT_DURATION_MS 10000     // 10 seconds
 #define RECONNECTING_DURATION_MS 1000 // 1 seconds
 
 esp_timer_handle_t connection_timeout_timer;
 esp_timer_handle_t reconnecting_timer;
-int pairing_state = 0;
+PairingState pairing_state = PAIRING_STATE_UNPAIRED;
 int32_t secret_code = 0;
 uint8_t remote_addr[6] = {0, 0, 0, 0, 0, 0};
 
 static void connection_timeout_callback(void *arg) {
-  lv_label_set_text(ui_ConnectionState, "Disconnected");
+  init_stats();
 }
 
 static void reconnecting_timer_callback(void *arg) {
-  lv_label_set_text(ui_ConnectionState, "Reconnecting");
+  remoteStats.connectionState = CONNECTION_STATE_RECONNECTING;
+  update_stats_display();
   esp_timer_start_once(connection_timeout_timer, TIMEOUT_DURATION_MS * 1000);
 }
 
@@ -35,7 +36,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
   LAST_COMMAND_TIME = 0;
   ESP_LOGI(TAG, "RTT: %lld", deltaTime);
 
-  if (pairing_state == 1 && len == 6) {
+  if (pairing_state == PAIRING_STATE_UNPAIRED && len == 6) {
     memcpy(remote_addr, data, 6);
     ESP_LOGI(TAG, "Got Pairing request from VESC Express");
     ESP_LOGI(TAG, "packet Length: %d", len);
@@ -63,21 +64,21 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
       pairing_state++;
     }
   }
-  else if (pairing_state == 2 && len == 4) {
+  else if (pairing_state == PAIRING_STATE_PAIRING && len == 4) {
     // grab secret code
     ESP_LOGI(TAG, "Grabbing secret code");
     ESP_LOGI(TAG, "packet Length: %d", len);
     secret_code = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
     ESP_LOGI(TAG, "Secret Code: %li", secret_code);
-    pairing_state = 0;
+    pairing_state = PAIRING_STATE_PAIRED;
   }
 
-  if (pairing_state == 0 && len == 32) {
+  if (pairing_state == PAIRING_STATE_PAIRED && len == 32) {
     // Reset the timers
     esp_timer_stop(connection_timeout_timer);
     esp_timer_stop(reconnecting_timer);
-    start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
-    lv_label_set_text(ui_ConnectionState, "Connected");
+    start_or_reset_deep_sleep_timer();
+    remoteStats.connectionState = CONNECTION_STATE_CONNECTED;
     // Restart the connection timeout timer
     esp_timer_start_once(reconnecting_timer, RECONNECTING_DURATION_MS * 1000);
     uint8_t mode = data[0];
@@ -86,11 +87,14 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     float roll_angle = (int16_t)((data[4] << 8) | data[5]) / 10.0;
     uint8_t state = data[6];
     uint8_t switch_state = data[7];
+    remoteStats.switchState = switch_state;
     float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
     int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
     float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
+    remoteStats.speed = speed;
     float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
     float duty_cycle_now = (float)data[16] / 100.0 - 0.5;
+    remoteStats.dutyCycle = duty_cycle_now;
     float distance_abs;
     memcpy(&distance_abs, &data[17], sizeof(float));
     float fet_temp_filtered = (float)data[21] / 2.0;
@@ -98,39 +102,6 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
     float battery_level = (float)data[27] / 2.0;
     int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
-
-    switch (switch_state) {
-    case 0:
-      lv_arc_set_value(ui_LeftSensor, 0);
-      lv_arc_set_value(ui_RightSensor, 0);
-      break;
-    case 1:
-      lv_arc_set_value(ui_LeftSensor, 1);
-      lv_arc_set_value(ui_RightSensor, 0);
-      break;
-    case 2:
-      lv_arc_set_value(ui_LeftSensor, 0);
-      lv_arc_set_value(ui_RightSensor, 1);
-      break;
-    case 3:
-      lv_arc_set_value(ui_LeftSensor, 1);
-      lv_arc_set_value(ui_RightSensor, 1);
-      break;
-    default:
-      break;
-    }
-
-    char *formattedString;
-    asprintf(&formattedString, "%.0f%%", battery_level);
-    lv_label_set_text(ui_BatteryDisplay, formattedString);
-    asprintf(&formattedString, "Mot: %.0fC | Cont: %.0fC", motor_temp_filtered, fet_temp_filtered);
-    lv_label_set_text(ui_TempStats, formattedString);
-    asprintf(&formattedString, "Trip: %.0fkm | Rem: -69km", distance_abs);
-    lv_label_set_text(ui_DistanceStats, formattedString);
-    asprintf(&formattedString, "%.1f", speed);
-    lv_label_set_text(ui_PrimaryStat, formattedString);
-    free(formattedString);
-    lv_arc_set_value(ui_DutyCycle, duty_cycle_now);
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
     // ESP_LOGI(TAG, "Fault Code: %d", fault_code);
@@ -148,6 +119,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     // ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
     // ESP_LOGI(TAG, "Odometer: %lu", odometer);
     // ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
+    update_stats_display();
   }
   else {
     ESP_LOGI(TAG, "Invalid data length");

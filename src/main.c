@@ -14,7 +14,6 @@
 #include "remote/receiver.h"
 #include "remote/remote.h"
 #include "remote/remoteinputs.h"
-#include "remote/router.h"
 #include "remote/screen.h"
 #include "remote/settings.h"
 #include "remote/time.h"
@@ -23,14 +22,14 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char *TAG = "PUBMOTE-MAIN";
+static const char *TAG = "PUBREMOTE-MAIN";
 
 uint8_t PEER_MAC_ADDRESS[6] = {72, 49, 183, 171, 63, 137}; // Siwoz
 // uint8_t PEER_MAC_ADDRESS[6] = {60, 233, 14, 66, 213, 197};//Syler
 int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
-  init_nvs();
+  init_settings();
   init_power_management();
   init_led();
   init_buzzer();
@@ -52,8 +51,4 @@ void app_main(void) {
   // Remote inputs init
   init_buttons();
   init_thumbstick();
-  RemoteScreen stats_screen = {.name = "stats", .screen_obj = ui_StatsScreen};
-  // RemoteScreen calibration_screen = {.name = "calibration", .screen_obj = ui_CalibrationScreen};
-  router_register_screen(&stats_screen);
-  // router_register_screen(&calibration_screen);
 }

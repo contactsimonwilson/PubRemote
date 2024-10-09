@@ -5,14 +5,16 @@
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "remoteinputs.h"
+#include "settings.h"
 #include <esp_adc/adc_oneshot.h>
 #include <esp_err.h>
 #include <esp_sleep.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
+#include <math.h>
 #include <ui/ui.h>
-static const char *TAG = "PUBMOTE-POWERMANAGEMENT";
+static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
 float convert_adc_to_battery_volts(int adc_value) {
   // 0 - 4095 -> 0 - 255
@@ -24,25 +26,34 @@ float BATTERY_VOLTAGE = 0;
 #define BATTER_MONITOR_CHANNEL ADC_CHANNEL_0 // Assuming the Hall sensor is connected to GPIO0
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
+
+void enter_sleep() {
+  esp_deep_sleep_start();
+}
+
 void check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
   while (gpio_get_level(GPIO_NUM_15) == 1) { // Check if button is still pressed
     if ((esp_timer_get_time() - pressStartTime) >= (REQUIRED_PRESS_TIME_MS * 1000)) {
-      printf("Button has been pressed for 2 seconds.\n");
+      ESP_LOGI(TAG, "Button has been pressed for 2 seconds.");
       // Perform the desired action after confirmation of long press
       // maybe show start up screen or buzzer, etc.?
       break;
     }
-    vTaskDelay(10 / portTICK_PERIOD_MS); // Delay to allow for time checking without busy waiting
+    vTaskDelay(pdMS_TO_TICKS(10)); // Delay to allow for time checking without busy waiting
   }
   while (gpio_get_level(GPIO_NUM_15) == 1)
     ; // wait for button release
   if ((esp_timer_get_time() - pressStartTime) < (REQUIRED_PRESS_TIME_MS * 1000)) {
-    esp_deep_sleep_start(); // Go back to sleep if condition not met
+    enter_sleep(); // Go back to sleep if condition not met
   }
 }
 
 esp_timer_handle_t deep_sleep_timer;
+
+static uint64_t get_sleep_timer_time_ms() {
+  return get_auto_off_ms();
+}
 
 static void deep_sleep_timer_callback(void *arg) {
   // Enter deep sleep mode when the deep sleep timer expires
@@ -50,7 +61,15 @@ static void deep_sleep_timer_callback(void *arg) {
   esp_deep_sleep_start();
 }
 
-void start_or_reset_deep_sleep_timer(uint64_t duration_ms) {
+void start_or_reset_deep_sleep_timer() {
+  int duration_ms = get_sleep_timer_time_ms();
+
+  if (duration_ms == 0) {
+    ESP_LOGD(TAG, "Deep sleep timer disabled.");
+    deep_sleep_timer = NULL;
+    return;
+  }
+
   if (deep_sleep_timer == NULL) {
     esp_timer_create_args_t deep_sleep_timer_args = {.callback = deep_sleep_timer_callback,
                                                      .arg = NULL,
@@ -60,7 +79,7 @@ void start_or_reset_deep_sleep_timer(uint64_t duration_ms) {
   }
   else {
     ESP_ERROR_CHECK(esp_timer_stop(deep_sleep_timer));
-    ESP_LOGI(TAG, "Deep sleep reset.");
+    ESP_LOGD(TAG, "Deep sleep reset.");
   }
   ESP_ERROR_CHECK(esp_timer_start_once(deep_sleep_timer, duration_ms * 1000));
 }
@@ -90,7 +109,7 @@ void power_management_task(void *pvParameters) {
     int battery_value = 0;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BATTER_MONITOR_CHANNEL, &battery_value));
     BATTERY_VOLTAGE = convert_adc_to_battery_volts(battery_value);
-    printf("Battery volts: %.1f\n", BATTERY_VOLTAGE);
+    ESP_LOGD(TAG, "Battery volts: %.1f", BATTERY_VOLTAGE);
     // char str[20];
     // sprintf(str, "%.1f", BATTERY_VOLTAGE);
     //  lv_label_set_text(ui_PrimaryStat, str);
@@ -108,7 +127,7 @@ void init_power_management() {
   esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, 1); // 1 for high level
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: { // Wake-up caused by external signal using RTC_IO
-    printf("Woken up by external signal on EXT0.\n");
+    ESP_LOGI(TAG, "Woken up by external signal on EXT0.");
     // Proceed to check if the button is still pressed
     check_button_press();
     break;
@@ -122,9 +141,9 @@ void init_power_management() {
     // Handle other wake-up sources if necessary
     break;
   default:
-    printf("Not a deep sleep wakeup or other wake-up sources.\n");
+    ESP_LOGI(TAG, "Not a deep sleep wakeup or other wake-up sources.");
     break;
   }
-  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+  start_or_reset_deep_sleep_timer();
   xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
 }
