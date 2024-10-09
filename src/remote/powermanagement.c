@@ -109,7 +109,7 @@ void power_management_task(void *pvParameters) {
     int battery_value = 0;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BATTER_MONITOR_CHANNEL, &battery_value));
     BATTERY_VOLTAGE = convert_adc_to_battery_volts(battery_value);
-    ESP_LOGI(TAG, "Battery volts: %.1f", BATTERY_VOLTAGE);
+    ESP_LOGD(TAG, "Battery volts: %.1f", BATTERY_VOLTAGE);
     // char str[20];
     // sprintf(str, "%.1f", BATTERY_VOLTAGE);
     //  lv_label_set_text(ui_PrimaryStat, str);

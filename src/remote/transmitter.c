@@ -26,7 +26,7 @@ static void transmitter_task(void *pvParameters) {
       vTaskDelay(TRANSMIT_FREQUENCY);
       continue;
     }
-    if (pairing_state == 0) {
+    if (pairing_state == PAIRING_STATE_PAIRED) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
