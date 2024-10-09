@@ -43,7 +43,7 @@ void ui_PowerScreen_screen_init(void)
     lv_obj_set_style_pad_column(ui_PowerBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_AutoOffTime = lv_dropdown_create(ui_PowerBody);
-    lv_dropdown_set_options(ui_AutoOffTime, "Disabled\n2 minutes\n5 minutes\n60 minutes\n");
+    lv_dropdown_set_options(ui_AutoOffTime, "Disabled\n2 minutes\n5 minutes\n10 minutes\n");
     lv_obj_set_width(ui_AutoOffTime, 150);
     lv_obj_set_height(ui_AutoOffTime, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_AutoOffTime, LV_ALIGN_CENTER);

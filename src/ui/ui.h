@@ -109,6 +109,7 @@ extern lv_obj_t * ui_PowerMainActionButton;
 extern lv_obj_t * ui_PowerMainActionButtonLabel;
 // SCREEN: ui_CalibrationScreen
 void ui_CalibrationScreen_screen_init(void);
+void ui_event_CalibrationScreen(lv_event_t * e);
 extern lv_obj_t * ui_CalibrationScreen;
 extern lv_obj_t * ui_CalibrationContent;
 extern lv_obj_t * ui_CalibrationHeader;

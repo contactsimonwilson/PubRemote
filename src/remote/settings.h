@@ -25,12 +25,23 @@ typedef enum {
   AUTO_OFF_DISABLED,
   AUTO_OFF_2_MINUTES,
   AUTO_OFF_5_MINUTES,
-  AUTO_OFF_60_MINUTES,
+  AUTO_OFF_10_MINUTES,
 } AutoOffOptions;
+
+typedef struct {
+  int16_t x_min;
+  int16_t x_max;
+  int16_t y_min;
+  int16_t y_max;
+  int16_t x_center;
+  int16_t y_center;
+  int16_t deadzone;
+} StickCalibration;
 
 typedef struct {
   uint8_t bl_level;
   AutoOffOptions auto_off_time;
+  StickCalibration stick_calibration;
 } RemoteSettings;
 
 uint64_t get_auto_off_ms();

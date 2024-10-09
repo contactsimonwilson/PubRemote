@@ -8,8 +8,8 @@
 #include "freertos/task.h"
 #include "iot_button.h"
 #include "powermanagement.h"
-#include "remote/router.h"
 #include "rom/gpio.h"
+#include "settings.h"
 #include "time.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
@@ -17,21 +17,15 @@
 #include <ui/ui.h>
 static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 
+#define STICK_ADC_BITWIDTH ADC_BITWIDTH_12
+#define STICK_MAX_VAL ((1 << STICK_ADC_BITWIDTH) - 1)
+#define STICK_MID_VAL ((STICK_MAX_VAL / 2) - 1)
+
 RemoteDataUnion remote_data;
 
-#define X_STICK_DEADZONE 250
-#define Y_STICK_DEADZONE 250
-
-// For PS5 Hall
-// float convert_adc_to_axis(int adc_value) {
-//   // 0 - 4095 -> 1.0 to -1.0
-//   return (float)(2047 - adc_value) / 2047.0f;
-// }
-
-// For Switch
 float convert_adc_to_axis(int adc_value) {
   // 0 - 4095 -> 1.0 to -1.0
-  return (float)(2047 - adc_value) / 2047.0f;
+  return (float)(STICK_MID_VAL - adc_value) / STICK_MID_VAL;
 }
 
 void thumbstick_task(void *pvParameters) {
@@ -50,7 +44,7 @@ void thumbstick_task(void *pvParameters) {
 
   // Configure the ADC channel
   adc_oneshot_chan_cfg_t channel_config = {
-      .bitwidth = ADC_BITWIDTH_12,
+      .bitwidth = STICK_ADC_BITWIDTH,
       .atten = ADC_ATTEN_DB_12,
   };
   ESP_ERROR_CHECK(adc_oneshot_config_channel(adc2_handle, X_STICK_CHANNEL, &channel_config));
@@ -62,16 +56,17 @@ void thumbstick_task(void *pvParameters) {
     ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, Y_STICK_CHANNEL, &y_value));
     remote_data.data.js_x = 0;
     remote_data.data.js_y = 0;
-    if (x_value > 2047 + X_STICK_DEADZONE || x_value < 2047 - X_STICK_DEADZONE) {
-      // TODO - RESTORE
-      // start_or_reset_deep_sleep_timer();
+    int16_t deadzone = settings.stick_calibration.deadzone;
+    int16_t x_center = settings.stick_calibration.x_center;
+    int16_t y_center = settings.stick_calibration.y_center;
+    if (x_value > x_center + deadzone || x_value < x_center - deadzone) {
+      start_or_reset_deep_sleep_timer();
       remote_data.data.js_x = convert_adc_to_axis(x_value);
       // ESP_LOGI(TAG, "Thumbstick x value: %d", x_value);
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     }
-    if (y_value > 2047 + Y_STICK_DEADZONE || y_value < 2047 - Y_STICK_DEADZONE) {
-      // TODO - RESTORE
-      // start_or_reset_deep_sleep_timer();
+    if (y_value > y_center + deadzone || y_value < y_center - deadzone) {
+      start_or_reset_deep_sleep_timer();
       remote_data.data.js_y = convert_adc_to_axis(y_value);
       // ESP_LOGI(TAG, "Thumbstick y value: %d", y_value);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
@@ -82,8 +77,7 @@ void thumbstick_task(void *pvParameters) {
 
     // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
-
-    vTaskDelay(pdMS_TO_TICKS(LOOP_RATE)); // Increase the delay to 100ms for better clarity in the output
+    vTaskDelay(pdMS_TO_TICKS(LOOP_RATE));
   }
 
   ESP_LOGI(TAG, "Thumbstick task ended");
@@ -109,7 +103,6 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
   start_or_reset_deep_sleep_timer();
-  // router_show_screen("calibration");
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {

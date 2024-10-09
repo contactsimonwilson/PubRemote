@@ -3978,27 +3978,7 @@
                   },
                   {
                     "part": "lv.PART.MAIN",
-                    "childs": [
-                      {
-                        "nid": 1111036247,
-                        "strtype": "_style/StyleState",
-                        "strval": "DEFAULT",
-                        "childs": [
-                          {
-                            "nid": 1499187945,
-                            "strtype": "_style/Padding",
-                            "intarray": [
-                              0,
-                              0,
-                              12,
-                              0
-                            ],
-                            "InheritedType": 7
-                          }
-                        ],
-                        "InheritedType": 1
-                      }
-                    ],
+                    "childs": [],
                     "nid": -2957420,
                     "strtype": "CONTAINER/Style_main",
                     "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -16349,6 +16329,71 @@
               }
             ],
             "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": 1904466956,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_UNLOADED",
+            "childs": [
+              {
+                "nid": 946887638,
+                "strtype": "_event/name",
+                "strval": "PairingScreenUnloaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": -1187169364,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1751142349,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 756994161,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 913218219,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -717611759,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -740803724,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1214983291,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "pairing_screen_unloaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -55587864,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"
@@ -16908,7 +16953,7 @@
                       {
                         "nid": 1363302350,
                         "strtype": "DROPDOWN/Options",
-                        "strval": "Disabled\\n2 minutes\\n5 minutes\\n60 minutes\\n",
+                        "strval": "Disabled\\n2 minutes\\n5 minutes\\n10 minutes\\n",
                         "InheritedType": 10
                       },
                       {
@@ -22060,6 +22105,136 @@
             "strtype": "SCREEN/Style_scrollbar",
             "strval": "lv.PART.SCROLLBAR, Rectangle, Pad",
             "InheritedType": 11
+          },
+          {
+            "disabled": false,
+            "nid": 1258429448,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_LOADED",
+            "childs": [
+              {
+                "nid": -603209724,
+                "strtype": "_event/name",
+                "strval": "CalibrationScreenLoaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1542876531,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -1617636617,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -1591839643,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 390398202,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 435546638,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1458719621,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 2026072569,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "calibration_screen_loaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -407820147,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": 1836307408,
+            "strtype": "SCREEN/EventHandler",
+            "strval": "SCREEN_UNLOADED",
+            "childs": [
+              {
+                "nid": 1832303077,
+                "strtype": "_event/name",
+                "strval": "CalibrationScreenUnloaded",
+                "InheritedType": 10
+              },
+              {
+                "nid": 167479428,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1028094302,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": -831072921,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 1617543905,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -551613541,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1031703197,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1232241365,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "calibration_screen_unloaded",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": -1788045610,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"

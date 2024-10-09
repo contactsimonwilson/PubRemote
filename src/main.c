@@ -14,7 +14,6 @@
 #include "remote/receiver.h"
 #include "remote/remote.h"
 #include "remote/remoteinputs.h"
-#include "remote/router.h"
 #include "remote/screen.h"
 #include "remote/settings.h"
 #include "remote/time.h"
@@ -52,8 +51,4 @@ void app_main(void) {
   // Remote inputs init
   init_buttons();
   init_thumbstick();
-  RemoteScreen stats_screen = {.name = "stats", .screen_obj = ui_StatsScreen};
-  // RemoteScreen calibration_screen = {.name = "calibration", .screen_obj = ui_CalibrationScreen};
-  router_register_screen(&stats_screen);
-  // router_register_screen(&calibration_screen);
 }

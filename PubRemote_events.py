@@ -66,3 +66,15 @@ def stat_swipe_left(event_struct):
 def stat_swipe_right(event_struct):
     return
 
+
+def pairing_screen_unloaded(event_struct):
+    return
+
+
+def calibration_screen_unloaded(event_struct):
+    return
+
+
+def calibration_screen_loaded(event_struct):
+    return
+

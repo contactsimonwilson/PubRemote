@@ -19,9 +19,12 @@ void brightness_screen_loaded(lv_event_t * e);
 void brightness_slider_change(lv_event_t * e);
 void brightness_save(lv_event_t * e);
 void pairing_screen_loaded(lv_event_t * e);
+void pairing_screen_unloaded(lv_event_t * e);
 void power_screen_loaded(lv_event_t * e);
 void auto_off_select_change(lv_event_t * e);
 void power_settings_save(lv_event_t * e);
+void calibration_screen_loaded(lv_event_t * e);
+void calibration_screen_unloaded(lv_event_t * e);
 void calibration_settings_save(lv_event_t * e);
 
 #ifdef __cplusplus

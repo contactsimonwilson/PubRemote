@@ -17,6 +17,8 @@ static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 RemoteSettings settings = {
     .bl_level = BL_LEVEL_DEFAULT,
     .auto_off_time = DEFAULT_AUTO_OFF_TIME,
+    .stick_calibration =
+        {.x_min = 0, .x_max = 4095, .y_min = 0, .y_max = 4095, .x_center = 2047, .y_center = 2047, .deadzone = 250},
 };
 
 static uint8_t get_auto_off_time_minutes() {
@@ -27,8 +29,8 @@ static uint8_t get_auto_off_time_minutes() {
     return 2;
   case AUTO_OFF_5_MINUTES:
     return 5;
-  case AUTO_OFF_60_MINUTES:
-    return 60;
+  case AUTO_OFF_10_MINUTES:
+    return 10;
   default:
     return 0;
   }

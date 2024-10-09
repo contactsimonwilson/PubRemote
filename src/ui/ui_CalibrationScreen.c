@@ -94,5 +94,6 @@ void ui_CalibrationScreen_screen_init(void)
     lv_label_set_text(ui_CalibrationMainActionButtonLabel, "Save");
 
     lv_obj_add_event_cb(ui_CalibrationMainActionButton, ui_event_CalibrationMainActionButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_CalibrationScreen, ui_event_CalibrationScreen, LV_EVENT_ALL, NULL);
 
 }

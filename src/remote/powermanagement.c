@@ -65,7 +65,7 @@ void start_or_reset_deep_sleep_timer() {
   int duration_ms = get_sleep_timer_time_ms();
 
   if (duration_ms == 0) {
-    ESP_LOGI(TAG, "Deep sleep timer disabled.");
+    ESP_LOGD(TAG, "Deep sleep timer disabled.");
     deep_sleep_timer = NULL;
     return;
   }
@@ -79,7 +79,7 @@ void start_or_reset_deep_sleep_timer() {
   }
   else {
     ESP_ERROR_CHECK(esp_timer_stop(deep_sleep_timer));
-    ESP_LOGI(TAG, "Deep sleep reset.");
+    ESP_LOGD(TAG, "Deep sleep reset.");
   }
   ESP_ERROR_CHECK(esp_timer_start_once(deep_sleep_timer, duration_ms * 1000));
 }
