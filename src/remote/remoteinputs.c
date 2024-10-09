@@ -21,6 +21,10 @@ static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 #define STICK_MAX_VAL ((1 << STICK_ADC_BITWIDTH) - 1)
 #define STICK_MID_VAL ((STICK_MAX_VAL / 2) - 1)
 
+#ifndef JOYSTICK_BUTTON_LEVEL
+  #define JOYSTICK_BUTTON_LEVEL 1
+#endif
+
 RemoteDataUnion remote_data;
 
 float convert_adc_to_axis(int adc_value) {
@@ -123,7 +127,7 @@ void init_buttons() {
       .gpio_button_config =
           {
               .gpio_num = JOYSTICK_BUTTON_PIN,
-              .active_level = 1,
+              .active_level = JOYSTICK_BUTTON_LEVEL,
           },
   };
   button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
@@ -133,5 +137,5 @@ void init_buttons() {
 
   iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
   iot_button_register_cb(gpio_btn, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
-  iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_UP, button_long_press_cb, NULL);
+  iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_HOLD, button_long_press_cb, NULL);
 }
