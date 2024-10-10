@@ -3,22 +3,107 @@
 #include <remote/display.h>
 #include <remote/remoteinputs.h>
 #include <remote/settings.h>
+#include <screens/calibration_screen.h>
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-CALIBRATION_SCREEN";
+
+static uint8_t calibration_step = 0;
+// Current preview data
+static StickCalibration calibration_data;
+typedef struct {
+  uint16_t x_min;
+  uint16_t x_max;
+  uint16_t y_min;
+  uint16_t y_max;
+} MinMaxData;
+
+// Min/max data for step calibration
+static MinMaxData min_max_data;
+
+void reset_min_max_data() {
+  min_max_data.x_min = STICK_MAX_VAL;
+  min_max_data.x_max = STICK_MIN_VAL;
+  min_max_data.y_min = STICK_MAX_VAL;
+  min_max_data.y_max = STICK_MIN_VAL;
+}
 
 bool is_calibration_screen_active() {
   lv_obj_t *active_screen = lv_scr_act();
   return active_screen == ui_CalibrationScreen;
 }
 
+static void update_display_stick_label(float x, float y) {
+  char *formattedString;
+  asprintf(&formattedString, "X: %.2f \nY: %.2f", x, y);
+  lv_label_set_text(ui_CalibrationHeaderLabel, formattedString);
+  free(formattedString);
+}
+
+// Structure to represent a point
+typedef struct {
+  double x;
+  double y;
+} Point;
+
+// Function to calculate a point within a circle
+Point calculatePoint(float radius, float x, float y) {
+  // Calculate the angle from the center to the point
+  double angle = atan2(y, x);
+
+  // Calculate the distance from the center to the point
+  double distance = sqrt(x * x + y * y);
+
+  // Adjust the distance to be within the radius
+  if (distance > radius) {
+    distance = radius;
+  }
+
+  // Calculate the x and y coordinates
+  double xCoord = distance * cos(angle);
+  double yCoord = distance * sin(angle);
+
+  // Create a Point structure and return it
+  Point point = {xCoord, yCoord};
+  return point;
+}
+
+static void update_display_stick_position(float x, float y) {
+  Point position = calculatePoint(1, x, y);
+  lv_obj_set_pos(ui_PositionIndicatorContainer, lv_pct((int8_t)(position.x * 50)), (int8_t)(-position.y * 50));
+}
+
+static void update_min_max() {
+  if (joystick_data.x < min_max_data.x_min) {
+    min_max_data.x_min = joystick_data.x;
+  }
+  if (joystick_data.x > min_max_data.x_max) {
+    min_max_data.x_max = joystick_data.x;
+  }
+
+  if (joystick_data.y < min_max_data.y_min) {
+    min_max_data.y_min = joystick_data.y;
+  }
+  if (joystick_data.y > min_max_data.y_max) {
+    min_max_data.y_max = joystick_data.y;
+  }
+}
+
 void calibration_task(void *pvParameters) {
   while (is_calibration_screen_active()) {
-    char *formattedString;
-    asprintf(&formattedString, "X: %.2f (%d)\nY: %.2f (%d)", remote_data.data.js_x, joystick_data.x,
-             remote_data.data.js_y, joystick_data.y);
-    lv_label_set_text(ui_CalibrationDataLabel, formattedString);
-    free(formattedString);
+    if (calibration_step == CALIBRATION_STEP_MINMAX) {
+      update_min_max();
+    }
+
+    LVGL_lock(-1);
+    // Get values using current calibration data
+    float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
+                                           calibration_data.x_max, calibration_data.expo);
+    float curr_y_val = convert_adc_to_axis(joystick_data.y, calibration_data.y_min, calibration_data.y_center,
+                                           calibration_data.y_max, calibration_data.expo);
+    update_display_stick_label(curr_x_val, curr_y_val);
+    update_display_stick_position(curr_x_val, curr_y_val);
+    LVGL_unlock();
     vTaskDelay(pdMS_TO_TICKS(UI_RATE_MS));
   }
 
@@ -26,8 +111,65 @@ void calibration_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
+void update_calibration_screen() {
+  LVGL_lock(-1);
+
+  switch (calibration_step) {
+  case CALIBRATION_STEP_START:
+    lv_label_set_text(ui_CalibrationStepLabel, "Press start to begin calibration");
+    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Start");
+    break;
+  case CALIBRATION_STEP_CENTER:
+    lv_label_set_text(ui_CalibrationStepLabel, "Move stick to center");
+    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+    break;
+  case CALIBRATION_STEP_MINMAX:
+    lv_label_set_text(ui_CalibrationStepLabel, "Move stick to min/max");
+    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+    break;
+  case CALIBRATION_STEP_DEADZONE:
+    lv_label_set_text(ui_CalibrationStepLabel, "Move stick to deadzone");
+    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+    break;
+  case CALIBRATION_STEP_EXPO:
+    lv_label_set_text(ui_CalibrationStepLabel, "Set expo factor");
+    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+    break;
+  case CALIBRATION_STEP_DONE:
+    lv_label_set_text(ui_CalibrationStepLabel, "Calibration complete!");
+    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Save");
+    break;
+  }
+  LVGL_unlock();
+}
+
+static void reset_calibration_data() {
+  calibration_data.x_center = STICK_MID_VAL;
+  calibration_data.y_center = STICK_MID_VAL;
+  calibration_data.x_min = STICK_MIN_VAL;
+  calibration_data.y_min = STICK_MIN_VAL;
+  calibration_data.x_max = STICK_MAX_VAL;
+  calibration_data.y_max = STICK_MAX_VAL;
+  calibration_data.deadband = STICK_DEADBAND;
+  calibration_data.expo = STICK_EXPO;
+}
+
+static void load_current_calibration_data() {
+  calibration_data.x_center = settings.stick_calibration.x_center;
+  calibration_data.y_center = settings.stick_calibration.y_center;
+  calibration_data.x_min = settings.stick_calibration.x_min;
+  calibration_data.y_min = settings.stick_calibration.y_min;
+  calibration_data.x_max = settings.stick_calibration.x_max;
+  calibration_data.y_max = settings.stick_calibration.y_max;
+  calibration_data.deadband = settings.stick_calibration.deadband;
+  calibration_data.expo = settings.stick_calibration.expo;
+}
+
 // Event handlers
 void calibration_screen_loaded(lv_event_t *e) {
+  calibration_step = 0;
+  load_current_calibration_data();
+  update_calibration_screen();
   ESP_LOGI(TAG, "Calibration screen loaded");
 
   // start task to update UI
@@ -35,10 +177,48 @@ void calibration_screen_loaded(lv_event_t *e) {
 }
 
 void calibration_screen_unloaded(lv_event_t *e) {
+  calibration_step = 0;
+  update_calibration_screen();
   ESP_LOGI(TAG, "Calibration screen unloaded");
 }
 
 // Event handlers
-void calibration_settings_save(lv_event_t *e) {
-  // Your code here
+void calibration_settings_primary_button_press(lv_event_t *e) {
+  if (calibration_step == CALIBRATION_STEP_START) {
+    reset_calibration_data();
+  }
+  else if (calibration_step == CALIBRATION_STEP_CENTER) {
+    calibration_data.x_center = joystick_data.x;
+    calibration_data.y_center = joystick_data.y;
+    reset_min_max_data(); // Reset for next step
+  }
+  else if (calibration_step == CALIBRATION_STEP_MINMAX) {
+    calibration_data.x_min = min_max_data.x_min;
+    calibration_data.x_max = min_max_data.x_max;
+    calibration_data.y_min = min_max_data.y_min;
+    calibration_data.y_max = min_max_data.y_max;
+    reset_min_max_data(); // Reset for next step
+  }
+  else if (calibration_step == CALIBRATION_STEP_DEADZONE) {
+    int16_t x_diff = calibration_data.x_max - calibration_data.x_min;
+    int16_t y_diff = calibration_data.y_max - calibration_data.y_min;
+    calibration_data.deadband = (int16_t)((x_diff + y_diff) / 4);
+  }
+  else if (calibration_step == CALIBRATION_STEP_EXPO) {
+    // calibration_data.expo = remote_data.data.js_x;
+  }
+  else if (calibration_step >= CALIBRATION_STEP_DONE) {
+    settings.stick_calibration = calibration_data;
+    save_calibration();
+    _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+    return;
+  }
+
+  calibration_step++;
+
+  update_calibration_screen();
+}
+
+void calibration_settings_secondary_button_press(lv_event_t *e) {
+  // empty - already handled by screen switch
 }

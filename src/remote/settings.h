@@ -21,6 +21,8 @@ void save_bl_level();
 
 void save_auto_off_time();
 
+void save_calibration();
+
 typedef enum {
   AUTO_OFF_DISABLED,
   AUTO_OFF_2_MINUTES,

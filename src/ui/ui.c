@@ -118,13 +118,22 @@ void ui_event_CalibrationScreen(lv_event_t * e);
 lv_obj_t * ui_CalibrationScreen;
 lv_obj_t * ui_CalibrationContent;
 lv_obj_t * ui_CalibrationHeader;
+lv_obj_t * ui_CalibrationHeaderLabel;
 lv_obj_t * ui_CalibrationBody;
-lv_obj_t * ui_CalibrationDataLabel;
-lv_obj_t * ui_CalibrationOption;
+lv_obj_t * ui_CalibrationIndicatorContainer;
+lv_obj_t * ui_CalibrationLineVert;
+lv_obj_t * ui_CalibrationLineHoriz;
+lv_obj_t * ui_PositionIndicatorContainer;
+lv_obj_t * ui_PositionIndicatorHoriz;
+lv_obj_t * ui_PositionIndicatorVert;
+lv_obj_t * ui_CalibrationStepLabel;
 lv_obj_t * ui_CalibrationFooter;
-void ui_event_CalibrationMainActionButton(lv_event_t * e);
-lv_obj_t * ui_CalibrationMainActionButton;
-lv_obj_t * ui_CalibrationMainActionButtonLabel;
+void ui_event_CalibrationSecondaryActionButton(lv_event_t * e);
+lv_obj_t * ui_CalibrationSecondaryActionButton;
+lv_obj_t * ui_CalibrationSecondaryActionButtonLabel;
+void ui_event_CalibrationPrimaryActionButton(lv_event_t * e);
+lv_obj_t * ui_CalibrationPrimaryActionButton;
+lv_obj_t * ui_CalibrationPrimaryActionButtonLabel;
 lv_obj_t * ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -330,13 +339,21 @@ void ui_event_CalibrationScreen(lv_event_t * e)
         calibration_screen_unloaded(e);
     }
 }
-void ui_event_CalibrationMainActionButton(lv_event_t * e)
+void ui_event_CalibrationSecondaryActionButton(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
-        calibration_settings_save(e);
+        calibration_settings_secondary_button_press(e);
+    }
+}
+void ui_event_CalibrationPrimaryActionButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        calibration_settings_primary_button_press(e);
     }
 }
 
