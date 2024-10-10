@@ -121,6 +121,7 @@ lv_obj_t * ui_CalibrationHeader;
 lv_obj_t * ui_CalibrationHeaderLabel;
 lv_obj_t * ui_CalibrationBody;
 lv_obj_t * ui_CalibrationIndicatorContainer;
+lv_obj_t * ui_DeadbandIndicator;
 lv_obj_t * ui_CalibrationLineVert;
 lv_obj_t * ui_CalibrationLineHoriz;
 lv_obj_t * ui_PositionIndicatorContainer;

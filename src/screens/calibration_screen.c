@@ -20,9 +20,11 @@ typedef struct {
 
 // Min/max data for step calibration
 static MinMaxData min_max_data;
+static uint16_t deadband = STICK_DEADBAND;
+static float expo = STICK_EXPO;
 
 void reset_min_max_data() {
-  min_max_data.x_min = STICK_MAX_VAL;
+  min_max_data.x_min = STICK_MAX_VAL; // inverted min/max so we include all values
   min_max_data.x_max = STICK_MIN_VAL;
   min_max_data.y_min = STICK_MAX_VAL;
   min_max_data.y_max = STICK_MIN_VAL;
@@ -73,6 +75,34 @@ static void update_display_stick_position(float x, float y) {
   lv_obj_set_pos(ui_PositionIndicatorContainer, lv_pct((int8_t)(position.x * 50)), (int8_t)(-position.y * 50));
 }
 
+int16_t get_deadband() {
+  int16_t x1_diff = min_max_data.x_max - calibration_data.x_center;
+  int16_t y1_diff = min_max_data.y_max - calibration_data.y_center;
+  int16_t x2_diff = calibration_data.x_center - min_max_data.x_min;
+  int16_t y2_diff = calibration_data.y_center - min_max_data.y_min;
+
+  // return highest of all diffs
+  int16_t x_diff = (x1_diff > x2_diff ? x1_diff : x2_diff);
+  int16_t y_diff = (y1_diff > y2_diff ? y1_diff : y2_diff);
+
+  return x_diff > y_diff ? x_diff : y_diff;
+}
+
+static void update_deadband_indicator() {
+  if (calibration_step == CALIBRATION_STEP_DEADBAND) {
+    int16_t new_deadband = get_deadband();
+    uint16_t x_diff = calibration_data.x_max - calibration_data.x_min;
+    uint16_t y_diff = calibration_data.y_max - calibration_data.y_min;
+    uint8_t deadband_pct_x = (int8_t)(((float)new_deadband / (float)x_diff) * 100);
+    uint8_t deadband_pct_y = (int8_t)(((float)new_deadband / (float)y_diff) * 100);
+    uint8_t deadband_pct = (deadband_pct_x > deadband_pct_y ? deadband_pct_x : deadband_pct_y);
+    lv_obj_set_width(ui_DeadbandIndicator, lv_pct(deadband_pct * 2));
+    lv_obj_set_height(ui_DeadbandIndicator, lv_pct(deadband_pct * 2));
+
+    deadband = new_deadband;
+  }
+}
+
 static void update_min_max() {
   if (joystick_data.x < min_max_data.x_min) {
     min_max_data.x_min = joystick_data.x;
@@ -91,18 +121,18 @@ static void update_min_max() {
 
 void calibration_task(void *pvParameters) {
   while (is_calibration_screen_active()) {
-    if (calibration_step == CALIBRATION_STEP_MINMAX) {
-      update_min_max();
-    }
+    update_min_max();
 
     LVGL_lock(-1);
     // Get values using current calibration data
     float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
-                                           calibration_data.x_max, calibration_data.expo);
+                                           calibration_data.x_max, calibration_data.deadband, calibration_data.expo);
     float curr_y_val = convert_adc_to_axis(joystick_data.y, calibration_data.y_min, calibration_data.y_center,
-                                           calibration_data.y_max, calibration_data.expo);
+                                           calibration_data.y_max, calibration_data.deadband, calibration_data.expo);
     update_display_stick_label(curr_x_val, curr_y_val);
     update_display_stick_position(curr_x_val, curr_y_val);
+    update_deadband_indicator();
+
     LVGL_unlock();
     vTaskDelay(pdMS_TO_TICKS(UI_RATE_MS));
   }
@@ -113,6 +143,7 @@ void calibration_task(void *pvParameters) {
 
 void update_calibration_screen() {
   LVGL_lock(-1);
+  lv_obj_add_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN); // Hide for every step except deadband
 
   switch (calibration_step) {
   case CALIBRATION_STEP_START:
@@ -127,9 +158,12 @@ void update_calibration_screen() {
     lv_label_set_text(ui_CalibrationStepLabel, "Move stick to min/max");
     lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
     break;
-  case CALIBRATION_STEP_DEADZONE:
-    lv_label_set_text(ui_CalibrationStepLabel, "Move stick to deadzone");
+  case CALIBRATION_STEP_DEADBAND:
+    lv_label_set_text(ui_CalibrationStepLabel, "Move stick within deadband");
     lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+    lv_obj_set_width(ui_DeadbandIndicator, lv_pct(0));
+    lv_obj_set_height(ui_DeadbandIndicator, lv_pct(0));
+    lv_obj_clear_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);
     break;
   case CALIBRATION_STEP_EXPO:
     lv_label_set_text(ui_CalibrationStepLabel, "Set expo factor");
@@ -169,6 +203,9 @@ static void load_current_calibration_data() {
 void calibration_screen_loaded(lv_event_t *e) {
   calibration_step = 0;
   load_current_calibration_data();
+  reset_min_max_data();
+  deadband = STICK_DEADBAND;
+  expo = STICK_EXPO;
   update_calibration_screen();
   ESP_LOGI(TAG, "Calibration screen loaded");
 
@@ -190,22 +227,18 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
   else if (calibration_step == CALIBRATION_STEP_CENTER) {
     calibration_data.x_center = joystick_data.x;
     calibration_data.y_center = joystick_data.y;
-    reset_min_max_data(); // Reset for next step
   }
   else if (calibration_step == CALIBRATION_STEP_MINMAX) {
     calibration_data.x_min = min_max_data.x_min;
     calibration_data.x_max = min_max_data.x_max;
     calibration_data.y_min = min_max_data.y_min;
     calibration_data.y_max = min_max_data.y_max;
-    reset_min_max_data(); // Reset for next step
   }
-  else if (calibration_step == CALIBRATION_STEP_DEADZONE) {
-    int16_t x_diff = calibration_data.x_max - calibration_data.x_min;
-    int16_t y_diff = calibration_data.y_max - calibration_data.y_min;
-    calibration_data.deadband = (int16_t)((x_diff + y_diff) / 4);
+  else if (calibration_step == CALIBRATION_STEP_DEADBAND) {
+    calibration_data.deadband = deadband;
   }
   else if (calibration_step == CALIBRATION_STEP_EXPO) {
-    // calibration_data.expo = remote_data.data.js_x;
+    calibration_data.expo = expo;
   }
   else if (calibration_step >= CALIBRATION_STEP_DONE) {
     settings.stick_calibration = calibration_data;
@@ -215,7 +248,9 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
   }
 
   calibration_step++;
-
+  reset_min_max_data(); // Reset for each step
+  deadband = STICK_DEADBAND;
+  expo = STICK_EXPO;
   update_calibration_screen();
 }
 

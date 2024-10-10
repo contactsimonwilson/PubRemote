@@ -117,6 +117,7 @@ extern lv_obj_t * ui_CalibrationHeader;
 extern lv_obj_t * ui_CalibrationHeaderLabel;
 extern lv_obj_t * ui_CalibrationBody;
 extern lv_obj_t * ui_CalibrationIndicatorContainer;
+extern lv_obj_t * ui_DeadbandIndicator;
 extern lv_obj_t * ui_CalibrationLineVert;
 extern lv_obj_t * ui_CalibrationLineHoriz;
 extern lv_obj_t * ui_PositionIndicatorContainer;

@@ -15,7 +15,7 @@ void init_thumbstick();
 void init_buttons();
 void reset_button_state();
 
-float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, float expo);
+float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo);
 
 typedef struct {
   float js_y;
