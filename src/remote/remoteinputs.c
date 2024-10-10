@@ -19,6 +19,7 @@
 
 static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 
+// TODO - from SETTINGS
 #ifndef JOYSTICK_BUTTON_LEVEL
   #define JOYSTICK_BUTTON_LEVEL 1
 #endif
@@ -34,9 +35,23 @@ float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, 
   else {
     axis = (float)(adc_value - mid_val) / (mid_val - min_val);
   }
+
+  // Apply expo
   if (expo > 1) {
     axis = pow(axis, expo);
   }
+
+  // clamp between -1 and 1
+  if (axis > 1) {
+    axis = 1;
+  }
+  else if (axis < -1) {
+    axis = -1;
+  }
+
+  // Round to 2 decimal places
+  axis = roundf(axis * 100) / 100;
+
   return axis;
 }
 
@@ -97,7 +112,7 @@ void thumbstick_task(void *pvParameters) {
 
     // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
     // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
-    vTaskDelay(pdMS_TO_TICKS(LOOP_RATE));
+    vTaskDelay(pdMS_TO_TICKS(INPUT_RATE_MS));
   }
 
   ESP_LOGI(TAG, "Thumbstick task ended");

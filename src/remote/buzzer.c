@@ -27,6 +27,6 @@ void init_buzzer() {
   gpio_reset_pin(BUZZER_GPIO); // Initialize the pin
   gpio_set_direction(BUZZER_GPIO, GPIO_MODE_OUTPUT);
   buzzer_on();
-  vTaskDelay(1000 / portTICK_PERIOD_MS); // Wait for 1 second
+  vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for 1 second
   buzzer_off();
 }

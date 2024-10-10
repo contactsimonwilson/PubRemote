@@ -15,10 +15,11 @@ bool is_calibration_screen_active() {
 void calibration_task(void *pvParameters) {
   while (is_calibration_screen_active()) {
     char *formattedString;
-    asprintf(&formattedString, "X: %.1f (%d)\nY: %.1f (%d)", remote_data.data.js_x, joystick_data.x,
+    asprintf(&formattedString, "X: %.2f (%d)\nY: %.2f (%d)", remote_data.data.js_x, joystick_data.x,
              remote_data.data.js_y, joystick_data.y);
     lv_label_set_text(ui_CalibrationDataLabel, formattedString);
-    vTaskDelay(pdMS_TO_TICKS(100));
+    free(formattedString);
+    vTaskDelay(pdMS_TO_TICKS(UI_RATE_MS));
   }
 
   ESP_LOGI(TAG, "Calibration task ended");
