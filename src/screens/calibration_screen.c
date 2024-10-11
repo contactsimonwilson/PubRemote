@@ -76,8 +76,10 @@ Point calculatePoint(float radius, float x, float y) {
 }
 
 static void update_display_stick_position(float x, float y) {
-  Point position = calculatePoint(1, x, y);
-  lv_obj_set_pos(ui_PositionIndicatorContainer, lv_pct((int8_t)(position.x * 50)), (int8_t)(-position.y * 50));
+  lv_coord_t width = lv_obj_get_width(ui_CalibrationIndicatorContainer);
+  int radius = width / 2;
+  Point position = calculatePoint(radius, x * radius, y * radius);
+  lv_obj_set_pos(ui_PositionIndicatorContainer, position.x, -position.y);
 }
 
 int16_t get_deadband() {
