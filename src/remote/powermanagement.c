@@ -33,7 +33,7 @@ void enter_sleep() {
 
 void check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
-  while (gpio_get_level(GPIO_NUM_15) == 1) { // Check if button is still pressed
+  while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL) { // Check if button is still pressed
     if ((esp_timer_get_time() - pressStartTime) >= (REQUIRED_PRESS_TIME_MS * 1000)) {
       ESP_LOGI(TAG, "Button has been pressed for 2 seconds.");
       // Perform the desired action after confirmation of long press
@@ -42,7 +42,7 @@ void check_button_press() {
     }
     vTaskDelay(pdMS_TO_TICKS(10)); // Delay to allow for time checking without busy waiting
   }
-  while (gpio_get_level(GPIO_NUM_15) == 1)
+  while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL)
     ; // wait for button release
   if ((esp_timer_get_time() - pressStartTime) < (REQUIRED_PRESS_TIME_MS * 1000)) {
     enter_sleep(); // Go back to sleep if condition not met
@@ -124,7 +124,7 @@ void power_management_task(void *pvParameters) {
 void init_power_management() {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
-  esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, 1); // 1 for high level
+  esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL);
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: { // Wake-up caused by external signal using RTC_IO
     ESP_LOGI(TAG, "Woken up by external signal on EXT0.");

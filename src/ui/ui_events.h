@@ -31,7 +31,9 @@ void auto_off_select_change(lv_event_t * e);
 void power_settings_save(lv_event_t * e);
 void calibration_screen_loaded(lv_event_t * e);
 void calibration_screen_unloaded(lv_event_t * e);
-void calibration_settings_save(lv_event_t * e);
+void expo_slider_change(lv_event_t * e);
+void calibration_settings_secondary_button_press(lv_event_t * e);
+void calibration_settings_primary_button_press(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/
