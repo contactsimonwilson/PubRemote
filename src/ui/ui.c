@@ -120,6 +120,9 @@ lv_obj_t * ui_CalibrationContent;
 lv_obj_t * ui_CalibrationHeader;
 lv_obj_t * ui_CalibrationHeaderLabel;
 lv_obj_t * ui_CalibrationBody;
+lv_obj_t * ui_CalibrationStepContent;
+void ui_event_ExpoSlider(lv_event_t * e);
+lv_obj_t * ui_ExpoSlider;
 lv_obj_t * ui_CalibrationIndicatorContainer;
 lv_obj_t * ui_DeadbandIndicator;
 lv_obj_t * ui_CalibrationLineVert;
@@ -338,6 +341,14 @@ void ui_event_CalibrationScreen(lv_event_t * e)
     }
     if(event_code == LV_EVENT_SCREEN_UNLOADED) {
         calibration_screen_unloaded(e);
+    }
+}
+void ui_event_ExpoSlider(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        expo_slider_change(e);
     }
 }
 void ui_event_CalibrationSecondaryActionButton(lv_event_t * e)

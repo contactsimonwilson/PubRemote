@@ -50,7 +50,25 @@ void ui_CalibrationScreen_screen_init(void)
     lv_obj_set_style_pad_row(ui_CalibrationBody, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(ui_CalibrationBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_CalibrationIndicatorContainer = lv_obj_create(ui_CalibrationBody);
+    ui_CalibrationStepContent = lv_obj_create(ui_CalibrationBody);
+    lv_obj_remove_style_all(ui_CalibrationStepContent);
+    lv_obj_set_height(ui_CalibrationStepContent, 80);
+    lv_obj_set_width(ui_CalibrationStepContent, lv_pct(100));
+    lv_obj_set_align(ui_CalibrationStepContent, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_CalibrationStepContent, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_clear_flag(ui_CalibrationStepContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_ExpoSlider = lv_slider_create(ui_CalibrationStepContent);
+    lv_slider_set_range(ui_ExpoSlider, 1, 20);
+    lv_slider_set_value(ui_ExpoSlider, 10, LV_ANIM_OFF);
+    if(lv_slider_get_mode(ui_ExpoSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ui_ExpoSlider, 0, LV_ANIM_OFF);
+    lv_obj_set_height(ui_ExpoSlider, 10);
+    lv_obj_set_width(ui_ExpoSlider, lv_pct(100));
+    lv_obj_set_align(ui_ExpoSlider, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);     /// Flags
+
+
+    ui_CalibrationIndicatorContainer = lv_obj_create(ui_CalibrationStepContent);
     lv_obj_remove_style_all(ui_CalibrationIndicatorContainer);
     lv_obj_set_width(ui_CalibrationIndicatorContainer, 80);
     lv_obj_set_height(ui_CalibrationIndicatorContainer, 80);
@@ -170,6 +188,7 @@ void ui_CalibrationScreen_screen_init(void)
     lv_obj_set_align(ui_CalibrationPrimaryActionButtonLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Start");
 
+    lv_obj_add_event_cb(ui_ExpoSlider, ui_event_ExpoSlider, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_CalibrationSecondaryActionButton, ui_event_CalibrationSecondaryActionButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_CalibrationPrimaryActionButton, ui_event_CalibrationPrimaryActionButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_CalibrationScreen, ui_event_CalibrationScreen, LV_EVENT_ALL, NULL);
