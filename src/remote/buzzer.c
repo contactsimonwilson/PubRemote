@@ -33,12 +33,12 @@ static const char *TAG = "PUBREMOTE-BUZZER";
 static SemaphoreHandle_t buzzer_mutex;
 
 // Note (hz), volume (0-100), duration (ms)
-int melody[] = {NOTE_C4, 100, 100, NOTE_D4, 100, 100, NOTE_E4, 100, 100, NOTE_F4, 100, 100,
-                NOTE_G4, 100, 100, NOTE_A4, 100, 100, NOTE_B4, 100, 100, NOTE_C5, 100, 200};
+static const int melody[] = {NOTE_C4, 100, 100, NOTE_D4, 100, 100, NOTE_E4, 100, 100, NOTE_F4, 100, 100,
+                             NOTE_G4, 100, 100, NOTE_A4, 100, 100, NOTE_B4, 100, 100, NOTE_C5, 100, 200};
 
-int notes = sizeof(melody) / sizeof(melody[0]) / 3; // Number of notes
+static const int notes = sizeof(melody) / sizeof(melody[0]) / 3; // Number of notes
 
-void play_note(int frequency, int volume, int duration) {
+static void play_note(int frequency, int volume, int duration) {
   // Take the mutex
   if (buzzer_mutex == NULL) {
     buzzer_mutex = xSemaphoreCreateMutex();
@@ -74,7 +74,7 @@ void play_note(int frequency, int volume, int duration) {
 }
 
 // task to play melody
-void play_melody_task(void *pvParameters) {
+static void play_melody_task(void *pvParameters) {
   for (int i = 0; i < notes; i++) {
     play_note(melody[i * 3], melody[i * 3 + 1], melody[i * 3 + 2]);
   }
@@ -86,13 +86,15 @@ void play_melody() {
 }
 
 void init_buzzer() {
-  ledc_channel_config_t channel_conf = {.gpio_num = BUZZER_PIN,
-                                        .speed_mode = LEDC_LOW_SPEED_MODE,
-                                        .channel = BUZZER_CHANNEL,
-                                        .intr_type = LEDC_INTR_DISABLE,
-                                        .timer_sel = BUZZER_TIMER,
-                                        .duty = 0, // Initially off
-                                        .hpoint = 0};
+  ledc_channel_config_t channel_conf = {
+      .gpio_num = BUZZER_PIN,
+      .speed_mode = LEDC_LOW_SPEED_MODE,
+      .channel = BUZZER_CHANNEL,
+      .intr_type = LEDC_INTR_DISABLE,
+      .timer_sel = BUZZER_TIMER,
+      .duty = MAX_DUTY, // Initially off (inverted)
+      .hpoint = 0,
+  };
   ledc_channel_config(&channel_conf);
 
   play_melody();
