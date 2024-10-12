@@ -14,7 +14,7 @@ bool is_settings_screen_active() {
 // Event handlers
 void settings_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen loaded");
-  lv_dropdown_set_selected(ui_AutoOffTime, settings.auto_off_time);
+  lv_dropdown_set_selected(ui_AutoOffTime, device_settings.auto_off_time);
 }
 
 void settings_screen_unloaded(lv_event_t *e) {

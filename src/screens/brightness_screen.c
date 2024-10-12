@@ -13,7 +13,7 @@ bool is_brightness_screen_active() {
 // Event handlers
 void brightness_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Brightness screen loaded");
-  lv_slider_set_value(ui_BrightnessSlider, settings.bl_level, LV_ANIM_OFF);
+  lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
 }
 
 void brightness_screen_unloaded(lv_event_t *e) {
@@ -22,8 +22,8 @@ void brightness_screen_unloaded(lv_event_t *e) {
 
 void brightness_slider_change(lv_event_t *e) {
   int val = lv_slider_get_value(ui_BrightnessSlider);
-  settings.bl_level = (uint8_t)val;
-  set_bl_level(settings.bl_level);
+  device_settings.bl_level = (uint8_t)val;
+  set_bl_level(device_settings.bl_level);
 }
 
 void brightness_save(lv_event_t *e) {

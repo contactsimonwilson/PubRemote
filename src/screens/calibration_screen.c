@@ -1,5 +1,7 @@
+#include "driver/gpio.h"
 #include "esp_log.h"
 #include "remote/screen.h"
+#include <colors.h>
 #include <remote/display.h>
 #include <remote/remoteinputs.h>
 #include <remote/settings.h>
@@ -10,7 +12,7 @@ static const char *TAG = "PUBREMOTE-CALIBRATION_SCREEN";
 
 static uint8_t calibration_step = 0;
 // Current preview data
-static StickCalibration calibration_data;
+static CalibrationSettings calibration_data;
 typedef struct {
   uint16_t x_min;
   uint16_t x_max;
@@ -126,6 +128,18 @@ static void update_min_max() {
   }
 }
 
+static void update_stick_press_indicator() {
+  bool is_stick_down = gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL;
+  if (is_stick_down) {
+    lv_obj_set_style_bg_color(ui_PositionIndicatorHoriz, lv_color_hex(COLOR_PRIMARY), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(ui_PositionIndicatorVert, lv_color_hex(COLOR_PRIMARY), LV_PART_MAIN);
+  }
+  else {
+    lv_obj_set_style_bg_color(ui_PositionIndicatorHoriz, lv_color_hex(COLOR_PRIMARY_TEXT), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(ui_PositionIndicatorVert, lv_color_hex(COLOR_PRIMARY_TEXT), LV_PART_MAIN);
+  }
+}
+
 void calibration_task(void *pvParameters) {
   while (is_calibration_screen_active()) {
     update_min_max();
@@ -139,6 +153,7 @@ void calibration_task(void *pvParameters) {
     update_display_stick_label(curr_x_val, curr_y_val);
     update_display_stick_position(curr_x_val, curr_y_val);
     update_deadband_indicator();
+    update_stick_press_indicator();
 
     LVGL_unlock();
     vTaskDelay(pdMS_TO_TICKS(UI_RATE_MS));
@@ -201,14 +216,14 @@ static void reset_calibration_data() {
 }
 
 static void load_current_calibration_data() {
-  calibration_data.x_center = settings.stick_calibration.x_center;
-  calibration_data.y_center = settings.stick_calibration.y_center;
-  calibration_data.x_min = settings.stick_calibration.x_min;
-  calibration_data.y_min = settings.stick_calibration.y_min;
-  calibration_data.x_max = settings.stick_calibration.x_max;
-  calibration_data.y_max = settings.stick_calibration.y_max;
-  calibration_data.deadband = settings.stick_calibration.deadband;
-  calibration_data.expo = settings.stick_calibration.expo;
+  calibration_data.x_center = calibration_settings.x_center;
+  calibration_data.y_center = calibration_settings.y_center;
+  calibration_data.x_min = calibration_settings.x_min;
+  calibration_data.y_min = calibration_settings.y_min;
+  calibration_data.x_max = calibration_settings.x_max;
+  calibration_data.y_max = calibration_settings.y_max;
+  calibration_data.deadband = calibration_settings.deadband;
+  calibration_data.expo = calibration_settings.expo;
 }
 
 // Event handlers
@@ -253,7 +268,7 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
     calibration_data.expo = expo;
   }
   else if (calibration_step >= CALIBRATION_STEP_DONE) {
-    settings.stick_calibration = calibration_data;
+    calibration_settings = calibration_data;
     save_calibration();
     _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
     return;

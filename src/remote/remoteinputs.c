@@ -98,14 +98,14 @@ void thumbstick_task(void *pvParameters) {
     joystick_data.x = x_value;
     joystick_data.y = y_value;
 
-    int16_t deadband = settings.stick_calibration.deadband;
-    int16_t x_center = settings.stick_calibration.x_center;
-    int16_t y_center = settings.stick_calibration.y_center;
-    int16_t y_max = settings.stick_calibration.y_max;
-    int16_t x_max = settings.stick_calibration.x_max;
-    int16_t y_min = settings.stick_calibration.y_min;
-    int16_t x_min = settings.stick_calibration.x_min;
-    float expo = settings.stick_calibration.expo;
+    int16_t deadband = calibration_settings.deadband;
+    int16_t x_center = calibration_settings.x_center;
+    int16_t y_center = calibration_settings.y_center;
+    int16_t y_max = calibration_settings.y_max;
+    int16_t x_max = calibration_settings.x_max;
+    int16_t y_min = calibration_settings.y_min;
+    int16_t x_min = calibration_settings.x_min;
+    float expo = calibration_settings.expo;
     float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo);
     float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo);
 

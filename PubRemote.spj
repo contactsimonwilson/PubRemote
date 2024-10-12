@@ -22420,8 +22420,7 @@
                                 "InheritedType": 11
                               }
                             ],
-                            "saved_objtypeKey": "CONTAINER",
-                            "tree_closed": true
+                            "saved_objtypeKey": "CONTAINER"
                           }
                         ],
                         "locked": false,
@@ -22733,8 +22732,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       }
                     ],
                     "locked": false,
@@ -25957,7 +25955,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 787,
+    "backup_cnt": 805,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
