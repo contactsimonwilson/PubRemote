@@ -1,5 +1,6 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
+#include "remote/display.h"
 #include <core/lv_event.h>
 #include <remote/stats.h>
 
@@ -25,11 +26,17 @@ bool is_stats_screen_active() {
   return active_screen == ui_StatsScreen;
 }
 
+#define MAX_SPEED_DEFAULT 30;
+static uint8_t max_speed = MAX_SPEED_DEFAULT;
+
 static void update_speed_dial_display() {
+  // TODO -set max value
   lv_arc_set_value(ui_SpeedDial, remoteStats.speed);
 }
 
 static void update_utilization_dial_display() {
+  // TODO - set color based on utilization
+  // TODO - use max proportional value
   lv_arc_set_value(ui_UtilizationDial, remoteStats.dutyCycle);
 }
 
@@ -82,12 +89,14 @@ static void update_battery_display() {
 }
 
 void update_stats_screen_display() {
+  LVGL_lock(-1);
   update_speed_dial_display();
   update_utilization_dial_display();
   update_primary_stat_display();
   update_secondary_stat_display();
   update_footpad_display();
   update_battery_display();
+  LVGL_unlock();
 }
 
 // Event handlers

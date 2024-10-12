@@ -414,6 +414,6 @@ void init_display(void) {
 
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));
-    set_bl_level(settings.bl_level);
+    set_bl_level(device_settings.bl_level);
   }
 }

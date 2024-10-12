@@ -39,16 +39,16 @@ typedef struct {
   uint16_t y_center;
   uint16_t deadband;
   float expo;
-} StickCalibration;
+} CalibrationSettings;
 
 typedef struct {
   uint8_t bl_level;
   AutoOffOptions auto_off_time;
-  StickCalibration stick_calibration;
-} RemoteSettings;
+} DeviceSettings;
 
 uint64_t get_auto_off_ms();
 
-extern RemoteSettings settings;
+extern CalibrationSettings calibration_settings;
+extern DeviceSettings device_settings;
 
 #endif

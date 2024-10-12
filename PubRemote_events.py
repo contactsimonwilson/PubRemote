@@ -90,3 +90,7 @@ def calibration_settings_secondary_button_press(event_struct):
 def calibration_settings_primary_button_press(event_struct):
     return
 
+
+def expo_slider_change(event_struct):
+    return
+

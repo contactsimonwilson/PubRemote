@@ -13,7 +13,7 @@ bool is_power_screen_active() {
 // Event handlers
 void power_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Power screen loaded");
-  lv_dropdown_set_selected(ui_AutoOffTime, settings.auto_off_time);
+  lv_dropdown_set_selected(ui_AutoOffTime, device_settings.auto_off_time);
 }
 
 void power_screen_unloaded(lv_event_t *e) {
@@ -22,7 +22,7 @@ void power_screen_unloaded(lv_event_t *e) {
 
 void auto_off_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_AutoOffTime);
-  settings.auto_off_time = (uint8_t)(val & 0xFF);
+  device_settings.auto_off_time = (uint8_t)(val & 0xFF);
 }
 
 void power_settings_save(lv_event_t *e) {
