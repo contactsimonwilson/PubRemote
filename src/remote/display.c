@@ -23,7 +23,7 @@
 // I2C touch controller
 // https://github.com/krupis/T-Display-S3-esp-idf/blob/923162ab67efe6f867ab1a3cdce19fe127c5c493/components/lvgl_setup/lvgl_setup.c#L255
 
-#if DISP_CST816S
+#if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
   #define DISP_BL_PWM 1
 #elif DISP_SH8601
@@ -277,7 +277,7 @@ void init_display(void) {
   spi_bus_config_t buscfg = {
       .sclk_io_num = DISP_CLK,
 
-#if DISP_CST816S
+#if DISP_GC9A01
       .mosi_io_num = DISP_MOSI,
       .miso_io_num = DISP_MISO,
       .quadwp_io_num = -1,
@@ -321,7 +321,7 @@ void init_display(void) {
       .bits_per_pixel = 16,
   };
 
-#if DISP_CST816S
+#if DISP_GC9A01
   ESP_LOGI(TAG, "Install GC9A01 panel driver");
   ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(io_handle, &panel_config, &panel_handle));
 #elif DISP_SH8601
