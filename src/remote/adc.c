@@ -3,7 +3,7 @@
 #include <esp_err.h>
 #include <hal/adc_types.h>
 
-static const char *TAG = "PUBMOTE-ADC";
+static const char *TAG = "PUBREMOTE-ADC";
 
 bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle) {
   adc_cali_handle_t handle = NULL;

@@ -11,7 +11,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-static const char *TAG = "PUBMOTE-TRANSMITTER";
+static const char *TAG = "PUBREMOTE-TRANSMITTER";
+#define COMMAND_TIMEOUT 1000
 
 // Function to send ESP-NOW data
 static void transmitter_task(void *pvParameters) {
@@ -20,13 +21,12 @@ static void transmitter_task(void *pvParameters) {
   while (1) {
     int64_t newTime = get_current_time_ms();
 
-// Check if the last command was sent less than 1000ms ago
-#define COMMAND_TIMEOUT 1000
+    // Check if the last command was sent less than 1000ms ago
     if (newTime - LAST_COMMAND_TIME < COMMAND_TIMEOUT) {
-      vTaskDelay(TRANSMIT_FREQUENCY);
+      vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
       continue;
     }
-    if (pairing_state == 0) {
+    if (pairing_state == PAIRING_STATE_PAIRED) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
@@ -45,7 +45,7 @@ static void transmitter_task(void *pvParameters) {
       LAST_COMMAND_TIME = newTime;
       ESP_LOGI(TAG, "Sent command");
     }
-    vTaskDelay(TRANSMIT_FREQUENCY);
+    vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
   }
 
   // The task will not reach this point as it runs indefinitely

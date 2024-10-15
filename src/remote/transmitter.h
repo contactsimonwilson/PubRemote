@@ -5,10 +5,7 @@
 
 #include "esp_now.h"
 
-#define TRANSMIT_TIME 20
-#define TRANSMIT_FREQUENCY TRANSMIT_TIME / portTICK_PERIOD_MS
-
-#define FIRMWARE_ID "PUBMOTE_0_0_1"
+#define FIRMWARE_ID "PUBREMOTE-0_0_1"
 
 extern uint8_t PEER_MAC_ADDRESS[6]; // Replace XX with the actual MAC address bytes
 

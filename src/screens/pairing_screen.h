@@ -1,0 +1,10 @@
+#include <ui/ui.h>
+#ifndef __PAIRING_SCREEN_H
+  #define __PAIRING_SCREEN_H
+
+bool is_pairing_screen_active();
+
+void pairing_screen_loaded(lv_event_t *e);
+void pairing_screen_unloaded(lv_event_t *e);
+
+#endif

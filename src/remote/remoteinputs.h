@@ -1,5 +1,7 @@
 #ifndef __REMOTEINPUTS_H
 #define __REMOTEINPUTS_H
+#include "adc.h"
+#include "driver/gpio.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
@@ -14,6 +16,8 @@ void init_thumbstick();
 void init_buttons();
 void reset_button_state();
 
+float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo);
+
 typedef struct {
   float js_y;
   float js_x;
@@ -27,6 +31,12 @@ typedef union {
   uint8_t bytes[sizeof(remote_data_t)];
 } RemoteDataUnion;
 
+typedef struct {
+  uint16_t x;
+  uint16_t y;
+} JoystickData;
+
 extern RemoteDataUnion remote_data;
+extern JoystickData joystick_data;
 
 #endif

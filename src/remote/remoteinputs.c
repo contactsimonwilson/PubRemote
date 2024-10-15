@@ -8,30 +8,65 @@
 #include "freertos/task.h"
 #include "iot_button.h"
 #include "powermanagement.h"
-#include "remote/router.h"
 #include "rom/gpio.h"
+#include "settings.h"
 #include "time.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
+#include <math.h>
 #include <ui/ui.h>
-static const char *TAG = "PUBMOTE-REMOTEINPUTS";
+
+static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
+
+// TODO - from SETTINGS
+#ifndef JOYSTICK_BUTTON_LEVEL
+  #define JOYSTICK_BUTTON_LEVEL 1
+#endif
 
 RemoteDataUnion remote_data;
+JoystickData joystick_data;
 
-#define X_STICK_DEADZONE 250
-#define Y_STICK_DEADZONE 250
+float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo) {
+  float axis = 0;
 
-// For PS5 Hall
-// float convert_adc_to_axis(int adc_value) {
-//   // 0 - 4095 -> 1.0 to -1.0
-//   return (float)(2047 - adc_value) / 2047.0f;
-// }
+  int mid_val_lower = mid_val - deadband;
+  int mid_val_upper = mid_val + deadband;
 
-// For Switch
-float convert_adc_to_axis(int adc_value) {
-  // 0 - 4095 -> 1.0 to -1.0
-  return (float)(2047 - adc_value) / 2047.0f;
+  if (adc_value > mid_val_lower && adc_value < mid_val_upper) {
+    // Within deadband
+    return 0;
+  }
+
+  // Apply across adjusted mid vals so we get smooth ramping outside of deadband
+  if (adc_value > mid_val) {
+    axis = (float)(adc_value - mid_val_upper) / (max_val - mid_val_upper);
+  }
+  else {
+    axis = (float)(adc_value - mid_val_lower) / (mid_val_lower - min_val);
+  }
+
+  // Apply expo
+  if (expo > 1) {
+    bool negative = axis < 0;
+    axis = pow(axis, expo);
+    if (negative) {
+      axis = -axis;
+    }
+  }
+
+  // clamp between -1 and 1
+  if (axis > 1) {
+    axis = 1;
+  }
+  else if (axis < -1) {
+    axis = -1;
+  }
+
+  // Round to 2 decimal places
+  axis = roundf(axis * 100) / 100;
+
+  return axis;
 }
 
 void thumbstick_task(void *pvParameters) {
@@ -50,7 +85,7 @@ void thumbstick_task(void *pvParameters) {
 
   // Configure the ADC channel
   adc_oneshot_chan_cfg_t channel_config = {
-      .bitwidth = ADC_BITWIDTH_12,
+      .bitwidth = STICK_ADC_BITWIDTH,
       .atten = ADC_ATTEN_DB_12,
   };
   ESP_ERROR_CHECK(adc_oneshot_config_channel(adc2_handle, X_STICK_CHANNEL, &channel_config));
@@ -60,28 +95,27 @@ void thumbstick_task(void *pvParameters) {
     int x_value, y_value;
     ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, X_STICK_CHANNEL, &x_value));
     ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, Y_STICK_CHANNEL, &y_value));
-    remote_data.data.js_x = 0;
-    remote_data.data.js_y = 0;
-    if (x_value > 2047 + X_STICK_DEADZONE || x_value < 2047 - X_STICK_DEADZONE) {
-      start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
-      remote_data.data.js_x = convert_adc_to_axis(x_value);
-      printf("Thumbstick x value: %d\n", x_value);
-      // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
+    joystick_data.x = x_value;
+    joystick_data.y = y_value;
+
+    int16_t deadband = calibration_settings.deadband;
+    int16_t x_center = calibration_settings.x_center;
+    int16_t y_center = calibration_settings.y_center;
+    int16_t y_max = calibration_settings.y_max;
+    int16_t x_max = calibration_settings.x_max;
+    int16_t y_min = calibration_settings.y_min;
+    int16_t x_min = calibration_settings.x_min;
+    float expo = calibration_settings.expo;
+    float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo);
+    float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo);
+
+    if (new_x != remote_data.data.js_x || new_y != remote_data.data.js_y) {
+      start_or_reset_deep_sleep_timer();
+      remote_data.data.js_x = new_x;
+      remote_data.data.js_y = new_y;
     }
-    if (y_value > 2047 + Y_STICK_DEADZONE || y_value < 2047 - Y_STICK_DEADZONE) {
-      start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
-      remote_data.data.js_y = convert_adc_to_axis(y_value);
-      printf("Thumbstick y value: %d\n", y_value);
-      // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
-    }
 
-    // printf("Thumbstick x-axis raw value: %d\n", x_value);
-    // printf("Thumbstick y-axis raw value: %d\n", y_value);
-
-    // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
-    // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
-
-    vTaskDelay(pdMS_TO_TICKS(100)); // Increase the delay to 100ms for better clarity in the output
+    vTaskDelay(pdMS_TO_TICKS(INPUT_RATE_MS));
   }
 
   ESP_LOGI(TAG, "Thumbstick task ended");
@@ -94,7 +128,7 @@ void init_thumbstick() {
 
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
-  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
+  start_or_reset_deep_sleep_timer();
   remote_data.data.bt_c = 1;
 
   // Start a timer to reset the button state after a certain duration
@@ -106,13 +140,12 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
-  start_or_reset_deep_sleep_timer(DEEP_SLEEP_DELAY_MS);
-  // router_show_screen("calibration");
+  start_or_reset_deep_sleep_timer();
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON LONG PRESSS");
-  esp_deep_sleep_start();
+  enter_sleep();
 }
 
 void reset_button_state() {
@@ -128,7 +161,7 @@ void init_buttons() {
       .gpio_button_config =
           {
               .gpio_num = JOYSTICK_BUTTON_PIN,
-              .active_level = 1,
+              .active_level = JOYSTICK_BUTTON_LEVEL,
           },
   };
   button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
@@ -138,5 +171,5 @@ void init_buttons() {
 
   iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
   iot_button_register_cb(gpio_btn, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
-  iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_UP, button_long_press_cb, NULL);
+  iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_HOLD, button_long_press_cb, NULL);
 }

@@ -5,7 +5,10 @@
 
 #pragma once
 
+#include "sdkconfig.h"
+#if CONFIG_SOC_ADC_SUPPORTED
 #include "button_adc.h"
+#endif
 #include "button_gpio.h"
 #include "button_matrix.h"
 #include "esp_err.h"
@@ -15,6 +18,20 @@ extern "C" {
 #endif
 
 typedef void (* button_cb_t)(void *button_handle, void *usr_data);
+
+#if CONFIG_GPIO_BUTTON_SUPPORT_POWER_SAVE
+typedef void (* button_power_save_cb_t)(void *usr_data);
+
+/**
+ * @brief Structs to store power save callback info
+ *
+ */
+typedef struct {
+    button_power_save_cb_t enter_power_save_cb;
+    void *usr_data;
+} button_power_save_config_t;
+#endif
+
 typedef void *button_handle_t;
 
 /**
@@ -32,6 +49,7 @@ typedef enum {
     BUTTON_LONG_PRESS_START,
     BUTTON_LONG_PRESS_HOLD,
     BUTTON_LONG_PRESS_UP,
+    BUTTON_PRESS_END,
     BUTTON_EVENT_MAX,
     BUTTON_NONE_PRESS,
 } button_event_t;
@@ -110,7 +128,9 @@ typedef struct {
     uint16_t short_press_time;                        /**< Trigger time(ms) for short press, if 0 default to BUTTON_SHORT_PRESS_TIME_MS */
     union {
         button_gpio_config_t gpio_button_config;      /**< gpio button configuration */
+#if CONFIG_SOC_ADC_SUPPORTED
         button_adc_config_t adc_button_config;        /**< adc button configuration */
+#endif
         button_matrix_config_t matrix_button_config; /**< matrix key button configuration */
         button_custom_config_t custom_button_config;  /**< custom button configuration */
     }; /**< button configuration */
@@ -295,6 +315,21 @@ esp_err_t iot_button_resume(void);
  *     - ESP_ERR_INVALID_STATE   timer state is invalid
  */
 esp_err_t iot_button_stop(void);
+
+#if CONFIG_GPIO_BUTTON_SUPPORT_POWER_SAVE
+/**
+ * @brief Register a callback function for power saving.
+ *        The config->enter_power_save_cb function will be called when all keys stop working.
+ *
+ * @param config Button power save config
+ * @return
+ *     - ESP_OK                  on success
+ *     - ESP_ERR_INVALID_STATE   No button registered
+ *     - ESP_ERR_INVALID_ARG     Arguments is invalid
+ *     - ESP_ERR_NO_MEM          Not enough memory
+ */
+esp_err_t iot_button_register_power_save_cb(const button_power_save_config_t *config);
+#endif
 
 #ifdef __cplusplus
 }
