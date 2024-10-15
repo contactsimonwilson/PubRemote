@@ -23,16 +23,19 @@
 // I2C touch controller
 // https://github.com/krupis/T-Display-S3-esp-idf/blob/923162ab67efe6f867ab1a3cdce19fe127c5c493/components/lvgl_setup/lvgl_setup.c#L255
 
-#if USE_GC9A01
+#if DISP_CST816S
   #include "esp_lcd_gc9a01.h"
+  #define DISP_BL_PWM 1
+#elif DISP_SH8601
+  #include "esp_lcd_sh8601.h"
 #endif
 
-#if USE_CST816S
+#if TP_CST816S
   #include "esp_lcd_touch_cst816s.h"
-#endif
-
-#ifndef DISP_BL_PWM
-  #define DISP_BL_PWM 0
+  #define TOUCH_ENABLED 1
+#elif TP_FT3168
+// #include "esp_lcd_touch_ft3168.h"
+// #define TOUCH_ENABLED 1
 #endif
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
@@ -40,12 +43,6 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
 #define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
-
-#if USE_CST816S
-  #define TOUCH_ENABLED 1
-#else
-  #define TOUCH_ENABLED 0
-#endif
 
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
@@ -80,6 +77,23 @@ static void LVGL_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t 
   // copy a buffer's content to a specific area of the display
   esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, color_map);
 }
+
+#if DISP_SH8601
+void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area) {
+  uint16_t x1 = area->x1;
+  uint16_t x2 = area->x2;
+  uint16_t y1 = area->y1;
+  uint16_t y2 = area->y2;
+
+  // round the start of area down to the nearest even number
+  area->x1 = (x1 >> 1) << 1;
+  area->y1 = (y1 >> 1) << 1;
+
+  // round the end of area up to the nearest odd number
+  area->x2 = ((x2 >> 1) << 1) + 1;
+  area->y2 = ((y2 >> 1) << 1) + 1;
+}
+#endif
 
 /* Rotate display and touch, when rotated screen in LVGL. Called when driver parameters are updated. */
 static void LVGL_port_update_callback(lv_disp_drv_t *drv) {
@@ -198,7 +212,7 @@ void set_bl_level(u_int8_t level) {
 }
 
 static void init_backlight(void) {
-#if DISP_BL_PWM
+#if DISP_BL_PWM == 1
   ESP_LOGI(TAG, "Configure LCD backlight");
   // Configure PWM channel
   ledc_timer_config_t timer_config = {
@@ -222,7 +236,8 @@ static void init_backlight(void) {
 #endif
 }
 
-bool my_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
+#if TOUCH_ENABLED
+bool LVGL_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   uint16_t touchpad_x[1] = {0};
   uint16_t touchpad_y[1] = {0};
   uint8_t touchpad_cnt = 0;
@@ -247,6 +262,7 @@ bool my_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
 
   return false;
 }
+#endif
 
 void init_display(void) {
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
@@ -257,28 +273,43 @@ void init_display(void) {
   set_bl_level(0);
 
   ESP_LOGI(TAG, "Initialize SPI bus");
+
   spi_bus_config_t buscfg = {
       .sclk_io_num = DISP_CLK,
+
+#if DISP_CST816S
       .mosi_io_num = DISP_MOSI,
       .miso_io_num = DISP_MISO,
       .quadwp_io_num = -1,
       .quadhd_io_num = -1,
+#elif DISP_SH8601
+      .data0_io_num = DISP_DATA0,
+      .data1_io_num = DISP_DATA1,
+      .data2_io_num = DISP_DATA2,
+      .data3_io_num = DISP_DATA3,
+#endif
       .max_transfer_sz = LV_HOR_RES * 80 * sizeof(uint16_t),
   };
+
   ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
   ESP_LOGI(TAG, "Install panel IO");
   esp_lcd_panel_io_handle_t io_handle = NULL;
-  esp_lcd_panel_io_spi_config_t io_config = {
-      .dc_gpio_num = DISP_DC,
-      .cs_gpio_num = DISP_CS,
-      .pclk_hz = LCD_PIXEL_CLOCK_HZ,
-      .lcd_cmd_bits = LCD_CMD_BITS,
-      .lcd_param_bits = LCD_PARAM_BITS,
-      .spi_mode = 0,
-      .trans_queue_depth = 10,
-      .on_color_trans_done = notify_lvgl_flush_ready,
-      .user_ctx = &disp_drv,
+  esp_lcd_panel_io_spi_config_t io_config = {.dc_gpio_num = DISP_DC,
+                                             .cs_gpio_num = DISP_CS,
+                                             .pclk_hz = LCD_PIXEL_CLOCK_HZ,
+                                             .lcd_cmd_bits = LCD_CMD_BITS,
+                                             .lcd_param_bits = LCD_PARAM_BITS,
+                                             .spi_mode = 0,
+                                             .trans_queue_depth = 10,
+                                             .on_color_trans_done = notify_lvgl_flush_ready,
+                                             .user_ctx = &disp_drv,
+#if DISP_SH8601
+                                             .flags =
+                                                 {
+                                                     .quad_mode = 1, // Enable QSPI
+                                                 }
+#endif
   };
   // Attach the LCD to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &io_handle));
@@ -290,17 +321,18 @@ void init_display(void) {
       .bits_per_pixel = 16,
   };
 
-#if USE_GC9A01
+#if DISP_CST816S
   ESP_LOGI(TAG, "Install GC9A01 panel driver");
   ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(io_handle, &panel_config, &panel_handle));
+#elif DISP_SH8601
+  ESP_LOGI(TAG, "Install SH8601 panel driver");
+  ESP_ERROR_CHECK(esp_lcd_new_panel_sh8601(io_handle, &panel_config, &panel_handle));
 #endif
 
   ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
   ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
 
-#if USE_GC9A01
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, true));
-#endif
   ESP_ERROR_CHECK(esp_lcd_panel_mirror(panel_handle, true, false));
 
   // user can flush pre-defined pattern to the screen before we turn on the screen or backlight
@@ -308,7 +340,6 @@ void init_display(void) {
 
 #if TOUCH_ENABLED
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
-  #if USE_CST816S
 
   i2c_config_t i2c_conf = {
       .mode = I2C_MODE_MASTER,
@@ -335,7 +366,11 @@ void init_display(void) {
     i2c_cmd_link_delete(cmd);
   }
 
+  #if TP_CST816S
   esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_CST816S_CONFIG();
+  #elif TP_FT3168
+  esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_FT3168_CONFIG();
+  #endif
   // Attach the TOUCH to the I2C bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)TP_I2C_NUM, &tp_io_config, &tp_io_handle));
 
@@ -352,8 +387,12 @@ void init_display(void) {
           },
   };
 
+  #if TP_CST816S
   ESP_LOGI(TAG, "Initialize touch controller CST816S");
   ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_cst816s(tp_io_handle, &tp_cfg, &tp));
+  #elif TP_FT3168
+  ESP_LOGI(TAG, "Initialize touch controller FT3168");
+  ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_ft3168(tp_io_handle, &tp_cfg, &tp));
   #endif
 #endif // TOUCH_ENABLED
 
@@ -374,6 +413,9 @@ void init_display(void) {
   disp_drv.ver_res = LV_VER_RES;
   disp_drv.flush_cb = LVGL_flush_cb;
   disp_drv.drv_update_cb = LVGL_port_update_callback;
+#if DISP_SH8601
+  disp_drv.rounder_cb = LVGL_port_rounder_callback;
+#endif
   disp_drv.draw_buf = &disp_buf;
   disp_drv.user_data = panel_handle;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
@@ -394,7 +436,7 @@ void init_display(void) {
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.disp = disp;
-  indev_drv.read_cb = my_input_read; // Use the my_input_read function
+  indev_drv.read_cb = LVGL_input_read;
   indev_drv.user_data = tp;
 
   lv_indev_drv_register(&indev_drv);
