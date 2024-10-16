@@ -217,7 +217,7 @@ void set_bl_level(u_int8_t level) {
 }
 
 static void init_backlight(void) {
-#if DISP_BL_PWM == 1
+#if DISP_BL_PWM
   ESP_LOGI(TAG, "Configure LCD backlight");
   // Configure PWM channel
   ledc_timer_config_t timer_config = {
