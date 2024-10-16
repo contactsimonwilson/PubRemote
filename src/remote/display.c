@@ -28,9 +28,11 @@
 #if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
   #define DISP_BL_PWM 1
+  #define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
 #elif DISP_SH8601
   #include "esp_lcd_sh8601.h"
   #define DISP_BL_PWM 1
+  #define LCD_PIXEL_CLOCK_HZ (40 * 1000 * 1000)
 #endif
 
 #if TP_CST816S
@@ -45,7 +47,6 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
-#define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
 
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
@@ -316,7 +317,6 @@ void init_display(void) {
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_panel_dev_config_t panel_config = {
       .reset_gpio_num = DISP_RST,
-      .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
       .rgb_endian = LCD_RGB_ENDIAN_BGR,
       .bits_per_pixel = LCD_PIXEL_DEPTH,
       .vendor_config = &vendor_config,
