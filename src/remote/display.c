@@ -22,12 +22,15 @@
 // https://github.com/espressif/esp-bsp/tree/master/components/lcd/esp_lcd_gc9a01
 // I2C touch controller
 // https://github.com/krupis/T-Display-S3-esp-idf/blob/923162ab67efe6f867ab1a3cdce19fe127c5c493/components/lvgl_setup/lvgl_setup.c#L255
+// https://github.com/espressif/esp-iot-solution/tree/1f855ac00e3fdb33773c8ba5893d4f98f1d9b576/components/display/lcd/esp_lcd_sh8601#if
+// https://github.com/nikthefix/Lilygo_Support_T_Encoder_Pro_Smart_Watch/blob/075f7020b162513062f9bf7415c1b4fa52a8673d/sls_encoder_pro_watch/sh8601.cpp#L48
 
 #if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
   #define DISP_BL_PWM 1
 #elif DISP_SH8601
   #include "esp_lcd_sh8601.h"
+  #define DISP_BL_PWM 1
 #endif
 
 #if TP_CST816S
@@ -47,6 +50,8 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
 #define LCD_PARAM_BITS 8
+#define LCD_PIXEL_DEPTH 16
+#define MAX_TRAN_SIZE (LV_HOR_RES * LV_VER_RES * LCD_PIXEL_DEPTH / 8)
 
 // LVGL
 #define LVGL_TICK_PERIOD_MS 2
@@ -273,52 +278,48 @@ void init_display(void) {
   set_bl_level(0);
 
   ESP_LOGI(TAG, "Initialize SPI bus");
-
-  spi_bus_config_t buscfg = {
-      .sclk_io_num = DISP_CLK,
-
 #if DISP_GC9A01
-      .mosi_io_num = DISP_MOSI,
-      .miso_io_num = DISP_MISO,
-      .quadwp_io_num = -1,
-      .quadhd_io_num = -1,
+  const spi_bus_config_t buscfg = GC9A01_PANEL_BUS_SPI_CONFIG(DISP_CLK, DISP_MOSI, MAX_TRAN_SIZE);
 #elif DISP_SH8601
-      .data0_io_num = DISP_DATA0,
-      .data1_io_num = DISP_DATA1,
-      .data2_io_num = DISP_DATA2,
-      .data3_io_num = DISP_DATA3,
+  const spi_bus_config_t buscfg =
+      SH8601_PANEL_BUS_QSPI_CONFIG(DISP_CLK, DISP_SDIO0, DISP_SDIO1, DISP_SDIO2, DISP_SDIO3, MAX_TRAN_SIZE);
 #endif
-      .max_transfer_sz = LV_HOR_RES * 80 * sizeof(uint16_t),
-  };
-
   ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
   ESP_LOGI(TAG, "Install panel IO");
   esp_lcd_panel_io_handle_t io_handle = NULL;
-  esp_lcd_panel_io_spi_config_t io_config = {.dc_gpio_num = DISP_DC,
-                                             .cs_gpio_num = DISP_CS,
-                                             .pclk_hz = LCD_PIXEL_CLOCK_HZ,
-                                             .lcd_cmd_bits = LCD_CMD_BITS,
-                                             .lcd_param_bits = LCD_PARAM_BITS,
-                                             .spi_mode = 0,
-                                             .trans_queue_depth = 10,
-                                             .on_color_trans_done = notify_lvgl_flush_ready,
-                                             .user_ctx = &disp_drv,
-#if DISP_SH8601
-                                             .flags =
-                                                 {
-                                                     .quad_mode = 1, // Enable QSPI
-                                                 }
+#if DISP_GC9A01
+  esp_lcd_panel_io_spi_config_t io_config =
+      GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, notify_lvgl_flush_ready, &disp_drv);
+#elif DISP_SH8601
+  esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, notify_lvgl_flush_ready, &disp_drv);
 #endif
-  };
   // Attach the LCD to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &io_handle));
+
+  ESP_LOGI(TAG, "Install LCD driver of sh8601");
+
+#if DISP_GC9A01
+  gc9a01_vendor_config_t vendor_config = {
+
+  };
+
+#elif DISP_SH8601
+  sh8601_vendor_config_t vendor_config = {
+      .flags =
+          {
+              .use_qspi_interface = 1,
+          },
+  };
+#endif
 
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_panel_dev_config_t panel_config = {
       .reset_gpio_num = DISP_RST,
+      .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
       .rgb_endian = LCD_RGB_ENDIAN_BGR,
-      .bits_per_pixel = 16,
+      .bits_per_pixel = LCD_PIXEL_DEPTH,
+      .vendor_config = &vendor_config,
   };
 
 #if DISP_GC9A01
