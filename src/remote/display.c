@@ -31,7 +31,6 @@
   #define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
 #elif DISP_SH8601
   #include "esp_lcd_sh8601.h"
-  #define DISP_BL_PWM 1
   #define LCD_PIXEL_CLOCK_HZ (40 * 1000 * 1000)
 #endif
 
@@ -51,8 +50,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
 #define LCD_PARAM_BITS 8
-#define LCD_PIXEL_DEPTH 16
-#define MAX_TRAN_SIZE (LV_HOR_RES * LV_VER_RES * LCD_PIXEL_DEPTH / 8)
+#define MAX_TRAN_SIZE (LV_HOR_RES * LV_VER_RES * LV_COLOR_DEPTH / 8)
 
 // LVGL
 #define LVGL_TICK_PERIOD_MS 2
@@ -62,6 +60,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define LVGL_TASK_PRIORITY 2
 
 static SemaphoreHandle_t lvgl_mux = NULL;
+static esp_lcd_panel_io_handle_t io_handle = NULL;
 
 #if TOUCH_ENABLED
 esp_lcd_touch_handle_t tp = NULL;
@@ -208,12 +207,22 @@ static void LVGL_port_task(void *arg) {
   }
 }
 
+void sh8601_set_brightness(uint8_t brightness) {
+  // Create a buffer for the command and brightness value
+  uint8_t data[1] = {brightness};
+
+  // Send the command and brightness value over SPI
+  ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(io_handle, 0x51, &data, 1));
+  // esp_lcd_panel_io_rx_param(io_handle, NULL, 0);
+}
+
 void set_bl_level(u_int8_t level) {
 #if DISP_BL_PWM
   ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, level);
   ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
 #else
-  gpio_set_level(DISP_BL, level > 0 ? 1 : 0);
+  // TODO - SPI brightness control for amoled
+  sh8601_set_brightness(level);
 #endif
 }
 
@@ -237,8 +246,10 @@ static void init_backlight(void) {
   };
   ledc_channel_config(&channel_config);
 #else
-  gpio_config_t bk_gpio_config = {.mode = GPIO_MODE_OUTPUT, .pin_bit_mask = 1ULL << DISP_BL};
-  ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
+  // If we don't do PWM control (amoled display), just set enable pin to high
+  gpio_reset_pin(DISP_BL);
+  gpio_set_direction(DISP_BL, GPIO_MODE_OUTPUT);
+  ESP_ERROR_CHECK(gpio_set_level(DISP_BL, 1));
 #endif
 }
 
@@ -288,7 +299,6 @@ void init_display(void) {
   ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
   ESP_LOGI(TAG, "Install panel IO");
-  esp_lcd_panel_io_handle_t io_handle = NULL;
 #if DISP_GC9A01
   esp_lcd_panel_io_spi_config_t io_config =
       GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, notify_lvgl_flush_ready, &disp_drv);
@@ -318,7 +328,7 @@ void init_display(void) {
   esp_lcd_panel_dev_config_t panel_config = {
       .reset_gpio_num = DISP_RST,
       .rgb_endian = LCD_RGB_ENDIAN_BGR,
-      .bits_per_pixel = LCD_PIXEL_DEPTH,
+      .bits_per_pixel = LV_COLOR_DEPTH,
       .vendor_config = &vendor_config,
   };
 
