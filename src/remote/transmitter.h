@@ -7,8 +7,6 @@
 
 #define FIRMWARE_ID "PUBREMOTE-0_0_1"
 
-extern uint8_t PEER_MAC_ADDRESS[6]; // Replace XX with the actual MAC address bytes
-
 typedef struct {
   char *firmwareId;
 } ParingInfo;

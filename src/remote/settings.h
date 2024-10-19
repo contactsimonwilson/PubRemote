@@ -4,6 +4,7 @@
 
   #include "esp_system.h"
   #include "nvs_flash.h"
+  #include <remote/receiver.h>
 
 // Function to initialize NVS
 esp_err_t init_nvs();
@@ -23,12 +24,20 @@ void save_auto_off_time();
 
 void save_calibration();
 
+esp_err_t save_pairing_data();
+
 typedef enum {
   AUTO_OFF_DISABLED,
   AUTO_OFF_2_MINUTES,
   AUTO_OFF_5_MINUTES,
   AUTO_OFF_10_MINUTES,
 } AutoOffOptions;
+
+typedef struct {
+  PairingState state;
+  int32_t secret_code;
+  uint8_t remote_addr[6];
+} PairingSettings;
 
 typedef struct {
   uint16_t x_min;
@@ -50,5 +59,6 @@ uint64_t get_auto_off_ms();
 
 extern CalibrationSettings calibration_settings;
 extern DeviceSettings device_settings;
+extern PairingSettings pairing_settings;
 
 #endif
