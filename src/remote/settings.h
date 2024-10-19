@@ -18,6 +18,12 @@ esp_err_t nvs_write_int(const char *key, int32_t value);
 // Function to read an integer from NVS
 esp_err_t nvs_read_int(const char *key, int32_t *value);
 
+// Function to write a byte array to NVS
+esp_err_t nvs_write_blob(const char *key, void *value, size_t length);
+
+// Function to read a byte array from NVS
+esp_err_t nvs_read_blob(const char *key, void *value, size_t length);
+
 void save_bl_level();
 
 void save_auto_off_time();
