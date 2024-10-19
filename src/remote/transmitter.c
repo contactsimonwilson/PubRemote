@@ -8,6 +8,7 @@
 #include "receiver.h"
 #include "remoteinputs.h"
 #include "time.h"
+#include <remote/settings.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,17 +27,17 @@ static void transmitter_task(void *pvParameters) {
       vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
       continue;
     }
-    if (pairing_state == PAIRING_STATE_PAIRED) {
+    if (pairing_settings.state == PAIRING_STATE_PAIRED) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
       // Copy secret_Code to the beginning of the buffer
-      memcpy(combined_data, &secret_code, sizeof(int32_t));
+      memcpy(combined_data, &pairing_settings.secret_code, sizeof(int32_t));
 
       // Copy remote_data.bytes after secret_Code
       memcpy(combined_data + sizeof(int32_t), remote_data.bytes, sizeof(remote_data.bytes));
 
-      esp_err_t result = esp_now_send(&remote_addr, combined_data, sizeof(combined_data));
+      esp_err_t result = esp_now_send(&pairing_settings.remote_addr, combined_data, sizeof(combined_data));
       if (result != ESP_OK) {
         // Handle error if needed
         ESP_LOGE(TAG, "Error sending data: %d", result);

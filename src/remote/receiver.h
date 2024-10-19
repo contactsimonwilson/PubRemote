@@ -8,6 +8,7 @@ void init_receiver();
 typedef enum {
   PAIRING_STATE_UNPAIRED,
   PAIRING_STATE_PAIRING,
+  PAIRING_STATE_PENDING,
   PAIRING_STATE_PAIRED
 } PairingState;
 

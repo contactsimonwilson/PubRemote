@@ -33,6 +33,11 @@ CalibrationSettings calibration_settings = {
 
 };
 
+PairingSettings pairing_settings = {
+    .state = PAIRING_STATE_UNPAIRED,
+    .remote_addr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, // Use 0xFF for -1 as uint8_t is unsigned
+    .secret_code = -1};
+
 static uint8_t get_auto_off_time_minutes() {
   switch (device_settings.auto_off_time) {
   case AUTO_OFF_DISABLED:
@@ -58,6 +63,52 @@ void save_bl_level() {
 
 void save_auto_off_time() {
   nvs_write_int(AUTO_OFF_TIME_KEY, device_settings.auto_off_time);
+}
+
+esp_err_t save_pairing_data() {
+  nvs_handle_t my_handle;
+  esp_err_t err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+    return err;
+  }
+
+  // Save the 'state' field as an integer
+  err = nvs_set_i32(my_handle, "pairing_state", (int32_t)pairing_settings.state);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to write pairing state!");
+    nvs_close(my_handle);
+    return err;
+  }
+
+  // Save the 'secret_code' field
+  err = nvs_set_i32(my_handle, "secret_code", pairing_settings.secret_code);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to write secret code!");
+    nvs_close(my_handle);
+    return err;
+  }
+
+  // Save the 'remote_addr' array as a blob
+  err = nvs_set_blob(my_handle, "remote_addr", pairing_settings.remote_addr, sizeof(pairing_settings.remote_addr));
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to write remote address!");
+    nvs_close(my_handle);
+    return err;
+  }
+
+  // Commit the changes
+  err = nvs_commit(my_handle);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to commit changes to NVS!");
+    nvs_close(my_handle);
+    return err;
+  }
+
+  // Close the NVS handle
+  nvs_close(my_handle);
+  ESP_LOGI(TAG, "Pairing data saved successfully.");
+  return ESP_OK;
 }
 
 void save_calibration() {
@@ -93,12 +144,14 @@ esp_err_t init_settings() {
     return err;
   }
 
+  // Reading device settings
   device_settings.bl_level =
       nvs_read_int("bl_level", &device_settings.bl_level) == ESP_OK ? device_settings.bl_level : BL_LEVEL_DEFAULT;
   device_settings.auto_off_time = nvs_read_int("auto_off_time", &device_settings.auto_off_time) == ESP_OK
                                       ? device_settings.auto_off_time
                                       : DEFAULT_AUTO_OFF_TIME;
 
+  // Reading calibration settings
   calibration_settings.x_min =
       nvs_read_int("x_min", &calibration_settings.x_min) == ESP_OK ? calibration_settings.x_min : STICK_MIN_VAL;
   calibration_settings.x_max =
@@ -125,6 +178,31 @@ esp_err_t init_settings() {
   int16_t expo = STICK_EXPO;
 
   calibration_settings.expo = nvs_read_int("x_expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
+
+  // Reading pairing settings
+  int32_t pairing_state = PAIRING_STATE_UNPAIRED;
+  nvs_read_int("pairing_state", &pairing_state);
+  pairing_settings.state = (PairingState)pairing_state;
+
+  nvs_read_int("secret_code", &pairing_settings.secret_code) == ESP_OK ? pairing_settings.secret_code : -1;
+
+  // Read the 'remote_addr' blob
+  nvs_handle_t my_handle;
+  err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &my_handle);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+    return err;
+  }
+
+  size_t remote_addr_size = sizeof(pairing_settings.remote_addr);
+  err = nvs_get_blob(my_handle, "remote_addr", pairing_settings.remote_addr, &remote_addr_size);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to read remote_addr. Using default.");
+    memcpy(pairing_settings.remote_addr, (uint8_t[]){0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+           sizeof(pairing_settings.remote_addr));
+  }
+
+  nvs_close(my_handle);
 
   return ESP_OK;
 }
