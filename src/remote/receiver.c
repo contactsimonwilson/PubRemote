@@ -7,7 +7,9 @@
 #include "powermanagement.h"
 #include "stats.h"
 #include "time.h"
+#include <remote/settings.h>
 #include <string.h>
+#include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-RECEIVER";
 
@@ -16,9 +18,6 @@ static const char *TAG = "PUBREMOTE-RECEIVER";
 
 esp_timer_handle_t connection_timeout_timer;
 esp_timer_handle_t reconnecting_timer;
-PairingState pairing_state = PAIRING_STATE_UNPAIRED;
-int32_t secret_code = 0;
-uint8_t remote_addr[6] = {0, 0, 0, 0, 0, 0};
 
 static void connection_timeout_callback(void *arg) {
   init_stats();
@@ -36,8 +35,8 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
   LAST_COMMAND_TIME = 0;
   ESP_LOGI(TAG, "RTT: %lld", deltaTime);
 
-  if (pairing_state == PAIRING_STATE_UNPAIRED && len == 6) {
-    memcpy(remote_addr, data, 6);
+  if (pairing_settings.state == PAIRING_STATE_UNPAIRED && len == 6) {
+    memcpy(pairing_settings.remote_addr, data, 6);
     ESP_LOGI(TAG, "Got Pairing request from VESC Express");
     ESP_LOGI(TAG, "packet Length: %d", len);
     ESP_LOGI(TAG, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", data[0], data[1], data[2], data[3], data[4], data[5]);
@@ -45,35 +44,54 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     //          mac_addr[3], mac_addr[4], mac_addr[5]);
     uint8_t TEST[1] = {420};
     esp_now_peer_info_t peerInfo = {};
-    // uint8_t PEER_MAC_ADDRESS_BROADCAST[6] = {255, 255, 255, 255, 255, 255};
     peerInfo.channel = 1; // Set the channel number (0-14)
     peerInfo.encrypt = false;
-    memcpy(peerInfo.peer_addr, remote_addr, sizeof(remote_addr));
+    memcpy(peerInfo.peer_addr, pairing_settings.remote_addr, sizeof(pairing_settings.remote_addr));
     // ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
     if (!esp_now_is_peer_exist(&peerInfo)) {
       esp_now_add_peer(&peerInfo);
     }
 
-    esp_err_t result = esp_now_send(&remote_addr, (uint8_t *)&TEST, sizeof(TEST));
+    esp_err_t result = esp_now_send(&pairing_settings.remote_addr, (uint8_t *)&TEST, sizeof(TEST));
     if (result != ESP_OK) {
       // Handle error if needed
       ESP_LOGE(TAG, "Error sending data: %d", result);
     }
     else {
       ESP_LOGI(TAG, "Sent response back to VESC Express");
-      pairing_state++;
+      pairing_settings.state++;
     }
   }
-  else if (pairing_state == PAIRING_STATE_PAIRING && len == 4) {
+  else if (pairing_settings.state == PAIRING_STATE_PAIRING && len == 4) {
     // grab secret code
     ESP_LOGI(TAG, "Grabbing secret code");
     ESP_LOGI(TAG, "packet Length: %d", len);
-    secret_code = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-    ESP_LOGI(TAG, "Secret Code: %li", secret_code);
-    pairing_state = PAIRING_STATE_PAIRED;
+    pairing_settings.secret_code = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+    ESP_LOGI(TAG, "Secret Code: %li", pairing_settings.secret_code);
+    char *formattedString;
+    asprintf(&formattedString, "%ld", pairing_settings.secret_code);
+    lv_label_set_text(ui_PairingCode, formattedString);
+    pairing_settings.state = PAIRING_STATE_PENDING;
+  }
+  else if (pairing_settings.state == PAIRING_STATE_PENDING && len == 4) {
+    // grab secret code
+    ESP_LOGI(TAG, "Grabbing response");
+    ESP_LOGI(TAG, "packet Length: %d", len);
+    int response = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+    ESP_LOGI(TAG, "Response: %i", response);
+    if (response == -1) {
+      pairing_settings.state = PAIRING_STATE_PAIRED;
+      // save here and exit screen?
+
+      lv_disp_load_scr(ui_StatsScreen);
+    }
+    else {
+      pairing_settings.state = PAIRING_STATE_UNPAIRED;
+    }
+    lv_label_set_text(ui_PairingCode, "0000");
   }
 
-  if (pairing_state == PAIRING_STATE_PAIRED && len == 32) {
+  else if (pairing_settings.state == PAIRING_STATE_PAIRED && len == 32) {
     // Reset the timers
     esp_timer_stop(connection_timeout_timer);
     esp_timer_stop(reconnecting_timer);
@@ -122,7 +140,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     update_stats_display();
   }
   else {
-    ESP_LOGI(TAG, "Invalid data length");
+    ESP_LOGI(TAG, "Invalid data length %d", len);
   }
 }
 
