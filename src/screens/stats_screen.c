@@ -93,10 +93,10 @@ static void update_battery_display() {
 
   switch (stat_display_options.battery_display) {
   case BATTERY_DISPLAY_ALL:
-    asprintf(&formattedString, "%.1f%% | %.1fv", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
+    asprintf(&formattedString, "%.0f%% | %.1fv", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
     break;
   case BATTERY_DISPLAY_PERCENT:
-    asprintf(&formattedString, "%.1f%%", remoteStats.batteryPercentage);
+    asprintf(&formattedString, "%.0f%%", remoteStats.batteryPercentage);
     break;
   case BATTERY_DISPLAY_VOLTAGE:
     asprintf(&formattedString, "%.1fv", remoteStats.batteryVoltage);
