@@ -1,6 +1,7 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
 #include "remote/display.h"
+#include <colors.h>
 #include <core/lv_event.h>
 #include <remote/stats.h>
 
@@ -37,7 +38,8 @@ static void update_speed_dial_display() {
 static void update_utilization_dial_display() {
   // TODO - set color based on utilization
   // TODO - use max proportional value
-  lv_arc_set_value(ui_UtilizationDial, remoteStats.dutyCycle);
+  lv_arc_set_value(ui_UtilizationDial, (uint16_t)(remoteStats.dutyCycle * 100)); // Dial requires values in int
+  // lv_obj_set_style_arc_color(ui_UtilizationDial, lv_color_hex(COLOR_DANGER), LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
 static void update_primary_stat_display() {

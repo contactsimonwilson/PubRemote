@@ -31,7 +31,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_width(ui_UtilizationDial, lv_pct(100));
     lv_obj_set_height(ui_UtilizationDial, lv_pct(100));
     lv_obj_set_align(ui_UtilizationDial, LV_ALIGN_CENTER);
-    lv_arc_set_range(ui_UtilizationDial, 0, 1);
     lv_arc_set_value(ui_UtilizationDial, 0);
     lv_arc_set_mode(ui_UtilizationDial, LV_ARC_MODE_REVERSE);
     lv_obj_set_style_pad_left(ui_UtilizationDial, 20, LV_PART_MAIN | LV_STATE_DEFAULT);

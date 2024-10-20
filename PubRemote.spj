@@ -1280,7 +1280,7 @@
                 "strtype": "ARC/Range",
                 "intarray": [
                   0,
-                  1
+                  100
                 ],
                 "InheritedType": 7
               },
@@ -20577,7 +20577,7 @@
                           {
                             "disabled": false,
                             "nid": -773858868,
-                            "strtype": "SLIDER/EventHandler",
+                            "strtype": "_event/EventHandler",
                             "strval": "VALUE_CHANGED",
                             "childs": [
                               {
@@ -25955,7 +25955,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
-    "backup_cnt": 805,
+    "backup_cnt": 806,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
