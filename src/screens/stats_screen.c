@@ -44,6 +44,7 @@ static void update_primary_stat_display() {
   char *formattedString;
   asprintf(&formattedString, "%.1f", remoteStats.speed);
   lv_label_set_text(ui_PrimaryStat, formattedString);
+  free(formattedString);
 }
 
 static void update_secondary_stat_display() {
@@ -86,6 +87,23 @@ static void update_footpad_display() {
 }
 
 static void update_battery_display() {
+  char *formattedString;
+
+  switch (stat_display_options.battery_display) {
+  case BATTERY_DISPLAY_ALL:
+    asprintf(&formattedString, "%.1f%% | %.1fv", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
+    break;
+  case BATTERY_DISPLAY_PERCENT:
+    asprintf(&formattedString, "%.1f%%", remoteStats.batteryPercentage);
+    break;
+  case BATTERY_DISPLAY_VOLTAGE:
+    asprintf(&formattedString, "%.1fv", remoteStats.batteryVoltage);
+    break;
+  default:
+    break;
+  }
+  lv_label_set_text(ui_BatteryDisplay, formattedString);
+  free(formattedString);
 }
 
 void update_stats_screen_display() {

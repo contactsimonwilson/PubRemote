@@ -30,10 +30,10 @@ static void reconnecting_timer_callback(void *arg) {
 }
 
 static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) {
-  ESP_LOGI(TAG, "RECEIVED");
+  ESP_LOGD(TAG, "RECEIVED");
   int64_t deltaTime = get_current_time_ms() - LAST_COMMAND_TIME;
   LAST_COMMAND_TIME = 0;
-  ESP_LOGI(TAG, "RTT: %lld", deltaTime);
+  ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
   if (pairing_settings.state == PAIRING_STATE_UNPAIRED && len == 6) {
     memcpy(pairing_settings.remote_addr, data, 6);
@@ -71,6 +71,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     char *formattedString;
     asprintf(&formattedString, "%ld", pairing_settings.secret_code);
     lv_label_set_text(ui_PairingCode, formattedString);
+    free(formattedString);
     pairing_settings.state = PAIRING_STATE_PENDING;
   }
   else if (pairing_settings.state == PAIRING_STATE_PENDING && len == 4) {
@@ -107,6 +108,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     uint8_t switch_state = data[7];
     remoteStats.switchState = switch_state;
     float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
+    remoteStats.batteryVoltage = input_voltage_filtered;
     int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
     float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
     remoteStats.speed = speed;
@@ -119,6 +121,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     float motor_temp_filtered = (float)data[22] / 2.0;
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
     float battery_level = (float)data[27] / 2.0;
+    remoteStats.batteryPercentage = battery_level;
     int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
@@ -140,7 +143,7 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     update_stats_display();
   }
   else {
-    ESP_LOGI(TAG, "Invalid data length %d", len);
+    ESP_LOGD(TAG, "Invalid data length %d", len);
   }
 }
 

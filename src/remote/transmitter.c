@@ -44,7 +44,7 @@ static void transmitter_task(void *pvParameters) {
       }
 
       LAST_COMMAND_TIME = newTime;
-      ESP_LOGI(TAG, "Sent command");
+      ESP_LOGD(TAG, "Sent command");
     }
     vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
   }
@@ -55,7 +55,7 @@ static void transmitter_task(void *pvParameters) {
 }
 
 static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  ESP_LOGI(TAG, "SENT");
+  ESP_LOGD(TAG, "SENT");
 }
 
 void init_transmitter() {

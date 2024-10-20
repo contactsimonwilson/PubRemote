@@ -168,6 +168,8 @@ esp_err_t init_settings() {
   err = nvs_read_blob("remote_addr", &remote_addr, sizeof(remote_addr));
   if (err == ESP_OK) {
     memcpy(pairing_settings.remote_addr, remote_addr, sizeof(remote_addr));
+    // ESP_LOGI(TAG, "Remote address read successfully");
+    // ESP_LOG_BUFFER_HEX(TAG, remote_addr, sizeof(remote_addr));
   }
   else {
     memcpy(pairing_settings.remote_addr, DEFAULT_PEER_ADDR, sizeof(DEFAULT_PEER_ADDR));
