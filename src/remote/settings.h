@@ -4,6 +4,7 @@
 
   #include "esp_system.h"
   #include "nvs_flash.h"
+  #include <remote/receiver.h>
 
 // Function to initialize NVS
 esp_err_t init_nvs();
@@ -17,11 +18,19 @@ esp_err_t nvs_write_int(const char *key, int32_t value);
 // Function to read an integer from NVS
 esp_err_t nvs_read_int(const char *key, int32_t *value);
 
+// Function to write a byte array to NVS
+esp_err_t nvs_write_blob(const char *key, void *value, size_t length);
+
+// Function to read a byte array from NVS
+esp_err_t nvs_read_blob(const char *key, void *value, size_t length);
+
 void save_bl_level();
 
 void save_auto_off_time();
 
 void save_calibration();
+
+esp_err_t save_pairing_data();
 
 typedef enum {
   AUTO_OFF_DISABLED,
@@ -29,6 +38,12 @@ typedef enum {
   AUTO_OFF_5_MINUTES,
   AUTO_OFF_10_MINUTES,
 } AutoOffOptions;
+
+typedef struct {
+  PairingState state;
+  int32_t secret_code;
+  uint8_t remote_addr[6];
+} PairingSettings;
 
 typedef struct {
   uint16_t x_min;
@@ -50,5 +65,6 @@ uint64_t get_auto_off_ms();
 
 extern CalibrationSettings calibration_settings;
 extern DeviceSettings device_settings;
+extern PairingSettings pairing_settings;
 
 #endif
