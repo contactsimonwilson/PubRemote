@@ -208,6 +208,11 @@ static void LVGL_port_task(void *arg) {
 }
 
 void sh8601_set_brightness(uint8_t brightness) {
+  if (io_handle == NULL) {
+    ESP_LOGW(TAG, "IO handle is NULL");
+    return;
+  }
+
   // Create a buffer for the command and brightness value
   uint8_t data[1] = {brightness};
 
