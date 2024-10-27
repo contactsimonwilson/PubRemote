@@ -218,16 +218,16 @@ void sh8601_set_brightness(uint8_t brightness) {
 
   // Send the command and brightness value over SPI
   ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(io_handle, 0x51, &data, 1));
-  // esp_lcd_panel_io_rx_param(io_handle, NULL, 0);
 }
 
 void set_bl_level(u_int8_t level) {
 #if DISP_BL_PWM
   ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, level);
   ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-#else
-  // TODO - SPI brightness control for amoled
+#elif DISP_SH8601
   sh8601_set_brightness(level);
+#else
+  ESP_LOGW(TAG, "No backlight control method defined");
 #endif
 }
 
@@ -292,7 +292,9 @@ void init_display(void) {
 
   ESP_LOGI(TAG, "Turn off LCD backlight");
   init_backlight();
+#if DISP_BL_PWM
   set_bl_level(0);
+#endif
 
   ESP_LOGI(TAG, "Initialize SPI bus");
 #if DISP_GC9A01
