@@ -31,6 +31,7 @@
   #define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
 #elif DISP_SH8601
   #include "esp_lcd_sh8601.h"
+  #include "sh8601.h"
   #define LCD_PIXEL_CLOCK_HZ (40 * 1000 * 1000)
 #endif
 
@@ -50,7 +51,8 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
 #define LCD_PARAM_BITS 8
-#define MAX_TRAN_SIZE (LV_HOR_RES * LV_VER_RES * LV_COLOR_DEPTH / 8)
+// #define MAX_TRAN_SIZE (LV_HOR_RES * LV_VER_RES * LV_COLOR_DEPTH / 8)
+#define MAX_TRAN_SIZE (LV_HOR_RES * 80 * sizeof(uint16_t))
 
 // LVGL
 #define LVGL_TICK_PERIOD_MS 2
@@ -194,7 +196,7 @@ void sh8601_set_brightness(uint8_t brightness) {
   uint8_t data[1] = {brightness};
 
   // Send the command and brightness value over SPI
-  ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(io_handle, 0x51, &data, 1));
+  ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(io_handle, SH8601_W_WDBRIGHTNESSVALNOR, data, 1));
 }
 
 void set_bl_level(u_int8_t level) {
@@ -301,6 +303,8 @@ void init_display(void) {
 
 #elif DISP_SH8601
   sh8601_vendor_config_t vendor_config = {
+      .init_cmds = lcd_init_cmds,
+      .init_cmds_size = sizeof(lcd_init_cmds) / sizeof(sh8601_lcd_init_cmd_t),
       .flags =
           {
               .use_qspi_interface = 1,
