@@ -38,8 +38,8 @@
   #include "esp_lcd_touch_cst816s.h"
   #define TOUCH_ENABLED 1
 #elif TP_FT3168
-// #include "esp_lcd_touch_ft3168.h"
-// #define TOUCH_ENABLED 1
+  #include "esp_lcd_touch_ft3168.h"
+  #define TOUCH_ENABLED 1
 #endif
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
@@ -147,29 +147,6 @@ static void LVGL_port_update_callback(lv_disp_drv_t *drv) {
     break;
   }
 }
-
-#if TOUCH_ENABLED
-static void LVGL_touch_cb(lv_indev_drv_t *drv, lv_indev_data_t *data) {
-  uint16_t touchpad_x[1] = {0};
-  uint16_t touchpad_y[1] = {0};
-  uint8_t touchpad_cnt = 0;
-
-  /* Read touch controller data */
-  esp_lcd_touch_read_data(drv->user_data);
-
-  /* Get coordinates */
-  bool touchpad_pressed = esp_lcd_touch_get_coordinates(drv->user_data, touchpad_x, touchpad_y, NULL, &touchpad_cnt, 1);
-
-  if (touchpad_pressed && touchpad_cnt > 0) {
-    data->point.x = touchpad_x[0];
-    data->point.y = touchpad_y[0];
-    data->state = LV_INDEV_STATE_PRESSED;
-  }
-  else {
-    data->state = LV_INDEV_STATE_RELEASED;
-  }
-}
-#endif
 
 static void increase_lvgl_tick(void *arg) {
   /* Tell LVGL how many milliseconds has elapsed */

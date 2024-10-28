@@ -18,14 +18,23 @@
 #include <stdio.h>
 #include <string.h>
 
-#define POINT_NUM_MAX (5)
+#define POINT_NUM_MAX 1
 
-#define FT3168_I2C_ADDR (0x38)
-#define REG_MODE (0x00)
-#define REG_GEST_ID (0x01)
-#define REG_TD_STATUS (0x02)
-#define REG_TOUCH_DATA (0x03)
-#define REG_CHIP_ID (0xA3)
+#define CURR_POINT_REG 0x02
+#define TOUCH1_X_H_REG 0x03
+#define TOUCH1_X_L_REG 0x04
+#define TOUCH1_Y_H_REG 0x05
+#define TOUCH1_Y_L_REG 0x06
+
+#define FT3168_EVENT_FLAG_MASK 0xC0 // Bits 7:6
+#define FT3168_COORD_MASK 0x0F      // Bits 3:0
+
+typedef enum {
+  FT3168_EVENT_PRESS = 0x00,
+  FT3168_EVENT_LIFT = 0x40,
+  FT3168_EVENT_CONTACT = 0x80,
+  FT3168_EVENT_NONE = 0xC0
+} ft3168_event_t;
 
 static const char *TAG = "FT3168";
 
@@ -35,10 +44,8 @@ static bool get_xy(esp_lcd_touch_handle_t tp, uint16_t *x, uint16_t *y, uint16_t
 static esp_err_t del(esp_lcd_touch_handle_t tp);
 
 static esp_err_t i2c_read_bytes(esp_lcd_touch_handle_t tp, uint16_t reg, uint8_t *data, uint8_t len);
-static esp_err_t i2c_write_byte(esp_lcd_touch_handle_t tp, uint16_t reg, uint8_t data);
 
 static esp_err_t reset(esp_lcd_touch_handle_t tp);
-static esp_err_t read_id(esp_lcd_touch_handle_t tp);
 
 esp_err_t esp_lcd_touch_new_i2c_ft3168(const esp_lcd_panel_io_handle_t io, const esp_lcd_touch_config_t *config,
                                        esp_lcd_touch_handle_t *tp) {
@@ -83,8 +90,6 @@ esp_err_t esp_lcd_touch_new_i2c_ft3168(const esp_lcd_panel_io_handle_t io, const
   }
   /* Reset controller */
   ESP_GOTO_ON_ERROR(reset(ft3168), err, TAG, "Reset failed");
-  /* Read product id */
-  ESP_GOTO_ON_ERROR(read_id(ft3168), err, TAG, "Read version failed");
   *tp = ft3168;
 
   return ESP_OK;
@@ -97,16 +102,48 @@ err:
 }
 
 static esp_err_t read_data(esp_lcd_touch_handle_t tp) {
-  uint8_t data[4 * POINT_NUM_MAX];
-  ESP_RETURN_ON_ERROR(i2c_read_bytes(tp, REG_TOUCH_DATA, data, sizeof(data)), TAG, "I2C read failed");
+  typedef struct {
+    uint8_t num;
+    uint8_t x_h : 4;
+    uint8_t : 4;
+    uint8_t x_l;
+    uint8_t y_h : 4;
+    uint8_t : 4;
+    uint8_t y_l;
+  } data_t;
 
-  uint8_t touch_points = data[REG_TD_STATUS - REG_TOUCH_DATA] & 0x0F;
+  data_t point = {0};
+  uint8_t tmp = 0;
+  ESP_RETURN_ON_ERROR(i2c_read_bytes(tp, CURR_POINT_REG, (uint8_t *)&tmp, sizeof(tmp)), TAG,
+                      "I2C read failed (touch points)");
+
+  point.num = tmp;
+
+  ESP_RETURN_ON_ERROR(i2c_read_bytes(tp, TOUCH1_X_H_REG, (uint8_t *)&tmp, sizeof(tmp)), TAG,
+                      "I2C read failed (touch points)");
+  point.x_h = tmp;
+
+  ESP_RETURN_ON_ERROR(i2c_read_bytes(tp, TOUCH1_X_L_REG, (uint8_t *)&tmp, sizeof(tmp)), TAG,
+                      "I2C read failed (touch points)");
+  point.x_l = tmp;
+
+  ESP_RETURN_ON_ERROR(i2c_read_bytes(tp, TOUCH1_Y_H_REG, (uint8_t *)&tmp, sizeof(tmp)), TAG,
+                      "I2C read failed (touch points)");
+
+  point.y_h = tmp;
+
+  ESP_RETURN_ON_ERROR(i2c_read_bytes(tp, TOUCH1_Y_L_REG, (uint8_t *)&tmp, sizeof(tmp)), TAG,
+                      "I2C read failed (touch points)");
+
+  point.y_l = tmp;
 
   portENTER_CRITICAL(&tp->data.lock);
-  tp->data.points = (touch_points > POINT_NUM_MAX ? POINT_NUM_MAX : touch_points);
-  for (int i = 0; i < tp->data.points; i++) {
-    tp->data.coords[i].x = ((data[i * 6 + 0] & 0x0F) << 8) | data[i * 6 + 1];
-    tp->data.coords[i].y = ((data[i * 6 + 2] & 0x0F) << 8) | data[i * 6 + 3];
+  point.num = (point.num > POINT_NUM_MAX ? POINT_NUM_MAX : point.num);
+  tp->data.points = point.num;
+  /* Fill all coordinates */
+  for (int i = 0; i < point.num; i++) {
+    tp->data.coords[i].x = ((point.x_h & FT3168_COORD_MASK) << 8) | point.x_l;
+    tp->data.coords[i].y = ((point.y_h & FT3168_COORD_MASK) << 8) | point.y_l;
   }
   portEXIT_CRITICAL(&tp->data.lock);
 
@@ -153,30 +190,17 @@ static esp_err_t del(esp_lcd_touch_handle_t tp) {
 static esp_err_t reset(esp_lcd_touch_handle_t tp) {
   if (tp->config.rst_gpio_num != GPIO_NUM_NC) {
     ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, tp->config.levels.reset), TAG, "GPIO set level failed");
-    vTaskDelay(pdMS_TO_TICKS(10));
+    vTaskDelay(pdMS_TO_TICKS(200));
     ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, !tp->config.levels.reset), TAG,
                         "GPIO set level failed");
-    vTaskDelay(pdMS_TO_TICKS(50));
+    vTaskDelay(pdMS_TO_TICKS(200));
   }
 
-  // Set to normal operation mode
-  ESP_RETURN_ON_ERROR(i2c_write_byte(tp, REG_MODE, 0x00), TAG, "Set mode failed");
-
-  return ESP_OK;
-}
-
-static esp_err_t read_id(esp_lcd_touch_handle_t tp) {
-  uint8_t id;
-  ESP_RETURN_ON_ERROR(i2c_read_bytes(tp, REG_CHIP_ID, &id, 1), TAG, "I2C read failed");
-  ESP_LOGI(TAG, "IC id: 0x%02X", id);
   return ESP_OK;
 }
 
 static esp_err_t i2c_read_bytes(esp_lcd_touch_handle_t tp, uint16_t reg, uint8_t *data, uint8_t len) {
   ESP_RETURN_ON_FALSE(data, ESP_ERR_INVALID_ARG, TAG, "Invalid data");
-  return esp_lcd_panel_io_rx_param(tp->io, reg, data, len);
-}
 
-static esp_err_t i2c_write_byte(esp_lcd_touch_handle_t tp, uint16_t reg, uint8_t data) {
-  return esp_lcd_panel_io_tx_param(tp->io, reg, &data, 1);
+  return esp_lcd_panel_io_rx_param(tp->io, reg, data, len);
 }
