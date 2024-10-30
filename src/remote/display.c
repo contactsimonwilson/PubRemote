@@ -315,7 +315,7 @@ void init_display(void) {
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_panel_dev_config_t panel_config = {
       .reset_gpio_num = DISP_RST,
-      .rgb_endian = LCD_RGB_ENDIAN_BGR,
+      .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
       .bits_per_pixel = LV_COLOR_DEPTH,
       .vendor_config = &vendor_config,
   };
