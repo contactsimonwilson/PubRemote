@@ -1,3 +1,4 @@
+#include "display_driver.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/ledc.h"
@@ -30,8 +31,8 @@
   #define DISP_BL_PWM 1
   #define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
 #elif DISP_SH8601
+  #include "display_driver_sh8601.h"
   #include "esp_lcd_sh8601.h"
-  #include "sh8601.h"
   #define LCD_PIXEL_CLOCK_HZ (40 * 1000 * 1000)
 #endif
 
@@ -186,32 +187,26 @@ static void LVGL_port_task(void *arg) {
   }
 }
 
-void sh8601_set_brightness(uint8_t brightness) {
+void set_bl_level(u_int8_t level) {
+#if DISP_GC9A01
+  ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, level);
+  ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+#elif DISP_SH8601
   if (io_handle == NULL) {
     ESP_LOGW(TAG, "IO handle is NULL");
     return;
   }
 
   // Create a buffer for the command and brightness value
-  uint8_t data[1] = {brightness};
+  uint8_t data[1] = {level};
 
   // Send the command and brightness value over SPI
   ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(io_handle, SH8601_W_WDBRIGHTNESSVALNOR, data, 1));
-}
-
-void set_bl_level(u_int8_t level) {
-#if DISP_BL_PWM
-  ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, level);
-  ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-#elif DISP_SH8601
-  sh8601_set_brightness(level);
-#else
-  ESP_LOGW(TAG, "No backlight control method defined");
 #endif
 }
 
 static void init_backlight(void) {
-#if DISP_BL_PWM
+#if DISP_GC9A01
   ESP_LOGI(TAG, "Configure LCD backlight");
   // Configure PWM channel
   ledc_timer_config_t timer_config = {
@@ -229,7 +224,7 @@ static void init_backlight(void) {
       .timer_sel = LEDC_TIMER_0,
   };
   ledc_channel_config(&channel_config);
-#else
+#elif DISP_SH8601
   // If we don't do PWM control (amoled display), just set enable pin to high
   gpio_reset_pin(DISP_BL);
   gpio_set_direction(DISP_BL, GPIO_MODE_OUTPUT);
@@ -304,7 +299,7 @@ void init_display(void) {
 #elif DISP_SH8601
   sh8601_vendor_config_t vendor_config = {
       .init_cmds = lcd_init_cmds,
-      .init_cmds_size = sizeof(lcd_init_cmds) / sizeof(sh8601_lcd_init_cmd_t),
+      .init_cmds_size = get_lcd_init_cmds_size(),
       .flags =
           {
               .use_qspi_interface = 1,
@@ -330,6 +325,9 @@ void init_display(void) {
 
   ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
   ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
+
+  ESP_LOGI(TAG, "Test display communication");
+  ESP_ERROR_CHECK(test_display_communication(io_handle));
 
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, true));
   ESP_ERROR_CHECK(esp_lcd_panel_mirror(panel_handle, true, false));
