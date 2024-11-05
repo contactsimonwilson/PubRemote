@@ -1,4 +1,4 @@
-#include "display_driver.h"
+#include "display/display_driver.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/ledc.h"
@@ -28,12 +28,9 @@
 
 #if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
-  #define DISP_BL_PWM 1
-  #define LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000)
 #elif DISP_SH8601
-  #include "display_driver_sh8601.h"
+  #include "display/sh8601/display_driver_sh8601.h"
   #include "esp_lcd_sh8601.h"
-  #define LCD_PIXEL_CLOCK_HZ (40 * 1000 * 1000)
 #endif
 
 #if TP_CST816S
@@ -188,21 +185,7 @@ static void LVGL_port_task(void *arg) {
 }
 
 void set_bl_level(u_int8_t level) {
-#if DISP_GC9A01
-  ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, level);
-  ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-#elif DISP_SH8601
-  if (io_handle == NULL) {
-    ESP_LOGW(TAG, "IO handle is NULL");
-    return;
-  }
-
-  // Create a buffer for the command and brightness value
-  uint8_t data[1] = {level};
-
-  // Send the command and brightness value over SPI
-  ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(io_handle, SH8601_W_WDBRIGHTNESSVALNOR, data, 1));
-#endif
+  set_display_brightness(io_handle, level);
 }
 
 static void init_backlight(void) {
@@ -298,8 +281,8 @@ void init_display(void) {
 
 #elif DISP_SH8601
   sh8601_vendor_config_t vendor_config = {
-      .init_cmds = lcd_init_cmds,
-      .init_cmds_size = get_lcd_init_cmds_size(),
+      .init_cmds = sh8601_lcd_init_cmds,
+      .init_cmds_size = sh8601_get_lcd_init_cmds_size(),
       .flags =
           {
               .use_qspi_interface = 1,
@@ -325,15 +308,22 @@ void init_display(void) {
 
   ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
   ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
+  bool invert_color = false;
 
-  ESP_LOGI(TAG, "Test display communication");
-  ESP_ERROR_CHECK(test_display_communication(io_handle));
+#if DISP_GC9A01
+  invert_color = true;
+#elif DISP_SH8601
+  invert_color = false;
+#endif
 
-  ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, true));
+  ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, invert_color));
   ESP_ERROR_CHECK(esp_lcd_panel_mirror(panel_handle, true, false));
 
   // user can flush pre-defined pattern to the screen before we turn on the screen or backlight
   ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
+
+  ESP_LOGI(TAG, "Test display communication");
+  ESP_ERROR_CHECK(test_display_communication(io_handle));
 
 #if TOUCH_ENABLED
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
