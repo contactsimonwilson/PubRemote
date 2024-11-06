@@ -29,6 +29,8 @@
 #if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
 #elif DISP_SH8601
+  #define SW_ROTATE 1
+  #define ROUNDER_CALLBACK 1
   #include "display/sh8601/display_driver_sh8601.h"
   #include "esp_lcd_sh8601.h"
 #endif
@@ -43,6 +45,7 @@
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
+#define BUFFER_SIZE ((int)(LV_HOR_RES * (LV_VER_RES / 8)))
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
 
@@ -107,8 +110,12 @@ static void LVGL_port_update_callback(lv_disp_drv_t *drv) {
   switch (drv->rotated) {
   case LV_DISP_ROT_NONE:
     // Rotate LCD display
+#if SW_ROTATE
+    esp_lcd_panel_mirror(panel_handle, false, false);
+#else
     esp_lcd_panel_swap_xy(panel_handle, false);
     esp_lcd_panel_mirror(panel_handle, true, false);
+#endif
 #if TOUCH_ENABLED
     // Rotate LCD touch
     esp_lcd_touch_set_mirror_y(tp, false);
@@ -116,9 +123,13 @@ static void LVGL_port_update_callback(lv_disp_drv_t *drv) {
 #endif
     break;
   case LV_DISP_ROT_90:
-    // Rotate LCD display
+// Rotate LCD display
+#if SW_ROTATE
+    esp_lcd_panel_mirror(panel_handle, false, false);
+#else
     esp_lcd_panel_swap_xy(panel_handle, true);
     esp_lcd_panel_mirror(panel_handle, true, true);
+#endif
 #if TOUCH_ENABLED
     // Rotate LCD touch
     esp_lcd_touch_set_mirror_y(tp, false);
@@ -355,12 +366,12 @@ void init_display(void) {
   lv_init();
   // alloc draw buffers used by LVGL
   // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
-  lv_color_t *buf1 = heap_caps_malloc(LV_HOR_RES * 20 * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t *buf1 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
   assert(buf1);
-  lv_color_t *buf2 = heap_caps_malloc(LV_HOR_RES * 20 * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t *buf2 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
   assert(buf2);
   // initialize LVGL draw buffers
-  lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LV_HOR_RES * 20);
+  lv_disp_draw_buf_init(&disp_buf, buf1, buf2, BUFFER_SIZE);
 
   ESP_LOGI(TAG, "Register display driver to LVGL");
   lv_disp_drv_init(&disp_drv);
@@ -368,14 +379,15 @@ void init_display(void) {
   disp_drv.ver_res = LV_VER_RES;
   disp_drv.flush_cb = LVGL_flush_cb;
   disp_drv.drv_update_cb = LVGL_port_update_callback;
-#if DISP_SH8601
+  disp_drv.sw_rotate = SW_ROTATE;
+#if ROUNDER_CALLBACK
   disp_drv.rounder_cb = LVGL_port_rounder_callback;
 #endif
   disp_drv.draw_buf = &disp_buf;
   disp_drv.user_data = panel_handle;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
-#ifdef DISP_ROTATE
+#if SW_ROTATE
   lv_disp_set_rotation(disp, DISP_ROTATE);
 #endif
 
