@@ -17,6 +17,15 @@ esp_err_t test_display_communication(esp_lcd_panel_io_handle_t io_handle) {
 #endif
 }
 
+esp_err_t display_driver_preinit() {
+  ESP_LOGI(TAG, "Preinit display driver");
+#if DISP_GC9A01
+  return gc9a01_display_driver_preinit();
+#elif DISP_SH8601
+  return sh8601_display_driver_preinit();
+#endif
+}
+
 esp_err_t set_display_brightness(esp_lcd_panel_io_handle_t io_handle, uint8_t brightness) {
   ESP_LOGI(TAG, "Setting display brightness");
 #if DISP_GC9A01

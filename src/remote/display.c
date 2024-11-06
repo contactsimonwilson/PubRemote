@@ -188,33 +188,6 @@ void set_bl_level(u_int8_t level) {
   set_display_brightness(io_handle, level);
 }
 
-static void init_backlight(void) {
-#if DISP_GC9A01
-  ESP_LOGI(TAG, "Configure LCD backlight");
-  // Configure PWM channel
-  ledc_timer_config_t timer_config = {
-      .speed_mode = LEDC_LOW_SPEED_MODE,
-      .timer_num = LEDC_TIMER_0,
-      .duty_resolution = LEDC_TIMER_8_BIT, // Resolution up to 256
-      .freq_hz = 1000,                     // 1 kHz frequency
-  };
-  ledc_timer_config(&timer_config);
-
-  ledc_channel_config_t channel_config = {
-      .gpio_num = DISP_BL,
-      .speed_mode = LEDC_LOW_SPEED_MODE,
-      .channel = LEDC_CHANNEL_0,
-      .timer_sel = LEDC_TIMER_0,
-  };
-  ledc_channel_config(&channel_config);
-#elif DISP_SH8601
-  // If we don't do PWM control (amoled display), just set enable pin to high
-  gpio_reset_pin(DISP_BL);
-  gpio_set_direction(DISP_BL, GPIO_MODE_OUTPUT);
-  ESP_ERROR_CHECK(gpio_set_level(DISP_BL, 1));
-#endif
-}
-
 #if TOUCH_ENABLED
 bool LVGL_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   uint16_t touchpad_x[1] = {0};
@@ -246,12 +219,7 @@ bool LVGL_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
 void init_display(void) {
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // contains callback functions
-
-  ESP_LOGI(TAG, "Turn off LCD backlight");
-  init_backlight();
-#if DISP_BL_PWM
-  set_bl_level(0);
-#endif
+  display_driver_preinit();
 
   ESP_LOGI(TAG, "Initialize SPI bus");
 #if DISP_GC9A01

@@ -123,6 +123,7 @@ enum {
 extern const sh8601_lcd_init_cmd_t sh8601_lcd_init_cmds[];
 size_t sh8601_get_lcd_init_cmds_size(void);
 esp_err_t sh8601_test_display_communication(esp_lcd_panel_io_handle_t io_handle);
+esp_err_t sh8601_display_driver_preinit();
 esp_err_t sh8601_set_display_brightness(esp_lcd_panel_io_handle_t io_handle, uint8_t brightness);
 
 #endif

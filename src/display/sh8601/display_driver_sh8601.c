@@ -1,4 +1,5 @@
 #include "display_driver_sh8601.h"
+#include "driver/ledc.h"
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_sh8601.h>
 #include <esp_log.h>
@@ -54,6 +55,14 @@ esp_err_t sh8601_test_display_communication(esp_lcd_panel_io_handle_t io_handle)
   rx_param(io_handle, SH8601_R_RDID, &id_array, 3);
 
   ESP_LOGI(TAG, "Display ID: %02X %02X %02X", id_array[0], id_array[1], id_array[2]);
+  return ESP_OK;
+}
+
+esp_err_t sh8601_display_driver_preinit() {
+  ESP_LOGI(TAG, "Preinit SH8601 display driver");
+  gpio_reset_pin(DISP_BL);
+  gpio_set_direction(DISP_BL, GPIO_MODE_OUTPUT);
+  ESP_ERROR_CHECK(gpio_set_level(DISP_BL, 1));
   return ESP_OK;
 }
 
