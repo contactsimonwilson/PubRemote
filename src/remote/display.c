@@ -379,7 +379,9 @@ void init_display(void) {
   disp_drv.ver_res = LV_VER_RES;
   disp_drv.flush_cb = LVGL_flush_cb;
   disp_drv.drv_update_cb = LVGL_port_update_callback;
+#ifdef SW_ROTATE
   disp_drv.sw_rotate = SW_ROTATE;
+#endif
 #if ROUNDER_CALLBACK
   disp_drv.rounder_cb = LVGL_port_rounder_callback;
 #endif
