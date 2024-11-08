@@ -15,6 +15,7 @@
 #include "hal/ledc_types.h"
 #include "lvgl.h"
 #include "powermanagement.h"
+#include "screens/screen_utils.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include <stdio.h>
@@ -424,6 +425,7 @@ void init_display(void) {
   // Lock the mutex due to the LVGL APIs are not thread-safe
   if (LVGL_lock(-1)) {
     ui_init();
+    apply_ui_scale();
     // Release the mutex
     LVGL_unlock();
 
