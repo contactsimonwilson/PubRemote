@@ -61,5 +61,5 @@ static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) 
 void init_transmitter() {
   ESP_LOGI(TAG, "Registered RX callback. Creating tasks");
   ESP_ERROR_CHECK(esp_now_register_send_cb(on_data_sent));
-  xTaskCreate(transmitter_task, "transmitter_task", 4096, NULL, 2, NULL);
+  xTaskCreatePinnedToCore(transmitter_task, "transmitter_task", 4096, NULL, 20, NULL, 0);
 }

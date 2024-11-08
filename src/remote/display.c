@@ -64,7 +64,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define LVGL_TASK_MAX_DELAY_MS 500
 #define LVGL_TASK_MIN_DELAY_MS 1
 #define LVGL_TASK_STACK_SIZE (4 * 1024)
-#define LVGL_TASK_PRIORITY 2
+#define LVGL_TASK_PRIORITY 20
 
 static SemaphoreHandle_t lvgl_mux = NULL;
 static esp_lcd_panel_io_handle_t io_handle = NULL;
@@ -421,7 +421,7 @@ void init_display(void) {
   lvgl_mux = xSemaphoreCreateRecursiveMutex();
   assert(lvgl_mux);
   ESP_LOGI(TAG, "Create LVGL task");
-  xTaskCreate(LVGL_port_task, "LVGL", LVGL_TASK_STACK_SIZE, NULL, LVGL_TASK_PRIORITY, NULL);
+  xTaskCreatePinnedToCore(LVGL_port_task, "LVGL", LVGL_TASK_STACK_SIZE, NULL, LVGL_TASK_PRIORITY, NULL, 1);
 
   ESP_LOGI(TAG, "Display UI");
   // Lock the mutex due to the LVGL APIs are not thread-safe

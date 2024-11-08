@@ -123,7 +123,7 @@ void thumbstick_task(void *pvParameters) {
 }
 
 void init_thumbstick() {
-  xTaskCreate(thumbstick_task, "thumbstick_task", 4096, NULL, 2, NULL);
+  xTaskCreatePinnedToCore(thumbstick_task, "thumbstick_task", 4096, NULL, 20, NULL, 0);
 }
 
 static void button_single_click_cb(void *arg, void *usr_data) {
