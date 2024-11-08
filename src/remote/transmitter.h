@@ -12,7 +12,7 @@ typedef struct {
 } ParingInfo;
 
 typedef struct {
-  u_int16_t size;
+  uint16_t size;
   uint16_t *results;
 } LatencyTestResults;
 

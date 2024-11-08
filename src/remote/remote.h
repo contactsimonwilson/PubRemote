@@ -23,7 +23,7 @@ typedef enum {
 
 typedef struct {
   RemoteCommand command;
-  u_int8_t *payload;
+  uint8_t *payload;
 } RemotePayload;
 
 typedef enum {

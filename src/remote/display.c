@@ -28,11 +28,14 @@
 
 #if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
+  #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_BGR
+
 #elif DISP_SH8601
   #define SW_ROTATE 1
   #define ROUNDER_CALLBACK 1
   #include "display/sh8601/display_driver_sh8601.h"
   #include "esp_lcd_sh8601.h"
+  #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_RGB
 #endif
 
 #if TP_CST816S
@@ -45,7 +48,7 @@
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
-#define BUFFER_SIZE ((int)(LV_HOR_RES * (LV_VER_RES / 8)))
+#define BUFFER_SIZE ((int)(LV_HOR_RES * (LV_VER_RES / 10)))
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
 
@@ -84,6 +87,7 @@ static void LVGL_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t 
   int offsety2 = area->y2;
   // copy a buffer's content to a specific area of the display
   esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, color_map);
+  lv_disp_flush_ready(drv); // Indicate that flushing is done
 }
 
 #if DISP_SH8601
@@ -195,7 +199,7 @@ static void LVGL_port_task(void *arg) {
   }
 }
 
-void set_bl_level(u_int8_t level) {
+void set_bl_level(uint8_t level) {
   set_display_brightness(io_handle, level);
 }
 
@@ -272,7 +276,7 @@ void init_display(void) {
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_panel_dev_config_t panel_config = {
       .reset_gpio_num = DISP_RST,
-      .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
+      .rgb_ele_order = RGB_ELE_ORDER,
       .bits_per_pixel = LV_COLOR_DEPTH,
       .vendor_config = &vendor_config,
   };
