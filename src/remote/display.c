@@ -60,7 +60,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define MAX_TRAN_SIZE (LV_HOR_RES * 80 * sizeof(uint16_t))
 
 // LVGL
-#define LVGL_TICK_PERIOD_MS 2
+#define LVGL_TICK_PERIOD_MS 5
 #define LVGL_TASK_MAX_DELAY_MS 500
 #define LVGL_TASK_MIN_DELAY_MS 1
 #define LVGL_TASK_STACK_SIZE (4 * 1024)
@@ -384,6 +384,8 @@ void init_display(void) {
   disp_drv.ver_res = LV_VER_RES;
   disp_drv.flush_cb = LVGL_flush_cb;
   disp_drv.drv_update_cb = LVGL_port_update_callback;
+  // disp_drv.direct_mode = 1;
+  disp_drv.full_refresh = 0;
 #ifdef SW_ROTATE
   disp_drv.sw_rotate = SW_ROTATE;
 #endif
