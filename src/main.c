@@ -30,6 +30,8 @@ void app_main(void) {
   init_power_management();
   init_led();
   init_buzzer();
+  init_buttons();
+  init_thumbstick();
   init_display();
   init_espnow();
 
@@ -45,7 +47,4 @@ void app_main(void) {
 
   init_receiver();
   init_transmitter();
-  // Remote inputs init
-  init_buttons();
-  init_thumbstick();
 }
