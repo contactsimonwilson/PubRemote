@@ -169,6 +169,9 @@ LV_IMG_DECLARE(ui_img_icon_png);    // assets/icon.png
 LV_FONT_DECLARE(ui_font_Inter_14);
 LV_FONT_DECLARE(ui_font_Inter_Bold_14);
 LV_FONT_DECLARE(ui_font_Inter_Bold_48);
+LV_FONT_DECLARE(ui_font_Inter_Bold_28);
+LV_FONT_DECLARE(ui_font_Inter_28);
+LV_FONT_DECLARE(ui_font_Inter_Bold_96);
 
 // UI INIT
 void ui_init(void);
