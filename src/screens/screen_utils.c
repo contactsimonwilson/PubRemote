@@ -211,6 +211,10 @@ void scale_element(lv_obj_t *element) {
 }
 
 void apply_ui_scale() {
+  if (SCALE_FACTOR == 1.0) {
+    return;
+  }
+
   process_children_recursive(ui_SplashScreen, scale_element);
   process_children_recursive(ui_StatsScreen, scale_element);
   process_children_recursive(ui_SettingsScreen, scale_element);
