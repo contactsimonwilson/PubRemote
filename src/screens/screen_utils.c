@@ -37,15 +37,31 @@ static void scale_dimensions(lv_obj_t *obj) {
     return;
   }
 
-  lv_coord_t width = lv_obj_get_style_width(obj, LV_PART_MAIN);
-  lv_coord_t height = lv_obj_get_style_height(obj, LV_PART_MAIN);
+  // Array of parts to process
+  uint32_t parts[] = {
+      LV_PART_MAIN,
+      // LV_PART_KNOB,
+      // LV_PART_INDICATOR,
+      // LV_PART_SELECTED
+  };
 
-  if (!LV_COORD_IS_PCT(width) && width != LV_SIZE_CONTENT) {
-    lv_obj_set_width(obj, (lv_coord_t)(width * SCALE_FACTOR));
-  }
+  for (size_t i = 0; i < sizeof(parts) / sizeof(parts[0]); i++) {
+    uint32_t part = parts[i];
 
-  if (!LV_COORD_IS_PCT(height) && height != LV_SIZE_CONTENT) {
-    lv_obj_set_height(obj, (lv_coord_t)(height * SCALE_FACTOR));
+    lv_coord_t width = lv_obj_get_style_width(obj, part);
+    lv_coord_t height = lv_obj_get_style_height(obj, part);
+
+    if (width != NULL) {
+      if (!LV_COORD_IS_PCT(width) && width != LV_SIZE_CONTENT) {
+        lv_obj_set_width(obj, (lv_coord_t)(width * SCALE_FACTOR));
+      }
+    }
+
+    if (height != NULL) {
+      if (!LV_COORD_IS_PCT(height) && height != LV_SIZE_CONTENT) {
+        lv_obj_set_height(obj, (lv_coord_t)(height * SCALE_FACTOR));
+      }
+    }
   }
 }
 
@@ -75,49 +91,63 @@ static uint8_t get_font_size(lv_font_t *font) {
 }
 
 void scale_text(lv_obj_t *obj) {
-  if (obj == NULL || !lv_obj_check_type(obj, &lv_label_class)) {
+  if (obj == NULL || (!lv_obj_check_type(obj, &lv_label_class) && !lv_obj_check_type(obj, &lv_dropdown_class))) {
     return;
   }
 
-  lv_font_t *font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-  int size = get_font_size(font) * SCALE_FACTOR;
-  bool is_bold = is_bold_font(font);
+  uint32_t parts[] = {
+      LV_PART_MAIN,
+      // LV_PART_ITEMS,
+      // LV_PART_SELECTED
+  };
 
-  lv_font_t *new_font = font;
-  if (size <= 20) {
-    if (is_bold) {
-      new_font = &ui_font_Inter_Bold_14;
-    }
-    else {
-      new_font = &ui_font_Inter_28;
-    }
-  }
-  else if (size <= 36) {
-    if (is_bold) {
-      new_font = &ui_font_Inter_Bold_28;
-    }
-    else {
-      new_font = &ui_font_Inter_28;
-    }
-  }
-  else if (size <= 64) {
-    if (is_bold) {
-      new_font = &ui_font_Inter_Bold_48;
-    }
-    else {
-      new_font = &ui_font_Inter_28;
-    }
-  }
-  else {
-    if (is_bold) {
-      new_font = &ui_font_Inter_Bold_96;
-    }
-    else {
-      new_font = &ui_font_Inter_28;
-    }
-  }
+  for (size_t i = 0; i < sizeof(parts) / sizeof(parts[0]); i++) {
+    uint32_t part = parts[i];
+    lv_font_t *font = lv_obj_get_style_text_font(obj, part);
 
-  lv_obj_set_style_text_font(obj, new_font, LV_PART_MAIN);
+    if (font == NULL) {
+      continue;
+    }
+
+    int size = get_font_size(font) * SCALE_FACTOR;
+    bool is_bold = is_bold_font(font);
+
+    lv_font_t *new_font = font;
+    if (size <= 20) {
+      if (is_bold) {
+        new_font = &ui_font_Inter_Bold_14;
+      }
+      else {
+        new_font = &ui_font_Inter_28;
+      }
+    }
+    else if (size <= 36) {
+      if (is_bold) {
+        new_font = &ui_font_Inter_Bold_28;
+      }
+      else {
+        new_font = &ui_font_Inter_28;
+      }
+    }
+    else if (size <= 64) {
+      if (is_bold) {
+        new_font = &ui_font_Inter_Bold_48;
+      }
+      else {
+        new_font = &ui_font_Inter_28;
+      }
+    }
+    else {
+      if (is_bold) {
+        new_font = &ui_font_Inter_Bold_96;
+      }
+      else {
+        new_font = &ui_font_Inter_28;
+      }
+    }
+
+    lv_obj_set_style_text_font(obj, new_font, part);
+  }
 }
 
 static void scale_position(lv_obj_t *obj) {
@@ -125,15 +155,25 @@ static void scale_position(lv_obj_t *obj) {
     return;
   }
 
-  lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
-  lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
+  uint32_t parts[] = {
+      LV_PART_MAIN,
+      // LV_PART_ITEMS,
+      // LV_PART_SELECTED
+  };
 
-  if (!LV_COORD_IS_PCT(x)) {
-    lv_obj_set_x(obj, (lv_coord_t)(x * SCALE_FACTOR));
-  }
+  for (size_t i = 0; i < sizeof(parts) / sizeof(parts[0]); i++) {
+    uint32_t part = parts[i];
 
-  if (!LV_COORD_IS_PCT(y)) {
-    lv_obj_set_y(obj, (lv_coord_t)(y * SCALE_FACTOR));
+    lv_coord_t x = lv_obj_get_style_x(obj, part);
+    lv_coord_t y = lv_obj_get_style_y(obj, part);
+
+    if (!LV_COORD_IS_PCT(x)) {
+      lv_obj_set_x(obj, (lv_coord_t)(x * SCALE_FACTOR));
+    }
+
+    if (!LV_COORD_IS_PCT(y)) {
+      lv_obj_set_y(obj, (lv_coord_t)(y * SCALE_FACTOR));
+    }
   }
 }
 

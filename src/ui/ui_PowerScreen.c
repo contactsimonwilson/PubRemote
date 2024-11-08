@@ -54,6 +54,9 @@ void ui_PowerScreen_screen_init(void)
 
     lv_obj_set_style_text_font(lv_dropdown_get_list(ui_AutoOffTime), &ui_font_Inter_14,  LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_AutoOffTime), &ui_font_Inter_14,
+                               LV_PART_SELECTED | LV_STATE_DEFAULT);
+
     ui_PowerLabel = lv_label_create(ui_PowerBody);
     lv_obj_set_width(ui_PowerLabel, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_PowerLabel, LV_SIZE_CONTENT);    /// 1
