@@ -40,11 +40,11 @@ static void scale_dimensions(lv_obj_t *obj) {
   lv_coord_t width = lv_obj_get_style_width(obj, LV_PART_MAIN);
   lv_coord_t height = lv_obj_get_style_height(obj, LV_PART_MAIN);
 
-  if (!LV_COORD_IS_PCT(width)) {
+  if (!LV_COORD_IS_PCT(width) && width != LV_SIZE_CONTENT) {
     lv_obj_set_width(obj, (lv_coord_t)(width * SCALE_FACTOR));
   }
 
-  if (!LV_COORD_IS_PCT(height)) {
+  if (!LV_COORD_IS_PCT(height) && height != LV_SIZE_CONTENT) {
     lv_obj_set_height(obj, (lv_coord_t)(height * SCALE_FACTOR));
   }
 }
@@ -102,48 +102,80 @@ void scale_text(lv_obj_t *obj) {
   }
   else if (size <= 64) {
     if (is_bold) {
-      lv_obj_set_style_text_font(obj, &ui_font_Inter_Bold_48, LV_PART_MAIN);
+      new_font = &ui_font_Inter_Bold_48;
     }
     else {
-      lv_obj_set_style_text_font(obj, &ui_font_Inter_28, LV_PART_MAIN);
+      new_font = &ui_font_Inter_28;
     }
   }
   else {
     if (is_bold) {
-      lv_obj_set_style_text_font(obj, &ui_font_Inter_Bold_48, LV_PART_MAIN);
+      new_font = &ui_font_Inter_Bold_96;
     }
     else {
-      lv_obj_set_style_text_font(obj, &ui_font_Inter_28, LV_PART_MAIN);
+      new_font = &ui_font_Inter_28;
     }
   }
 
   lv_obj_set_style_text_font(obj, new_font, LV_PART_MAIN);
 }
 
+static void scale_position(lv_obj_t *obj) {
+  if (obj == NULL) {
+    return;
+  }
+
+  lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
+  lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
+
+  if (!LV_COORD_IS_PCT(x)) {
+    lv_obj_set_x(obj, (lv_coord_t)(x * SCALE_FACTOR));
+  }
+
+  if (!LV_COORD_IS_PCT(y)) {
+    lv_obj_set_y(obj, (lv_coord_t)(y * SCALE_FACTOR));
+  }
+}
+
+/**
+ * Recursively process all children of an LVGL object
+ * @param parent The parent object to start from
+ * @param callback Function to call for each child
+ */
+static void process_children_recursive(lv_obj_t *parent, void (*callback)(lv_obj_t *obj)) {
+  // callback(parent);
+  uint32_t child_cnt = lv_obj_get_child_cnt(parent);
+
+  for (uint32_t i = 0; i < child_cnt; i++) {
+    lv_obj_t *child = lv_obj_get_child(parent, i);
+    if (child != NULL) {
+      // Process this child
+      callback(child);
+
+      // Recursively process its children
+      process_children_recursive(child, callback);
+    }
+  }
+}
+
 void scale_element(lv_obj_t *element) {
   scale_padding(element);
   scale_dimensions(element);
   scale_arc_width(element);
+  scale_text(element);
+  scale_position(element);
 
   // Mark the style as modified
   lv_obj_mark_layout_as_dirty(element);
   lv_obj_refresh_style(element, LV_STYLE_PROP_ANY, LV_PART_MAIN);
-  scale_text(element);
 }
 
 void apply_ui_scale() {
-  // StatsScreen
-  scale_element(ui_SpeedDial);
-  scale_element(ui_UtilizationDial);
-  scale_element(ui_LeftSensor);
-  scale_element(ui_RightSensor);
-
-  // SettingsScreen
-  scale_element(ui_SettingsBackButton);
-  // scale_element(ui_SettingsBackButtonLabel);
-  scale_element(ui_SettingsBrightnessButton);
-  scale_element(ui_SettingsPowerButton);
-  scale_element(ui_SettingsCalibrateButton);
-  scale_element(ui_SettingsPairButton);
-  scale_element(ui_SettingsShutdownButton);
+  process_children_recursive(ui_SplashScreen, scale_element);
+  process_children_recursive(ui_StatsScreen, scale_element);
+  process_children_recursive(ui_SettingsScreen, scale_element);
+  process_children_recursive(ui_BrightnessScreen, scale_element);
+  process_children_recursive(ui_PowerScreen, scale_element);
+  process_children_recursive(ui_CalibrationScreen, scale_element);
+  process_children_recursive(ui_PairingScreen, scale_element);
 }
