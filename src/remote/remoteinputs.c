@@ -74,7 +74,7 @@ static void thumbstick_task(void *pvParameters) {
   // Configure the ADC
   adc_oneshot_unit_handle_t adc_handle;
   adc_oneshot_unit_init_cfg_t init_config = {
-      .unit_id = JOYSTICK_X_ADC_UNIT,
+      .unit_id = JOYSTICK_X_ADC_UNIT - 1, // ADC enum is 0-indexed
       .ulp_mode = ADC_ULP_MODE_DISABLE,
   };
   ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc_handle));
@@ -82,7 +82,7 @@ static void thumbstick_task(void *pvParameters) {
   // Calibration
   //-------------ADC Calibration Init---------------//
   adc_cali_handle_t adc_cali_handle = NULL;
-  bool do_calibration = adc_calibration_init(JOYSTICK_X_ADC_UNIT, ADC_ATTEN_DB_12, &adc_cali_handle);
+  bool do_calibration = adc_calibration_init(JOYSTICK_X_ADC_UNIT - 1, ADC_ATTEN_DB_12, &adc_cali_handle);
 
   #if (JOYSTICK_Y_ENABLED && JOYSTICK_Y_ADC_UNIT != JOYSTICK_X_ADC_UNIT)
     // TODO - support multiple ADC units

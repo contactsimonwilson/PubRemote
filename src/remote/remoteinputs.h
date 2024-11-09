@@ -12,12 +12,12 @@
   #define JOYSTICK_BUTTON_PIN -1
 #endif
 
-#ifndef JOYSTICK_X_PIN
-  #define JOYSTICK_X_PIN -1
+#ifndef JOYSTICK_X_ADC
+  #define JOYSTICK_X_ADC -1
 #endif
 
-#ifndef JOYSTICK_Y_PIN
-  #define JOYSTICK_Y_PIN -1
+#ifndef JOYSTICK_Y_ADC
+  #define JOYSTICK_Y_ADC -1
 #endif
 
 #if JOYSTICK_BUTTON_PIN < 0
@@ -26,13 +26,13 @@
   #define JOYSTICK_BUTTON_ENABLED 1
 #endif
 
-#if JOYSTICK_X_PIN < 0
+#if JOYSTICK_X_ADC < 0
   #define JOYSTICK_X_ENABLED 0
 #else
   #define JOYSTICK_X_ENABLED 1
 #endif
 
-#if JOYSTICK_Y_PIN < 0
+#if JOYSTICK_Y_ADC < 0
   #define JOYSTICK_Y_ENABLED 0
 #else
   #define JOYSTICK_Y_ENABLED 1
