@@ -23,7 +23,6 @@ float convert_adc_to_battery_volts(int adc_value) {
 }
 
 float BATTERY_VOLTAGE = 0;
-#define BATTER_MONITOR_CHANNEL ADC_CHANNEL_0 // Assuming the Hall sensor is connected to GPIO0
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
 
@@ -86,12 +85,12 @@ void start_or_reset_deep_sleep_timer() {
 
 void power_management_task(void *pvParameters) {
   // Configure the ADC
-  adc_oneshot_unit_handle_t adc1_handle;
+  adc_oneshot_unit_handle_t adc_handle;
   adc_oneshot_unit_init_cfg_t init_config = {
       .unit_id = ADC_UNIT_1,
       .ulp_mode = ADC_ULP_MODE_DISABLE,
   };
-  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc1_handle));
+  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc_handle));
 
   // Calibration
   adc_cali_handle_t adc_cali_handle = NULL;
@@ -102,12 +101,12 @@ void power_management_task(void *pvParameters) {
       .bitwidth = ADC_BITWIDTH_12,
       .atten = ADC_ATTEN_DB_12,
   };
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, BATTER_MONITOR_CHANNEL, &channel_config));
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, BAT_ADC, &channel_config));
   vTaskDelay(pdMS_TO_TICKS(1000));
 
   while (1) {
     int battery_value = 0;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BATTER_MONITOR_CHANNEL, &battery_value));
+    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, BAT_ADC, &battery_value));
     BATTERY_VOLTAGE = convert_adc_to_battery_volts(battery_value);
     ESP_LOGD(TAG, "Battery volts: %.1f", BATTERY_VOLTAGE);
     // char str[20];

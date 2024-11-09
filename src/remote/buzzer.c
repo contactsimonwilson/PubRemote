@@ -13,11 +13,12 @@
 
 static const char *TAG = "PUBREMOTE-BUZZER";
 
-#define BUZZER_PIN 21
-#define BUZZER_CHANNEL LEDC_CHANNEL_1
-#define BUZZER_TIMER LEDC_TIMER_1
-#define BUZZER_RESOLUTION LEDC_TIMER_10_BIT
-#define MAX_DUTY ((1 << 10) - 1)
+#if BUZZER_ENABLED
+  #define BUZZER_CHANNEL LEDC_CHANNEL_1
+  #define BUZZER_TIMER LEDC_TIMER_1
+  #define BUZZER_RESOLUTION LEDC_TIMER_10_BIT
+  #define MAX_DUTY ((1 << 10) - 1)
+#endif
 
 // Define notes (frequencies in Hz)
 #define NOTE_C4 261
@@ -29,6 +30,7 @@ static const char *TAG = "PUBREMOTE-BUZZER";
 #define NOTE_B4 493
 #define NOTE_C5 523
 
+#if BUZZER_ENABLED
 // mutex for buzzer
 static SemaphoreHandle_t buzzer_mutex;
 
@@ -37,8 +39,10 @@ static const int melody[] = {NOTE_C4, 100, 100, NOTE_D4, 100, 100, NOTE_E4, 100,
                              NOTE_G4, 100, 100, NOTE_A4, 100, 100, NOTE_B4, 100, 100, NOTE_C5, 100, 200};
 
 static const int notes = sizeof(melody) / sizeof(melody[0]) / 3; // Number of notes
+#endif
 
 static void play_note(int frequency, int volume, int duration) {
+#if BUZZER_ENABLED
   // Take the mutex
   if (buzzer_mutex == NULL) {
     buzzer_mutex = xSemaphoreCreateMutex();
@@ -71,8 +75,10 @@ static void play_note(int frequency, int volume, int duration) {
 
   // Release the mutex
   xSemaphoreGive(buzzer_mutex);
+#endif
 }
 
+#if BUZZER_ENABLED
 // task to play melody
 static void play_melody_task(void *pvParameters) {
   for (int i = 0; i < notes; i++) {
@@ -80,12 +86,16 @@ static void play_melody_task(void *pvParameters) {
   }
   vTaskDelete(NULL);
 }
+#endif
 
 void play_melody() {
+#if BUZZER_ENABLED
   xTaskCreate(play_melody_task, "play_melody_task", 4096, NULL, 2, NULL);
+#endif
 }
 
 void init_buzzer() {
+#if BUZZER_ENABLED
   ledc_channel_config_t channel_conf = {
       .gpio_num = BUZZER_PIN,
       .speed_mode = LEDC_LOW_SPEED_MODE,
@@ -98,4 +108,5 @@ void init_buzzer() {
   ledc_channel_config(&channel_conf);
 
   play_melody();
+#endif
 }
