@@ -5,6 +5,7 @@ SET(SOURCES ui_SplashScreen.c
     ui_PairingScreen.c
     ui_PowerScreen.c
     ui_CalibrationScreen.c
+    ui_AboutScreen.c
     ui_theme_manager.c
     ui_themes.c
     ui.c
@@ -12,10 +13,10 @@ SET(SOURCES ui_SplashScreen.c
     ui_helpers.c
     ui_img_icon_png.c
     fonts/ui_font_Inter_14.c
-    fonts/ui_font_Inter_28.c
     fonts/ui_font_Inter_Bold_14.c
-    fonts/ui_font_Inter_Bold_28.c
     fonts/ui_font_Inter_Bold_48.c
+    fonts/ui_font_Inter_28.c
+    fonts/ui_font_Inter_Bold_28.c
     fonts/ui_font_Inter_Bold_96.c)
 
 add_library(ui ${SOURCES})

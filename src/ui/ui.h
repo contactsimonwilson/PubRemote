@@ -64,6 +64,9 @@ extern lv_obj_t * ui_SettingsBody;
 void ui_event_SettingsBackButton(lv_event_t * e);
 extern lv_obj_t * ui_SettingsBackButton;
 extern lv_obj_t * ui_SettingsBackButtonLabel;
+void ui_event_SettingsAboutButton(lv_event_t * e);
+extern lv_obj_t * ui_SettingsAboutButton;
+extern lv_obj_t * ui_SettingsAboutButtonLabel;
 extern lv_obj_t * ui_SettingsCategoryLabel;
 void ui_event_SettingsBrightnessButton(lv_event_t * e);
 extern lv_obj_t * ui_SettingsBrightnessButton;
@@ -158,6 +161,19 @@ extern lv_obj_t * ui_CalibrationPrimaryActionButton;
 extern lv_obj_t * ui_CalibrationPrimaryActionButtonLabel;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_AboutScreen
+void ui_AboutScreen_screen_init(void);
+void ui_event_AboutScreen(lv_event_t * e);
+extern lv_obj_t * ui_AboutScreen;
+extern lv_obj_t * ui_AboutContent;
+extern lv_obj_t * ui_AboutBody;
+extern lv_obj_t * ui_AboutBodyLabel;
+extern lv_obj_t * ui_AboutFooter;
+void ui_event_AboutMainActionButton(lv_event_t * e);
+extern lv_obj_t * ui_AboutMainActionButton;
+extern lv_obj_t * ui_AboutMainActionButtonLabel;
+// CUSTOM VARIABLES
+
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
@@ -167,10 +183,10 @@ LV_IMG_DECLARE(ui_img_icon_png);    // assets/icon.png
 
 // FONTS
 LV_FONT_DECLARE(ui_font_Inter_14);
-LV_FONT_DECLARE(ui_font_Inter_28);
 LV_FONT_DECLARE(ui_font_Inter_Bold_14);
-LV_FONT_DECLARE(ui_font_Inter_Bold_28);
 LV_FONT_DECLARE(ui_font_Inter_Bold_48);
+LV_FONT_DECLARE(ui_font_Inter_28);
+LV_FONT_DECLARE(ui_font_Inter_Bold_28);
 LV_FONT_DECLARE(ui_font_Inter_Bold_96);
 
 // UI INIT

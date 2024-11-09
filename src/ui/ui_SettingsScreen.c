@@ -30,7 +30,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_height(ui_SettingsBody, lv_pct(100));
     lv_obj_set_align(ui_SettingsBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_SettingsBody, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_SettingsBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+    lv_obj_set_flex_align(ui_SettingsBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_add_state(ui_SettingsBody, LV_STATE_PRESSED);       /// States
     lv_obj_clear_flag(ui_SettingsBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SCROLL_ELASTIC |
                       LV_OBJ_FLAG_SCROLL_MOMENTUM);     /// Flags
@@ -54,6 +54,19 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_height(ui_SettingsBackButtonLabel, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_SettingsBackButtonLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_SettingsBackButtonLabel, "Back");
+
+    ui_SettingsAboutButton = lv_btn_create(ui_SettingsBody);
+    lv_obj_set_height(ui_SettingsAboutButton, 42);
+    lv_obj_set_width(ui_SettingsAboutButton, lv_pct(100));
+    lv_obj_set_align(ui_SettingsAboutButton, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SettingsAboutButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_SettingsAboutButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_SettingsAboutButtonLabel = lv_label_create(ui_SettingsAboutButton);
+    lv_obj_set_width(ui_SettingsAboutButtonLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_SettingsAboutButtonLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_SettingsAboutButtonLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_SettingsAboutButtonLabel, "About");
 
     ui_SettingsCategoryLabel = lv_label_create(ui_SettingsBody);
     lv_obj_set_width(ui_SettingsCategoryLabel, LV_SIZE_CONTENT);   /// 1
@@ -135,6 +148,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_label_set_text(ui_SettingsShutdownButtonLabel, "Shutdown");
 
     lv_obj_add_event_cb(ui_SettingsBackButton, ui_event_SettingsBackButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SettingsAboutButton, ui_event_SettingsAboutButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsBrightnessButton, ui_event_SettingsBrightnessButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsPowerButton, ui_event_SettingsPowerButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsCalibrateButton, ui_event_SettingsCalibrateButton, LV_EVENT_ALL, NULL);
