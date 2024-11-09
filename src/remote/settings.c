@@ -158,8 +158,8 @@ esp_err_t init_settings() {
   calibration_settings.expo = nvs_read_int("x_expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
 
   // Reading pairing settings
-  pairing_settings.state =
-      nvs_read_int("deadband", &pairing_settings.state) == ESP_OK ? pairing_settings.state : PAIRING_STATE_UNPAIRED;
+  pairing_settings.state = nvs_read_int("pairing_state", &pairing_settings.state) == ESP_OK ? pairing_settings.state
+                                                                                            : PAIRING_STATE_UNPAIRED;
 
   pairing_settings.secret_code =
       nvs_read_int("secret_code", &pairing_settings.secret_code) == ESP_OK ? pairing_settings.secret_code : -1;

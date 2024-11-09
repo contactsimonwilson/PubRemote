@@ -13,7 +13,7 @@
 
 static const char *TAG = "PUBREMOTE-RECEIVER";
 
-#define TIMEOUT_DURATION_MS 10000     // 10 seconds
+#define TIMEOUT_DURATION_MS 30000     // 30 seconds
 #define RECONNECTING_DURATION_MS 1000 // 1 seconds
 
 esp_timer_handle_t connection_timeout_timer;
