@@ -21,7 +21,7 @@ static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 
 // TODO - from SETTINGS
 #ifndef JOYSTICK_BUTTON_LEVEL
-  #define JOYSTICK_BUTTON_LEVEL 1
+  #error "JOYSTICK_BUTTON_LEVEL must be defined"
 #endif
 
 RemoteDataUnion remote_data;
@@ -69,35 +69,44 @@ float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, 
   return axis;
 }
 
-void thumbstick_task(void *pvParameters) {
+static void thumbstick_task(void *pvParameters) {
+#if (JOYSTICK_Y_ENABLED || JOYSTICK_X_ENABLED)
   // Configure the ADC
-  adc_oneshot_unit_handle_t adc2_handle;
+  adc_oneshot_unit_handle_t adc_handle;
   adc_oneshot_unit_init_cfg_t init_config = {
-      .unit_id = ADC_UNIT_2,
+      .unit_id = JOYSTICK_X_ADC_UNIT,
       .ulp_mode = ADC_ULP_MODE_DISABLE,
   };
-  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc2_handle));
+  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc_handle));
 
   // Calibration
-  //-------------ADC2 Calibration Init---------------//
-  adc_cali_handle_t adc2_cali_handle = NULL;
-  bool do_calibration2 = adc_calibration_init(ADC_UNIT_2, ADC_ATTEN_DB_12, &adc2_cali_handle);
+  //-------------ADC Calibration Init---------------//
+  adc_cali_handle_t adc_cali_handle = NULL;
+  bool do_calibration = adc_calibration_init(JOYSTICK_X_ADC_UNIT, ADC_ATTEN_DB_12, &adc_cali_handle);
+
+  #if (JOYSTICK_Y_ENABLED && JOYSTICK_Y_ADC_UNIT != JOYSTICK_X_ADC_UNIT)
+    // TODO - support multiple ADC units
+    #error "JOYSTICK_Y_ADC_UNIT must be the same as JOYSTICK_X_ADC_UNIT"
+  #endif
 
   // Configure the ADC channel
   adc_oneshot_chan_cfg_t channel_config = {
       .bitwidth = STICK_ADC_BITWIDTH,
       .atten = ADC_ATTEN_DB_12,
   };
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc2_handle, X_STICK_CHANNEL, &channel_config));
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc2_handle, Y_STICK_CHANNEL, &channel_config));
+
+  #if JOYSTICK_X_ENABLED
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, JOYSTICK_X_ADC, &channel_config));
+  #endif
+
+  #if JOYSTICK_Y_ENABLED
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, JOYSTICK_Y_ADC, &channel_config));
+  #endif
+
+#endif
 
   while (1) {
-    int x_value, y_value;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, X_STICK_CHANNEL, &x_value));
-    ESP_ERROR_CHECK(adc_oneshot_read(adc2_handle, Y_STICK_CHANNEL, &y_value));
-    joystick_data.x = x_value;
-    joystick_data.y = y_value;
-
+    bool has_updated = false;
     int16_t deadband = calibration_settings.deadband;
     int16_t x_center = calibration_settings.x_center;
     int16_t y_center = calibration_settings.y_center;
@@ -106,13 +115,33 @@ void thumbstick_task(void *pvParameters) {
     int16_t y_min = calibration_settings.y_min;
     int16_t x_min = calibration_settings.x_min;
     float expo = calibration_settings.expo;
+
+#if JOYSTICK_X_ENABLED
+    int x_value;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, JOYSTICK_X_ADC, &x_value));
+    joystick_data.x = x_value;
     float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo);
+
+    if (new_x != remote_data.data.js_x) {
+      remote_data.data.js_x = new_x;
+      has_updated = true;
+    }
+#endif
+
+#if JOYSTICK_Y_ENABLED
+    int y_value;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, JOYSTICK_Y_ADC, &y_value));
+    joystick_data.y = y_value;
     float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo);
 
-    if (new_x != remote_data.data.js_x || new_y != remote_data.data.js_y) {
-      start_or_reset_deep_sleep_timer();
-      remote_data.data.js_x = new_x;
+    if (new_y != remote_data.data.js_y) {
       remote_data.data.js_y = new_y;
+      has_updated = true;
+    }
+#endif
+
+    if (has_updated) {
+      start_or_reset_deep_sleep_timer();
     }
 
     vTaskDelay(pdMS_TO_TICKS(INPUT_RATE_MS));
@@ -123,7 +152,9 @@ void thumbstick_task(void *pvParameters) {
 }
 
 void init_thumbstick() {
+#if (JOYSTICK_Y_ENABLED || JOYSTICK_X_ENABLED)
   xTaskCreatePinnedToCore(thumbstick_task, "thumbstick_task", 4096, NULL, 20, NULL, 0);
+#endif
 }
 
 static void button_single_click_cb(void *arg, void *usr_data) {
@@ -153,6 +184,7 @@ void reset_button_state() {
 }
 
 void init_buttons() {
+#if JOYSTICK_BUTTON_ENABLED
   // create gpio button
   button_config_t gpio_btn_cfg = {
       .type = BUTTON_TYPE_GPIO,
@@ -172,4 +204,5 @@ void init_buttons() {
   iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
   iot_button_register_cb(gpio_btn, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
   iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_HOLD, button_long_press_cb, NULL);
+#endif
 }

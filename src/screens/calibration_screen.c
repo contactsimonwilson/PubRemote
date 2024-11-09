@@ -145,11 +145,21 @@ void calibration_task(void *pvParameters) {
     update_min_max();
 
     LVGL_lock(-1);
-    // Get values using current calibration data
+// Get values using current calibration data
+#if JOYSTICK_X_ENABLED
     float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
                                            calibration_data.x_max, calibration_data.deadband, calibration_data.expo);
+#else
+    float curr_x_val = 0;
+#endif
+
+#if JOYSTICK_Y_ENABLED
     float curr_y_val = convert_adc_to_axis(joystick_data.y, calibration_data.y_min, calibration_data.y_center,
                                            calibration_data.y_max, calibration_data.deadband, calibration_data.expo);
+#else
+    float curr_y_val = 0;
+#endif
+
     update_display_stick_label(curr_x_val, curr_y_val);
     update_display_stick_position(curr_x_val, curr_y_val);
     update_deadband_indicator();

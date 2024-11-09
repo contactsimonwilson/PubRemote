@@ -8,9 +8,43 @@
 #include <stdio.h>
 
 // Configuration
-#define JOYSTICK_BUTTON_PIN GPIO_NUM_15
-#define X_STICK_CHANNEL ADC_CHANNEL_6 // GPIO 17
-#define Y_STICK_CHANNEL ADC_CHANNEL_5 // GPIO 16
+#ifndef JOYSTICK_BUTTON_PIN
+  #define JOYSTICK_BUTTON_PIN -1
+#endif
+
+#ifndef JOYSTICK_X_PIN
+  #define JOYSTICK_X_PIN -1
+#endif
+
+#ifndef JOYSTICK_Y_PIN
+  #define JOYSTICK_Y_PIN -1
+#endif
+
+#if JOYSTICK_BUTTON_PIN < 0
+  #define JOYSTICK_BUTTON_ENABLED 0
+#else
+  #define JOYSTICK_BUTTON_ENABLED 1
+#endif
+
+#if JOYSTICK_X_PIN < 0
+  #define JOYSTICK_X_ENABLED 0
+#else
+  #define JOYSTICK_X_ENABLED 1
+#endif
+
+#if JOYSTICK_Y_PIN < 0
+  #define JOYSTICK_Y_ENABLED 0
+#else
+  #define JOYSTICK_Y_ENABLED 1
+#endif
+
+#if (JOYSTICK_Y_ENABLED && !defined(JOYSTICK_Y_ADC_UNIT))
+  #error "JOYSTICK_Y_ADC_UNIT must be defined"
+#endif
+
+#if (JOYSTICK_X_ENABLED && !defined(JOYSTICK_X_ADC_UNIT))
+  #error "JOYSTICK_X_ADC_UNIT must be defined"
+#endif
 
 void init_thumbstick();
 void init_buttons();

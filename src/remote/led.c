@@ -14,18 +14,17 @@
 
 static const char *TAG = "PUBREMOTE-LED";
 
-#define LED_POWER_GPIO GPIO_NUM_33
-#define LED_GPIO GPIO_NUM_18
-#define LEDC_CHANNEL LEDC_CHANNEL_2
-#define LEDC_TIMER LEDC_TIMER_2
-#define LED_COUNT 1
-#define LED_STRIP_RMT_RES_HZ (10 * 1000 * 1000)
+#if LED_ENABLED
+  #define LEDC_CHANNEL LEDC_CHANNEL_2
+  #define LEDC_TIMER LEDC_TIMER_2
+  #define LED_COUNT 1
+  #define LED_STRIP_RMT_RES_HZ (10 * 1000 * 1000)
 static led_strip_handle_t led_strip;
 
 static void configure_led(void) {
   // LED strip general initialization, according to your led board design
   led_strip_config_t strip_config = {
-      .strip_gpio_num = LED_GPIO,               // The GPIO that connected to the LED strip's data line
+      .strip_gpio_num = LED_DATA_PIN,           // The GPIO that connected to the LED strip's data line
       .max_leds = LED_COUNT,                    // The number of LEDs in the strip,
       .led_pixel_format = LED_PIXEL_FORMAT_GRB, // Pixel format of your LED strip
       .led_model = LED_MODEL_WS2812,            // LED strip model
@@ -45,9 +44,9 @@ static void configure_led(void) {
 }
 
 static void led_power_on() {
-  gpio_reset_pin(LED_POWER_GPIO); // Initialize the pin
-  gpio_set_direction(LED_POWER_GPIO, GPIO_MODE_OUTPUT);
-  gpio_set_level(LED_POWER_GPIO, 1); // Turn on the LED power
+  gpio_reset_pin(LED_POWER_PIN); // Initialize the pin
+  gpio_set_direction(LED_POWER_PIN, GPIO_MODE_OUTPUT);
+  gpio_set_level(LED_POWER_PIN, 1); // Turn on the LED power
 }
 
 typedef struct {
@@ -56,7 +55,7 @@ typedef struct {
   uint8_t b;
 } RGB;
 
-RGB adjustBrightness(RGB originalColor, float brightnessScaling) {
+static RGB adjustBrightness(RGB originalColor, float brightnessScaling) {
   float gamma = 2.2; // Typical gamma value for WS2812 LEDs
 
   // Apply gamma correction to the scaling factor
@@ -109,11 +108,14 @@ static void led_task(void *pvParameters) {
   led_off();
   vTaskDelete(NULL);
 }
+#endif
 
 void init_led() {
+#if LED_ENABLED
   ESP_LOGI(TAG, "Initializing LED strip");
   led_power_on();
   configure_led();
 
   xTaskCreate(led_task, "led_task", 4096, NULL, 2, NULL);
+#endif
 }
