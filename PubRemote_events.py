@@ -94,3 +94,19 @@ def calibration_settings_primary_button_press(event_struct):
 def expo_slider_change(event_struct):
     return
 
+
+def info_screen_unloaded(event_struct):
+    return
+
+
+def info_screen_loaded(event_struct):
+    return
+
+
+def about_screen_unloaded(event_struct):
+    return
+
+
+def about_screen_loaded(event_struct):
+    return
+

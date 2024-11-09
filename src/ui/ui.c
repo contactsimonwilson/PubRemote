@@ -57,6 +57,9 @@ lv_obj_t * ui_SettingsBody;
 void ui_event_SettingsBackButton(lv_event_t * e);
 lv_obj_t * ui_SettingsBackButton;
 lv_obj_t * ui_SettingsBackButtonLabel;
+void ui_event_SettingsAboutButton(lv_event_t * e);
+lv_obj_t * ui_SettingsAboutButton;
+lv_obj_t * ui_SettingsAboutButtonLabel;
 lv_obj_t * ui_SettingsCategoryLabel;
 void ui_event_SettingsBrightnessButton(lv_event_t * e);
 lv_obj_t * ui_SettingsBrightnessButton;
@@ -155,6 +158,20 @@ lv_obj_t * ui_CalibrationPrimaryActionButton;
 lv_obj_t * ui_CalibrationPrimaryActionButtonLabel;
 // CUSTOM VARIABLES
 
+
+// SCREEN: ui_AboutScreen
+void ui_AboutScreen_screen_init(void);
+void ui_event_AboutScreen(lv_event_t * e);
+lv_obj_t * ui_AboutScreen;
+lv_obj_t * ui_AboutContent;
+lv_obj_t * ui_AboutBody;
+lv_obj_t * ui_AboutBodyLabel;
+lv_obj_t * ui_AboutFooter;
+void ui_event_AboutMainActionButton(lv_event_t * e);
+lv_obj_t * ui_AboutMainActionButton;
+lv_obj_t * ui_AboutMainActionButtonLabel;
+// CUSTOM VARIABLES
+
 // EVENTS
 lv_obj_t * ui____initial_actions0;
 
@@ -240,6 +257,15 @@ void ui_event_SettingsBackButton(lv_event_t * e)
 
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);
+    }
+}
+
+void ui_event_SettingsAboutButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_AboutScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_AboutScreen_screen_init);
     }
 }
 
@@ -411,6 +437,27 @@ void ui_event_CalibrationPrimaryActionButton(lv_event_t * e)
     }
 }
 
+void ui_event_AboutScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        about_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        about_screen_unloaded(e);
+    }
+}
+
+void ui_event_AboutMainActionButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+    }
+}
+
 ///////////////////// SCREENS ////////////////////
 
 void ui_init(void)
@@ -426,6 +473,7 @@ void ui_init(void)
     ui_PairingScreen_screen_init();
     ui_PowerScreen_screen_init();
     ui_CalibrationScreen_screen_init();
+    ui_AboutScreen_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_SplashScreen);
 }
