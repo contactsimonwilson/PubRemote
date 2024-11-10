@@ -1,20 +1,23 @@
 {
   "name": "pubmote-firmware-tool",
   "private": true,
+  "homepage": "https://contactsimonwilson.github.io/pubremote",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "clsx": "^2.1.0",
+    "esptool-js": "^0.4.1",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "esptool-js": "^0.4.1",
-    "clsx": "^2.1.0",
     "xterm": "^5.3.0"
   },
   "devDependencies": {
@@ -26,6 +29,7 @@
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",
+    "gh-pages": "^6.2.0",
     "globals": "^15.9.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
