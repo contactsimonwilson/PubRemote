@@ -371,6 +371,7 @@ void init_display(void) {
   lv_init();
   // alloc draw buffers used by LVGL
   // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
+  // https://github.com/dj140/ESP32S3/blob/3f2cee4c092082c18e5437f834c38012f8bb5451/main/lvgl_port/lv_port_disp.c#L113
   lv_color_t *buf1 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
   assert(buf1);
   lv_color_t *buf2 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
