@@ -6,11 +6,11 @@ dependencies:
       type: service
     version: 0.5.3
   espressif/esp_lcd_touch:
-    component_hash: d4d8f2dc33205797169a97a02e0d89a8982f59fe0509129b54422052b8522f59
+    component_hash: 779b4ba2464a3ae85681e4b860caa5fdc35801458c23f3039ee761bae7f442a4
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.1.1
+    version: 1.1.2
   idf:
     component_hash: null
     source:
