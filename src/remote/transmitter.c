@@ -15,8 +15,16 @@
 static const char *TAG = "PUBREMOTE-TRANSMITTER";
 #define COMMAND_TIMEOUT 1000
 
+static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  // This callback runs in WiFi task context!
+  ESP_LOGI(TAG, "SENT");
+}
+
 // Function to send ESP-NOW data
 static void transmitter_task(void *pvParameters) {
+  ESP_ERROR_CHECK(esp_now_register_send_cb(on_data_sent));
+  ESP_LOGI(TAG, "Registered RX callback");
+
   ESP_LOGI(TAG, "TX task started");
   uint8_t combined_data[sizeof(int32_t) + sizeof(remote_data.bytes)];
   while (1) {
@@ -40,7 +48,7 @@ static void transmitter_task(void *pvParameters) {
       esp_err_t result = esp_now_send(&pairing_settings.remote_addr, combined_data, sizeof(combined_data));
       if (result != ESP_OK) {
         // Handle error if needed
-        ESP_LOGE(TAG, "Error sending data: %d", result);
+        ESP_LOGE(TAG, "Error sending remote data: %d", result);
       }
 
       LAST_COMMAND_TIME = newTime;
@@ -53,13 +61,6 @@ static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "TX task ended");
   vTaskDelete(NULL);
 }
-
-static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  ESP_LOGI(TAG, "SENT");
-}
-
 void init_transmitter() {
-  ESP_LOGI(TAG, "Registered RX callback. Creating tasks");
-  ESP_ERROR_CHECK(esp_now_register_send_cb(on_data_sent));
   xTaskCreatePinnedToCore(transmitter_task, "transmitter_task", 4096, NULL, 20, NULL, 0);
 }

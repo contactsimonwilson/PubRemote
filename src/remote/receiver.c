@@ -7,6 +7,7 @@
 #include "powermanagement.h"
 #include "stats.h"
 #include "time.h"
+#include <freertos/queue.h>
 #include <remote/settings.h>
 #include <string.h>
 #include <ui/ui.h>
@@ -16,6 +17,14 @@ static const char *TAG = "PUBREMOTE-RECEIVER";
 #define TIMEOUT_DURATION_MS 30000     // 30 seconds
 #define RECONNECTING_DURATION_MS 1000 // 1 seconds
 
+// Structure to hold ESP-NOW data
+typedef struct {
+  uint8_t mac_addr[ESP_NOW_ETH_ALEN];
+  uint8_t *data;
+  int len;
+} esp_now_event_t;
+
+static QueueHandle_t espnow_queue;
 esp_timer_handle_t connection_timeout_timer;
 esp_timer_handle_t reconnecting_timer;
 
@@ -30,7 +39,24 @@ static void reconnecting_timer_callback(void *arg) {
 }
 
 static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) {
+  // This callback runs in WiFi task context!
   ESP_LOGI(TAG, "RECEIVED");
+  esp_now_event_t evt;
+  memcpy(evt.mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
+  evt.data = malloc(len);
+  memcpy(evt.data, data, len);
+  evt.len = len;
+
+  // Send to queue for processing in application task
+  if (xQueueSend(espnow_queue, &evt, portMAX_DELAY) != pdTRUE) {
+    ESP_LOGE(TAG, "Queue send failed");
+    free(evt.data);
+  }
+}
+
+static void process_data(esp_now_event_t evt) {
+  uint8_t *data = evt.data;
+  int len = evt.len;
   int64_t deltaTime = get_current_time_ms() - LAST_COMMAND_TIME;
   LAST_COMMAND_TIME = 0;
   ESP_LOGI(TAG, "RTT: %lld", deltaTime);
@@ -137,16 +163,17 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
     // ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
     // ESP_LOGI(TAG, "Odometer: %lu", odometer);
     // ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
-    update_stats_display();
+    update_stats_display(); // TODO - use callbacks to update the UI instead of direct calls
   }
   else {
     ESP_LOGI(TAG, "Invalid data length %d", len);
   }
 }
 
-void init_receiver() {
-  ESP_LOGI(TAG, "Registered RX callback");
+static void receiver_task(void *pvParameters) {
+  espnow_queue = xQueueCreate(10, sizeof(esp_now_event_t));
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
+  ESP_LOGI(TAG, "Registered RX callback");
 
   esp_timer_create_args_t connection_timeout_args = {.callback = connection_timeout_callback,
                                                      .arg = NULL,
@@ -158,4 +185,21 @@ void init_receiver() {
                                                      .dispatch_method = ESP_TIMER_TASK,
                                                      .name = "ReconnectingTimer"};
   ESP_ERROR_CHECK(esp_timer_create(&reconnecting_timer_args, &reconnecting_timer));
+
+  esp_now_event_t evt;
+  while (1) {
+    if (xQueueReceive(espnow_queue, &evt, portMAX_DELAY) == pdTRUE) {
+      process_data(evt);
+      free(evt.data);
+    }
+  }
+
+  // The task will not reach this point as it runs indefinitely
+  ESP_LOGI(TAG, "RX task ended");
+  vTaskDelete(NULL);
+}
+
+void init_receiver() {
+  ESP_LOGI(TAG, "Starting receiver task");
+  xTaskCreatePinnedToCore(receiver_task, "receiver_task", 4096, NULL, 20, NULL, 0);
 }
