@@ -40,6 +40,14 @@ function App() {
     setDeviceInfo({ connected: false });
   };
 
+  const handleSendCommand = async (command: string) => {
+    try {
+      await espService.sendCommand(command);
+    } catch (error) {
+      console.error('Command error:', error);
+    }
+  };
+
   const handleFlash = async () => {
     if (!selectedFirmware) return;
 
@@ -80,6 +88,7 @@ function App() {
             deviceInfo={deviceInfo}
             onConnect={handleConnect}
             onDisconnect={handleDisconnect}
+            onSendCommand={handleSendCommand}
           />
 
           <div className="rounded-lg bg-gray-900 p-6">

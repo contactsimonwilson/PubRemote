@@ -1,10 +1,12 @@
 import { ESPLoader, Transport, LoaderOptions } from 'esptool-js';
 import { Terminal } from 'xterm';
+import { delay } from '../utils/delay';
 
 export class ESPService {
   private espLoader: ESPLoader | null = null;
   private terminal: Terminal;
   private isConnecting: boolean = false;
+  private monitorInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     this.terminal = new Terminal({
@@ -44,7 +46,7 @@ export class ESPService {
       this.log('Requesting serial port...');
 
       const port = await navigator.serial.requestPort();
-      const transport = new Transport(port);
+      const transport = new Transport(port, true);
 
       this.log('Initializing connection...');
       const loaderOptions: LoaderOptions = {
@@ -59,6 +61,7 @@ export class ESPService {
       };
 
       const loader = new ESPLoader(loaderOptions);
+
       await loader.main();
       await loader.sync();
 
@@ -67,8 +70,13 @@ export class ESPService {
       const macAddress = await loader.chip.readMac(loader);
       const chipId = await loader.chip.getChipDescription(loader);
 
-      // this.log('Rebooting into normal mode');
-      // await loader.hardReset();
+      this.log('Rebooting into normal mode');
+      await loader.hardReset();
+      await loader.transport.disconnect()
+      await delay(200);
+
+      // await loader.transport.connect(115200);
+      // this.addSerialMonitor();
 
       this.espLoader = loader;
 
@@ -94,6 +102,25 @@ export class ESPService {
     }
   }
 
+  async sendCommand(command: string): Promise<void> {
+    if (!this.espLoader || !this.isConnected()) {
+      throw new Error('Device not connected');
+    }
+
+    try {
+      await this.espLoader.write(command, true)
+      this.log(`Sent command: ${command}`, 'info');
+    } catch (error) {
+      this.log(
+        `Failed to send command: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+        'error'
+      );
+      throw error;
+    }
+  }
+
   async flash(firmware: {
     bootloader: File;
     partitionTable: File;
@@ -104,6 +131,10 @@ export class ESPService {
     }
 
     try {
+      this.removeSerialMonitor();
+      this.log('Rebooting into bootloader...');
+      await this.espLoader.main();
+      await this.espLoader.sync();
       this.log('Erasing flash...');
       await this.espLoader.eraseFlash();
 
@@ -167,7 +198,45 @@ export class ESPService {
     return this.espLoader !== null;
   }
 
+  addSerialMonitor() {
+    if (!this.monitorInterval) {
+      this.monitorInterval = setInterval(async () => {
+        if (!this.isConnected() || !this.espLoader) {
+          this.removeSerialMonitor();
+          return;
+        }
+
+        try {
+          const data = await this.espLoader.transport.rawRead();
+          if (data) {
+            console.log(111)
+            this.terminal.write(data);
+          } else {
+            this.removeSerialMonitor();
+          }
+        } catch (error) {
+          this.log(
+            `Connection lost: ${
+              error instanceof Error ? error.message : 'Unknown error'
+            }`,
+            'error'
+          );
+          this.removeSerialMonitor();
+          await this.disconnect();
+        }
+      }, 50);
+    }
+  }
+
+  removeSerialMonitor() {
+    if (this.monitorInterval) {
+      clearInterval(this.monitorInterval);
+      this.monitorInterval = null;
+    }
+  }
+
   async disconnect(): Promise<void> {
+    this.removeSerialMonitor();
     if (this.espLoader) {
       try {
         await this.espLoader.transport.disconnect();

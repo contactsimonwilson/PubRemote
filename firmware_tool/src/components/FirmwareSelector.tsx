@@ -1,7 +1,9 @@
 import React from 'react';
-import { Upload, Check, HardDrive, Table, Cpu } from 'lucide-react';
+import { Upload, Check, HardDrive, Table, Cpu, Tag, X } from 'lucide-react';
 import { FirmwareFiles, FirmwareVersion } from '../types';
 import { useFirmware } from '../hooks/useFirmware';
+import { Dropdown } from './ui/Dropdown';
+import { cn } from '../utils/cn';
 
 interface Props {
   onSelectFirmware: (files: FirmwareFiles) => void;
@@ -24,6 +26,44 @@ function FileUpload({
   accept = '.bin',
 }: FileUploadProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [isInvalid, setIsInvalid] = React.useState(false);
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    setIsInvalid(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const droppedFile = e.dataTransfer.files[0];
+    if (!droppedFile) return;
+
+    // Check if the file type is correct
+    if (!droppedFile.name.endsWith('.bin')) {
+      setIsInvalid(true);
+      setTimeout(() => setIsInvalid(false), 2000);
+      return;
+    }
+
+    onChange(droppedFile);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -34,9 +74,17 @@ function FileUpload({
 
   return (
     <div
-      className={`flex flex-col items-center gap-4 rounded-lg bg-gray-800/50 p-6 ${
-        file ? 'bg-gray-800' : ''
-      }`}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      className={cn(
+        'flex flex-col items-center gap-4 rounded-lg p-6 transition-colors duration-200',
+        file ? 'bg-gray-800/50' : 'bg-gray-800/30',
+        isDragging && !isInvalid && 'bg-blue-900/20 border-2 border-dashed border-blue-500',
+        isInvalid && 'bg-red-900/20 border-2 border-dashed border-red-500',
+        'relative'
+      )}
     >
       <input
         ref={inputRef}
@@ -45,11 +93,20 @@ function FileUpload({
         onChange={handleFileChange}
         className="hidden"
       />
-      {file ? (
+      
+      {isInvalid ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/95 rounded-lg">
+          <X className="h-8 w-8 text-red-500 mb-2" />
+          <p className="text-sm text-red-400">Invalid file type</p>
+        </div>
+      ) : file ? (
         <Check className="h-8 w-8 text-blue-500" />
+      ) : isDragging ? (
+        <Upload className="h-8 w-8 text-blue-500" />
       ) : (
         <div className="h-8 w-8 text-gray-600">{icon}</div>
       )}
+
       <div className="text-center">
         {file ? (
           <>
@@ -101,12 +158,15 @@ export function FirmwareSelector({
     onSelectFirmware(newFiles);
   };
 
-  const handleVersionSelect = async (version: FirmwareVersion) => {
+  const handleVersionSelect = async (version: string) => {
+    const selectedVersion = versions.find(v => v.version === version);
+    if (!selectedVersion) return;
+
     try {
       const [bootloaderRes, partitionRes, applicationRes] = await Promise.all([
-        fetch(version.bootloader),
-        fetch(version.partitionTable),
-        fetch(version.application),
+        fetch(selectedVersion.bootloader),
+        fetch(selectedVersion.partitionTable),
+        fetch(selectedVersion.application),
       ]);
 
       const [bootloaderBlob, partitionBlob, applicationBlob] =
@@ -135,33 +195,26 @@ export function FirmwareSelector({
     }
   };
 
+  const versionOptions = versions.map(version => ({
+    value: version.version,
+    label: `Version ${version.version} (${new Date(version.date).toLocaleDateString()})`,
+  }));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Select Firmware Files</h2>
-        <select
+        <Dropdown
+          options={versionOptions}
           value={selectedVersion}
-          onChange={(e) => {
-            setSelectedVersion(e.target.value);
-            const version = versions.find((v) => v.version === e.target.value);
-            if (version) handleVersionSelect(version);
+          onChange={(value) => {
+            setSelectedVersion(value as string);
+            handleVersionSelect(value as string);
           }}
-          className="bg-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          label={loading ? 'Loading releases...' : versions.length === 0 ? 'No releases available' : 'Select Version'}
+          icon={<Tag className="h-4 w-4" />}
           disabled={loading || versions.length === 0}
-        >
-          {loading ? (
-            <option>Loading releases...</option>
-          ) : versions.length === 0 ? (
-            <option>No releases available</option>
-          ) : (
-            versions.map((version) => (
-              <option key={version.version} value={version.version}>
-                Version {version.version} (
-                {new Date(version.date).toLocaleDateString()})
-              </option>
-            ))
-          )}
-        </select>
+        />
       </div>
 
       {error && (

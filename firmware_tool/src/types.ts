@@ -9,6 +9,8 @@ export interface DeviceInfoData {
   connected: boolean;
   chipId?: string;
   macAddress?: string;
+  version?: string;
+  variant?: string;
 }
 
 export interface FlashProgress {
