@@ -84,29 +84,12 @@ void start_or_reset_deep_sleep_timer() {
 }
 
 void power_management_task(void *pvParameters) {
-  // Configure the ADC
-  adc_oneshot_unit_handle_t adc_handle;
-  adc_oneshot_unit_init_cfg_t init_config = {
-      .unit_id = ADC_UNIT_1,
-      .ulp_mode = ADC_ULP_MODE_DISABLE,
-  };
-  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc_handle));
-
-  // Calibration
-  adc_cali_handle_t adc_cali_handle = NULL;
-  bool do_calibration2 = adc_calibration_init(ADC_UNIT_1, ADC_ATTEN_DB_12, &adc_cali_handle);
-
-  // Configure the ADC channel
-  adc_oneshot_chan_cfg_t channel_config = {
-      .bitwidth = ADC_BITWIDTH_12,
-      .atten = ADC_ATTEN_DB_12,
-  };
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, BAT_ADC, &channel_config));
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, BAT_ADC, &adc_channel_config));
   vTaskDelay(pdMS_TO_TICKS(1000));
 
   while (1) {
     int battery_value = 0;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, BAT_ADC, &battery_value));
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BAT_ADC, &battery_value));
     BATTERY_VOLTAGE = convert_adc_to_battery_volts(battery_value);
     ESP_LOGD(TAG, "Battery volts: %.1f", BATTERY_VOLTAGE);
     // char str[20];
