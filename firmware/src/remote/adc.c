@@ -1,11 +1,35 @@
+#include "adc.h"
 #include "esp_log.h"
 #include <esp_adc/adc_cali.h>
+#include <esp_adc/adc_oneshot.h>
 #include <esp_err.h>
 #include <hal/adc_types.h>
+#include <remote/adc.h>
 
 static const char *TAG = "PUBREMOTE-ADC";
 
-bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle) {
+const adc_oneshot_chan_cfg_t adc_channel_config = {
+    .bitwidth = STICK_ADC_BITWIDTH,
+    .atten = ADC_ATTEN_DB_12,
+};
+
+static const adc_oneshot_unit_init_cfg_t adc1_init_config = {
+    .unit_id = ADC_UNIT_1,
+    .ulp_mode = ADC_ULP_MODE_DISABLE,
+};
+
+static const adc_oneshot_unit_init_cfg_t adc2_init_config = {
+    .unit_id = ADC_UNIT_2,
+    .ulp_mode = ADC_ULP_MODE_DISABLE,
+};
+
+adc_oneshot_unit_handle_t adc1_handle = NULL;
+adc_cali_handle_t adc1_cali_handle = NULL;
+
+adc_oneshot_unit_handle_t adc2_handle = NULL;
+adc_cali_handle_t adc2_cali_handle = NULL;
+
+static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle) {
   adc_cali_handle_t handle = NULL;
   esp_err_t ret = ESP_FAIL;
   bool calibrated = false;
@@ -52,4 +76,11 @@ bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t 
   }
 
   return calibrated;
+}
+
+void init_adcs() {
+  ESP_ERROR_CHECK(adc_oneshot_new_unit(&adc1_init_config, &adc1_handle));
+  adc_calibration_init(adc1_init_config.unit_id, adc_channel_config.atten, &adc1_cali_handle);
+  ESP_ERROR_CHECK(adc_oneshot_new_unit(&adc2_init_config, &adc2_handle));
+  adc_calibration_init(adc2_init_config.unit_id, adc_channel_config.atten, &adc2_cali_handle);
 }

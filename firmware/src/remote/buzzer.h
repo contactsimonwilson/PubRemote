@@ -13,6 +13,10 @@
   #define BUZZER_ENABLED 1
 #endif
 
+#ifndef BUZZER_INVERT
+  #define BUZZER_INVERT 0
+#endif
+
 void play_melody();
 void init_buzzer();
 

@@ -1,3 +1,4 @@
+#include "buzzer.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_now.h"
@@ -59,7 +60,11 @@ static void play_note(int frequency, int volume, int duration) {
   // Calculate duty cycle based on volume (0-100)
   uint8_t final_volume = volume > 100 ? 100 : volume;
   final_volume = volume < 0 ? 0 : volume;
+  #if BUZZER_INVERT
   uint32_t duty = MAX_DUTY - (((float)final_volume / 100) * 100); // Level is inverted
+  #else
+  uint32_t duty = ((float)final_volume / 100) * 100;
+  #endif
   ESP_LOGD(TAG, "Playing note at %d Hz with volume %d (duty: %ld) and duration %d ms", frequency, final_volume, duty,
            duration);
 
@@ -70,7 +75,11 @@ static void play_note(int frequency, int volume, int duration) {
   vTaskDelay(duration / portTICK_PERIOD_MS);
 
   // Stop the buzzer
+  #if BUZZER_INVERT
   ledc_set_duty(LEDC_LOW_SPEED_MODE, BUZZER_CHANNEL, MAX_DUTY);
+  #else
+  ledc_set_duty(LEDC_LOW_SPEED_MODE, BUZZER_CHANNEL, 0);
+  #endif
   ledc_update_duty(LEDC_LOW_SPEED_MODE, BUZZER_CHANNEL);
 
   // Release the mutex
@@ -102,7 +111,11 @@ void init_buzzer() {
       .channel = BUZZER_CHANNEL,
       .intr_type = LEDC_INTR_DISABLE,
       .timer_sel = BUZZER_TIMER,
-      .duty = MAX_DUTY, // Initially off (inverted)
+  #if BUZZER_INVERT
+      .duty = MAX_DUTY,
+  #else
+      .duty = 0, // Initially off
+  #endif
       .hpoint = 0,
   };
   ledc_channel_config(&channel_conf);
