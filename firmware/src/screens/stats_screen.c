@@ -44,6 +44,7 @@ static void update_primary_stat_display() {
   char *formattedString;
   asprintf(&formattedString, "%.1f", remoteStats.speed);
   lv_label_set_text(ui_PrimaryStat, formattedString);
+  free(formattedString);
 }
 
 static void update_secondary_stat_display() {
