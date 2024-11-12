@@ -394,8 +394,8 @@ void init_display(void) {
 #endif
   disp_drv.draw_buf = &disp_buf;
   disp_drv.user_data = panel_handle;
-  disp_drv.rotated = DISP_ROTATE;
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
+  lv_disp_set_rotation(disp, DISP_ROTATE);
 
   ESP_LOGI(TAG, "Install LVGL tick timer");
   // Tick interface for LVGL (using esp_timer to generate 2ms periodic event)
