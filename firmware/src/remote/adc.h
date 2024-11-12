@@ -1,6 +1,7 @@
 #ifndef __ADC_H
 #define __ADC_H
 #include <esp_adc/adc_cali.h>
+#include <esp_adc/adc_oneshot.h>
 #include <math.h>
 
 #define STICK_ADC_BITWIDTH ADC_BITWIDTH_12
@@ -10,5 +11,14 @@
 #define STICK_DEADBAND 10
 #define STICK_EXPO 1
 
-bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle);
+extern const adc_oneshot_chan_cfg_t adc_channel_config;
+
+extern adc_oneshot_unit_handle_t adc1_handle;
+extern adc_cali_handle_t adc1_cali_handle;
+
+extern adc_oneshot_unit_handle_t adc2_handle;
+extern adc_cali_handle_t adc2_cali_handle;
+
+void init_adcs();
+
 #endif

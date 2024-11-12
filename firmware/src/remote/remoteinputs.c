@@ -71,36 +71,27 @@ float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, 
 
 static void thumbstick_task(void *pvParameters) {
 #if (JOYSTICK_Y_ENABLED || JOYSTICK_X_ENABLED)
-  // Configure the ADC
-  adc_oneshot_unit_handle_t adc_handle;
-  adc_oneshot_unit_init_cfg_t init_config = {
-      .unit_id = JOYSTICK_X_ADC_UNIT - 1, // ADC enum is 0-indexed
-      .ulp_mode = ADC_ULP_MODE_DISABLE,
-  };
-  ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config, &adc_handle));
-
-  // Calibration
-  //-------------ADC Calibration Init---------------//
-  adc_cali_handle_t adc_cali_handle = NULL;
-  bool do_calibration = adc_calibration_init(JOYSTICK_X_ADC_UNIT - 1, ADC_ATTEN_DB_12, &adc_cali_handle);
-
-  #if (JOYSTICK_Y_ENABLED && JOYSTICK_Y_ADC_UNIT != JOYSTICK_X_ADC_UNIT)
-    // TODO - support multiple ADC units
-    #error "JOYSTICK_Y_ADC_UNIT must be the same as JOYSTICK_X_ADC_UNIT"
-  #endif
-
-  // Configure the ADC channel
-  adc_oneshot_chan_cfg_t channel_config = {
-      .bitwidth = STICK_ADC_BITWIDTH,
-      .atten = ADC_ATTEN_DB_12,
-  };
-
   #if JOYSTICK_X_ENABLED
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, JOYSTICK_X_ADC, &channel_config));
+    #if JOYSTICK_X_ADC_UNIT == 1 // ADC_UNIT_1
+  adc_oneshot_unit_handle_t x_adc_handle = adc1_handle;
+    #elif JOYSTICK_X_ADC_UNIT == 2 // ADC_UNIT_2
+  adc_oneshot_unit_handle_t x_adc_handle = adc2_handle;
+    #else
+      #error "Invalid ADC unit"
+    #endif
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(x_adc_handle, JOYSTICK_X_ADC, &adc_channel_config));
   #endif
 
   #if JOYSTICK_Y_ENABLED
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, JOYSTICK_Y_ADC, &channel_config));
+    #if JOYSTICK_Y_ADC_UNIT == 1 // ADC_UNIT_1
+  adc_oneshot_unit_handle_t y_adc_handle = adc1_handle;
+    #elif JOYSTICK_Y_ADC_UNIT == 2 // ADC_UNIT_2
+  adc_oneshot_unit_handle_t y_adc_handle = adc2_handle;
+    #else
+      #error "Invalid ADC unit"
+    #endif
+
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(y_adc_handle, JOYSTICK_Y_ADC, &adc_channel_config));
   #endif
 
 #endif
@@ -118,7 +109,7 @@ static void thumbstick_task(void *pvParameters) {
 
 #if JOYSTICK_X_ENABLED
     int x_value;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, JOYSTICK_X_ADC, &x_value));
+    ESP_ERROR_CHECK(adc_oneshot_read(x_adc_handle, JOYSTICK_X_ADC, &x_value));
     joystick_data.x = x_value;
     float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo);
 
@@ -130,7 +121,7 @@ static void thumbstick_task(void *pvParameters) {
 
 #if JOYSTICK_Y_ENABLED
     int y_value;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, JOYSTICK_Y_ADC, &y_value));
+    ESP_ERROR_CHECK(adc_oneshot_read(y_adc_handle, JOYSTICK_Y_ADC, &y_value));
     joystick_data.y = y_value;
     float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo);
 

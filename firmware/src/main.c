@@ -5,6 +5,7 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "remote/adc.h"
 #include "remote/buzzer.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
@@ -26,6 +27,7 @@ static const char *TAG = "PUBREMOTE-MAIN";
 int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
+  init_adcs();
   init_settings();
   init_power_management();
   init_led();
