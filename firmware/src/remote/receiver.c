@@ -97,6 +97,7 @@ static void process_data(esp_now_event_t evt) {
     char *formattedString;
     asprintf(&formattedString, "%ld", pairing_settings.secret_code);
     lv_label_set_text(ui_PairingCode, formattedString);
+    free(formattedString);
     pairing_settings.state = PAIRING_STATE_PENDING;
   }
   else if (pairing_settings.state == PAIRING_STATE_PENDING && len == 4) {
