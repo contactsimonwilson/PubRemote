@@ -15,9 +15,9 @@
 #include "hal/ledc_types.h"
 #include "lvgl.h"
 #include "powermanagement.h"
-#include "screens/screen_utils.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "utilities/screen_utils.h"
 #include <stdio.h>
 
 // https://github.com/espressif/esp-idf/blob/master/examples/peripherals/lcd/spi_lcd_touch/main/spi_lcd_touch_example_main.c
@@ -87,7 +87,7 @@ static void LVGL_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t 
   int offsety2 = area->y2;
   // copy a buffer's content to a specific area of the display
   esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, color_map);
-  lv_disp_flush_ready(drv); // Indicate that flushing is done
+  // Don't flush here as it's handled by the notify_lvgl_flush_ready callback
 }
 
 #if DISP_SH8601

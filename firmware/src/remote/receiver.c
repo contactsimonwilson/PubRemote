@@ -7,8 +7,11 @@
 #include "powermanagement.h"
 #include "stats.h"
 #include "time.h"
+#include "utilities/conversion_utils.h"
 #include <freertos/queue.h>
+#include <math.h>
 #include <remote/settings.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ui/ui.h>
 
@@ -40,7 +43,7 @@ static void reconnecting_timer_callback(void *arg) {
 
 static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) {
   // This callback runs in WiFi task context!
-  ESP_LOGI(TAG, "RECEIVED");
+  ESP_LOGD(TAG, "RECEIVED");
   esp_now_event_t evt;
   memcpy(evt.mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
   evt.data = malloc(len);
@@ -59,7 +62,7 @@ static void process_data(esp_now_event_t evt) {
   int len = evt.len;
   int64_t deltaTime = get_current_time_ms() - LAST_COMMAND_TIME;
   LAST_COMMAND_TIME = 0;
-  ESP_LOGI(TAG, "RTT: %lld", deltaTime);
+  ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
   if (pairing_settings.state == PAIRING_STATE_UNPAIRED && len == 6) {
     memcpy(pairing_settings.remote_addr, data, 6);
@@ -136,10 +139,10 @@ static void process_data(esp_now_event_t evt) {
     float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
     int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
     float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
-    remoteStats.speed = speed;
+    remoteStats.speed = convert_ms_to_kph(fabs(speed)); // Store in kph
     float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
     float duty_cycle_now = (float)data[16] / 100.0 - 0.5;
-    remoteStats.dutyCycle = duty_cycle_now;
+    remoteStats.dutyCycle = (uint8_t)(fabs(duty_cycle_now) * 100);
     float distance_abs;
     memcpy(&distance_abs, &data[17], sizeof(float));
     float fet_temp_filtered = (float)data[21] / 2.0;

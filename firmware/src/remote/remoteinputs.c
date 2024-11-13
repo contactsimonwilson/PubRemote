@@ -18,6 +18,7 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
+#define SLEEP_DISRUPT_THRESHOLD 25
 
 // TODO - from SETTINGS
 #ifndef JOYSTICK_BUTTON_LEVEL
@@ -96,8 +97,10 @@ static void thumbstick_task(void *pvParameters) {
 
 #endif
 
+  int16_t last_x_raw = 0;
+  int16_t last_y_raw = 0;
   while (1) {
-    bool has_updated = false;
+    bool trigger_sleep_disrupt = false;
     int16_t deadband = calibration_settings.deadband;
     int16_t x_center = calibration_settings.x_center;
     int16_t y_center = calibration_settings.y_center;
@@ -113,10 +116,11 @@ static void thumbstick_task(void *pvParameters) {
     joystick_data.x = x_value;
     float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo);
 
-    if (new_x != remote_data.data.js_x) {
-      remote_data.data.js_x = new_x;
-      has_updated = true;
+    if (abs(x_value - last_x_raw) > SLEEP_DISRUPT_THRESHOLD) {
+      last_x_raw = x_value;
+      trigger_sleep_disrupt = true;
     }
+    remote_data.data.js_x = new_x;
 #endif
 
 #if JOYSTICK_Y_ENABLED
@@ -125,13 +129,14 @@ static void thumbstick_task(void *pvParameters) {
     joystick_data.y = y_value;
     float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo);
 
-    if (new_y != remote_data.data.js_y) {
-      remote_data.data.js_y = new_y;
-      has_updated = true;
+    if (abs(y_value - last_y_raw) > SLEEP_DISRUPT_THRESHOLD) {
+      last_y_raw = y_value;
+      trigger_sleep_disrupt = true;
     }
+    remote_data.data.js_y = new_y;
 #endif
 
-    if (has_updated) {
+    if (trigger_sleep_disrupt) {
       start_or_reset_deep_sleep_timer();
     }
 

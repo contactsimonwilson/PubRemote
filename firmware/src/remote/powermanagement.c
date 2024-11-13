@@ -6,6 +6,8 @@
 #include "esp_timer.h"
 #include "remoteinputs.h"
 #include "settings.h"
+#include "stats.h"
+#include "utilities/number_utils.h"
 #include <esp_adc/adc_oneshot.h>
 #include <esp_err.h>
 #include <esp_sleep.h>
@@ -14,6 +16,7 @@
 #include <freertos/task.h>
 #include <math.h>
 #include <ui/ui.h>
+
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
 float convert_adc_to_battery_volts(int adc_value) {
@@ -21,8 +24,6 @@ float convert_adc_to_battery_volts(int adc_value) {
   float val = 3.3 / (1 << 12) * 3 * adc_value;
   return roundf(val * 10) / 10;
 }
-
-float BATTERY_VOLTAGE = 0;
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
 
@@ -49,38 +50,65 @@ void check_button_press() {
 }
 
 esp_timer_handle_t deep_sleep_timer;
+static SemaphoreHandle_t timer_mutex = NULL;
+
+// Call this during initialization
+static void init_sleep_timer() {
+  timer_mutex = xSemaphoreCreateMutex();
+  assert(timer_mutex != NULL);
+}
 
 static uint64_t get_sleep_timer_time_ms() {
   return get_auto_off_ms();
 }
 
-static void deep_sleep_timer_callback(void *arg) {
-  // Enter deep sleep mode when the deep sleep timer expires
-  ESP_LOGI(TAG, "Deep sleep timer expired. Entering deep sleep mode.");
-  esp_deep_sleep_start();
+void deep_sleep_timer_callback(void *arg) {
+  // Take mutex if you're modifying shared resources
+  if (xSemaphoreTake(timer_mutex, portMAX_DELAY) == pdTRUE) {
+    // Enter deep sleep mode when the deep sleep timer expires
+    ESP_LOGI(TAG, "Deep sleep timer expired. Entering deep sleep mode.");
+    esp_deep_sleep_start();
+
+    xSemaphoreGive(timer_mutex);
+  }
 }
 
 void start_or_reset_deep_sleep_timer() {
-  int duration_ms = get_sleep_timer_time_ms();
-
-  if (duration_ms == 0) {
-    ESP_LOGD(TAG, "Deep sleep timer disabled.");
-    deep_sleep_timer = NULL;
+  if (timer_mutex == NULL) {
+    ESP_LOGE(TAG, "Timer mutex not initialized!");
     return;
   }
 
-  if (deep_sleep_timer == NULL) {
-    esp_timer_create_args_t deep_sleep_timer_args = {.callback = deep_sleep_timer_callback,
-                                                     .arg = NULL,
-                                                     .dispatch_method = ESP_TIMER_TASK,
-                                                     .name = "DeepSleepTimer"};
-    ESP_ERROR_CHECK(esp_timer_create(&deep_sleep_timer_args, &deep_sleep_timer));
+  if (xSemaphoreTake(timer_mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+    ESP_LOGE(TAG, "Could not take timer mutex!");
+    return;
   }
-  else {
-    ESP_ERROR_CHECK(esp_timer_stop(deep_sleep_timer));
-    ESP_LOGD(TAG, "Deep sleep reset.");
+
+  int duration_ms = get_sleep_timer_time_ms();
+
+  // Handle existing timer
+  if (deep_sleep_timer != NULL) {
+    if (esp_timer_is_active(deep_sleep_timer)) {
+      ESP_ERROR_CHECK(esp_timer_stop(deep_sleep_timer));
+    }
+    ESP_ERROR_CHECK(esp_timer_delete(deep_sleep_timer));
+    deep_sleep_timer = NULL;
   }
+
+  if (duration_ms == 0) {
+    ESP_LOGI(TAG, "Deep sleep timer disabled.");
+    xSemaphoreGive(timer_mutex);
+    return;
+  }
+
+  // Create new timer
+  esp_timer_create_args_t deep_sleep_timer_args = {
+      .callback = deep_sleep_timer_callback, .arg = NULL, .dispatch_method = ESP_TIMER_TASK, .name = "DeepSleepTimer"};
+  ESP_ERROR_CHECK(esp_timer_create(&deep_sleep_timer_args, &deep_sleep_timer));
   ESP_ERROR_CHECK(esp_timer_start_once(deep_sleep_timer, duration_ms * 1000));
+  ESP_LOGI(TAG, "Deep sleep timer started for %d ms", duration_ms);
+
+  xSemaphoreGive(timer_mutex);
 }
 
 void power_management_task(void *pvParameters) {
@@ -90,11 +118,10 @@ void power_management_task(void *pvParameters) {
   while (1) {
     int battery_value = 0;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BAT_ADC, &battery_value));
-    BATTERY_VOLTAGE = convert_adc_to_battery_volts(battery_value);
-    ESP_LOGD(TAG, "Battery volts: %.1f", BATTERY_VOLTAGE);
-    // char str[20];
-    // sprintf(str, "%.1f", BATTERY_VOLTAGE);
-    //  lv_label_set_text(ui_PrimaryStat, str);
+    remoteStats.batteryVoltage = convert_adc_to_battery_volts(battery_value);
+    float battery_percentage = (remoteStats.batteryVoltage - 3.0) / (4.2 - 3.0);
+    remoteStats.batteryPercentage = clampu8((uint8_t)(battery_percentage * 100), 0, 100);
+    ESP_LOGD(TAG, "Battery volts: %.1f %d", remoteStats.batteryVoltage, remoteStats.batteryPercentage);
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
 
@@ -104,6 +131,7 @@ void power_management_task(void *pvParameters) {
 }
 
 void init_power_management() {
+  init_sleep_timer();
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
   esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL);

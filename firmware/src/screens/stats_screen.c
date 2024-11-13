@@ -26,11 +26,20 @@ bool is_stats_screen_active() {
   return active_screen == ui_StatsScreen;
 }
 
-#define MAX_SPEED_DEFAULT 30;
-static uint8_t max_speed = MAX_SPEED_DEFAULT;
+static uint8_t max_speed = 0;
 
 static void update_speed_dial_display() {
-  // TODO -set max value
+  if (!max_speed) {
+    /// get range from arc in case it was not set
+    max_speed = lv_arc_get_max_value(ui_SpeedDial);
+  }
+
+  if (remoteStats.speed > max_speed) {
+    max_speed = (uint8_t)remoteStats.speed;
+    // Set range based on max speed
+    lv_arc_set_range(ui_SpeedDial, 0, max_speed);
+  }
+
   lv_arc_set_value(ui_SpeedDial, remoteStats.speed);
 }
 
@@ -42,7 +51,15 @@ static void update_utilization_dial_display() {
 
 static void update_primary_stat_display() {
   char *formattedString;
-  asprintf(&formattedString, "%.1f", remoteStats.speed);
+  float converted_val = remoteStats.speed; // TODO - apply based on primary stat display option
+
+  if (converted_val >= 10) {
+    asprintf(&formattedString, "%.0f", remoteStats.speed);
+  }
+  else {
+    asprintf(&formattedString, "%.1f", remoteStats.speed);
+  }
+
   lv_label_set_text(ui_PrimaryStat, formattedString);
   free(formattedString);
 }
