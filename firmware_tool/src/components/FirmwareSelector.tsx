@@ -1,13 +1,14 @@
 import React from 'react';
-import { Upload, Check, HardDrive, Table, Cpu, Tag, X } from 'lucide-react';
-import { FirmwareFiles, FirmwareVersion } from '../types';
+import { Upload, Check, HardDrive, Table, Cpu, Archive, Tag, X } from 'lucide-react';
+import { FirmwareFiles } from '../types';
 import { useFirmware } from '../hooks/useFirmware';
 import { Dropdown } from './ui/Dropdown';
+import { Badge } from './ui/Badge';
 import { cn } from '../utils/cn';
+import JSZip from 'jszip';
 
 interface Props {
-  onSelectFirmware: (files: FirmwareFiles) => void;
-  selectedFirmware: FirmwareFiles | null;
+  onSelectFirmware: (files: FirmwareFiles | null) => void;
 }
 
 interface FileUploadProps {
@@ -55,8 +56,8 @@ function FileUpload({
     const droppedFile = e.dataTransfer.files[0];
     if (!droppedFile) return;
 
-    // Check if the file type is correct
-    if (!droppedFile.name.endsWith('.bin')) {
+    const extension = accept.split(',')[0].replace('*', '');
+    if (!droppedFile.name.endsWith(extension)) {
       setIsInvalid(true);
       setTimeout(() => setIsInvalid(false), 2000);
       return;
@@ -134,115 +135,167 @@ function FileUpload({
   );
 }
 
-export function FirmwareSelector({
-  onSelectFirmware,
-  selectedFirmware,
-}: Props) {
-  const { versions, loading, error } = useFirmware();
-  const [files, setFiles] = React.useState<FirmwareFiles>({
+export function FirmwareSelector({ onSelectFirmware }: Props) {
+  const { versions, loading, error: fetchError } = useFirmware();
+  const [files, setFiles] = React.useState<FirmwareFiles & { zip: File | null }>({
     bootloader: null,
     partitionTable: null,
     application: null,
+    zip: null,
   });
-  const [selectedVersion, setSelectedVersion] = React.useState<string>('');
+  const [uploadMode, setUploadMode] = React.useState<'individual' | 'package'>('package');
 
-  React.useEffect(() => {
-    if (versions.length > 0 && !selectedVersion) {
-      setSelectedVersion(versions[0].version);
+  const extractFirmwareFiles = async (file: File): Promise<FirmwareFiles> => {
+    try {
+      const zip = new JSZip();
+      const contents = await zip.loadAsync(file);
+      
+      const bootloaderFile = contents.file('bootloader.bin');
+      const partitionsFile = contents.file('partitions.bin');
+      const firmwareFile = contents.file('firmware.bin');
+
+      if (!bootloaderFile || !partitionsFile || !firmwareFile) {
+        throw new Error('Invalid firmware package - missing required files');
+      }
+
+      const [bootloaderBlob, partitionsBlob, firmwareBlob] = await Promise.all([
+        bootloaderFile.async('blob'),
+        partitionsFile.async('blob'),
+        firmwareFile.async('blob'),
+      ]);
+
+      return {
+        bootloader: new File([bootloaderBlob], 'bootloader.bin', { type: 'application/octet-stream' }),
+        partitionTable: new File([partitionsBlob], 'partitions.bin', { type: 'application/octet-stream' }),
+        application: new File([firmwareBlob], 'firmware.bin', { type: 'application/octet-stream' }),
+      };
+    } catch (error) {
+      console.error('Failed to extract firmware files:', error);
+      throw new Error('Invalid firmware package');
     }
-  }, [versions]);
+  };
 
-  const handleFileChange = (type: keyof FirmwareFiles) => (file: File) => {
+  const handleIndividualFileChange = (type: keyof FirmwareFiles) => (file: File) => {
     const newFiles = { ...files, [type]: file };
     setFiles(newFiles);
     onSelectFirmware(newFiles);
   };
 
-  const handleVersionSelect = async (version: string) => {
-    const selectedVersion = versions.find(v => v.version === version);
-    if (!selectedVersion) return;
-
+  const handlePackageFileChange = async (file: File) => {
     try {
-      const [bootloaderRes, partitionRes, applicationRes] = await Promise.all([
-        fetch(selectedVersion.bootloader),
-        fetch(selectedVersion.partitionTable),
-        fetch(selectedVersion.application),
-      ]);
-
-      const [bootloaderBlob, partitionBlob, applicationBlob] =
-        await Promise.all([
-          bootloaderRes.blob(),
-          partitionRes.blob(),
-          applicationRes.blob(),
-        ]);
-
-      const newFiles = {
-        bootloader: new File([bootloaderBlob], 'bootloader.bin', {
-          type: 'application/octet-stream',
-        }),
-        partitionTable: new File([partitionBlob], 'partitions.bin', {
-          type: 'application/octet-stream',
-        }),
-        application: new File([applicationBlob], 'firmware.bin', {
-          type: 'application/octet-stream',
-        }),
-      };
-
-      setFiles(newFiles);
-      onSelectFirmware(newFiles);
-    } catch (err) {
-      console.error('Failed to download firmware files:', err);
+      const extractedFiles = await extractFirmwareFiles(file);
+      setFiles({ bootloader: null, partitionTable: null, application: null, zip: file });
+      onSelectFirmware(extractedFiles);
+    } catch (error) {
+      setFiles({ bootloader: null, partitionTable: null, application: null, zip: null });
+      onSelectFirmware(null);
+      throw error;
     }
   };
 
-  const versionOptions = versions.map(version => ({
-    value: version.version,
-    label: `Version ${version.version} (${new Date(version.date).toLocaleDateString()})`,
-  }));
+  const versionOptions = versions.flatMap(version =>
+    version.variants.map(variant => ({
+      value: variant.zipUrl,
+      tooltip: `Version ${version.version} (${variant.variant}) - ${new Date(version.date).toLocaleDateString()}`,
+      label: (
+        <div className="flex items-center justify-between w-full">
+          <div className="flex-1 truncate">
+            <span className="mr-2">{version.version}</span>
+            <span className="text-gray-400">{variant.variant}</span>
+            <span className="ml-2 text-gray-400 text-xs">
+              {new Date(version.date).toLocaleDateString()}
+            </span>
+          </div>
+          {version.prerelease && (
+            <Badge variant="warning" className="ml-2 flex-shrink-0">
+              Pre-release
+            </Badge>
+          )}
+        </div>
+      ),
+    }))
+  );
+
+  const handleVersionSelect = (url: string) => {
+    window.open(url, '_blank');
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Select Firmware Files</h2>
-        <Dropdown
-          options={versionOptions}
-          value={selectedVersion}
-          onChange={(value) => {
-            setSelectedVersion(value as string);
-            handleVersionSelect(value as string);
-          }}
-          label={loading ? 'Loading releases...' : versions.length === 0 ? 'No releases available' : 'Select Version'}
-          icon={<Tag className="h-4 w-4" />}
-          disabled={loading || versions.length === 0}
-        />
+          <div className="flex rounded-lg bg-gray-800 p-1">
+            <button
+              onClick={() => setUploadMode('package')}
+              className={cn(
+                'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
+                uploadMode === 'package'
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-400 hover:text-white'
+              )}
+            >
+              Package
+            </button>
+            <button
+              onClick={() => setUploadMode('individual')}
+              className={cn(
+                'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
+                uploadMode === 'individual'
+                  ? 'bg-gray-700 text-white'
+                  : 'text-gray-400 hover:text-white'
+              )}
+            >
+              Individual Files
+            </button>
+          </div>
+          <Dropdown
+            options={versionOptions}
+            value=""
+            onChange={(value) => handleVersionSelect(value as string)}
+            label={loading ? 'Loading...' : versions.length === 0 ? 'No releases available' : 'Download Release'}
+            icon={<Tag className="h-4 w-4" />}
+            disabled={loading || versions.length === 0}
+            width="fixed"
+            dropdownWidth={400}
+          />
       </div>
 
-      {error && (
-        <div className="p-3 rounded-lg bg-red-900/50 text-red-200">{error}</div>
+      {fetchError && (
+        <div className="p-3 rounded-lg bg-red-900/50 text-red-200">{fetchError}</div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <FileUpload
-          label="Select Bootloader"
-          icon={<HardDrive className="h-full w-full" />}
-          file={files.bootloader}
-          onChange={handleFileChange('bootloader')}
-        />
+      {uploadMode === 'individual' ? (
+        <div className="grid gap-4 md:grid-cols-3">
+          <FileUpload
+            label="Select Bootloader"
+            icon={<HardDrive className="h-full w-full" />}
+            file={files.bootloader}
+            onChange={handleIndividualFileChange('bootloader')}
+          />
 
-        <FileUpload
-          label="Select Partition Table"
-          icon={<Table className="h-full w-full" />}
-          file={files.partitionTable}
-          onChange={handleFileChange('partitionTable')}
-        />
+          <FileUpload
+            label="Select Partition Table"
+            icon={<Table className="h-full w-full" />}
+            file={files.partitionTable}
+            onChange={handleIndividualFileChange('partitionTable')}
+          />
 
+          <FileUpload
+            label="Select Application"
+            icon={<Cpu className="h-full w-full" />}
+            file={files.application}
+            onChange={handleIndividualFileChange('application')}
+          />
+        </div>
+      ) : (
         <FileUpload
-          label="Select Application"
-          icon={<Cpu className="h-full w-full" />}
-          file={files.application}
-          onChange={handleFileChange('application')}
+          label="Select or drop firmware package"
+          icon={<Archive className="h-full w-full" />}
+          file={files.zip}
+          onChange={handlePackageFileChange}
+          accept=".zip"
         />
-      </div>
+      )}
     </div>
   );
 }

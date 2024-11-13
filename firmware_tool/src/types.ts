@@ -1,8 +1,7 @@
 export interface FirmwareVariant {
-  bootloader: string;
-  partitionTable: string;
-  application: string;
+  zipUrl: string;
   date: string;
+  variant: string;
 }
 
 export interface DeviceInfoData {
@@ -22,9 +21,8 @@ export interface FlashProgress {
 export interface FirmwareVersion {
   version: string;
   date: string;
-  bootloader: string;
-  partitionTable: string;
-  application: string;
+  variants: FirmwareVariant[];
+  prerelease: boolean;
 }
 
 export interface FirmwareFiles {

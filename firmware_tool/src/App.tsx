@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Header } from './components/Header';
 import { DeviceInfo } from './components/DeviceInfo';
 import { FirmwareSelector } from './components/FirmwareSelector';
@@ -6,8 +6,11 @@ import { FlashProgress } from './components/FlashProgress';
 import { FlashProgress as FlashProgressType, DeviceInfoData } from './types';
 import { Usb } from 'lucide-react';
 import { ESPService } from './services/espService';
+import { TerminalService } from './services/terminal';
 
 function App() {
+  const terminal = useRef<TerminalService>(new TerminalService()).current;
+  const espService = useRef<ESPService>(new ESPService(terminal)).current;
   const [selectedFirmware, setSelectedFirmware] = useState<
     File | string | null
   >(null);
@@ -18,7 +21,6 @@ function App() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfoData>({
     connected: false,
   });
-  const [espService] = useState(() => new ESPService());
 
   const handleConnect = async () => {
     try {
@@ -64,9 +66,6 @@ function App() {
 
       setFlashProgress({ status: 'complete', progress: 100 });
       handleDisconnect();
-
-      // Reconnect to get updated device info
-      // await handleConnect();
     } catch (error) {
       console.error('Flash error:', error);
       setFlashProgress({
@@ -89,12 +88,12 @@ function App() {
             onConnect={handleConnect}
             onDisconnect={handleDisconnect}
             onSendCommand={handleSendCommand}
+            terminal={terminal}
           />
 
           <div className="rounded-lg bg-gray-900 p-6">
             <FirmwareSelector
               onSelectFirmware={setSelectedFirmware}
-              selectedFirmware={selectedFirmware}
             />
           </div>
 

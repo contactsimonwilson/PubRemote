@@ -1,42 +1,51 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Terminal as TerminalIcon, Send, Trash2, Filter, Download } from 'lucide-react';
-import { Dropdown } from '../components/ui/Dropdown';
+import { Dropdown } from './ui/Dropdown';
 import { DeviceInfoData } from '../types';
+import { LogEntry, TerminalService } from '../services/terminal';
 
-type LogType = 'info' | 'error' | 'success';
-
-interface Log {
-  message: string;
-  type: LogType;
-  timestamp: string;
-}
-
-interface TerminalProps {
-  logs: Log[];
+interface Props {
+  terminal: TerminalService;
   onSendCommand: (command: string) => void;
   disabled?: boolean;
   deviceInfo?: DeviceInfoData;
 }
 
-export function Terminal({ logs, onSendCommand, disabled = false, deviceInfo }: TerminalProps) {
+export function Terminal({ terminal, onSendCommand, disabled = false, deviceInfo }: Props) {
   const [command, setCommand] = React.useState('');
-  const [localLogs, setLocalLogs] = React.useState<Log[]>(logs);
+  const [logs, setLogs] = React.useState<LogEntry[]>([]);
   const [enabledLogTypes, setEnabledLogTypes] = React.useState<string[]>([
     'info',
     'error',
     'success',
   ]);
-  const terminalRef = React.useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    setLocalLogs(logs);
-  }, [logs]);
+  useEffect(() => {
+    // Subscribe to terminal data
+    const dataHandler = (data: LogEntry | null) => {
+      if (data === null) {
+        setLogs([]);
+      } else {
 
-  React.useEffect(() => {
+        if (data) {
+          setLogs(prev => [...prev, data]);
+        }
+      }
+    };
+
+    const remove = terminal.subscribe(dataHandler);
+
+    return () => {
+      remove();
+    };
+  }, [terminal]);
+
+  useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, [localLogs]);
+  }, [logs]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +56,8 @@ export function Terminal({ logs, onSendCommand, disabled = false, deviceInfo }: 
   };
 
   const clearLogs = () => {
-    setLocalLogs([]);
+    setLogs([]);
+    terminal.clear();
   };
 
   const downloadLogs = () => {
@@ -61,10 +71,11 @@ export function Terminal({ logs, onSendCommand, disabled = false, deviceInfo }: 
 `
       : 'Device not connected\n\n';
 
-    const logsText = filteredLogs
-      .map((log) => `[${log.timestamp}] ${log.type.toUpperCase()}: ${log.message}`)
+    const logsText = logs
+      .filter(log => enabledLogTypes.includes(log.type))
+      .map(log => `[${log.timestamp}] ${log.type.toUpperCase()}: ${log.message}`)
       .join('\n');
-
+    
     const fullText = deviceInfoText + 'Terminal Logs:\n' + logsText;
     
     const blob = new Blob([fullText], { type: 'text/plain' });
@@ -78,7 +89,7 @@ export function Terminal({ logs, onSendCommand, disabled = false, deviceInfo }: 
     URL.revokeObjectURL(url);
   };
 
-  const filteredLogs = localLogs.filter(log => enabledLogTypes.includes(log.type));
+  const filteredLogs = logs.filter(log => enabledLogTypes.includes(log.type));
 
   const logLevelOptions = [
     { value: 'info', label: 'Info', color: 'text-blue-500' },

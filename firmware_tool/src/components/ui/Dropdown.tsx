@@ -3,9 +3,10 @@ import { Check } from 'lucide-react';
 
 interface DropdownOption {
   value: string;
-  label: string;
+  label: React.ReactNode;
   icon?: React.ReactNode;
   color?: string;
+  tooltip?: string;
 }
 
 interface DropdownProps {
@@ -17,6 +18,8 @@ interface DropdownProps {
   icon?: React.ReactNode;
   disabled?: boolean;
   className?: string;
+  width?: 'auto' | 'fixed';
+  dropdownWidth?: 'auto' | 'button' | number;
 }
 
 export function Dropdown({
@@ -28,6 +31,8 @@ export function Dropdown({
   icon,
   disabled = false,
   className = '',
+  width = 'auto',
+  dropdownWidth = 'button',
 }: DropdownProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -64,8 +69,31 @@ export function Dropdown({
     return value === optionValue;
   };
 
+  const getDisplayLabel = () => {
+    if (multiple) {
+      return label;
+    }
+    const selectedOption = options.find(opt => opt.value === value);
+    return selectedOption ? selectedOption.label : label;
+  };
+
+  const getOptionTooltip = (option: DropdownOption) => {
+    if (option.tooltip) return option.tooltip;
+    if (typeof option.label === 'string') return option.label;
+    return '';
+  };
+
+  const getDropdownWidth = () => {
+    if (typeof dropdownWidth === 'number') return `${dropdownWidth}px`;
+    if (dropdownWidth === 'auto') return 'auto';
+    return '100%';
+  };
+
   return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
+    <div 
+      className={`relative ${width === 'fixed' ? 'w-45' : ''} ${className}`} 
+      ref={dropdownRef}
+    >
       <button
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
@@ -79,10 +107,10 @@ export function Dropdown({
           }
         `}
       >
-        {icon && <span className={`${disabled ? 'opacity-50' : 'text-gray-500'}`}>{icon}</span>}
-        <span className="flex-1 text-left">{label}</span>
+        {icon && <span className={`flex-shrink-0 ${disabled ? 'opacity-50' : 'text-gray-500'}`}>{icon}</span>}
+        <span className="flex-1 text-left truncate">{label}</span>
         <svg 
-          className={`h-4 w-4 fill-current ${disabled ? 'text-gray-600' : 'text-gray-400'} transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          className={`h-4 w-4 flex-shrink-0 fill-current ${disabled ? 'text-gray-600' : 'text-gray-400'} transition-transform ${isOpen ? 'rotate-180' : ''}`} 
           viewBox="0 0 20 20"
         >
           <path 
@@ -94,17 +122,22 @@ export function Dropdown({
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-full bg-gray-900 rounded-lg shadow-lg py-1 z-10">
+        <div 
+          style={{ width: getDropdownWidth() }}
+          className={`absolute right-0 mt-1 bg-gray-900 rounded-lg shadow-lg py-1 z-10`}
+        >
           {multiple && (
             <div className="px-3 py-2 text-xs font-medium text-gray-400 uppercase border-b border-gray-800">
               Select Options
             </div>
           )}
-          <div className="px-2">
+          <div className="max-h-48 overflow-y-auto px-2">
             {options.map((option) => (
-              <label
+              <button
                 key={option.value}
-                className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-800 rounded cursor-pointer"
+                onClick={() => handleOptionClick(option.value)}
+                title={getOptionTooltip(option)}
+                className="flex w-full items-center gap-2 px-2 py-1.5 hover:bg-gray-800 rounded cursor-pointer"
               >
                 {multiple ? (
                   <input
@@ -123,8 +156,8 @@ export function Dropdown({
                   </span>
                 )}
                 {option.icon && <span>{option.icon}</span>}
-                <span className="text-sm text-gray-300">{option.label}</span>
-              </label>
+                <span className="text-sm text-gray-300 truncate">{option.label}</span>
+              </button>
             ))}
           </div>
         </div>

@@ -2,79 +2,23 @@ import React from 'react';
 import { Cpu, Wifi, Tag, Box, Link, Link2Off } from 'lucide-react';
 import { DeviceInfoData } from '../types';
 import { Terminal } from './Terminal';
+import { TerminalService } from '../services/terminal';
 
 interface Props {
   deviceInfo: DeviceInfoData;
   onConnect: () => Promise<void>;
   onDisconnect: () => void;
   onSendCommand: (command: string) => Promise<void>;
+  terminal: TerminalService;
 }
 
-export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand }: Props) {
-  const [logs, setLogs] = React.useState<
-    Array<{
-      message: string;
-      type: 'info' | 'error' | 'success';
-      timestamp: string;
-    }>
-  >([]);
+export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand, terminal }: Props) {
   const [isConnecting, setIsConnecting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-
-  // Subscribe to console logs
-  React.useEffect(() => {
-    const originalConsole = {
-      log: console.log,
-      error: console.error,
-      info: console.info,
-    };
-
-    function addLog(message: string, type: 'info' | 'error' | 'success') {
-      const timestamp = new Date().toLocaleTimeString();
-      setLogs((prev) => [...prev, { message, type, timestamp }]);
-    }
-
-    console.log = (...args) => {
-      originalConsole.log(...args);
-      const message = args.find(
-        (arg) => typeof arg === 'string' && arg.startsWith('[ESP]')
-      );
-      if (message) {
-        addLog(message.replace('[ESP] ', ''), 'success');
-      }
-    };
-
-    console.error = (...args) => {
-      originalConsole.error(...args);
-      const message = args.find(
-        (arg) => typeof arg === 'string' && arg.startsWith('[ESP]')
-      );
-      if (message) {
-        addLog(message.replace('[ESP] ', ''), 'error');
-      }
-    };
-
-    console.info = (...args) => {
-      originalConsole.info(...args);
-      const message = args.find(
-        (arg) => typeof arg === 'string' && arg.startsWith('[ESP]')
-      );
-      if (message) {
-        addLog(message.replace('[ESP] ', ''), 'info');
-      }
-    };
-
-    return () => {
-      console.log = originalConsole.log;
-      console.error = originalConsole.error;
-      console.info = originalConsole.info;
-    };
-  }, []);
 
   const handleConnect = async () => {
     setIsConnecting(true);
     setError(null);
-    setLogs([]);
     try {
       await onConnect();
     } catch (err) {
@@ -151,7 +95,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand 
             <div>
               <div className="text-sm text-gray-400">Firmware Version</div>
               <div className="font-medium text-gray-200">
-                v1.0.0
+                {deviceInfo.version || 'Unknown'}
               </div>
             </div>
           </div>
@@ -161,7 +105,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand 
             <div>
               <div className="text-sm text-gray-400">Firmware Variant</div>
               <div className="font-medium text-gray-200">
-                Standard
+                {deviceInfo.variant || 'Unknown'}
               </div>
             </div>
           </div>
@@ -169,7 +113,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand 
       )}
 
       <Terminal
-        logs={logs}
+        terminal={terminal}
         onSendCommand={onSendCommand}
         disabled={!deviceInfo.connected}
         deviceInfo={deviceInfo}
