@@ -7,9 +7,11 @@ const GITHUB_API = 'https://api.github.com';
 interface GitHubRelease {
   tag_name: string;
   published_at: string;
+  prerelease: boolean;
   assets: Array<{
     name: string;
     browser_download_url: string;
+    url: string;
   }>;
 }
 
@@ -21,31 +23,37 @@ export function useFirmware() {
   useEffect(() => {
     async function loadFirmware() {
       try {
-        const response = await fetch(`${GITHUB_API}/repos/${GITHUB_REPO}/releases`);
+        const response = await fetch(`${GITHUB_API}/repos/${GITHUB_REPO}/releases`, {
+          headers: {
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+        
         if (!response.ok) {
-          throw new Error('Failed to fetch releases');
+          throw new Error(`Failed to fetch releases: ${response.statusText}`);
         }
         
         const releases: GitHubRelease[] = await response.json();
         
-        const firmwareVersions: FirmwareVersion[] = releases
-          .map(release => {
-            const bootloader = release.assets.find(asset => asset.name === 'bootloader.bin')?.browser_download_url;
-            const partitionTable = release.assets.find(asset => asset.name === 'partitions.bin')?.browser_download_url;
-            const application = release.assets.find(asset => asset.name === 'firmware.bin')?.browser_download_url;
-
-            if (bootloader && partitionTable && application) {
+        const firmwareVersions: FirmwareVersion[] = releases.map(release => {
+          const variants = release.assets
+            .filter(asset => asset.name.endsWith('.zip'))
+            .map(asset => {
+              const variant = asset.name.replace(/^firmware_(.+)\.zip$/, '$1');
               return {
-                version: release.tag_name,
+                variant,
+                zipUrl: asset.browser_download_url,
                 date: release.published_at,
-                bootloader,
-                partitionTable,
-                application
               };
-            }
-            return null;
-          })
-          .filter((version): version is FirmwareVersion => version !== null);
+            });
+
+          return {
+            version: release.tag_name,
+            date: release.published_at,
+            prerelease: release.prerelease,
+            variants,
+          };
+        }).filter(version => version.variants.length > 0);
 
         setVersions(firmwareVersions);
         setLoading(false);
