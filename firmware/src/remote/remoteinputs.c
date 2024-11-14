@@ -18,6 +18,7 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
+#define SLEEP_DISRUPT_THRESHOLD 25
 
 // TODO - from SETTINGS
 #ifndef JOYSTICK_BUTTON_LEVEL
@@ -97,7 +98,7 @@ static void thumbstick_task(void *pvParameters) {
 #endif
 
   while (1) {
-    bool has_updated = false;
+    bool trigger_sleep_disrupt = false;
     int16_t deadband = calibration_settings.deadband;
     int16_t x_center = calibration_settings.x_center;
     int16_t y_center = calibration_settings.y_center;
@@ -115,7 +116,7 @@ static void thumbstick_task(void *pvParameters) {
 
     if (new_x != remote_data.data.js_x) {
       remote_data.data.js_x = new_x;
-      has_updated = true;
+      trigger_sleep_disrupt = true;
     }
 #endif
 
@@ -127,11 +128,11 @@ static void thumbstick_task(void *pvParameters) {
 
     if (new_y != remote_data.data.js_y) {
       remote_data.data.js_y = new_y;
-      has_updated = true;
+      trigger_sleep_disrupt = true;
     }
 #endif
 
-    if (has_updated) {
+    if (trigger_sleep_disrupt) {
       start_or_reset_deep_sleep_timer();
     }
 

@@ -27,15 +27,18 @@ typedef enum {
 } SwitchState;
 
 typedef struct {
-  float speed;
-  float dutyCycle;
+  float speed;       // kph
+  float maxSpeed;    // kph
+  uint8_t dutyCycle; // 0 to 100
   SpeedUnit speedUnit;
   TempUnit tempUnit;
   float batteryVoltage;
-  float batteryPercentage;
-  uint8_t signalStrength;
+  uint8_t batteryPercentage; // 0 to 100
+  uint8_t signalStrength;    // RSSI
   SwitchState switchState;
   ConnectionState connectionState;
+  float remoteBatteryVoltage;
+  uint8_t remoteBatteryPercentage; // 0 to 100
 } RemoteStats;
 
 extern RemoteStats remoteStats;

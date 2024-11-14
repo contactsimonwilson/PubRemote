@@ -465,7 +465,7 @@
                 "strtype": "ARC/Range",
                 "intarray": [
                   0,
-                  100
+                  40
                 ],
                 "InheritedType": 7
               },
@@ -678,7 +678,7 @@
                 "strtype": "ARC/Range",
                 "intarray": [
                   0,
-                  1
+                  100
                 ],
                 "InheritedType": 7
               },
@@ -16251,7 +16251,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 984,
+    "backup_cnt": 986,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",

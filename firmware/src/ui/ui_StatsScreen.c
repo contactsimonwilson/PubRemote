@@ -18,6 +18,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_width(ui_SpeedDial, lv_pct(100));
     lv_obj_set_height(ui_SpeedDial, lv_pct(100));
     lv_obj_set_align(ui_SpeedDial, LV_ALIGN_CENTER);
+    lv_arc_set_range(ui_SpeedDial, 0, 40);
     lv_arc_set_value(ui_SpeedDial, 0);
     lv_obj_set_style_arc_color(ui_SpeedDial, lv_color_hex(0x414141), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(ui_SpeedDial, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -31,7 +32,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_width(ui_UtilizationDial, lv_pct(100));
     lv_obj_set_height(ui_UtilizationDial, lv_pct(100));
     lv_obj_set_align(ui_UtilizationDial, LV_ALIGN_CENTER);
-    lv_arc_set_range(ui_UtilizationDial, 0, 1);
     lv_arc_set_value(ui_UtilizationDial, 0);
     lv_arc_set_mode(ui_UtilizationDial, LV_ARC_MODE_REVERSE);
     lv_obj_set_style_pad_left(ui_UtilizationDial, 20, LV_PART_MAIN | LV_STATE_DEFAULT);

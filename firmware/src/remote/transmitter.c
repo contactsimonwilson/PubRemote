@@ -17,7 +17,7 @@ static const char *TAG = "PUBREMOTE-TRANSMITTER";
 
 static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // This callback runs in WiFi task context!
-  ESP_LOGI(TAG, "SENT");
+  ESP_LOGD(TAG, "SENT");
 }
 
 // Function to send ESP-NOW data
@@ -52,7 +52,7 @@ static void transmitter_task(void *pvParameters) {
       }
 
       LAST_COMMAND_TIME = newTime;
-      ESP_LOGI(TAG, "Sent command");
+      ESP_LOGD(TAG, "Sent command");
     }
     vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
   }
