@@ -106,7 +106,7 @@ void start_or_reset_deep_sleep_timer() {
       .callback = deep_sleep_timer_callback, .arg = NULL, .dispatch_method = ESP_TIMER_TASK, .name = "DeepSleepTimer"};
   ESP_ERROR_CHECK(esp_timer_create(&deep_sleep_timer_args, &deep_sleep_timer));
   ESP_ERROR_CHECK(esp_timer_start_once(deep_sleep_timer, duration_ms * 1000));
-  ESP_LOGI(TAG, "Deep sleep timer started for %d ms", duration_ms);
+  ESP_LOGD(TAG, "Deep sleep timer started for %d ms", duration_ms);
 
   xSemaphoreGive(timer_mutex);
 }
