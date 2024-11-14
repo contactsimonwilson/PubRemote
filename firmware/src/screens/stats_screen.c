@@ -82,19 +82,19 @@ static void update_secondary_stat_display() {
 
 static void update_footpad_display() {
   switch (remoteStats.switchState) {
-  case 0:
+  case SWITCH_STATE_OFF:
     lv_arc_set_value(ui_LeftSensor, 0);
     lv_arc_set_value(ui_RightSensor, 0);
     break;
-  case 1:
+  case SWITCH_STATE_LEFT:
     lv_arc_set_value(ui_LeftSensor, 1);
     lv_arc_set_value(ui_RightSensor, 0);
     break;
-  case 2:
+  case SWITCH_STATE_RIGHT:
     lv_arc_set_value(ui_LeftSensor, 0);
     lv_arc_set_value(ui_RightSensor, 1);
     break;
-  case 3:
+  case SWITCH_STATE_BOTH:
     lv_arc_set_value(ui_LeftSensor, 1);
     lv_arc_set_value(ui_RightSensor, 1);
     break;
