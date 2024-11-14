@@ -97,8 +97,6 @@ static void thumbstick_task(void *pvParameters) {
 
 #endif
 
-  int16_t last_x_raw = 0;
-  int16_t last_y_raw = 0;
   while (1) {
     bool trigger_sleep_disrupt = false;
     int16_t deadband = calibration_settings.deadband;
@@ -116,11 +114,10 @@ static void thumbstick_task(void *pvParameters) {
     joystick_data.x = x_value;
     float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo);
 
-    if (abs(x_value - last_x_raw) > SLEEP_DISRUPT_THRESHOLD) {
-      last_x_raw = x_value;
+    if (new_x != remote_data.data.js_x) {
+      remote_data.data.js_x = new_x;
       trigger_sleep_disrupt = true;
     }
-    remote_data.data.js_x = new_x;
 #endif
 
 #if JOYSTICK_Y_ENABLED
@@ -129,11 +126,10 @@ static void thumbstick_task(void *pvParameters) {
     joystick_data.y = y_value;
     float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo);
 
-    if (abs(y_value - last_y_raw) > SLEEP_DISRUPT_THRESHOLD) {
-      last_y_raw = y_value;
+    if (new_y != remote_data.data.js_y) {
+      remote_data.data.js_y = new_y;
       trigger_sleep_disrupt = true;
     }
-    remote_data.data.js_y = new_y;
 #endif
 
     if (trigger_sleep_disrupt) {
