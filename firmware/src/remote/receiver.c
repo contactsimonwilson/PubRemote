@@ -17,8 +17,9 @@
 
 static const char *TAG = "PUBREMOTE-RECEIVER";
 
-#define TIMEOUT_DURATION_MS 30000     // 30 seconds
-#define RECONNECTING_DURATION_MS 1000 // 1 seconds
+#define TIMEOUT_DURATION_MS 30000
+#define RECONNECTING_DURATION_MS 1000
+#define RX_QUEUE_SIZE 1
 
 // Structure to hold ESP-NOW data
 typedef struct {
@@ -50,8 +51,17 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
   memcpy(evt.data, data, len);
   evt.len = len;
 
+#if RX_QUEUE_SIZE > 1
   // Send to queue for processing in application task
+  if (uxQueueSpacesAvailable() == 0) {
+    // reset the queue
+    xQueueReset(espnow_queue);
+  }
   if (xQueueSend(espnow_queue, &evt, portMAX_DELAY) != pdTRUE) {
+#else
+  // overwrite the previous data
+  if (xQueueOverwrite(espnow_queue, &evt) != pdTRUE) {
+#endif
     ESP_LOGE(TAG, "Queue send failed");
     free(evt.data);
   }
@@ -175,7 +185,7 @@ static void process_data(esp_now_event_t evt) {
 }
 
 static void receiver_task(void *pvParameters) {
-  espnow_queue = xQueueCreate(10, sizeof(esp_now_event_t));
+  espnow_queue = xQueueCreate(RX_QUEUE_SIZE, sizeof(esp_now_event_t));
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
   ESP_LOGI(TAG, "Registered RX callback");
 
