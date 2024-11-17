@@ -122,3 +122,15 @@ def menu_screen_loaded(event_struct):
 def settings_save(event_struct):
     return
 
+
+def temp_units_select_change(event_struct):
+    return
+
+
+def distance_units_select_change(event_struct):
+    return
+
+
+def theme_color_picker_change(event_struct):
+    return
+

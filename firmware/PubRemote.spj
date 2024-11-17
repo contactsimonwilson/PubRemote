@@ -7569,7 +7569,7 @@
                           {
                             "nid": 1363302350,
                             "strtype": "DROPDOWN/Options",
-                            "strval": "Disabled\\n2 minutes\\n5 minutes\\n10 minutes\\n",
+                            "strval": "Disabled\\n2 minutes\\n5 minutes\\n10 minutes",
                             "InheritedType": 10
                           },
                           {
@@ -7951,7 +7951,8 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER"
+                    "saved_objtypeKey": "CONTAINER",
+                    "tree_closed": true
                   },
                   {
                     "guid": "GUID6183281-826406S7713322",
@@ -8188,7 +8189,7 @@
                           {
                             "nid": 1363302350,
                             "strtype": "DROPDOWN/Options",
-                            "strval": "Celcius\\nFarenheit\\n",
+                            "strval": "Celcius\\nFarenheit",
                             "InheritedType": 10
                           },
                           {
@@ -8318,7 +8319,7 @@
                               {
                                 "nid": 1100306910,
                                 "strtype": "_event/name",
-                                "strval": "AutoOffSelectChange",
+                                "strval": "TempUnitsSelectChange",
                                 "InheritedType": 10
                               },
                               {
@@ -8359,7 +8360,7 @@
                                   {
                                     "nid": -1727936940,
                                     "strtype": "CALL FUNCTION/Function_name",
-                                    "strval": "auto_off_select_change",
+                                    "strval": "temp_units_select_change",
                                     "InheritedType": 10
                                   },
                                   {
@@ -8571,8 +8572,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID12135862-826409S534273322",
@@ -8939,7 +8939,7 @@
                               {
                                 "nid": 1100306910,
                                 "strtype": "_event/name",
-                                "strval": "AutoOffSelectChange",
+                                "strval": "DistanceUnitsSelectChange",
                                 "InheritedType": 10
                               },
                               {
@@ -8980,7 +8980,7 @@
                                   {
                                     "nid": -1727936940,
                                     "strtype": "CALL FUNCTION/Function_name",
-                                    "strval": "auto_off_select_change",
+                                    "strval": "distance_units_select_change",
                                     "InheritedType": 10
                                   },
                                   {
@@ -9192,8 +9192,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID19851876-826418S7563322",
@@ -9463,6 +9462,71 @@
                             "strtype": "COLORWHEEL/Fixed_mode",
                             "strval": "False",
                             "InheritedType": 2
+                          },
+                          {
+                            "disabled": false,
+                            "nid": 1000000,
+                            "strtype": "_event/EventHandler",
+                            "strval": "VALUE_CHANGED",
+                            "childs": [
+                              {
+                                "nid": 1000001,
+                                "strtype": "_event/name",
+                                "strval": "ThemeColorPickerChange",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1000002,
+                                "strtype": "_event/condition_C",
+                                "strval": "",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1000003,
+                                "strtype": "_event/condition_P",
+                                "strval": "",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1000004,
+                                "strtype": "_event/action",
+                                "strval": "CALL FUNCTION",
+                                "childs": [
+                                  {
+                                    "nid": 1000005,
+                                    "strtype": "CALL FUNCTION/Name",
+                                    "strval": "CALL FUNCTION",
+                                    "InheritedType": 10
+                                  },
+                                  {
+                                    "nid": 1000006,
+                                    "strtype": "CALL FUNCTION/Call",
+                                    "strval": "<{Function_name}>( event_struct )",
+                                    "InheritedType": 10
+                                  },
+                                  {
+                                    "nid": 1000007,
+                                    "strtype": "CALL FUNCTION/CallC",
+                                    "strval": "<{Function_name}>( e );",
+                                    "InheritedType": 10
+                                  },
+                                  {
+                                    "nid": 1000008,
+                                    "strtype": "CALL FUNCTION/Function_name",
+                                    "strval": "",
+                                    "InheritedType": 10
+                                  },
+                                  {
+                                    "nid": 1000009,
+                                    "strtype": "CALL FUNCTION/Dont_export_function",
+                                    "strval": "True",
+                                    "InheritedType": 2
+                                  }
+                                ],
+                                "InheritedType": 10
+                              }
+                            ],
+                            "InheritedType": 4
                           }
                         ],
                         "saved_objtypeKey": "COLORWHEEL"
@@ -16437,7 +16501,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1016,
+    "backup_cnt": 1019,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
@@ -16453,7 +16517,7 @@
     "drive_fatfs_path": "",
     "naming": "Name",
     "naming_force_lowercase": false,
-    "nidcnt": 0,
+    "nidcnt": 1000010,
     "BitDepth": 16,
     "Name": "SquareLine_Project"
   }

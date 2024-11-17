@@ -103,6 +103,7 @@ void ui_event_DistanceUnits(lv_event_t * e);
 extern lv_obj_t * ui_DistanceUnits;
 extern lv_obj_t * ui_ThemeColorBody;
 extern lv_obj_t * ui_ThemeColorLabel;
+void ui_event_ThemeColor(lv_event_t * e);
 extern lv_obj_t * ui_ThemeColor;
 extern lv_obj_t * ui_SettingsFooter;
 void ui_event_SettingsMainActionButton(lv_event_t * e);

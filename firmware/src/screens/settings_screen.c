@@ -1,4 +1,5 @@
 #include "esp_log.h"
+#include "utilities/theme_utils.h"
 #include <remote/display.h>
 #include <remote/settings.h>
 #include <ui/ui.h>
@@ -18,6 +19,16 @@ void settings_screen_loaded(lv_event_t *e) {
 
   // Auto off time
   lv_dropdown_set_selected(ui_AutoOffTime, device_settings.auto_off_time);
+
+  // Temp units
+  lv_dropdown_set_selected(ui_TempUnits, device_settings.temp_units);
+
+  // Distance units
+  lv_dropdown_set_selected(ui_DistanceUnits, device_settings.distance_units);
+
+  // Theme color
+  lv_color_t color = lv_color_hex(device_settings.theme_color);
+  lv_colorwheel_set_rgb(ui_ThemeColor, color);
 }
 
 void settings_screen_unloaded(lv_event_t *e) {
@@ -35,10 +46,23 @@ void auto_off_select_change(lv_event_t *e) {
   device_settings.auto_off_time = (uint8_t)(val & 0xFF);
 }
 
+void temp_units_select_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_TempUnits);
+  device_settings.temp_units = (uint8_t)(val & 0xFF);
+}
+
+void distance_units_select_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_DistanceUnits);
+  device_settings.distance_units = (uint8_t)(val & 0xFF);
+}
+
+void theme_color_picker_change(lv_event_t *e) {
+  lv_color_t val = lv_colorwheel_get_rgb(ui_ThemeColor);
+  device_settings.theme_color = lv_color_to32(val);
+  reload_theme();
+}
+
 void settings_save(lv_event_t *e) {
   // Brightness
-  save_bl_level();
-
-  // Auto off time
-  save_auto_off_time();
+  save_device_settings();
 }

@@ -107,7 +107,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_label_set_text(ui_PowerLabel, "Auto-off time");
 
     ui_AutoOffTime = lv_dropdown_create(ui_PowerBody);
-    lv_dropdown_set_options(ui_AutoOffTime, "Disabled\n2 minutes\n5 minutes\n10 minutes\n");
+    lv_dropdown_set_options(ui_AutoOffTime, "Disabled\n2 minutes\n5 minutes\n10 minutes");
     lv_obj_set_width(ui_AutoOffTime, lv_pct(100));
     lv_obj_set_height(ui_AutoOffTime, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_AutoOffTime, LV_ALIGN_CENTER);
@@ -150,7 +150,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_label_set_text(ui_TempUnitsLabel, "Temp units");
 
     ui_TempUnits = lv_dropdown_create(ui_TempUnitsBody);
-    lv_dropdown_set_options(ui_TempUnits, "Celcius\nFarenheit\n");
+    lv_dropdown_set_options(ui_TempUnits, "Celcius\nFarenheit");
     lv_obj_set_width(ui_TempUnits, lv_pct(100));
     lv_obj_set_height(ui_TempUnits, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_TempUnits, LV_ALIGN_CENTER);
@@ -277,6 +277,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_add_event_cb(ui_AutoOffTime, ui_event_AutoOffTime, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_TempUnits, ui_event_TempUnits, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_DistanceUnits, ui_event_DistanceUnits, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_ThemeColor, ui_event_ThemeColor, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsMainActionButton, ui_event_SettingsMainActionButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsScreen, ui_event_SettingsScreen, LV_EVENT_ALL, NULL);
 

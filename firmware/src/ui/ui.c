@@ -99,6 +99,7 @@ void ui_event_DistanceUnits(lv_event_t * e);
 lv_obj_t * ui_DistanceUnits;
 lv_obj_t * ui_ThemeColorBody;
 lv_obj_t * ui_ThemeColorLabel;
+void ui_event_ThemeColor(lv_event_t * e);
 lv_obj_t * ui_ThemeColor;
 lv_obj_t * ui_SettingsFooter;
 void ui_event_SettingsMainActionButton(lv_event_t * e);
@@ -333,7 +334,7 @@ void ui_event_TempUnits(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_VALUE_CHANGED) {
-        auto_off_select_change(e);
+        temp_units_select_change(e);
     }
 }
 
@@ -342,7 +343,16 @@ void ui_event_DistanceUnits(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_VALUE_CHANGED) {
-        auto_off_select_change(e);
+        distance_units_select_change(e);
+    }
+}
+
+void ui_event_ThemeColor(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        theme_color_picker_change(e);
     }
 }
 
