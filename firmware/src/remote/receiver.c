@@ -51,14 +51,13 @@ static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) 
   memcpy(evt.data, data, len);
   evt.len = len;
 
-#if QUEUE_SIZE > 1
+#if RX_QUEUE_SIZE > 1
   // Send to queue for processing in application task
   if (uxQueueSpacesAvailable() == 0) {
     // reset the queue
     xQueueReset(espnow_queue);
   }
   if (xQueueSend(espnow_queue, &evt, portMAX_DELAY) != pdTRUE) {
-
 #else
   // overwrite the previous data
   if (xQueueOverwrite(espnow_queue, &evt) != pdTRUE) {
