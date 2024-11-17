@@ -1,13 +1,10 @@
 ui_SplashScreen.c
 ui_StatsScreen.c
+ui_MenuScreen.c
 ui_SettingsScreen.c
-ui_BrightnessScreen.c
 ui_PairingScreen.c
-ui_PowerScreen.c
 ui_CalibrationScreen.c
 ui_AboutScreen.c
-ui_theme_manager.c
-ui_themes.c
 ui.c
 ui_comp_hook.c
 ui_helpers.c

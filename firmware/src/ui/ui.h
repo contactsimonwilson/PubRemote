@@ -14,8 +14,6 @@ extern "C" {
 
 #include "ui_helpers.h"
 #include "ui_events.h"
-#include "ui_theme_manager.h"
-#include "ui_themes.h"
 
 
 // SCREEN: ui_SplashScreen
@@ -55,51 +53,61 @@ extern lv_obj_t * ui_StatsFooter;
 extern lv_obj_t * ui_BatteryDisplay;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_MenuScreen
+void ui_MenuScreen_screen_init(void);
+void ui_event_MenuScreen(lv_event_t * e);
+extern lv_obj_t * ui_MenuScreen;
+extern lv_obj_t * ui_MenuContent;
+extern lv_obj_t * ui_MenuBody;
+void ui_event_MenuBackButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuBackButton;
+extern lv_obj_t * ui_MenuBackButtonLabel;
+void ui_event_MenuAboutButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuAboutButton;
+extern lv_obj_t * ui_MenuAboutButtonLabel;
+void ui_event_MenuSettingsButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuSettingsButton;
+extern lv_obj_t * ui_MenuSettingsButtonLabel;
+void ui_event_MenuCalibrateButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuCalibrateButton;
+extern lv_obj_t * ui_MenuCalibrateButtonLabel;
+void ui_event_MenuPairButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuPairButton;
+extern lv_obj_t * ui_MenuPairButtonLabel;
+void ui_event_MenuShutdownButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuShutdownButton;
+extern lv_obj_t * ui_MenuShutdownButtonLabel;
+// CUSTOM VARIABLES
+
 // SCREEN: ui_SettingsScreen
 void ui_SettingsScreen_screen_init(void);
 void ui_event_SettingsScreen(lv_event_t * e);
 extern lv_obj_t * ui_SettingsScreen;
-extern lv_obj_t * ui_Content;
+extern lv_obj_t * ui_SettingsContent;
 extern lv_obj_t * ui_SettingsBody;
-void ui_event_SettingsBackButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsBackButton;
-extern lv_obj_t * ui_SettingsBackButtonLabel;
-void ui_event_SettingsAboutButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsAboutButton;
-extern lv_obj_t * ui_SettingsAboutButtonLabel;
-extern lv_obj_t * ui_SettingsCategoryLabel;
-void ui_event_SettingsBrightnessButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsBrightnessButton;
-extern lv_obj_t * ui_SettingsBrightnessButtonLabel;
-void ui_event_SettingsPowerButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsPowerButton;
-extern lv_obj_t * ui_SettingsPowerButtonLabel;
-void ui_event_SettingsCalibrateButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsCalibrateButton;
-extern lv_obj_t * ui_SettingsCalibrateButtonLabel;
-extern lv_obj_t * ui_ActionsCategoryLabel;
-void ui_event_SettingsPairButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsPairButton;
-extern lv_obj_t * ui_SettingsPairButtonLabel;
-void ui_event_SettingsShutdownButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsShutdownButton;
-extern lv_obj_t * ui_SettingsShutdownButtonLabel;
-// CUSTOM VARIABLES
-
-// SCREEN: ui_BrightnessScreen
-void ui_BrightnessScreen_screen_init(void);
-void ui_event_BrightnessScreen(lv_event_t * e);
-extern lv_obj_t * ui_BrightnessScreen;
-extern lv_obj_t * ui_BrightnessContent;
-extern lv_obj_t * ui_BrightnessHeader;
 extern lv_obj_t * ui_BrightnessBody;
+extern lv_obj_t * ui_BrightnessLabel;
 void ui_event_BrightnessSlider(lv_event_t * e);
 extern lv_obj_t * ui_BrightnessSlider;
-extern lv_obj_t * ui_BrightnessLabel;
-extern lv_obj_t * ui_BrightnessFooter;
-void ui_event_BrightnessMainActionButton(lv_event_t * e);
-extern lv_obj_t * ui_BrightnessMainActionButton;
-extern lv_obj_t * ui_BrightnessMainActionButtonLabel;
+extern lv_obj_t * ui_PowerBody;
+extern lv_obj_t * ui_PowerLabel;
+void ui_event_AutoOffTime(lv_event_t * e);
+extern lv_obj_t * ui_AutoOffTime;
+extern lv_obj_t * ui_TempUnitsBody;
+extern lv_obj_t * ui_TempUnitsLabel;
+void ui_event_TempUnits(lv_event_t * e);
+extern lv_obj_t * ui_TempUnits;
+extern lv_obj_t * ui_DistanceUnitsBody;
+extern lv_obj_t * ui_DistanceUnitsLabel;
+void ui_event_DistanceUnits(lv_event_t * e);
+extern lv_obj_t * ui_DistanceUnits;
+extern lv_obj_t * ui_ThemeColorBody;
+extern lv_obj_t * ui_ThemeColorLabel;
+extern lv_obj_t * ui_ThemeColor;
+extern lv_obj_t * ui_SettingsFooter;
+void ui_event_SettingsMainActionButton(lv_event_t * e);
+extern lv_obj_t * ui_SettingsMainActionButton;
+extern lv_obj_t * ui_SettingsMainActionButtonLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_PairingScreen
@@ -115,22 +123,6 @@ extern lv_obj_t * ui_PairingFooter;
 void ui_event_PairingMainActionButton(lv_event_t * e);
 extern lv_obj_t * ui_PairingMainActionButton;
 extern lv_obj_t * ui_PairingMainActionButtonLabel;
-// CUSTOM VARIABLES
-
-// SCREEN: ui_PowerScreen
-void ui_PowerScreen_screen_init(void);
-void ui_event_PowerScreen(lv_event_t * e);
-extern lv_obj_t * ui_PowerScreen;
-extern lv_obj_t * ui_PowerContent;
-extern lv_obj_t * ui_PowerHeader;
-extern lv_obj_t * ui_PowerBody;
-void ui_event_AutoOffTime(lv_event_t * e);
-extern lv_obj_t * ui_AutoOffTime;
-extern lv_obj_t * ui_PowerLabel;
-extern lv_obj_t * ui_PowerFooter;
-void ui_event_PowerMainActionButton(lv_event_t * e);
-extern lv_obj_t * ui_PowerMainActionButton;
-extern lv_obj_t * ui_PowerMainActionButtonLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_CalibrationScreen

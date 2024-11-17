@@ -110,3 +110,15 @@ def about_screen_unloaded(event_struct):
 def about_screen_loaded(event_struct):
     return
 
+
+def menu_screen_unloaded(event_struct):
+    return
+
+
+def menu_screen_loaded(event_struct):
+    return
+
+
+def settings_save(event_struct):
+    return
+

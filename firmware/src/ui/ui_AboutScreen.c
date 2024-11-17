@@ -9,10 +9,8 @@ void ui_AboutScreen_screen_init(void)
 {
     ui_AboutScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_AboutScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    ui_object_set_themeable_style_property(ui_AboutScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_COLOR,
-                                           _ui_theme_color_Background);
-    ui_object_set_themeable_style_property(ui_AboutScreen, LV_PART_MAIN | LV_STATE_DEFAULT, LV_STYLE_BG_OPA,
-                                           _ui_theme_alpha_Background);
+    lv_obj_set_style_bg_color(ui_AboutScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_AboutScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_AboutContent = lv_obj_create(ui_AboutScreen);
     lv_obj_remove_style_all(ui_AboutContent);
