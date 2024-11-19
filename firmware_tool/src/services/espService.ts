@@ -241,7 +241,7 @@ export class ESPService {
     bootloader: File;
     partitionTable: File;
     application: File;
-  }): Promise<void> {
+  }, eraseFlash: boolean = true): Promise<void> {
     if (!this.espLoader) {
       throw new Error("Not connected to device");
     }
@@ -253,8 +253,11 @@ export class ESPService {
       this.log("Rebooting into bootloader...");
       await this.espLoader.main();
       await this.espLoader.sync();
-      this.log("Erasing flash...");
-      await this.espLoader.eraseFlash();
+      
+      if (eraseFlash) {
+        this.log("Erasing flash...");
+        await this.espLoader.eraseFlash();
+      }
 
       const files = [
         {
