@@ -5,9 +5,11 @@ import { CheckCircle, AlertCircle, Loader2, CircleDot } from 'lucide-react';
 interface Props {
   progress: FlashProgressType;
   isDeviceConnected?: boolean;
+  eraseFlash: boolean;
+  onEraseFlashChange: (value: boolean) => void;
 }
 
-export function FlashProgress({ progress, isDeviceConnected = false }: Props) {
+export function FlashProgress({ progress, isDeviceConnected = false, eraseFlash, onEraseFlashChange }: Props) {
   const getStatusIcon = () => {
     switch (progress.status) {
       case 'idle':
@@ -48,11 +50,23 @@ export function FlashProgress({ progress, isDeviceConnected = false }: Props) {
 
   return (
     <div className="space-y-4 rounded-lg bg-gray-800/50 p-4">
-      <div className="flex items-center gap-3">
-        {getStatusIcon()}
-        <span className="text-sm font-medium text-gray-200">
-          {getStatusText()}
-        </span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {getStatusIcon()}
+          <span className="text-sm font-medium text-gray-200">
+            {getStatusText()}
+          </span>
+        </div>
+        <label className="flex items-center gap-2 text-sm text-gray-300">
+          <input
+            type="checkbox"
+            checked={eraseFlash}
+            onChange={(e) => onEraseFlashChange(e.target.checked)}
+            disabled={progress.status !== 'idle'}
+            className="rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900"
+          />
+          Erase flash
+        </label>
       </div>
 
       {progress.status !== 'idle' &&

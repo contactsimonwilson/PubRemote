@@ -21,6 +21,7 @@ function App() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfoData>({
     connected: false,
   });
+  const [eraseFlash, setEraseFlash] = useState<boolean>(false);
 
   const handleConnect = async () => {
     try {
@@ -59,10 +60,12 @@ function App() {
         await handleConnect();
       }
 
-      setFlashProgress({ status: 'erasing', progress: 20 });
+      if (eraseFlash) {
+        setFlashProgress({ status: 'erasing', progress: 20 });
+      }
       setFlashProgress({ status: 'flashing', progress: 50 });
 
-      await espService.flash(selectedFirmware);
+      await espService.flash(selectedFirmware, eraseFlash);
 
       setFlashProgress({ status: 'complete', progress: 100 });
       handleDisconnect();
@@ -103,6 +106,8 @@ function App() {
               <FlashProgress
                 progress={flashProgress}
                 isDeviceConnected={deviceInfo.connected}
+                eraseFlash={eraseFlash}
+                onEraseFlashChange={setEraseFlash}
               />
 
               <button
