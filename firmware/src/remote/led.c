@@ -6,6 +6,7 @@
 #include "esp_wifi.h"
 #include "led_strip.h"
 #include "nvs_flash.h"
+#include "settings.h"
 #include <driver/ledc.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
@@ -76,13 +77,20 @@ static void led_off() {
 }
 
 static void led_task(void *pvParameters) {
-  RGB base_color = {255, 105, 180};
+  RGB rgb = {255, 255, 255};
   uint8_t brightness = 0;
   bool increasing = true;
 
   ESP_LOGD(TAG, "Start blinking LED strip");
   while (1) {
-    RGB new_col = adjustBrightness(base_color, brightness / 255.0);
+    if (brightness == 0) {
+      uint32_t color = device_settings.theme_color;
+      rgb.r = (color >> 16) & 0xff;
+      rgb.g = (color >> 8) & 0xff;
+      rgb.b = color & 0xff;
+    }
+
+    RGB new_col = adjustBrightness(rgb, brightness / 255.0);
 
     for (int i = 0; i < LED_COUNT; i++) {
       ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, new_col.r, new_col.g, new_col.b));

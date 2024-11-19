@@ -12,7 +12,8 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 #define BL_LEVEL_KEY "bl_level"
 #define BL_LEVEL_DEFAULT 200
 #define AUTO_OFF_TIME_KEY "auto_off_time"
-#define EXPO_ADJUST_FACTOR 100
+#define EXPO_ADJUST_FACTOR 100 // Stored as 2dp int
+#define THEME_COLOR_DEFAULT 0x2095f6
 
 static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -22,7 +23,7 @@ DeviceSettings device_settings = {
     .auto_off_time = DEFAULT_AUTO_OFF_TIME,
     .temp_units = TEMP_UNITS_CELSIUS,
     .distance_units = DISTANCE_UNITS_METRIC,
-    .theme_color = 0x00FF00FF,
+    .theme_color = THEME_COLOR_DEFAULT,
 };
 
 CalibrationSettings calibration_settings = {
@@ -140,8 +141,9 @@ esp_err_t init_settings() {
                                        ? device_settings.distance_units
                                        : DISTANCE_UNITS_METRIC;
 
-  device_settings.theme_color =
-      nvs_read_int("theme_color", &device_settings.theme_color) == ESP_OK ? device_settings.theme_color : 0x00FF00FF;
+  device_settings.theme_color = nvs_read_int("theme_color", &device_settings.theme_color) == ESP_OK
+                                    ? device_settings.theme_color
+                                    : THEME_COLOR_DEFAULT;
 
   // Reading calibration settings
   calibration_settings.x_min =
