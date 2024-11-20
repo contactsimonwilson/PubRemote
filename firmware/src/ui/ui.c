@@ -80,27 +80,33 @@ void ui_SettingsScreen_screen_init(void);
 void ui_event_SettingsScreen(lv_event_t * e);
 lv_obj_t * ui_SettingsScreen;
 lv_obj_t * ui_SettingsContent;
+lv_obj_t * ui_SettingsHeader;
+lv_obj_t * ui_Selection1;
+lv_obj_t * ui_Selection2;
+lv_obj_t * ui_Selection3;
+lv_obj_t * ui_Selection4;
+lv_obj_t * ui_Selection5;
 lv_obj_t * ui_SettingsBody;
 lv_obj_t * ui_BrightnessBody;
-lv_obj_t * ui_BrightnessLabel;
 void ui_event_BrightnessSlider(lv_event_t * e);
 lv_obj_t * ui_BrightnessSlider;
+lv_obj_t * ui_BrightnessLabel;
 lv_obj_t * ui_PowerBody;
-lv_obj_t * ui_PowerLabel;
 void ui_event_AutoOffTime(lv_event_t * e);
 lv_obj_t * ui_AutoOffTime;
+lv_obj_t * ui_PowerLabel;
 lv_obj_t * ui_TempUnitsBody;
-lv_obj_t * ui_TempUnitsLabel;
 void ui_event_TempUnits(lv_event_t * e);
 lv_obj_t * ui_TempUnits;
+lv_obj_t * ui_TempUnitsLabel;
 lv_obj_t * ui_DistanceUnitsBody;
-lv_obj_t * ui_DistanceUnitsLabel;
 void ui_event_DistanceUnits(lv_event_t * e);
 lv_obj_t * ui_DistanceUnits;
+lv_obj_t * ui_DistanceUnitsLabel;
 lv_obj_t * ui_ThemeColorBody;
-lv_obj_t * ui_ThemeColorLabel;
 void ui_event_ThemeColor(lv_event_t * e);
 lv_obj_t * ui_ThemeColor;
+lv_obj_t * ui_ThemeColorLabel;
 lv_obj_t * ui_SettingsFooter;
 void ui_event_SettingsMainActionButton(lv_event_t * e);
 lv_obj_t * ui_SettingsMainActionButton;
@@ -159,7 +165,10 @@ void ui_event_AboutScreen(lv_event_t * e);
 lv_obj_t * ui_AboutScreen;
 lv_obj_t * ui_AboutContent;
 lv_obj_t * ui_AboutBody;
-lv_obj_t * ui_AboutBodyLabel;
+lv_obj_t * ui_VersionInfoHeaderLabel;
+lv_obj_t * ui_VersionInfoLabel;
+lv_obj_t * ui_DebugInfoHeaderLabel;
+lv_obj_t * ui_DebugInfoLabel;
 lv_obj_t * ui_AboutFooter;
 void ui_event_AboutMainActionButton(lv_event_t * e);
 lv_obj_t * ui_AboutMainActionButton;
@@ -309,6 +318,9 @@ void ui_event_SettingsScreen(lv_event_t * e)
     if(event_code == LV_EVENT_SCREEN_UNLOADED) {
         settings_screen_unloaded(e);
     }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        settings_screen_load_start(e);
+    }
 }
 
 void ui_event_BrightnessSlider(lv_event_t * e)
@@ -436,6 +448,9 @@ void ui_event_AboutScreen(lv_event_t * e)
     }
     if(event_code == LV_EVENT_SCREEN_UNLOADED) {
         about_screen_unloaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        about_screen_load_start(e);
     }
 }
 

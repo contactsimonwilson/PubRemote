@@ -12,8 +12,8 @@ bool is_settings_screen_active() {
 }
 
 // Event handlers
-void settings_screen_loaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Settings screen loaded");
+void settings_screen_load_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Settings screen load start");
   // Brightness
   lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
 
@@ -29,6 +29,10 @@ void settings_screen_loaded(lv_event_t *e) {
   // Theme color
   lv_color_t color = lv_color_hex(device_settings.theme_color);
   lv_colorwheel_set_rgb(ui_ThemeColor, color);
+}
+
+void settings_screen_loaded(lv_event_t *e) {
+  ESP_LOGI(TAG, "Settings screen loaded");
 }
 
 void settings_screen_unloaded(lv_event_t *e) {

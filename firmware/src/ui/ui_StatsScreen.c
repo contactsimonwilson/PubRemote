@@ -15,8 +15,6 @@ void ui_StatsScreen_screen_init(void)
     ui_SpeedDial = lv_arc_create(ui_StatsScreen);
     lv_obj_set_width(ui_SpeedDial, lv_pct(100));
     lv_obj_set_height(ui_SpeedDial, lv_pct(100));
-    lv_obj_set_x(ui_SpeedDial, lv_pct(1));
-    lv_obj_set_y(ui_SpeedDial, lv_pct(0));
     lv_obj_set_align(ui_SpeedDial, LV_ALIGN_CENTER);
     lv_arc_set_range(ui_SpeedDial, 0, 40);
     lv_arc_set_value(ui_SpeedDial, 0);
@@ -124,7 +122,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_BatteryIndicatorContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_BatteryIndicatorContainer, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_BatteryIndicatorContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
-    lv_obj_add_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_BatteryTip = lv_obj_create(ui_BatteryIndicatorContainer);
@@ -160,7 +157,7 @@ void ui_StatsScreen_screen_init(void)
 
     ui_RSSIContainer = lv_obj_create(ui_StatsHeaderIndicatorContainer);
     lv_obj_remove_style_all(ui_RSSIContainer);
-    lv_obj_set_width(ui_RSSIContainer, 24);
+    lv_obj_set_width(ui_RSSIContainer, 22);
     lv_obj_set_height(ui_RSSIContainer, 14);
     lv_obj_set_align(ui_RSSIContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_RSSIContainer, LV_FLEX_FLOW_ROW);
@@ -170,7 +167,7 @@ void ui_StatsScreen_screen_init(void)
 
     ui_RSSI1 = lv_obj_create(ui_RSSIContainer);
     lv_obj_remove_style_all(ui_RSSI1);
-    lv_obj_set_width(ui_RSSI1, 6);
+    lv_obj_set_width(ui_RSSI1, 5);
     lv_obj_set_height(ui_RSSI1, 6);
     lv_obj_set_align(ui_RSSI1, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_RSSI1, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -179,7 +176,7 @@ void ui_StatsScreen_screen_init(void)
 
     ui_RSSI2 = lv_obj_create(ui_RSSIContainer);
     lv_obj_remove_style_all(ui_RSSI2);
-    lv_obj_set_width(ui_RSSI2, 6);
+    lv_obj_set_width(ui_RSSI2, 5);
     lv_obj_set_height(ui_RSSI2, 10);
     lv_obj_set_align(ui_RSSI2, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_RSSI2, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -188,7 +185,7 @@ void ui_StatsScreen_screen_init(void)
 
     ui_RSSI3 = lv_obj_create(ui_RSSIContainer);
     lv_obj_remove_style_all(ui_RSSI3);
-    lv_obj_set_width(ui_RSSI3, 6);
+    lv_obj_set_width(ui_RSSI3, 5);
     lv_obj_set_height(ui_RSSI3, 14);
     lv_obj_set_align(ui_RSSI3, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_RSSI3, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags

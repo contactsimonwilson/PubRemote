@@ -1,4 +1,7 @@
 #include "esp_log.h"
+#include "remote/display.h"
+#include <remote/stats.h>
+#include <stdio.h>
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-ABOUT_SCREEN";
@@ -9,6 +12,24 @@ bool is_about_screen_active() {
 }
 
 // Event handlers
+void about_screen_load_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "About screen load start");
+  LVGL_lock(-1);
+
+  // set the version number
+  char *formattedString;
+  asprintf(&formattedString, "Version: %d.%d.%d\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
+           BUILD_TYPE, BUILD_ID);
+
+  lv_label_set_text(ui_VersionInfoLabel, formattedString);
+
+  asprintf(&formattedString, "Battery: %.2fV", remoteStats.batteryVoltage);
+  lv_label_set_text(ui_DebugInfoLabel, formattedString);
+  LVGL_unlock();
+
+  free(formattedString);
+}
+
 void about_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen loaded");
 }

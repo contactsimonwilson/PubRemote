@@ -134,3 +134,11 @@ def distance_units_select_change(event_struct):
 def theme_color_picker_change(event_struct):
     return
 
+
+def settings_screen_load_start(event_struct):
+    return
+
+
+def about_screen_load_start(event_struct):
+    return
+

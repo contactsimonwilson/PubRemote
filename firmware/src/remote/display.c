@@ -423,15 +423,14 @@ void init_display(void) {
 
   ESP_LOGI(TAG, "Display UI");
   // Lock the mutex due to the LVGL APIs are not thread-safe
-  if (LVGL_lock(-1)) {
-    ui_init();
-    reload_theme();
-    apply_ui_scale();
-    // Release the mutex
-    LVGL_unlock();
+  LVGL_lock(-1);
+  ui_init();
+  reload_theme();
+  apply_ui_scale();
+  // Release the mutex
+  LVGL_unlock();
 
-    // Delay backlight turn on to avoid flickering
-    vTaskDelay(pdMS_TO_TICKS(200));
-    set_bl_level(device_settings.bl_level);
-  }
+  // Delay backlight turn on to avoid flickering
+  vTaskDelay(pdMS_TO_TICKS(200));
+  set_bl_level(device_settings.bl_level);
 }
