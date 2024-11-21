@@ -97,10 +97,10 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_scroll_dir(ui_SettingsBody, LV_DIR_HOR);
     lv_obj_set_style_pad_left(ui_SettingsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_SettingsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_SettingsBody, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_SettingsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_SettingsBody, 30, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_row(ui_SettingsBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_SettingsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_SettingsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_SettingsBody, 80, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BrightnessBody = lv_obj_create(ui_SettingsBody);
     lv_obj_remove_style_all(ui_BrightnessBody);
@@ -263,8 +263,8 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_style_pad_column(ui_ThemeColorBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ThemeColor = lv_colorwheel_create(ui_ThemeColorBody, true);
-    lv_obj_set_width(ui_ThemeColor, 65);
-    lv_obj_set_height(ui_ThemeColor, 65);
+    lv_obj_set_width(ui_ThemeColor, 75);
+    lv_obj_set_height(ui_ThemeColor, 75);
     lv_obj_set_align(ui_ThemeColor, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_ThemeColor, LV_OBJ_FLAG_GESTURE_BUBBLE);      /// Flags
 

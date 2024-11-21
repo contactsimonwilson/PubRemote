@@ -1,4 +1,5 @@
 #include "esp_log.h"
+#include "utilities/number_utils.h"
 #include "utilities/theme_utils.h"
 #include <remote/display.h>
 #include <remote/settings.h>
@@ -11,9 +12,35 @@ bool is_settings_screen_active() {
   return active_screen == ui_SettingsScreen;
 }
 
+static void scroll_event_cb(lv_event_t *e) {
+  lv_obj_t *cont = lv_event_get_target(e);
+  uint8_t total_items = lv_obj_get_child_cnt(cont);
+
+  lv_coord_t visible_height = lv_obj_get_width(cont);
+  lv_coord_t scroll_x = lv_obj_get_scroll_x(cont);
+  uint32_t page_index = (scroll_x + (visible_height / 2)) / visible_height;
+
+  // Ensure we don't exceed total items
+  uint8_t current_page = clampu8((uint8_t)page_index, 0, total_items - 1);
+
+  LVGL_lock(-1);
+  for (uint8_t i = 0; i < total_items; i++) {
+    // get scroll indicator
+    lv_obj_t *indicator = lv_obj_get_child(ui_SettingsHeader, i);
+    lv_obj_set_style_bg_opa(indicator, i == current_page ? 255 : 100, LV_PART_MAIN);
+  }
+  LVGL_unlock();
+}
+
 // Event handlers
 void settings_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen load start");
+  LVGL_lock(-1);
+  // Set the scroll snap
+  lv_obj_set_scroll_snap_x(ui_SettingsBody, LV_SCROLL_SNAP_CENTER);
+  lv_obj_add_event_cb(ui_SettingsBody, scroll_event_cb, LV_EVENT_SCROLL, NULL);
+  // lv_obj_scroll_to_x(ui_SettingsBody, 0, LV_ANIM_OFF);
+
   // Brightness
   lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
 
@@ -29,6 +56,7 @@ void settings_screen_load_start(lv_event_t *e) {
   // Theme color
   lv_color_t color = lv_color_hex(device_settings.theme_color);
   lv_colorwheel_set_rgb(ui_ThemeColor, color);
+  LVGL_unlock();
 }
 
 void settings_screen_loaded(lv_event_t *e) {
@@ -37,6 +65,7 @@ void settings_screen_loaded(lv_event_t *e) {
 
 void settings_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen unloaded");
+  lv_obj_remove_event_cb(ui_SettingsBody, scroll_event_cb);
 }
 
 void brightness_slider_change(lv_event_t *e) {
