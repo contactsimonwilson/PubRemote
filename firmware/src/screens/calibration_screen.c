@@ -280,7 +280,7 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
   else if (calibration_step >= CALIBRATION_STEP_DONE) {
     calibration_settings = calibration_data;
     save_calibration();
-    _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_SettingsScreen_screen_init);
+    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MenuScreen_screen_init);
     return;
   }
 

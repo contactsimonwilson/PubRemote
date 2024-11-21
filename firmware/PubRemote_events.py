@@ -110,3 +110,35 @@ def about_screen_unloaded(event_struct):
 def about_screen_loaded(event_struct):
     return
 
+
+def menu_screen_unloaded(event_struct):
+    return
+
+
+def menu_screen_loaded(event_struct):
+    return
+
+
+def settings_save(event_struct):
+    return
+
+
+def temp_units_select_change(event_struct):
+    return
+
+
+def distance_units_select_change(event_struct):
+    return
+
+
+def theme_color_picker_change(event_struct):
+    return
+
+
+def settings_screen_load_start(event_struct):
+    return
+
+
+def about_screen_load_start(event_struct):
+    return
+

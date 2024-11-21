@@ -18,6 +18,7 @@
 #include "settings.h"
 #include "ui/ui.h"
 #include "utilities/screen_utils.h"
+#include "utilities/theme_utils.h"
 #include <stdio.h>
 
 // https://github.com/espressif/esp-idf/blob/master/examples/peripherals/lcd/spi_lcd_touch/main/spi_lcd_touch_example_main.c
@@ -422,14 +423,14 @@ void init_display(void) {
 
   ESP_LOGI(TAG, "Display UI");
   // Lock the mutex due to the LVGL APIs are not thread-safe
-  if (LVGL_lock(-1)) {
-    ui_init();
-    apply_ui_scale();
-    // Release the mutex
-    LVGL_unlock();
+  LVGL_lock(-1);
+  ui_init();
+  reload_theme();
+  apply_ui_scale();
+  // Release the mutex
+  LVGL_unlock();
 
-    // Delay backlight turn on to avoid flickering
-    vTaskDelay(pdMS_TO_TICKS(200));
-    set_bl_level(device_settings.bl_level);
-  }
+  // Delay backlight turn on to avoid flickering
+  vTaskDelay(pdMS_TO_TICKS(200));
+  set_bl_level(device_settings.bl_level);
 }

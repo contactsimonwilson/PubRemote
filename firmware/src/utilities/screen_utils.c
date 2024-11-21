@@ -217,9 +217,8 @@ void apply_ui_scale() {
 
   process_children_recursive(ui_SplashScreen, scale_element);
   process_children_recursive(ui_StatsScreen, scale_element);
+  process_children_recursive(ui_MenuScreen, scale_element);
   process_children_recursive(ui_SettingsScreen, scale_element);
-  process_children_recursive(ui_BrightnessScreen, scale_element);
-  process_children_recursive(ui_PowerScreen, scale_element);
   process_children_recursive(ui_CalibrationScreen, scale_element);
   process_children_recursive(ui_PairingScreen, scale_element);
   process_children_recursive(ui_AboutScreen, scale_element);

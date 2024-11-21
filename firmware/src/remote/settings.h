@@ -13,10 +13,10 @@ esp_err_t init_nvs();
 esp_err_t init_settings();
 
 // Function to write an integer to NVS
-esp_err_t nvs_write_int(const char *key, int32_t value);
+esp_err_t nvs_write_int(const char *key, uint32_t value);
 
 // Function to read an integer from NVS
-esp_err_t nvs_read_int(const char *key, int32_t *value);
+esp_err_t nvs_read_int(const char *key, uint32_t *value);
 
 // Function to write a byte array to NVS
 esp_err_t nvs_write_blob(const char *key, void *value, size_t length);
@@ -24,9 +24,7 @@ esp_err_t nvs_write_blob(const char *key, void *value, size_t length);
 // Function to read a byte array from NVS
 esp_err_t nvs_read_blob(const char *key, void *value, size_t length);
 
-void save_bl_level();
-
-void save_auto_off_time();
+void save_device_settings();
 
 void save_calibration();
 
@@ -39,9 +37,19 @@ typedef enum {
   AUTO_OFF_10_MINUTES,
 } AutoOffOptions;
 
+typedef enum {
+  TEMP_UNITS_CELSIUS,
+  TEMP_UNITS_FAHRENHEIT,
+} TempUnits;
+
+typedef enum {
+  DISTANCE_UNITS_METRIC,
+  DISTANCE_UNITS_IMPERIAL,
+} DistanceUnits;
+
 typedef struct {
   PairingState state;
-  int32_t secret_code;
+  uint32_t secret_code;
   uint8_t remote_addr[6];
 } PairingSettings;
 
@@ -59,6 +67,9 @@ typedef struct {
 typedef struct {
   uint8_t bl_level;
   AutoOffOptions auto_off_time;
+  uint8_t temp_units;
+  uint8_t distance_units;
+  uint32_t theme_color;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();

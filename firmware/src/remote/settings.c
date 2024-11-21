@@ -12,7 +12,8 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 #define BL_LEVEL_KEY "bl_level"
 #define BL_LEVEL_DEFAULT 200
 #define AUTO_OFF_TIME_KEY "auto_off_time"
-#define EXPO_ADJUST_FACTOR 100
+#define EXPO_ADJUST_FACTOR 100 // Stored as 2dp int
+#define THEME_COLOR_DEFAULT 0x2095f6
 
 static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -20,6 +21,9 @@ static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 DeviceSettings device_settings = {
     .bl_level = BL_LEVEL_DEFAULT,
     .auto_off_time = DEFAULT_AUTO_OFF_TIME,
+    .temp_units = TEMP_UNITS_CELSIUS,
+    .distance_units = DISTANCE_UNITS_METRIC,
+    .theme_color = THEME_COLOR_DEFAULT,
 };
 
 CalibrationSettings calibration_settings = {
@@ -58,12 +62,12 @@ uint64_t get_auto_off_ms() {
   return get_auto_off_time_minutes() * 60 * 1000;
 }
 
-void save_bl_level() {
+void save_device_settings() {
   nvs_write_int(BL_LEVEL_KEY, device_settings.bl_level);
-}
-
-void save_auto_off_time() {
   nvs_write_int(AUTO_OFF_TIME_KEY, device_settings.auto_off_time);
+  nvs_write_int("temp_units", device_settings.temp_units);
+  nvs_write_int("distance_units", device_settings.distance_units);
+  nvs_write_int("theme_color", device_settings.theme_color);
 }
 
 esp_err_t save_pairing_data() {
@@ -128,6 +132,18 @@ esp_err_t init_settings() {
   device_settings.auto_off_time = nvs_read_int("auto_off_time", &device_settings.auto_off_time) == ESP_OK
                                       ? device_settings.auto_off_time
                                       : DEFAULT_AUTO_OFF_TIME;
+
+  device_settings.temp_units = nvs_read_int("temp_units", &device_settings.temp_units) == ESP_OK
+                                   ? device_settings.temp_units
+                                   : TEMP_UNITS_CELSIUS;
+
+  device_settings.distance_units = nvs_read_int("distance_units", &device_settings.distance_units) == ESP_OK
+                                       ? device_settings.distance_units
+                                       : DISTANCE_UNITS_METRIC;
+
+  device_settings.theme_color = nvs_read_int("theme_color", &device_settings.theme_color) == ESP_OK
+                                    ? device_settings.theme_color
+                                    : THEME_COLOR_DEFAULT;
 
   // Reading calibration settings
   calibration_settings.x_min =
@@ -240,7 +256,7 @@ static esp_err_t nvs_write(const char *key, void *value, nvs_type_t type, size_t
 }
 
 // Function to read from NVS
-static esp_err_t nvs_read(const char *key, int32_t *value, nvs_type_t type, size_t length) {
+static esp_err_t nvs_read(const char *key, void *value, nvs_type_t type, size_t length) {
   nvs_handle_t nvs_handle;
   esp_err_t err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &nvs_handle);
   if (err != ESP_OK) {
@@ -328,7 +344,7 @@ static esp_err_t nvs_read(const char *key, int32_t *value, nvs_type_t type, size
 
   switch (err) {
   case ESP_OK:
-    ESP_LOGI(TAG, "Read done, value = %ld", *value);
+    ESP_LOGI(TAG, "Read done");
     break;
   case ESP_ERR_NVS_NOT_FOUND:
     ESP_LOGE(TAG, "The value is not initialized yet!");
@@ -342,8 +358,8 @@ static esp_err_t nvs_read(const char *key, int32_t *value, nvs_type_t type, size
 }
 
 // Function to write an integer to NVS
-esp_err_t nvs_write_int(const char *key, int32_t value) {
-  return nvs_write(key, &value, NVS_TYPE_I32, 0);
+esp_err_t nvs_write_int(const char *key, uint32_t value) {
+  return nvs_write(key, &value, NVS_TYPE_U32, 0);
 }
 
 // Function to write a blob to NVS
@@ -352,8 +368,8 @@ esp_err_t nvs_write_blob(const char *key, void *value, size_t length) {
 }
 
 // Function to read an integer from NVS
-esp_err_t nvs_read_int(const char *key, int32_t *value) {
-  return nvs_read(key, value, NVS_TYPE_I32, 0);
+esp_err_t nvs_read_int(const char *key, uint32_t *value) {
+  return nvs_read(key, value, NVS_TYPE_U32, 0);
 }
 
 // Function to read a blob from NVS

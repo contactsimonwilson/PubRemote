@@ -2,7 +2,9 @@
 #include "esp_log.h"
 #include "remote/display.h"
 #include <core/lv_event.h>
+#include <remote/settings.h>
 #include <remote/stats.h>
+#include <utilities/conversion_utils.h>
 
 static const char *TAG = "PUBREMOTE-STATS_SCREEN";
 
@@ -50,8 +52,13 @@ static void update_utilization_dial_display() {
 }
 
 static void update_primary_stat_display() {
+  float converted_val = remoteStats.speed;
+
+  if (device_settings.distance_units == DISTANCE_UNITS_IMPERIAL) {
+    converted_val = convert_kph_to_mph(remoteStats.speed);
+  }
+
   char *formattedString;
-  float converted_val = remoteStats.speed; // TODO - apply based on primary stat display option
 
   if (converted_val >= 10) {
     asprintf(&formattedString, "%.0f", remoteStats.speed);
@@ -108,6 +115,14 @@ static void update_battery_display() {
 
 void update_stats_screen_display() {
   LVGL_lock(-1);
+
+  if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
+    lv_label_set_text(ui_PrimaryStatUnit, "kph");
+  }
+  else {
+    lv_label_set_text(ui_PrimaryStatUnit, "mph");
+  }
+
   update_speed_dial_display();
   update_utilization_dial_display();
   update_primary_stat_display();
@@ -120,6 +135,7 @@ void update_stats_screen_display() {
 // Event handlers
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
+  update_stats_screen_display();
 }
 
 void stats_screen_unloaded(lv_event_t *e) {
