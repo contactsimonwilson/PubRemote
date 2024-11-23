@@ -1,6 +1,7 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
 #include "remote/display.h"
+#include <colors.h>
 #include <core/lv_event.h>
 #include <remote/settings.h>
 #include <remote/stats.h>
@@ -46,9 +47,23 @@ static void update_speed_dial_display() {
 }
 
 static void update_utilization_dial_display() {
-  // TODO - set color based on utilization
   // TODO - use max proportional value
   lv_arc_set_value(ui_UtilizationDial, remoteStats.dutyCycle);
+
+  // set arc color
+  lv_color_t color = lv_color_hex(COLOR_STRUCTURE);
+
+  if (remoteStats.dutyCycle > 90) {
+    color = lv_color_hex(COLOR_DANGER);
+  }
+  else if (remoteStats.dutyCycle > 80) {
+    color = lv_color_hex(COLOR_ALERT);
+  }
+  else if (remoteStats.dutyCycle > 70) {
+    color = lv_color_hex(COLOR_WARNING);
+  }
+
+  lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 }
 
 static void update_primary_stat_display() {
@@ -111,6 +126,10 @@ static void update_footpad_display() {
 }
 
 static void update_battery_display() {
+  char *formattedString;
+  asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
+  lv_label_set_text(ui_BatteryDisplay, formattedString);
+  free(formattedString);
 }
 
 void update_stats_screen_display() {

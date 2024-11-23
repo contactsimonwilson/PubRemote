@@ -164,6 +164,7 @@ static void process_data(esp_now_event_t evt) {
     float motor_temp_filtered = (float)data[22] / 2.0;
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
     float battery_level = (float)data[27] / 2.0;
+    remoteStats.batteryPercentage = battery_level;
     int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
