@@ -4,7 +4,7 @@ import hashlib
 
 def generate_build_id():
     # Get current timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H")
     
     # Create a hash of timestamp for shorter unique ID
     hash_object = hashlib.md5(timestamp.encode())
