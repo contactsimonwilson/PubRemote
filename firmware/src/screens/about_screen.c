@@ -23,7 +23,7 @@ void about_screen_load_start(lv_event_t *e) {
 
   lv_label_set_text(ui_VersionInfoLabel, formattedString);
 
-  asprintf(&formattedString, "Battery: %.2fV", remoteStats.batteryVoltage);
+  asprintf(&formattedString, "Battery: %.2fV", remoteStats.remoteBatteryVoltage);
   lv_label_set_text(ui_DebugInfoLabel, formattedString);
   LVGL_unlock();
 
