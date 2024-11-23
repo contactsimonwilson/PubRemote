@@ -1,4 +1,5 @@
 #include "receiver.h"
+#include "display.h"
 #include "esp_log.h"
 #include "esp_now.h"
 #include "esp_timer.h"
@@ -109,7 +110,9 @@ static void process_data(esp_now_event_t evt) {
     ESP_LOGI(TAG, "Secret Code: %li", pairing_settings.secret_code);
     char *formattedString;
     asprintf(&formattedString, "%ld", pairing_settings.secret_code);
+    LVGL_lock(-1);
     lv_label_set_text(ui_PairingCode, formattedString);
+    LVGL_unlock();
     free(formattedString);
     pairing_settings.state = PAIRING_STATE_PENDING;
   }
@@ -119,6 +122,7 @@ static void process_data(esp_now_event_t evt) {
     ESP_LOGI(TAG, "packet Length: %d", len);
     int response = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
     ESP_LOGI(TAG, "Response: %i", response);
+    LVGL_lock(-1);
     if (response == -1) {
       pairing_settings.state = PAIRING_STATE_PAIRED;
       // save here and exit screen?
@@ -129,6 +133,7 @@ static void process_data(esp_now_event_t evt) {
       pairing_settings.state = PAIRING_STATE_UNPAIRED;
     }
     lv_label_set_text(ui_PairingCode, "0000");
+    LVGL_unlock();
   }
 
   else if (pairing_settings.state == PAIRING_STATE_PAIRED && len == 32) {

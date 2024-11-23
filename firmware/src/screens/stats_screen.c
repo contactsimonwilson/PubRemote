@@ -61,10 +61,10 @@ static void update_primary_stat_display() {
   char *formattedString;
 
   if (converted_val >= 10) {
-    asprintf(&formattedString, "%.0f", remoteStats.speed);
+    asprintf(&formattedString, "%.0f", converted_val);
   }
   else {
-    asprintf(&formattedString, "%.1f", remoteStats.speed);
+    asprintf(&formattedString, "%.1f", converted_val);
   }
 
   lv_label_set_text(ui_PrimaryStat, formattedString);

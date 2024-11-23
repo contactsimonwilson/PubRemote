@@ -47,6 +47,10 @@
   #define TOUCH_ENABLED 1
 #endif
 
+#ifndef DISP_ROTATE
+  #define DISP_ROTATE 0
+#endif
+
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define BUFFER_SIZE ((int)(LV_HOR_RES * (LV_VER_RES / 10)))

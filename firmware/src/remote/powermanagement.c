@@ -118,10 +118,10 @@ void power_management_task(void *pvParameters) {
   while (1) {
     int battery_value = 0;
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BAT_ADC, &battery_value));
-    remoteStats.batteryVoltage = convert_adc_to_battery_volts(battery_value);
-    float battery_percentage = (remoteStats.batteryVoltage - 3.0) / (4.2 - 3.0);
+    remoteStats.remoteBatteryVoltage = convert_adc_to_battery_volts(battery_value);
+    float battery_percentage = (remoteStats.remoteBatteryVoltage - 3.0) / (4.2 - 3.0);
     remoteStats.batteryPercentage = clampu8((uint8_t)(battery_percentage * 100), 0, 100);
-    ESP_LOGD(TAG, "Battery volts: %.1f %d", remoteStats.batteryVoltage, remoteStats.batteryPercentage);
+    ESP_LOGD(TAG, "Battery volts: %.1f %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
 
