@@ -48,7 +48,6 @@ typedef enum {
 } DistanceUnits;
 
 typedef struct {
-  PairingState state;
   uint32_t secret_code;
   uint8_t remote_addr[6];
 } PairingSettings;

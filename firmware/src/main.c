@@ -7,6 +7,7 @@
 #include "freertos/task.h"
 #include "remote/adc.h"
 #include "remote/buzzer.h"
+#include "remote/connection.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
 #include "remote/led.h"
@@ -17,6 +18,7 @@
 #include "remote/remoteinputs.h"
 #include "remote/screen.h"
 #include "remote/settings.h"
+#include "remote/stats.h"
 #include "remote/time.h"
 #include "remote/transmitter.h"
 #include "ui/ui.h"
@@ -35,13 +37,10 @@ void app_main(void) {
   init_buttons();
   init_thumbstick();
   init_display();
+
+  // Init radio comms
   init_espnow();
-
-  // Log MAC address
-  uint8_t mac[6];
-  ESP_ERROR_CHECK(esp_wifi_get_mac(WIFI_IF_STA, mac));
-  ESP_LOGI(TAG, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-
+  init_connection();
   init_receiver();
   init_transmitter();
 }

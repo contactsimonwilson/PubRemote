@@ -1,4 +1,5 @@
 #include "receiver.h"
+#include "connection.h"
 #include "display.h"
 #include "esp_log.h"
 #include "esp_now.h"
@@ -17,9 +18,6 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-RECEIVER";
-
-#define TIMEOUT_DURATION_MS 30000
-#define RECONNECTING_DURATION_MS 1000
 #define RX_QUEUE_SIZE 1
 
 // Structure to hold ESP-NOW data
@@ -30,18 +28,6 @@ typedef struct {
 } esp_now_event_t;
 
 static QueueHandle_t espnow_queue;
-esp_timer_handle_t connection_timeout_timer;
-esp_timer_handle_t reconnecting_timer;
-
-static void connection_timeout_callback(void *arg) {
-  init_stats();
-}
-
-static void reconnecting_timer_callback(void *arg) {
-  remoteStats.connectionState = CONNECTION_STATE_RECONNECTING;
-  update_stats_display();
-  esp_timer_start_once(connection_timeout_timer, TIMEOUT_DURATION_MS * 1000);
-}
 
 static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len) {
   // This callback runs in WiFi task context!
@@ -75,7 +61,7 @@ static void process_data(esp_now_event_t evt) {
   LAST_COMMAND_TIME = 0;
   ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
-  if (pairing_settings.state == PAIRING_STATE_UNPAIRED && len == 6) {
+  if (pairing_state == PAIRING_STATE_UNPAIRED && len == 6) {
     memcpy(pairing_settings.remote_addr, data, 6);
     ESP_LOGI(TAG, "Got Pairing request from VESC Express");
     ESP_LOGI(TAG, "packet Length: %d", len);
@@ -100,10 +86,10 @@ static void process_data(esp_now_event_t evt) {
     }
     else {
       ESP_LOGI(TAG, "Sent response back to VESC Express");
-      pairing_settings.state++;
+      pairing_state = PAIRING_STATE_PAIRING;
     }
   }
-  else if (pairing_settings.state == PAIRING_STATE_PAIRING && len == 4) {
+  else if (pairing_state == PAIRING_STATE_PAIRING && len == 4) {
     // grab secret code
     ESP_LOGI(TAG, "Grabbing secret code");
     ESP_LOGI(TAG, "packet Length: %d", len);
@@ -115,9 +101,9 @@ static void process_data(esp_now_event_t evt) {
     lv_label_set_text(ui_PairingCode, formattedString);
     LVGL_unlock();
     free(formattedString);
-    pairing_settings.state = PAIRING_STATE_PENDING;
+    pairing_state = PAIRING_STATE_PENDING;
   }
-  else if (pairing_settings.state == PAIRING_STATE_PENDING && len == 4) {
+  else if (pairing_state == PAIRING_STATE_PENDING && len == 4) {
     // grab secret code
     ESP_LOGI(TAG, "Grabbing response");
     ESP_LOGI(TAG, "packet Length: %d", len);
@@ -125,26 +111,21 @@ static void process_data(esp_now_event_t evt) {
     ESP_LOGI(TAG, "Response: %i", response);
     LVGL_lock(-1);
     if (response == -1) {
-      pairing_settings.state = PAIRING_STATE_PAIRED;
+      pairing_state = PAIRING_STATE_PAIRED;
       // save here and exit screen?
 
       lv_disp_load_scr(ui_StatsScreen);
     }
     else {
-      pairing_settings.state = PAIRING_STATE_UNPAIRED;
+      pairing_state = PAIRING_STATE_UNPAIRED;
     }
-    lv_label_set_text(ui_PairingCode, "0000");
     LVGL_unlock();
   }
-
-  else if (pairing_settings.state == PAIRING_STATE_PAIRED && len == 32) {
-    // Reset the timers
-    esp_timer_stop(connection_timeout_timer);
-    esp_timer_stop(reconnecting_timer);
+  else if ((connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
+            connection_state == CONNECTION_STATE_CONNECTING) &&
+           len == 32) {
     start_or_reset_deep_sleep_timer();
-    remoteStats.connectionState = CONNECTION_STATE_CONNECTED;
-    // Restart the connection timeout timer
-    esp_timer_start_once(reconnecting_timer, RECONNECTING_DURATION_MS * 1000);
+
     uint8_t mode = data[0];
     uint8_t fault_code = data[1];
     float pitch_angle = (int16_t)((data[2] << 8) | data[3]) / 10.0;
@@ -167,6 +148,8 @@ static void process_data(esp_now_event_t evt) {
     float battery_level = (float)data[27] / 2.0;
     remoteStats.batteryPercentage = battery_level;
     int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
+
+    remoteStats.lastUpdated = get_current_time_ms();
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
     // ESP_LOGI(TAG, "Fault Code: %d", fault_code);
@@ -195,18 +178,6 @@ static void receiver_task(void *pvParameters) {
   espnow_queue = xQueueCreate(RX_QUEUE_SIZE, sizeof(esp_now_event_t));
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
   ESP_LOGI(TAG, "Registered RX callback");
-
-  esp_timer_create_args_t connection_timeout_args = {.callback = connection_timeout_callback,
-                                                     .arg = NULL,
-                                                     .dispatch_method = ESP_TIMER_TASK,
-                                                     .name = "ConnectionTimeoutTimer"};
-  ESP_ERROR_CHECK(esp_timer_create(&connection_timeout_args, &connection_timeout_timer));
-  esp_timer_create_args_t reconnecting_timer_args = {.callback = reconnecting_timer_callback,
-                                                     .arg = NULL,
-                                                     .dispatch_method = ESP_TIMER_TASK,
-                                                     .name = "ReconnectingTimer"};
-  ESP_ERROR_CHECK(esp_timer_create(&reconnecting_timer_args, &reconnecting_timer));
-
   esp_now_event_t evt;
   while (1) {
     if (xQueueReceive(espnow_queue, &evt, portMAX_DELAY) == pdTRUE) {

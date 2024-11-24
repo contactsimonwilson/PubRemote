@@ -10,6 +10,7 @@ void update_stats_display() {
 }
 
 static void reset_stats() {
+  remoteStats.lastUpdated = 0;
   remoteStats.speed = 0.0;
   remoteStats.dutyCycle = 0;
   remoteStats.speedUnit = SPEED_UNIT_KMH;
@@ -20,7 +21,6 @@ static void reset_stats() {
   remoteStats.remoteBatteryPercentage = 0;
   remoteStats.signalStrength = 0;
   remoteStats.switchState = SWITCH_STATE_OFF;
-  remoteStats.connectionState = CONNECTION_STATE_DISCONNECTED;
 }
 
 void init_stats() {

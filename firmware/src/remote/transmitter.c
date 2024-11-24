@@ -1,4 +1,5 @@
 #include "transmitter.h"
+#include "connection.h"
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_now.h"
@@ -12,6 +13,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+
 static const char *TAG = "PUBREMOTE-TRANSMITTER";
 #define COMMAND_TIMEOUT 1000
 
@@ -30,12 +32,15 @@ static void transmitter_task(void *pvParameters) {
   while (1) {
     int64_t newTime = get_current_time_ms();
 
-    // Check if the last command was sent less than 1000ms ago
-    if (newTime - LAST_COMMAND_TIME < COMMAND_TIMEOUT) {
-      vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
-      continue;
-    }
-    if (pairing_settings.state == PAIRING_STATE_PAIRED) {
+    // Async/await API disabled for now
+    // // Check if the last command was sent less than 1000ms ago
+    // if (newTime - LAST_COMMAND_TIME < COMMAND_TIMEOUT) {
+    //   vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
+    //   continue;
+    // }
+
+    if (connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
+        connection_state == CONNECTION_STATE_CONNECTING) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);

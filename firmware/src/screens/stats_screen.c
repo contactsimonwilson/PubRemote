@@ -3,6 +3,7 @@
 #include "remote/display.h"
 #include <colors.h>
 #include <core/lv_event.h>
+#include <remote/connection.h>
 #include <remote/settings.h>
 #include <remote/stats.h>
 #include <utilities/conversion_utils.h>
@@ -87,12 +88,15 @@ static void update_primary_stat_display() {
 }
 
 static void update_secondary_stat_display() {
-  switch (remoteStats.connectionState) {
+  switch (connection_state) {
   case CONNECTION_STATE_DISCONNECTED:
     lv_label_set_text(ui_SecondaryStat, "Disconnected");
     break;
   case CONNECTION_STATE_RECONNECTING:
     lv_label_set_text(ui_SecondaryStat, "Reconnecting");
+    break;
+  case CONNECTION_STATE_CONNECTING:
+    lv_label_set_text(ui_SecondaryStat, "Connecting");
     break;
   case CONNECTION_STATE_CONNECTED:
     lv_label_set_text(ui_SecondaryStat, "Connected"); // TODO - apply based on secondary stat display option
