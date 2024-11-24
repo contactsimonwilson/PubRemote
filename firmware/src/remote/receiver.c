@@ -43,11 +43,11 @@ static void reconnecting_timer_callback(void *arg) {
   esp_timer_start_once(connection_timeout_timer, TIMEOUT_DURATION_MS * 1000);
 }
 
-static void on_data_recv(const uint8_t *mac_addr, const uint8_t *data, int len) {
+static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len) {
   // This callback runs in WiFi task context!
   ESP_LOGD(TAG, "RECEIVED");
   esp_now_event_t evt;
-  memcpy(evt.mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
+  memcpy(evt.mac_addr, recv_info->src_addr, ESP_NOW_ETH_ALEN);
   evt.data = malloc(len);
   memcpy(evt.data, data, len);
   evt.len = len;
@@ -82,17 +82,18 @@ static void process_data(esp_now_event_t evt) {
     ESP_LOGI(TAG, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", data[0], data[1], data[2], data[3], data[4], data[5]);
     // ESP_LOGI(TAG, "Incorrect MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2],
     //          mac_addr[3], mac_addr[4], mac_addr[5]);
-    uint8_t TEST[1] = {420};
+    uint8_t TEST[1] = {420}; // TODO - FIX THIS
     esp_now_peer_info_t peerInfo = {};
     peerInfo.channel = 1; // Set the channel number (0-14)
     peerInfo.encrypt = false;
     memcpy(peerInfo.peer_addr, pairing_settings.remote_addr, sizeof(pairing_settings.remote_addr));
     // ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
-    if (!esp_now_is_peer_exist(&peerInfo)) {
+    uint8_t *mac_addr = pairing_settings.remote_addr;
+    if (!esp_now_is_peer_exist(mac_addr)) {
       esp_now_add_peer(&peerInfo);
     }
 
-    esp_err_t result = esp_now_send(&pairing_settings.remote_addr, (uint8_t *)&TEST, sizeof(TEST));
+    esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&TEST, sizeof(TEST));
     if (result != ESP_OK) {
       // Handle error if needed
       ESP_LOGE(TAG, "Error sending data: %d", result);

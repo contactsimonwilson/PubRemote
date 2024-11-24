@@ -37,14 +37,9 @@ void app_main(void) {
   init_display();
   init_espnow();
 
+  // Log MAC address
   uint8_t mac[6];
   ESP_ERROR_CHECK(esp_wifi_get_mac(WIFI_IF_STA, mac));
-  esp_now_peer_info_t peerInfo = {};
-  peerInfo.channel = 1; // Set the channel number (0-14)
-  peerInfo.encrypt = false;
-  memcpy(peerInfo.peer_addr, pairing_settings.remote_addr, sizeof(pairing_settings.remote_addr));
-  ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
-  // Log MAC address
   ESP_LOGI(TAG, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
   init_receiver();
