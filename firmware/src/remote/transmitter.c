@@ -45,7 +45,8 @@ static void transmitter_task(void *pvParameters) {
       // Copy remote_data.bytes after secret_Code
       memcpy(combined_data + sizeof(int32_t), remote_data.bytes, sizeof(remote_data.bytes));
 
-      esp_err_t result = esp_now_send(&pairing_settings.remote_addr, combined_data, sizeof(combined_data));
+      uint8_t *mac_addr = pairing_settings.remote_addr;
+      esp_err_t result = esp_now_send(mac_addr, combined_data, sizeof(combined_data));
       if (result != ESP_OK) {
         // Handle error if needed
         ESP_LOGE(TAG, "Error sending remote data: %d", result);
