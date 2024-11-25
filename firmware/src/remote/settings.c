@@ -236,18 +236,18 @@ static esp_err_t nvs_write(const char *key, void *value, nvs_type_t type, size_t
   }
 
   if (err != ESP_OK) {
-    ESP_LOGI(TAG, "Write done");
+    ESP_LOGE(TAG, "Failed to write!");
   }
   else {
-    ESP_LOGE(TAG, "Failed to write!");
+    ESP_LOGI(TAG, "Write done");
   }
 
   err = nvs_commit(nvs_handle);
   if (err != ESP_OK) {
-    ESP_LOGI(TAG, "Commit done");
+    ESP_LOGE(TAG, "Failed to commit!");
   }
   else {
-    ESP_LOGE(TAG, "Failed to commit!");
+    ESP_LOGI(TAG, "Commit done");
   }
 
   nvs_close(nvs_handle);
@@ -363,7 +363,7 @@ esp_err_t nvs_write_int(const char *key, uint32_t value) {
 
 // Function to write a blob to NVS
 esp_err_t nvs_write_blob(const char *key, void *value, size_t length) {
-  return nvs_write(key, &value, NVS_TYPE_BLOB, length);
+  return nvs_write(key, value, NVS_TYPE_BLOB, length);
 }
 
 // Function to read an integer from NVS
