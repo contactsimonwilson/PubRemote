@@ -80,6 +80,16 @@ void init_connection() {
 
   // start off in connecting mode
   if (pairing_state == PAIRING_STATE_PAIRED) {
+    // TODO - MAKE FUNCTION FOR THIS
+    esp_now_peer_info_t peerInfo = {};
+    peerInfo.channel = 1; // Set the channel number (0-14)
+    peerInfo.encrypt = false;
+    memcpy(peerInfo.peer_addr, pairing_settings.remote_addr, sizeof(pairing_settings.remote_addr));
+    // ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
+    uint8_t *mac_addr = pairing_settings.remote_addr;
+    if (!esp_now_is_peer_exist(mac_addr)) {
+      esp_now_add_peer(&peerInfo);
+    }
     update_connection_state(CONNECTION_STATE_CONNECTING);
   }
   xTaskCreatePinnedToCore(connection_task, "connection_task", 2048, NULL, 20, NULL, 0);
