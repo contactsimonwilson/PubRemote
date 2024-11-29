@@ -18,7 +18,7 @@
 #include <string.h>
 
 static const char *TAG = "PUBREMOTE-CONNECTION";
-#define CONNECTION_TIMER_DELAY_MS 200
+#define CONNECTION_TIMER_DELAY_MS 100
 #define RECONNECTING_DURATION_MS 1000
 #define TIMEOUT_DURATION_MS 30000
 
@@ -49,7 +49,8 @@ static void connection_task(void *pvParameters) {
         // Never connected - reset the connection state
         update_connection_state(CONNECTION_STATE_DISCONNECTED);
       }
-      else if (remoteStats.lastUpdated > 0 && get_current_time_ms() - remoteStats.lastUpdated < TIMEOUT_DURATION_MS) {
+      else if (remoteStats.lastUpdated > 0 &&
+               get_current_time_ms() - remoteStats.lastUpdated < RECONNECTING_DURATION_MS) {
         // Connected - update connection state
         update_connection_state(CONNECTION_STATE_CONNECTED);
       }
@@ -74,7 +75,7 @@ static void connection_task(void *pvParameters) {
 }
 
 void init_connection() {
-  if (pairing_settings.secret_code == -1) {
+  if (pairing_settings.secret_code != DEFAULT_PAIRING_SECRET_CODE) {
     pairing_state = PAIRING_STATE_PAIRED;
   }
 

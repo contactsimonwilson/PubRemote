@@ -38,9 +38,10 @@ CalibrationSettings calibration_settings = {
 
 };
 
+
 PairingSettings pairing_settings = {
     .remote_addr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, // Use 0xFF for -1 as uint8_t is unsigned
-    .secret_code = -1};
+    .secret_code = DEFAULT_PAIRING_SECRET_CODE};
 
 static uint8_t get_auto_off_time_minutes() {
   switch (device_settings.auto_off_time) {

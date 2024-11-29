@@ -47,6 +47,8 @@ typedef enum {
   DISTANCE_UNITS_IMPERIAL,
 } DistanceUnits;
 
+  #define DEFAULT_PAIRING_SECRET_CODE -1
+
 typedef struct {
   uint32_t secret_code;
   uint8_t remote_addr[6];
