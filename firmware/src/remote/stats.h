@@ -33,7 +33,7 @@ typedef struct {
   uint8_t signalStrength;    // RSSI
   SwitchState switchState;
   float remoteBatteryVoltage;
-  uint8_t remoteBatteryPercentage; // 0 to 10
+  uint8_t remoteBatteryPercentage; // 0 to 100
 } RemoteStats;
 
 extern RemoteStats remoteStats;
