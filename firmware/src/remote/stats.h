@@ -14,13 +14,6 @@ typedef enum {
 } TempUnit;
 
 typedef enum {
-  CONNECTION_STATE_DISCONNECTED,
-  CONNECTION_STATE_CONNECTING,
-  CONNECTION_STATE_CONNECTED,
-  CONNECTION_STATE_RECONNECTING
-} ConnectionState;
-
-typedef enum {
   SWITCH_STATE_OFF,
   SWITCH_STATE_LEFT,
   SWITCH_STATE_RIGHT,
@@ -28,6 +21,8 @@ typedef enum {
 } SwitchState;
 
 typedef struct {
+  int64_t lastUpdated;
+  // Stats
   float speed;       // kph
   float maxSpeed;    // kph
   uint8_t dutyCycle; // 0 to 100
@@ -37,7 +32,6 @@ typedef struct {
   uint8_t batteryPercentage; // 0 to 100
   uint8_t signalStrength;    // RSSI
   SwitchState switchState;
-  ConnectionState connectionState;
   float remoteBatteryVoltage;
   uint8_t remoteBatteryPercentage; // 0 to 100
 } RemoteStats;

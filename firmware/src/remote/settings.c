@@ -38,10 +38,10 @@ CalibrationSettings calibration_settings = {
 
 };
 
+
 PairingSettings pairing_settings = {
-    .state = PAIRING_STATE_UNPAIRED,
     .remote_addr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, // Use 0xFF for -1 as uint8_t is unsigned
-    .secret_code = -1};
+    .secret_code = DEFAULT_PAIRING_SECRET_CODE};
 
 static uint8_t get_auto_off_time_minutes() {
   switch (device_settings.auto_off_time) {
@@ -72,12 +72,7 @@ void save_device_settings() {
 
 esp_err_t save_pairing_data() {
   ESP_LOGI(TAG, "Saving pairing data...");
-  esp_err_t err = nvs_write_int("pairing_state", (int32_t)pairing_settings.state);
-  if (err != ESP_OK) {
-    ESP_LOGE(TAG, "Error saving pairing state!");
-    return err;
-  }
-  err = nvs_write_int("secret_code", pairing_settings.secret_code);
+  esp_err_t err = nvs_write_int("secret_code", pairing_settings.secret_code);
   if (err != ESP_OK) {
     ESP_LOGE(TAG, "Error saving secret code!");
     return err;
@@ -173,9 +168,6 @@ esp_err_t init_settings() {
   calibration_settings.expo = nvs_read_int("x_expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
 
   // Reading pairing settings
-  pairing_settings.state = nvs_read_int("pairing_state", &pairing_settings.state) == ESP_OK ? pairing_settings.state
-                                                                                            : PAIRING_STATE_UNPAIRED;
-
   pairing_settings.secret_code =
       nvs_read_int("secret_code", &pairing_settings.secret_code) == ESP_OK ? pairing_settings.secret_code : -1;
 

@@ -1,4 +1,4 @@
-#include "number_utils.h";
+#include "number_utils.h"
 #include <stdio.h>
 
 float clampf(float value, float min, float max) {
