@@ -184,6 +184,7 @@ static void receiver_task(void *pvParameters) {
       process_data(evt);
       free(evt.data);
     }
+    vTaskDelay(pdMS_TO_TICKS(1));
   }
 
   // The task will not reach this point as it runs indefinitely
