@@ -38,7 +38,6 @@ CalibrationSettings calibration_settings = {
 
 };
 
-
 PairingSettings pairing_settings = {
     .remote_addr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, // Use 0xFF for -1 as uint8_t is unsigned
     .secret_code = DEFAULT_PAIRING_SECRET_CODE};
@@ -171,7 +170,7 @@ esp_err_t init_settings() {
   pairing_settings.secret_code =
       nvs_read_int("secret_code", &pairing_settings.secret_code) == ESP_OK ? pairing_settings.secret_code : -1;
 
-  uint8_t remote_addr[6];
+  uint8_t remote_addr[MAC_ADDR_LEN];
   err = nvs_read_blob("remote_addr", &remote_addr, sizeof(remote_addr));
   if (err == ESP_OK) {
     memcpy(pairing_settings.remote_addr, remote_addr, sizeof(remote_addr));

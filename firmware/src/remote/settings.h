@@ -48,10 +48,11 @@ typedef enum {
 } DistanceUnits;
 
   #define DEFAULT_PAIRING_SECRET_CODE -1
+  #define MAC_ADDR_LEN 6
 
 typedef struct {
   uint32_t secret_code;
-  uint8_t remote_addr[6];
+  uint8_t remote_addr[MAC_ADDR_LEN];
 } PairingSettings;
 
 typedef struct {

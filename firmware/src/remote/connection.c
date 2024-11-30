@@ -78,10 +78,13 @@ void connect_to_peer(uint8_t *mac_addr, uint8_t channel) {
   esp_now_peer_info_t peerInfo = {};
   peerInfo.channel = channel; // Set the channel number (0-14)
   peerInfo.encrypt = false;
-  memcpy(peerInfo.peer_addr, mac_addr, sizeof(mac_addr));
+  memcpy(peerInfo.peer_addr, mac_addr, MAC_ADDR_LEN);
 
   if (esp_now_is_peer_exist(mac_addr)) {
-    esp_now_del_peer(mac_addr);
+    esp_err_t res = esp_now_del_peer(mac_addr);
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to delete peer");
+    }
   }
 
   esp_err_t result = esp_now_add_peer(&peerInfo);
