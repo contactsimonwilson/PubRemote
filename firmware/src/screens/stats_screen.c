@@ -33,6 +33,12 @@ bool is_stats_screen_active() {
 static uint8_t max_speed = 0;
 
 static void update_speed_dial_display() {
+  static float last_value = 0;
+
+  if (last_value == remoteStats.speed) {
+    return;
+  }
+
   if (!max_speed) {
     /// get range from arc in case it was not set
     max_speed = lv_arc_get_max_value(ui_SpeedDial);
@@ -45,9 +51,16 @@ static void update_speed_dial_display() {
   }
 
   lv_arc_set_value(ui_SpeedDial, remoteStats.speed);
+  last_value = remoteStats.speed;
 }
 
 static void update_utilization_dial_display() {
+  static uint8_t last_value = 0;
+
+  if (last_value == remoteStats.dutyCycle) {
+    return;
+  }
+
   // TODO - use max proportional value
   lv_arc_set_value(ui_UtilizationDial, remoteStats.dutyCycle);
 
@@ -65,9 +78,16 @@ static void update_utilization_dial_display() {
   }
 
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+  last_value = remoteStats.dutyCycle;
 }
 
 static void update_primary_stat_display() {
+  static float last_value = 0;
+
+  if (last_value == remoteStats.speed) {
+    return;
+  }
+
   float converted_val = remoteStats.speed;
 
   if (device_settings.distance_units == DISTANCE_UNITS_IMPERIAL) {
@@ -85,9 +105,16 @@ static void update_primary_stat_display() {
 
   lv_label_set_text(ui_PrimaryStat, formattedString);
   free(formattedString);
+  last_value = remoteStats.speed;
 }
 
 static void update_secondary_stat_display() {
+  static ConnectionState last_value = CONNECTION_STATE_DISCONNECTED;
+
+  if (last_value == connection_state) {
+    return;
+  }
+
   switch (connection_state) {
   case CONNECTION_STATE_DISCONNECTED:
     lv_label_set_text(ui_SecondaryStat, "Disconnected");
@@ -104,9 +131,17 @@ static void update_secondary_stat_display() {
   default:
     break;
   }
+
+  last_value = connection_state;
 }
 
 static void update_footpad_display() {
+  static SwitchState last_value = SWITCH_STATE_OFF;
+
+  if (last_value == remoteStats.switchState) {
+    return;
+  }
+
   switch (remoteStats.switchState) {
   case SWITCH_STATE_OFF:
     lv_arc_set_value(ui_LeftSensor, 0);
@@ -127,13 +162,23 @@ static void update_footpad_display() {
   default:
     break;
   }
+
+  last_value = remoteStats.switchState;
 }
 
 static void update_battery_display() {
+  static uint8_t last_value = 0;
+
+  if (last_value == remoteStats.batteryPercentage) {
+    return;
+  }
+
   char *formattedString;
   asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
   lv_label_set_text(ui_BatteryDisplay, formattedString);
   free(formattedString);
+
+  last_value = remoteStats.batteryPercentage;
 }
 
 void update_stats_screen_display() {

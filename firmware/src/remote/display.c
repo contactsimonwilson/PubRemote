@@ -53,15 +53,12 @@
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
-#define BUFFER_SIZE ((int)(LV_HOR_RES * (LV_VER_RES / 10)))
 #define LCD_HOST SPI2_HOST
 #define TP_I2C_NUM 0
 
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
 #define LCD_PARAM_BITS 8
-// #define MAX_TRAN_SIZE (LV_HOR_RES * LV_VER_RES * LV_COLOR_DEPTH / 8)
-#define MAX_TRAN_SIZE (LV_HOR_RES * 80 * sizeof(uint16_t))
 
 // LVGL
 #define LVGL_TICK_PERIOD_MS 5
@@ -69,6 +66,11 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define LVGL_TASK_MIN_DELAY_MS 1
 #define LVGL_TASK_STACK_SIZE (4 * 1024)
 #define LVGL_TASK_PRIORITY 20
+
+// #define MAX_TRAN_SIZE (LV_HOR_RES * LV_VER_RES * LV_COLOR_DEPTH / 8)
+#define BUFFER_LINES ((int)(LV_VER_RES / 10))
+#define BUFFER_SIZE (LV_HOR_RES * BUFFER_LINES)
+#define MAX_TRAN_SIZE (BUFFER_SIZE * sizeof(lv_color_t))
 
 static SemaphoreHandle_t lvgl_mux = NULL;
 static esp_lcd_panel_io_handle_t io_handle = NULL;
@@ -376,9 +378,9 @@ void init_display(void) {
   // alloc draw buffers used by LVGL
   // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
   // https://github.com/dj140/ESP32S3/blob/3f2cee4c092082c18e5437f834c38012f8bb5451/main/lvgl_port/lv_port_disp.c#L113
-  lv_color_t *buf1 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t *buf1 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
   assert(buf1);
-  lv_color_t *buf2 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t *buf2 = heap_caps_malloc(BUFFER_SIZE * sizeof(lv_color_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
   assert(buf2);
   // initialize LVGL draw buffers
   lv_disp_draw_buf_init(&disp_buf, buf1, buf2, BUFFER_SIZE);
@@ -390,7 +392,9 @@ void init_display(void) {
   disp_drv.flush_cb = LVGL_flush_cb;
   disp_drv.drv_update_cb = LVGL_port_update_callback;
   // disp_drv.direct_mode = 1;
-  disp_drv.full_refresh = 0;
+  if (BUFFER_LINES >= LV_VER_RES) {
+    disp_drv.full_refresh = 1; // Enable full refresh mode for full screen buffer
+  }
 #ifdef SW_ROTATE
   disp_drv.sw_rotate = SW_ROTATE;
 #endif
