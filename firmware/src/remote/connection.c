@@ -74,6 +74,33 @@ static void connection_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
+void connect_to_peer(uint8_t *mac_addr, uint8_t channel) {
+  esp_now_peer_info_t peerInfo = {};
+  peerInfo.channel = channel; // Set the channel number (0-14)
+  peerInfo.encrypt = false;
+  memcpy(peerInfo.peer_addr, mac_addr, sizeof(mac_addr));
+
+  if (esp_now_is_peer_exist(mac_addr)) {
+    esp_now_del_peer(mac_addr);
+  }
+
+  esp_err_t result = esp_now_add_peer(&peerInfo);
+
+  if (result == ESP_OK) {
+    update_connection_state(CONNECTION_STATE_CONNECTING);
+  }
+  else {
+    ESP_LOGE(TAG, "Failed to add peer");
+  }
+}
+
+void connect_to_default_peer() {
+  if (pairing_state == PAIRING_STATE_PAIRED) {
+    uint8_t *mac_addr = pairing_settings.remote_addr;
+    connect_to_peer(mac_addr, 1);
+  }
+}
+
 void init_connection() {
   if (pairing_settings.secret_code != DEFAULT_PAIRING_SECRET_CODE) {
     pairing_state = PAIRING_STATE_PAIRED;
@@ -81,17 +108,7 @@ void init_connection() {
 
   // start off in connecting mode
   if (pairing_state == PAIRING_STATE_PAIRED) {
-    // TODO - MAKE FUNCTION FOR THIS
-    esp_now_peer_info_t peerInfo = {};
-    peerInfo.channel = 1; // Set the channel number (0-14)
-    peerInfo.encrypt = false;
-    memcpy(peerInfo.peer_addr, pairing_settings.remote_addr, sizeof(pairing_settings.remote_addr));
-    // ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
-    uint8_t *mac_addr = pairing_settings.remote_addr;
-    if (!esp_now_is_peer_exist(mac_addr)) {
-      esp_now_add_peer(&peerInfo);
-    }
-    update_connection_state(CONNECTION_STATE_CONNECTING);
+    connect_to_default_peer();
   }
   xTaskCreatePinnedToCore(connection_task, "connection_task", 2048, NULL, 20, NULL, 0);
 }

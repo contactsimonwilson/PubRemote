@@ -112,8 +112,8 @@ static void process_data(esp_now_event_t evt) {
     LVGL_lock(-1);
     if (response == -1) {
       pairing_state = PAIRING_STATE_PAIRED;
-      // save here and exit screen?
-
+      save_pairing_data();
+      connect_to_default_peer();
       lv_disp_load_scr(ui_StatsScreen);
     }
     else {

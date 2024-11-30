@@ -21,5 +21,7 @@ extern PairingState pairing_state;
 
 void update_connection_state(ConnectionState state);
 void init_connection();
+void connect_to_peer(uint8_t *mac_addr, uint8_t channel);
+void connect_to_default_peer();
 
 #endif
