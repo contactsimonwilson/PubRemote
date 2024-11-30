@@ -69,6 +69,7 @@ static void process_data(esp_now_event_t evt) {
     // ESP_LOGI(TAG, "Incorrect MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2],
     //          mac_addr[3], mac_addr[4], mac_addr[5]);
     uint8_t TEST[1] = {420}; // TODO - FIX THIS
+    // Do this internally as we don't want it to change connection state
     esp_now_peer_info_t peerInfo = {};
     peerInfo.channel = 1; // Set the channel number (0-14)
     peerInfo.encrypt = false;
@@ -82,7 +83,7 @@ static void process_data(esp_now_event_t evt) {
     esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&TEST, sizeof(TEST));
     if (result != ESP_OK) {
       // Handle error if needed
-      ESP_LOGE(TAG, "Error sending data: %d", result);
+      ESP_LOGE(TAG, "Error sending pairing data: %d", result);
     }
     else {
       ESP_LOGI(TAG, "Sent response back to VESC Express");
@@ -168,6 +169,9 @@ static void process_data(esp_now_event_t evt) {
     // ESP_LOGI(TAG, "Odometer: %lu", odometer);
     // ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
     update_stats_display(); // TODO - use callbacks to update the UI instead of direct calls
+  }
+  else if (connection_state == CONNECTION_STATE_DISCONNECTED) {
+    // Do nothing
   }
   else {
     ESP_LOGI(TAG, "Invalid data length %d", len);
