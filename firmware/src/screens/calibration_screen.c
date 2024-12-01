@@ -175,9 +175,9 @@ void calibration_task(void *pvParameters) {
 
 void update_calibration_screen() {
   LVGL_lock(-1);
-  lv_obj_clear_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN); // show on every step except expo
-  lv_obj_add_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);               // Hide for every step except deadband
-  lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);                      // Hide for every step except expo
+  lv_obj_remove_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN); // show on every step except expo
+  lv_obj_add_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);                // Hide for every step except deadband
+  lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);                       // Hide for every step except expo
 
   switch (calibration_step) {
   case CALIBRATION_STEP_START:
@@ -197,14 +197,14 @@ void update_calibration_screen() {
     lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
     lv_obj_set_width(ui_DeadbandIndicator, lv_pct(0));
     lv_obj_set_height(ui_DeadbandIndicator, lv_pct(0));
-    lv_obj_clear_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);
     break;
   case CALIBRATION_STEP_EXPO:
     lv_slider_set_value(ui_ExpoSlider, (int)(calibration_data.expo * 10), LV_ANIM_OFF);
     lv_obj_add_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
     lv_label_set_text(ui_CalibrationStepLabel, "Set expo factor");
     lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
-    lv_obj_clear_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);
     break;
   case CALIBRATION_STEP_DONE:
     lv_label_set_text(ui_CalibrationStepLabel, "Calibration complete!");

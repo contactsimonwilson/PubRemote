@@ -55,7 +55,7 @@ void settings_screen_load_start(lv_event_t *e) {
 
   // Theme color
   lv_color_t color = lv_color_hex(device_settings.theme_color);
-  lv_colorwheel_set_rgb(ui_ThemeColor, color);
+  // lv_colorwheel_set_rgb(ui_ThemeColor, color);
   LVGL_unlock();
 }
 
@@ -90,8 +90,8 @@ void distance_units_select_change(lv_event_t *e) {
 }
 
 void theme_color_picker_change(lv_event_t *e) {
-  lv_color_t val = lv_colorwheel_get_rgb(ui_ThemeColor);
-  device_settings.theme_color = lv_color_to32(val);
+  // lv_color_t val = lv_colorwheel_get_rgb(ui_ThemeColor);
+  // device_settings.theme_color = lv_color_to32(val);
   reload_theme();
 }
 

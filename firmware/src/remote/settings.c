@@ -3,6 +3,7 @@
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "remote/adc.h"
+#include "string.h"
 #include <colors.h>
 #include <stdio.h>
 
