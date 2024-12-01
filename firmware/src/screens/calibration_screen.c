@@ -144,7 +144,7 @@ void calibration_task(void *pvParameters) {
   while (is_calibration_screen_active()) {
     update_min_max();
 
-    LVGL_lock(-1);
+    LVGL_lock(0);
 // Get values using current calibration data
 #if JOYSTICK_X_ENABLED
     float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
@@ -174,7 +174,7 @@ void calibration_task(void *pvParameters) {
 }
 
 void update_calibration_screen() {
-  LVGL_lock(-1);
+  LVGL_lock(0);
   lv_obj_remove_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN); // show on every step except expo
   lv_obj_add_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);                // Hide for every step except deadband
   lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);                       // Hide for every step except expo

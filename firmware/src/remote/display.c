@@ -64,10 +64,11 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // LVGL
 #define LVGL_TICK_PERIOD_MS 5
 #define LVGL_TASK_MAX_DELAY_MS 500
-#define LVGL_TASK_CPU_AFFINITY -1
-#define LVGL_TASK_STACK_SIZE (8 * 1024)
+#define LVGL_TASK_CPU_AFFINITY 1
+#define LVGL_TASK_STACK_SIZE (4 * 1024)
 #define LVGL_TASK_PRIORITY 20
 #define BUFFER_LINES ((int)(LV_VER_RES / 10))
+#define BUFFER_SIZE (LV_HOR_RES * BUFFER_LINES)
 #define MAX_TRAN_SIZE ((int)LV_HOR_RES * LV_VER_RES * sizeof(uint16_t))
 
 /* LCD IO and panel */
@@ -114,9 +115,7 @@ void set_bl_level(uint8_t level) {
 
 static esp_err_t app_lcd_init(void) {
   esp_err_t ret = ESP_OK;
-
   display_driver_preinit();
-
   ESP_LOGI(TAG, "Initialize SPI bus");
 #if DISP_GC9A01
   const spi_bus_config_t buscfg = GC9A01_PANEL_BUS_SPI_CONFIG(DISP_CLK, DISP_MOSI, MAX_TRAN_SIZE);
@@ -297,7 +296,7 @@ static esp_err_t app_lvgl_init(void) {
   ESP_LOGD(TAG, "Add LCD screen");
   const lvgl_port_display_cfg_t disp_cfg = {.io_handle = lcd_io,
                                             .panel_handle = lcd_panel,
-                                            .buffer_size = LV_HOR_RES * BUFFER_LINES,
+                                            .buffer_size = BUFFER_SIZE,
                                             .double_buffer = true,
                                             .hres = LV_HOR_RES,
                                             .vres = LV_VER_RES,
@@ -354,7 +353,7 @@ void init_display(void) {
 
   ESP_LOGI(TAG, "Display UI");
   // Lock the mutex due to the LVGL APIs are not thread-safe
-  LVGL_lock(-1);
+  LVGL_lock(0);
   ui_init();
   reload_theme();
   apply_ui_scale();
