@@ -16,6 +16,12 @@ dependencies:
     source:
       type: idf
     version: 5.3.1
-manifest_hash: 92cec17e8a1222e5a837364288db354f19f81694157f51e39aab231108655a3e
+  lvgl/lvgl:
+    component_hash: 096c69af22eaf8a2b721e3913da91918c5e6bf1a762a113ec01f401aa61337a0
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 9.2.2
+manifest_hash: be0fabfe5828560a8326f007af83d6e13605bd6239046c316bceac40435d29eb
 target: esp32s3
 version: 1.0.0

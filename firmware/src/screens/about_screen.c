@@ -14,7 +14,7 @@ bool is_about_screen_active() {
 // Event handlers
 void about_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen load start");
-  LVGL_lock(-1);
+  LVGL_lock(0);
 
   // set the version number
   char *formattedString;

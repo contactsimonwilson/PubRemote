@@ -1,8 +1,8 @@
 #include "screens/stats_screen.h"
+#include "core/lv_obj_event.h"
 #include "esp_log.h"
 #include "remote/display.h"
 #include <colors.h>
-#include <core/lv_event.h>
 #include <remote/connection.h>
 #include <remote/settings.h>
 #include <remote/stats.h>
@@ -182,7 +182,7 @@ static void update_battery_display() {
 }
 
 void update_stats_screen_display() {
-  LVGL_lock(-1);
+  LVGL_lock(0);
 
   if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
     lv_label_set_text(ui_PrimaryStatUnit, "kph");
