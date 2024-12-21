@@ -64,8 +64,8 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // LVGL
 #define LVGL_TICK_PERIOD_MS 5
 #define LVGL_TASK_MAX_DELAY_MS 500
-#define LVGL_TASK_CPU_AFFINITY 1
-#define LVGL_TASK_STACK_SIZE (4 * 1024)
+#define LVGL_TASK_CPU_AFFINITY -1
+#define LVGL_TASK_STACK_SIZE (6 * 1024)
 #define LVGL_TASK_PRIORITY 20
 #define BUFFER_LINES ((int)(LV_VER_RES / 10))
 #define BUFFER_SIZE (LV_HOR_RES * BUFFER_LINES)
@@ -277,6 +277,7 @@ static esp_err_t app_lvgl_init(void) {
   ESP_LOGI(TAG, "Initialize LVGL library");
 
   /* Initialize LVGL */
+  // const lvgl_port_cfg_t lvgl_cfg = ESP_LVGL_PORT_INIT_CONFIG();
   const lvgl_port_cfg_t lvgl_cfg = {
       .task_priority = LVGL_TASK_PRIORITY,         /* LVGL task priority */
       .task_stack = LVGL_TASK_STACK_SIZE,          /* LVGL task stack size */
