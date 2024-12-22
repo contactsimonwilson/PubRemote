@@ -271,6 +271,12 @@ static esp_err_t app_touch_init(void) {
 
   return ESP_OK;
 }
+
+void lv_touch_cb(lv_event_t *e) {
+  ESP_LOGI(TAG, "Touch event");
+  start_or_reset_deep_sleep_timer();
+}
+
 #endif // TOUCH_ENABLED
 
 static esp_err_t app_lvgl_init(void) {
@@ -333,9 +339,7 @@ static esp_err_t app_lvgl_init(void) {
       .handle = touch_handle,
   };
   lvgl_touch_indev = lvgl_port_add_touch(&touch_cfg);
-
-  // TODO - Register touch callback for power management
-
+  lv_indev_add_event_cb(lvgl_touch_indev, lv_touch_cb, LV_EVENT_ALL, NULL);
 #endif
 
   return ESP_OK;
