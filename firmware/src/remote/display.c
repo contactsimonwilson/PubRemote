@@ -64,7 +64,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // LVGL
 #define LVGL_TICK_PERIOD_MS 5
 #define LVGL_TASK_MAX_DELAY_MS 500
-#define LVGL_TASK_CPU_AFFINITY -1
+#define LVGL_TASK_CPU_AFFINITY 1
 #define LVGL_TASK_STACK_SIZE (6 * 1024)
 #define LVGL_TASK_PRIORITY 20
 #define BUFFER_LINES ((int)(LV_VER_RES / 10))
@@ -272,8 +272,8 @@ static esp_err_t app_touch_init(void) {
   return ESP_OK;
 }
 
-void lv_touch_cb(lv_event_t *e) {
-  ESP_LOGI(TAG, "Touch event");
+static void lv_touch_cb(lv_event_t *e) {
+  ESP_LOGD(TAG, "Touch event");
   start_or_reset_deep_sleep_timer();
 }
 
