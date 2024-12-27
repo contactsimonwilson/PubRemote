@@ -127,34 +127,11 @@ static esp_err_t app_lcd_init(void) {
 
   ESP_LOGI(TAG, "Install panel IO");
 #if DISP_GC9A01
-  // const esp_lcd_panel_io_spi_config_t io_config =
-  //     GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, notify_lvgl_flush_ready, &disp_drv);
-  const esp_lcd_panel_io_spi_config_t io_config = {
-      .cs_gpio_num = DISP_CS,
-      .dc_gpio_num = DISP_DC,
-      .spi_mode = 0,
-      .pclk_hz = 80 * 1000 * 1000,
-      .trans_queue_depth = 10,
-      .lcd_cmd_bits = 8,
-      .lcd_param_bits = 8,
-  };
-#elif DISP_SH8601
-  // const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, notify_lvgl_flush_ready,
-  // &disp_drv);
+  const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
 
-  const esp_lcd_panel_io_spi_config_t io_config = {
-      .cs_gpio_num = DISP_CS,
-      .dc_gpio_num = -1,
-      .spi_mode = 0,
-      .pclk_hz = 40 * 1000 * 1000,
-      .trans_queue_depth = 10,
-      .lcd_cmd_bits = 32,
-      .lcd_param_bits = 8,
-      .flags =
-          {
-              .quad_mode = true,
-          },
-  };
+#elif DISP_SH8601
+  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
+
 #endif
   // Attach the LCD to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &lcd_io));
@@ -327,8 +304,7 @@ static esp_err_t app_lvgl_init(void) {
   lvgl_disp = lvgl_port_add_disp(&disp_cfg);
 
 #if ROUNDER_CALLBACK
-  lv_disp_drv_t *disp_drv = lvgl_port_get_disp_drv(lvgl_disp);
-  disp_drv->rounder_cb = LVGL_port_rounder_callback;
+  lvgl_disp->driver->rounder_cb = LVGL_port_rounder_callback;
 #endif
 
   lv_disp_set_rotation(lvgl_disp, DISP_ROTATE);
