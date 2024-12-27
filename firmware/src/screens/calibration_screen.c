@@ -144,7 +144,7 @@ void calibration_task(void *pvParameters) {
   while (is_calibration_screen_active()) {
     update_min_max();
 
-    LVGL_lock(0);
+    LVGL_lock(-1);
 // Get values using current calibration data
 #if JOYSTICK_X_ENABLED
     float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
