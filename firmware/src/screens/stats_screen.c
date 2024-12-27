@@ -182,7 +182,7 @@ static void update_battery_display() {
 }
 
 void update_stats_screen_display() {
-  LVGL_lock(0);
+  LVGL_lock(-1);
 
   if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
     lv_label_set_text(ui_PrimaryStatUnit, "kph");

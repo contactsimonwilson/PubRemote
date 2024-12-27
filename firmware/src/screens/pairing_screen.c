@@ -20,7 +20,7 @@ void pairing_screen_loaded(lv_event_t *e) {
 
 void pairing_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Pairing screen unloaded");
-  LVGL_lock(0);
+  LVGL_lock(-1);
   lv_label_set_text(ui_PairingCode, "0000");
   LVGL_unlock();
 }

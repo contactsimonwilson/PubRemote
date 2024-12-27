@@ -23,7 +23,7 @@ static void scroll_event_cb(lv_event_t *e) {
   // Ensure we don't exceed total items
   uint8_t current_page = clampu8((uint8_t)page_index, 0, total_items - 1);
 
-  LVGL_lock(0);
+  LVGL_lock(-1);
   for (uint8_t i = 0; i < total_items; i++) {
     // get scroll indicator
     lv_obj_t *indicator = lv_obj_get_child(ui_SettingsHeader, i);
@@ -35,7 +35,7 @@ static void scroll_event_cb(lv_event_t *e) {
 // Event handlers
 void settings_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen load start");
-  LVGL_lock(0);
+  LVGL_lock(-1);
   // Set the scroll snap
   lv_obj_set_scroll_snap_x(ui_SettingsBody, LV_SCROLL_SNAP_CENTER);
   lv_obj_add_event_cb(ui_SettingsBody, scroll_event_cb, LV_EVENT_SCROLL, NULL);
