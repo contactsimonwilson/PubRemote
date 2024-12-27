@@ -64,7 +64,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // LVGL
 #define LVGL_TICK_PERIOD_MS 5
 #define LVGL_TASK_MAX_DELAY_MS 500
-#define LVGL_TASK_CPU_AFFINITY 1
+#define LVGL_TASK_CPU_AFFINITY -1
 #define LVGL_TASK_STACK_SIZE (6 * 1024)
 #define LVGL_TASK_PRIORITY 20
 #define BUFFER_LINES ((int)(LV_VER_RES / 10))
@@ -285,7 +285,7 @@ static esp_err_t app_lvgl_init(void) {
                                             .hres = LV_HOR_RES,
                                             .vres = LV_VER_RES,
                                             .monochrome = false,
-                                            // .color_format = LV_COLOR_FORMAT_RGB565, //LVGL9
+                                            .color_format = LV_COLOR_FORMAT_RGB565,
                                             .rotation =
                                                 {
                                                     .swap_xy = false,
@@ -294,8 +294,8 @@ static esp_err_t app_lvgl_init(void) {
                                                 },
                                             .flags = {
                                                 .buff_dma = true,
-// .buff_spiram = false, //LVGL9
-// .swap_bytes = false, //LVGL9
+                                                .buff_spiram = true,
+                                                .swap_bytes = false,
 #if SW_ROTATE
                                                 .sw_rotate = true,
 #endif
@@ -315,7 +315,7 @@ static esp_err_t app_lvgl_init(void) {
       .handle = touch_handle,
   };
   lvgl_touch_indev = lvgl_port_add_touch(&touch_cfg);
-  //  lv_indev_add_event_cb(lvgl_touch_indev, lv_touch_cb, LV_EVENT_ALL, NULL); //LVGL9
+  lv_indev_add_event_cb(lvgl_touch_indev, lv_touch_cb, LV_EVENT_ALL, NULL);
 #endif
 
   return ESP_OK;
