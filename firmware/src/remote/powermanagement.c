@@ -28,7 +28,15 @@ float convert_adc_to_battery_volts(int adc_value) {
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
 
 void enter_sleep() {
+#if (JOYSTICK_BUTTON_PIN <= 21)
   esp_deep_sleep_start();
+#else
+  esp_light_sleep_start();
+#endif
+}
+
+void enter_sleep_ui(lv_event_t *e) {
+  enter_sleep();
 }
 
 void check_button_press() {
@@ -49,7 +57,7 @@ void check_button_press() {
   }
 }
 
-esp_timer_handle_t deep_sleep_timer;
+esp_timer_handle_t sleep_timer;
 static SemaphoreHandle_t timer_mutex = NULL;
 
 // Call this during initialization
@@ -62,7 +70,7 @@ static uint64_t get_sleep_timer_time_ms() {
   return get_auto_off_ms();
 }
 
-void deep_sleep_timer_callback(void *arg) {
+void sleep_timer_callback(void *arg) {
   // Take mutex if you're modifying shared resources
   if (xSemaphoreTake(timer_mutex, portMAX_DELAY) == pdTRUE) {
     // Enter deep sleep mode when the deep sleep timer expires
@@ -73,7 +81,7 @@ void deep_sleep_timer_callback(void *arg) {
   }
 }
 
-void start_or_reset_deep_sleep_timer() {
+void reset_sleep_timer() {
   if (timer_mutex == NULL) {
     ESP_LOGE(TAG, "Timer mutex not initialized!");
     return;
@@ -87,12 +95,12 @@ void start_or_reset_deep_sleep_timer() {
   int duration_ms = get_sleep_timer_time_ms();
 
   // Handle existing timer
-  if (deep_sleep_timer != NULL) {
-    if (esp_timer_is_active(deep_sleep_timer)) {
-      ESP_ERROR_CHECK(esp_timer_stop(deep_sleep_timer));
+  if (sleep_timer != NULL) {
+    if (esp_timer_is_active(sleep_timer)) {
+      ESP_ERROR_CHECK(esp_timer_stop(sleep_timer));
     }
-    ESP_ERROR_CHECK(esp_timer_delete(deep_sleep_timer));
-    deep_sleep_timer = NULL;
+    ESP_ERROR_CHECK(esp_timer_delete(sleep_timer));
+    sleep_timer = NULL;
   }
 
   if (duration_ms == 0) {
@@ -102,10 +110,10 @@ void start_or_reset_deep_sleep_timer() {
   }
 
   // Create new timer
-  esp_timer_create_args_t deep_sleep_timer_args = {
-      .callback = deep_sleep_timer_callback, .arg = NULL, .dispatch_method = ESP_TIMER_TASK, .name = "DeepSleepTimer"};
-  ESP_ERROR_CHECK(esp_timer_create(&deep_sleep_timer_args, &deep_sleep_timer));
-  ESP_ERROR_CHECK(esp_timer_start_once(deep_sleep_timer, duration_ms * 1000));
+  esp_timer_create_args_t sleep_timer_args = {
+      .callback = sleep_timer_callback, .arg = NULL, .dispatch_method = ESP_TIMER_TASK, .name = "DeepSleepTimer"};
+  ESP_ERROR_CHECK(esp_timer_create(&sleep_timer_args, &sleep_timer));
+  ESP_ERROR_CHECK(esp_timer_start_once(sleep_timer, duration_ms * 1000));
   ESP_LOGD(TAG, "Deep sleep timer started for %d ms", duration_ms);
 
   xSemaphoreGive(timer_mutex);
@@ -154,6 +162,6 @@ void init_power_management() {
     ESP_LOGI(TAG, "Not a deep sleep wakeup or other wake-up sources.");
     break;
   }
-  start_or_reset_deep_sleep_timer();
+  reset_sleep_timer();
   xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
 }

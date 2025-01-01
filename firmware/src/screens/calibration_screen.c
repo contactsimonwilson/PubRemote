@@ -166,7 +166,7 @@ void calibration_task(void *pvParameters) {
     update_stick_press_indicator();
 
     LVGL_unlock();
-    vTaskDelay(pdMS_TO_TICKS(UI_RATE_MS));
+    vTaskDelay(pdMS_TO_TICKS(LV_DISP_DEF_REFR_PERIOD));
   }
 
   ESP_LOGI(TAG, "Calibration task ended");
