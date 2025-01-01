@@ -133,7 +133,7 @@ static void thumbstick_task(void *pvParameters) {
 #endif
 
     if (trigger_sleep_disrupt) {
-      start_or_reset_deep_sleep_timer();
+      reset_sleep_timer();
     }
 
     vTaskDelay(pdMS_TO_TICKS(INPUT_RATE_MS));
@@ -151,7 +151,7 @@ void init_thumbstick() {
 
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
-  start_or_reset_deep_sleep_timer();
+  reset_sleep_timer();
   remote_data.data.bt_c = 1;
 
   // Start a timer to reset the button state after a certain duration
@@ -163,7 +163,7 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
-  start_or_reset_deep_sleep_timer();
+  reset_sleep_timer();
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {

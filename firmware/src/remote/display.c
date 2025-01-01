@@ -251,7 +251,7 @@ static esp_err_t app_touch_init(void) {
 
 static void lv_touch_cb(lv_event_t *e) {
   ESP_LOGD(TAG, "Touch event");
-  start_or_reset_deep_sleep_timer();
+  reset_sleep_timer();
 }
 
 #endif // TOUCH_ENABLED

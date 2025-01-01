@@ -125,7 +125,7 @@ static void process_data(esp_now_event_t evt) {
   else if ((connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
             connection_state == CONNECTION_STATE_CONNECTING) &&
            len == 32) {
-    start_or_reset_deep_sleep_timer();
+    reset_sleep_timer();
 
     uint8_t mode = data[0];
     uint8_t fault_code = data[1];

@@ -6230,7 +6230,7 @@
                               {
                                 "nid": -1540573669,
                                 "strtype": "CALL FUNCTION/Function_name",
-                                "strval": "enter_deep_sleep",
+                                "strval": "enter_sleep",
                                 "InheritedType": 10
                               },
                               {
@@ -17845,7 +17845,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1074,
+    "backup_cnt": 1076,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
