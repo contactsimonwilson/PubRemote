@@ -144,28 +144,29 @@ void calibration_task(void *pvParameters) {
   while (is_calibration_screen_active()) {
     update_min_max();
 
-    LVGL_lock(-1);
+    if (LVGL_lock(-1)) {
 // Get values using current calibration data
 #if JOYSTICK_X_ENABLED
-    float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
-                                           calibration_data.x_max, calibration_data.deadband, calibration_data.expo);
+      float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
+                                             calibration_data.x_max, calibration_data.deadband, calibration_data.expo);
 #else
-    float curr_x_val = 0;
+      float curr_x_val = 0;
 #endif
 
 #if JOYSTICK_Y_ENABLED
-    float curr_y_val = convert_adc_to_axis(joystick_data.y, calibration_data.y_min, calibration_data.y_center,
-                                           calibration_data.y_max, calibration_data.deadband, calibration_data.expo);
+      float curr_y_val = convert_adc_to_axis(joystick_data.y, calibration_data.y_min, calibration_data.y_center,
+                                             calibration_data.y_max, calibration_data.deadband, calibration_data.expo);
 #else
-    float curr_y_val = 0;
+      float curr_y_val = 0;
 #endif
 
-    update_display_stick_label(curr_x_val, curr_y_val);
-    update_display_stick_position(curr_x_val, curr_y_val);
-    update_deadband_indicator();
-    update_stick_press_indicator();
+      update_display_stick_label(curr_x_val, curr_y_val);
+      update_display_stick_position(curr_x_val, curr_y_val);
+      update_deadband_indicator();
+      update_stick_press_indicator();
 
-    LVGL_unlock();
+      LVGL_unlock();
+    }
     vTaskDelay(pdMS_TO_TICKS(LV_DISP_DEF_REFR_PERIOD));
   }
 
@@ -174,44 +175,45 @@ void calibration_task(void *pvParameters) {
 }
 
 void update_calibration_screen() {
-  LVGL_lock(-1);
-  lv_obj_clear_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN); // show on every step except expo
-  lv_obj_add_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);               // Hide for every step except deadband
-  lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);                      // Hide for every step except expo
+  if (LVGL_lock(0)) {
+    lv_obj_clear_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN); // show on every step except expo
+    lv_obj_add_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);               // Hide for every step except deadband
+    lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);                      // Hide for every step except expo
 
-  switch (calibration_step) {
-  case CALIBRATION_STEP_START:
-    lv_label_set_text(ui_CalibrationStepLabel, "Press start to begin calibration");
-    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Start");
-    break;
-  case CALIBRATION_STEP_CENTER:
-    lv_label_set_text(ui_CalibrationStepLabel, "Move stick to center");
-    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
-    break;
-  case CALIBRATION_STEP_MINMAX:
-    lv_label_set_text(ui_CalibrationStepLabel, "Move stick to min/max");
-    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
-    break;
-  case CALIBRATION_STEP_DEADBAND:
-    lv_label_set_text(ui_CalibrationStepLabel, "Move stick within deadband");
-    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
-    lv_obj_set_width(ui_DeadbandIndicator, lv_pct(0));
-    lv_obj_set_height(ui_DeadbandIndicator, lv_pct(0));
-    lv_obj_clear_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);
-    break;
-  case CALIBRATION_STEP_EXPO:
-    lv_slider_set_value(ui_ExpoSlider, (int)(calibration_data.expo * 10), LV_ANIM_OFF);
-    lv_obj_add_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
-    lv_label_set_text(ui_CalibrationStepLabel, "Set expo factor");
-    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
-    lv_obj_clear_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);
-    break;
-  case CALIBRATION_STEP_DONE:
-    lv_label_set_text(ui_CalibrationStepLabel, "Calibration complete!");
-    lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Save");
-    break;
+    switch (calibration_step) {
+    case CALIBRATION_STEP_START:
+      lv_label_set_text(ui_CalibrationStepLabel, "Press start to begin calibration");
+      lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Start");
+      break;
+    case CALIBRATION_STEP_CENTER:
+      lv_label_set_text(ui_CalibrationStepLabel, "Move stick to center");
+      lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+      break;
+    case CALIBRATION_STEP_MINMAX:
+      lv_label_set_text(ui_CalibrationStepLabel, "Move stick to min/max");
+      lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+      break;
+    case CALIBRATION_STEP_DEADBAND:
+      lv_label_set_text(ui_CalibrationStepLabel, "Move stick within deadband");
+      lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+      lv_obj_set_width(ui_DeadbandIndicator, lv_pct(0));
+      lv_obj_set_height(ui_DeadbandIndicator, lv_pct(0));
+      lv_obj_clear_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);
+      break;
+    case CALIBRATION_STEP_EXPO:
+      lv_slider_set_value(ui_ExpoSlider, (int)(calibration_data.expo * 10), LV_ANIM_OFF);
+      lv_obj_add_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+      lv_label_set_text(ui_CalibrationStepLabel, "Set expo factor");
+      lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+      lv_obj_clear_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);
+      break;
+    case CALIBRATION_STEP_DONE:
+      lv_label_set_text(ui_CalibrationStepLabel, "Calibration complete!");
+      lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Save");
+      break;
+    }
+    LVGL_unlock();
   }
-  LVGL_unlock();
 }
 
 static void reset_calibration_data() {

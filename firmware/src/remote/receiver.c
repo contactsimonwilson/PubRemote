@@ -98,9 +98,10 @@ static void process_data(esp_now_event_t evt) {
     ESP_LOGI(TAG, "Secret Code: %li", pairing_settings.secret_code);
     char *formattedString;
     asprintf(&formattedString, "%ld", pairing_settings.secret_code);
-    LVGL_lock(-1);
-    lv_label_set_text(ui_PairingCode, formattedString);
-    LVGL_unlock();
+    if (LVGL_lock(0)) {
+      lv_label_set_text(ui_PairingCode, formattedString);
+      LVGL_unlock();
+    }
     free(formattedString);
     pairing_state = PAIRING_STATE_PENDING;
   }
@@ -110,17 +111,18 @@ static void process_data(esp_now_event_t evt) {
     ESP_LOGI(TAG, "packet Length: %d", len);
     int response = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
     ESP_LOGI(TAG, "Response: %i", response);
-    LVGL_lock(-1);
-    if (response == -1) {
-      pairing_state = PAIRING_STATE_PAIRED;
-      save_pairing_data();
-      connect_to_default_peer();
-      lv_disp_load_scr(ui_StatsScreen);
+    if (LVGL_lock(0)) {
+      if (response == -1) {
+        pairing_state = PAIRING_STATE_PAIRED;
+        save_pairing_data();
+        connect_to_default_peer();
+        lv_disp_load_scr(ui_StatsScreen);
+      }
+      else {
+        pairing_state = PAIRING_STATE_UNPAIRED;
+      }
+      LVGL_unlock();
     }
-    else {
-      pairing_state = PAIRING_STATE_UNPAIRED;
-    }
-    LVGL_unlock();
   }
   else if ((connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
             connection_state == CONNECTION_STATE_CONNECTING) &&

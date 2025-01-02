@@ -198,7 +198,7 @@ static void process_children_recursive(lv_obj_t *parent, void (*callback)(lv_obj
   }
 }
 
-void scale_element(lv_obj_t *element) {
+static void scale_element(lv_obj_t *element) {
   scale_padding(element);
   scale_dimensions(element);
   scale_arc_width(element);
@@ -210,8 +210,18 @@ void scale_element(lv_obj_t *element) {
   lv_obj_refresh_style(element, LV_STYLE_PROP_ANY, LV_PART_MAIN);
 }
 
-void apply_ui_scale() {
+void apply_ui_scale(lv_obj_t *element) {
   if (SCALE_FACTOR == 1.0) {
+    return;
+  }
+
+  if (element != NULL) {
+    process_children_recursive(element, scale_element);
+    return;
+  }
+
+  if (ui_SplashScreen == NULL) {
+    process_children_recursive(lv_scr_act(), scale_element);
     return;
   }
 
