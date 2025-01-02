@@ -14,20 +14,21 @@ bool is_about_screen_active() {
 // Event handlers
 void about_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen load start");
-  LVGL_lock(-1);
+  if (LVGL_lock(0)) {
 
-  // set the version number
-  char *formattedString;
-  asprintf(&formattedString, "Version: %d.%d.%d\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
-           BUILD_TYPE, BUILD_ID);
+    // set the version number
+    char *formattedString;
+    asprintf(&formattedString, "Version: %d.%d.%d\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
+             BUILD_TYPE, BUILD_ID);
 
-  lv_label_set_text(ui_VersionInfoLabel, formattedString);
+    lv_label_set_text(ui_VersionInfoLabel, formattedString);
 
-  asprintf(&formattedString, "Battery: %.2fV", remoteStats.remoteBatteryVoltage);
-  lv_label_set_text(ui_DebugInfoLabel, formattedString);
-  LVGL_unlock();
+    asprintf(&formattedString, "Battery: %.2fV", remoteStats.remoteBatteryVoltage);
+    lv_label_set_text(ui_DebugInfoLabel, formattedString);
+    LVGL_unlock();
 
-  free(formattedString);
+    free(formattedString);
+  }
 }
 
 void about_screen_loaded(lv_event_t *e) {

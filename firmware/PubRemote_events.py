@@ -142,3 +142,7 @@ def settings_screen_load_start(event_struct):
 def about_screen_load_start(event_struct):
     return
 
+
+def enter_sleep_ui(event_struct):
+    return
+
