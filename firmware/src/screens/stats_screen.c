@@ -182,22 +182,22 @@ static void update_battery_display() {
 }
 
 void update_stats_screen_display() {
-  LVGL_lock(-1);
+  if (LVGL_lock(-1)) {
+    if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
+      lv_label_set_text(ui_PrimaryStatUnit, "kph");
+    }
+    else {
+      lv_label_set_text(ui_PrimaryStatUnit, "mph");
+    }
 
-  if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
-    lv_label_set_text(ui_PrimaryStatUnit, "kph");
+    update_speed_dial_display();
+    update_utilization_dial_display();
+    update_primary_stat_display();
+    update_secondary_stat_display();
+    update_footpad_display();
+    update_battery_display();
+    LVGL_unlock();
   }
-  else {
-    lv_label_set_text(ui_PrimaryStatUnit, "mph");
-  }
-
-  update_speed_dial_display();
-  update_utilization_dial_display();
-  update_primary_stat_display();
-  update_secondary_stat_display();
-  update_footpad_display();
-  update_battery_display();
-  LVGL_unlock();
 }
 
 // Event handlers

@@ -23,40 +23,42 @@ static void scroll_event_cb(lv_event_t *e) {
   // Ensure we don't exceed total items
   uint8_t current_page = clampu8((uint8_t)page_index, 0, total_items - 1);
 
-  LVGL_lock(-1);
-  for (uint8_t i = 0; i < total_items; i++) {
-    // get scroll indicator
-    lv_obj_t *indicator = lv_obj_get_child(ui_SettingsHeader, i);
-    lv_obj_set_style_bg_opa(indicator, i == current_page ? 255 : 100, LV_PART_MAIN);
+  if (LVGL_lock(-1)) {
+    for (uint8_t i = 0; i < total_items; i++) {
+      // get scroll indicator
+      lv_obj_t *indicator = lv_obj_get_child(ui_SettingsHeader, i);
+      lv_obj_set_style_bg_opa(indicator, i == current_page ? 255 : 100, LV_PART_MAIN);
+    }
+    LVGL_unlock();
   }
-  LVGL_unlock();
 }
 
 // Event handlers
 void settings_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen load start");
-  LVGL_lock(-1);
-  // Set the scroll snap
-  lv_obj_set_scroll_snap_x(ui_SettingsBody, LV_SCROLL_SNAP_CENTER);
-  lv_obj_add_event_cb(ui_SettingsBody, scroll_event_cb, LV_EVENT_SCROLL, NULL);
-  // lv_obj_scroll_to_x(ui_SettingsBody, 0, LV_ANIM_OFF);
+  if (LVGL_lock(-1)) {
+    // Set the scroll snap
+    lv_obj_set_scroll_snap_x(ui_SettingsBody, LV_SCROLL_SNAP_CENTER);
+    lv_obj_add_event_cb(ui_SettingsBody, scroll_event_cb, LV_EVENT_SCROLL, NULL);
+    // lv_obj_scroll_to_x(ui_SettingsBody, 0, LV_ANIM_OFF);
 
-  // Brightness
-  lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
+    // Brightness
+    lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
 
-  // Auto off time
-  lv_dropdown_set_selected(ui_AutoOffTime, device_settings.auto_off_time);
+    // Auto off time
+    lv_dropdown_set_selected(ui_AutoOffTime, device_settings.auto_off_time);
 
-  // Temp units
-  lv_dropdown_set_selected(ui_TempUnits, device_settings.temp_units);
+    // Temp units
+    lv_dropdown_set_selected(ui_TempUnits, device_settings.temp_units);
 
-  // Distance units
-  lv_dropdown_set_selected(ui_DistanceUnits, device_settings.distance_units);
+    // Distance units
+    lv_dropdown_set_selected(ui_DistanceUnits, device_settings.distance_units);
 
-  // Theme color
-  lv_color_t color = lv_color_hex(device_settings.theme_color);
-  // lv_colorwheel_set_rgb(ui_ThemeColor, color);
-  LVGL_unlock();
+    // Theme color
+    lv_color_t color = lv_color_hex(device_settings.theme_color);
+    // lv_colorwheel_set_rgb(ui_ThemeColor, color); // TODO: add new for LVGL9
+    LVGL_unlock();
+  }
 }
 
 void settings_screen_loaded(lv_event_t *e) {

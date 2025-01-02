@@ -6170,7 +6170,7 @@
                               {
                                 "nid": -1540573669,
                                 "strtype": "CALL FUNCTION/Function_name",
-                                "strval": "enter_deep_sleep",
+                                "strval": "enter_sleep",
                                 "InheritedType": 10
                               },
                               {

@@ -18,7 +18,7 @@ void stat_swipe_right(lv_event_t * e);
 void stats_footer_long_press(lv_event_t * e);
 void menu_screen_loaded(lv_event_t * e);
 void menu_screen_unloaded(lv_event_t * e);
-void enter_deep_sleep(lv_event_t * e);
+void enter_sleep_ui(lv_event_t * e);
 void settings_screen_loaded(lv_event_t * e);
 void settings_screen_unloaded(lv_event_t * e);
 void settings_screen_load_start(lv_event_t * e);

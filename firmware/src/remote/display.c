@@ -69,7 +69,9 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define LVGL_TASK_PRIORITY 20
 #define BUFFER_LINES ((int)(LV_VER_RES / 10))
 #define BUFFER_SIZE (LV_HOR_RES * BUFFER_LINES)
-#define MAX_TRAN_SIZE ((int)LV_HOR_RES * LV_VER_RES * sizeof(uint16_t))
+#define MAX_TRAN_SIZE ((int)LV_HOR_RES * BUFFER_LINES * sizeof(uint16_t))
+
+#define SCREEN_TEST_UI 0
 
 /* LCD IO and panel */
 static esp_lcd_panel_io_handle_t lcd_io = NULL;
@@ -251,7 +253,7 @@ static esp_err_t app_touch_init(void) {
 
 static void lv_touch_cb(lv_event_t *e) {
   ESP_LOGD(TAG, "Touch event");
-  start_or_reset_deep_sleep_timer();
+  reset_sleep_timer();
 }
 
 #endif // TOUCH_ENABLED
@@ -289,12 +291,19 @@ static esp_err_t app_lvgl_init(void) {
                                             .rotation =
                                                 {
                                                     .swap_xy = false,
+#if DISP_GC9A01
                                                     .mirror_x = true,
                                                     .mirror_y = false,
+#elif DISP_SH8601
+                                                    .mirror_x = false,
+                                                    .mirror_y = false,
+#endif
                                                 },
                                             .flags = {
                                                 .buff_dma = true,
-                                                .buff_spiram = true,
+                                                .buff_spiram = false,
+                                                .full_refresh = false,
+                                                .direct_mode = false,
                                                 .swap_bytes = false,
 #if SW_ROTATE
                                                 .sw_rotate = true,
@@ -304,7 +313,7 @@ static esp_err_t app_lvgl_init(void) {
   lvgl_disp = lvgl_port_add_disp(&disp_cfg);
 
 #if ROUNDER_CALLBACK
-  lvgl_disp->driver->rounder_cb = LVGL_port_rounder_callback;
+  lv_display_add_event_cb(lvgl_disp, LVGL_port_rounder_callback, LV_EVENT_INVALIDATE_AREA, NULL);
 #endif
 
   lv_disp_set_rotation(lvgl_disp, DISP_ROTATE);
@@ -321,6 +330,31 @@ static esp_err_t app_lvgl_init(void) {
   return ESP_OK;
 }
 
+static esp_err_t display_ui() {
+  ESP_LOGI(TAG, "Display UI");
+
+  if (LVGL_lock(0)) {
+#if SCREEN_TEST_UI // Useful for debugging mutexes and any sl generated code
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFF69B4), LV_PART_MAIN);
+    lv_obj_t *btn = lv_btn_create(lv_scr_act());
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_t *label = lv_label_create(btn);
+    lv_label_set_text(label, "Hello world");
+    lv_obj_center(label);
+#else
+    ui_init(); // Generated SL UI
+#endif
+    apply_ui_scale(NULL);
+    reload_theme();
+    LVGL_unlock();
+    // Delay backlight turn on to avoid flickering
+    vTaskDelay(pdMS_TO_TICKS(200));
+    set_bl_level(device_settings.bl_level);
+    return ESP_OK;
+  }
+  return ESP_FAIL;
+}
+
 void init_display(void) {
   ESP_LOGI(TAG, "Create LVGL conf");
   /* LCD HW initialization */
@@ -331,17 +365,5 @@ void init_display(void) {
 #endif
   /* LVGL initialization */
   ESP_ERROR_CHECK(app_lvgl_init());
-
-  ESP_LOGI(TAG, "Display UI");
-  // Lock the mutex due to the LVGL APIs are not thread-safe
-  LVGL_lock(0);
-  ui_init();
-  reload_theme();
-  apply_ui_scale();
-  // Release the mutex
-  LVGL_unlock();
-
-  // Delay backlight turn on to avoid flickering
-  vTaskDelay(pdMS_TO_TICKS(200));
-  set_bl_level(device_settings.bl_level);
+  ESP_ERROR_CHECK(display_ui());
 }
