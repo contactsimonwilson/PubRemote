@@ -330,6 +330,23 @@ static esp_err_t app_lvgl_init(void) {
   return ESP_OK;
 }
 
+#if SCREEN_TEST_UI
+static void event_handler(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+
+  if (code == LV_EVENT_CLICKED) {
+    LV_LOG_USER("Clicked");
+    ESP_LOGI(TAG, "Clicked");
+    LVGL_lock(0);
+    ui_init();
+    LVGL_unlock();
+  }
+  else if (code == LV_EVENT_VALUE_CHANGED) {
+    LV_LOG_USER("Toggled");
+  }
+}
+#endif
+
 static esp_err_t display_ui() {
   ESP_LOGI(TAG, "Display UI");
 
@@ -338,9 +355,12 @@ static esp_err_t display_ui() {
     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFF69B4), LV_PART_MAIN);
     lv_obj_t *btn = lv_btn_create(lv_scr_act());
     lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_event_cb(btn, event_handler, LV_EVENT_ALL, NULL);
+
     lv_obj_t *label = lv_label_create(btn);
     lv_label_set_text(label, "Hello world");
     lv_obj_center(label);
+    // lv_demo_widgets();
 #else
     ui_init(); // Generated SL UI
 #endif

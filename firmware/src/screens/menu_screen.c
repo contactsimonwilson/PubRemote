@@ -14,7 +14,6 @@ bool is_menu_screen_active() {
 // Event handlers
 void menu_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Menu screen loaded");
-  lv_dropdown_set_selected(ui_AutoOffTime, device_settings.auto_off_time);
 }
 
 void menu_screen_unloaded(lv_event_t *e) {
