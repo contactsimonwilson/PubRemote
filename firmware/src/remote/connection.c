@@ -53,6 +53,8 @@ static void connection_task(void *pvParameters) {
                get_current_time_ms() - remoteStats.lastUpdated < RECONNECTING_DURATION_MS) {
         // Connected - update connection state
         update_connection_state(CONNECTION_STATE_CONNECTED);
+        // Save pairing data. This way we remember the last channel we connected on
+        save_pairing_data();
       }
     }
     else if (connection_state == CONNECTION_STATE_RECONNECTING) {

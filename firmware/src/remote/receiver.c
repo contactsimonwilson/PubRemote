@@ -244,7 +244,7 @@ static void receiver_task(void *pvParameters) {
       if (is_connecting || is_pairing) {
         if (channel_switch_time_ms > CHANNEL_HOP_INTERVAL_MS) {
           // Hop to next channel
-          uint8_t next_channel = (pairing_settings.channel % 10) + 1;
+          uint8_t next_channel = (pairing_settings.channel % 11) + 1;
           change_channel(next_channel, is_pairing);
           channel_switch_time_ms = 0;
         }
