@@ -41,7 +41,9 @@ CalibrationSettings calibration_settings = {
 
 PairingSettings pairing_settings = {
     .remote_addr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, // Use 0xFF for -1 as uint8_t is unsigned
-    .secret_code = DEFAULT_PAIRING_SECRET_CODE};
+    .secret_code = DEFAULT_PAIRING_SECRET_CODE,
+    .channel = 1,
+};
 
 static uint8_t get_auto_off_time_minutes() {
   switch (device_settings.auto_off_time) {
@@ -75,6 +77,12 @@ esp_err_t save_pairing_data() {
   esp_err_t err = nvs_write_int("secret_code", pairing_settings.secret_code);
   if (err != ESP_OK) {
     ESP_LOGE(TAG, "Error saving secret code!");
+    return err;
+  }
+
+  err = nvs_write_int("channel", pairing_settings.channel);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Error saving channel!");
     return err;
   }
 
@@ -171,7 +179,10 @@ esp_err_t init_settings() {
   pairing_settings.secret_code =
       nvs_read_int("secret_code", &pairing_settings.secret_code) == ESP_OK ? pairing_settings.secret_code : -1;
 
-  uint8_t remote_addr[MAC_ADDR_LEN];
+  pairing_settings.channel =
+      nvs_read_int("channel", &pairing_settings.channel) == ESP_OK ? pairing_settings.channel : 1;
+
+  uint8_t remote_addr[ESP_NOW_ETH_ALEN];
   err = nvs_read_blob("remote_addr", &remote_addr, sizeof(remote_addr));
   if (err == ESP_OK) {
     memcpy(pairing_settings.remote_addr, remote_addr, sizeof(remote_addr));

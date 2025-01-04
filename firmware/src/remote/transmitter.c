@@ -22,6 +22,18 @@ static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) 
   ESP_LOGD(TAG, "SENT");
 }
 
+static uint8_t get_peer_channel(const uint8_t *peer_mac) {
+  esp_now_peer_info_t peer_info = {0};
+
+  esp_err_t result = esp_now_get_peer(peer_mac, &peer_info);
+  if (result != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to get peer info: %s", esp_err_to_name(result));
+    return 0; // Return 0 to indicate error
+  }
+
+  return peer_info.channel;
+}
+
 // Function to send ESP-NOW data
 static void transmitter_task(void *pvParameters) {
   ESP_ERROR_CHECK(esp_now_register_send_cb(on_data_sent));
@@ -54,7 +66,13 @@ static void transmitter_task(void *pvParameters) {
       esp_err_t result = esp_now_send(mac_addr, combined_data, sizeof(combined_data));
       if (result != ESP_OK) {
         // Handle error if needed
-        ESP_LOGE(TAG, "Error sending remote data: %d", result);
+        uint8_t chann = pairing_settings.channel;
+        uint8_t wifi_chann;
+        wifi_second_chan_t secondary_channel;
+        uint8_t peer_chann = get_peer_channel(mac_addr);
+        esp_wifi_get_channel(&wifi_chann, &secondary_channel);
+        ESP_LOGE(TAG, "Error sending remote data: %d  - Channel: %d, WiFi Channel: %d, Peer Channel: %d", result, chann,
+                 wifi_chann, peer_chann);
       }
 
       LAST_COMMAND_TIME = newTime;
