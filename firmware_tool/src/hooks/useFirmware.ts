@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FirmwareVersion } from '../types';
 
 const GITHUB_REPO = 'contactsimonwilson/pubremote';
