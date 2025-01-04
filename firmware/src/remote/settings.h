@@ -1,10 +1,10 @@
-#include <core/lv_obj.h>
 #ifndef __SETTINGS_H
-  #define __SETTINGS_H
-
-  #include "esp_system.h"
-  #include "nvs_flash.h"
-  #include <remote/receiver.h>
+#define __SETTINGS_H
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include <core/lv_obj.h>
+#include <esp_now.h>
+#include <remote/receiver.h>
 
 // Function to initialize NVS
 esp_err_t init_nvs();
@@ -47,12 +47,12 @@ typedef enum {
   DISTANCE_UNITS_IMPERIAL,
 } DistanceUnits;
 
-  #define DEFAULT_PAIRING_SECRET_CODE -1
-  #define MAC_ADDR_LEN 6
+#define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
   uint32_t secret_code;
-  uint8_t remote_addr[MAC_ADDR_LEN];
+  uint8_t remote_addr[ESP_NOW_ETH_ALEN];
+  uint8_t channel;
 } PairingSettings;
 
 typedef struct {
