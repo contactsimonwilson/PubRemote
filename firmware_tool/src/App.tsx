@@ -1,12 +1,13 @@
 import React, { useRef, useState } from 'react';
-import { Header } from './components/Header';
+import { Usb } from 'lucide-react';
 import { DeviceInfo } from './components/DeviceInfo';
 import { FirmwareSelector } from './components/FirmwareSelector';
 import { FlashProgress } from './components/FlashProgress';
-import { FlashProgress as FlashProgressType, DeviceInfoData } from './types';
-import { Usb } from 'lucide-react';
+import { FloatAccessoriesSelector } from './components/FloatAccessoriesSelector';
+import { Header } from './components/Header';
 import { ESPService } from './services/espService';
 import { TerminalService } from './services/terminal';
+import { DeviceInfoData, FlashProgress as FlashProgressType } from './types';
 
 function App() {
   const terminal = useRef<TerminalService>(new TerminalService()).current;
@@ -123,6 +124,10 @@ function App() {
                 Flash Device
               </button>
             </div>
+          </div>
+
+          <div className="rounded-lg bg-gray-900 p-6">
+            <FloatAccessoriesSelector />
           </div>
         </div>
       </main>
