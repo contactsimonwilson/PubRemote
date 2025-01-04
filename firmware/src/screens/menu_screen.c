@@ -1,4 +1,7 @@
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include <remote/connection.h>
 #include <remote/display.h>
 #include <remote/powermanagement.h>
 #include <remote/settings.h>
@@ -14,6 +17,23 @@ bool is_menu_screen_active() {
 // Event handlers
 void menu_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Menu screen loaded");
+
+  if (LVGL_lock(0)) {
+    if (pairing_state == PAIRING_STATE_PAIRED) {
+      lv_obj_clear_flag(ui_MenuConnectButton, LV_OBJ_FLAG_HIDDEN);
+
+      if (connection_state == CONNECTION_STATE_DISCONNECTED) {
+        lv_label_set_text(ui_MenuConnectButtonLabel, "Connect");
+      }
+      else {
+        lv_label_set_text(ui_MenuConnectButtonLabel, "Disconnect");
+      }
+    }
+    else {
+      lv_obj_add_flag(ui_MenuConnectButton, LV_OBJ_FLAG_HIDDEN);
+    }
+    LVGL_unlock();
+  }
 }
 
 void menu_screen_unloaded(lv_event_t *e) {
@@ -22,4 +42,20 @@ void menu_screen_unloaded(lv_event_t *e) {
 
 void enter_deep_sleep(lv_event_t *e) {
   enter_sleep();
+}
+
+void menu_connect_press(lv_event_t *e) {
+  ESP_LOGI(TAG, "Connect button pressed");
+
+  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
+    connect_to_default_peer();
+  }
+  else {
+    update_connection_state(CONNECTION_STATE_DISCONNECTED);
+  }
+
+  if (LVGL_lock(0)) {
+    _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);
+    LVGL_unlock();
+  }
 }

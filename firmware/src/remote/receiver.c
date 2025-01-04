@@ -19,7 +19,7 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-RECEIVER";
-#define RX_QUEUE_SIZE 1
+#define RX_QUEUE_SIZE 10
 
 // Structure to hold ESP-NOW data
 typedef struct {
@@ -43,7 +43,7 @@ static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *da
 
 #if RX_QUEUE_SIZE > 1
   // Send to queue for processing in application task
-  if (uxQueueSpacesAvailable() == 0) {
+  if (uxQueueSpacesAvailable(espnow_queue) == 0) {
     // reset the queue
     xQueueReset(espnow_queue);
   }
@@ -200,7 +200,7 @@ static void process_data(esp_now_event_t evt) {
   }
 }
 
-#define CHANNEL_HOP_INTERVAL_MS 500 // 1 second
+#define CHANNEL_HOP_INTERVAL_MS 200
 #define RECEIVER_TASK_DELAY_MS 5
 
 static void change_channel(uint8_t chan, bool is_pairing) {
