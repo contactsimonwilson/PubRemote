@@ -53,6 +53,8 @@ static void connection_task(void *pvParameters) {
                get_current_time_ms() - remoteStats.lastUpdated < RECONNECTING_DURATION_MS) {
         // Connected - update connection state
         update_connection_state(CONNECTION_STATE_CONNECTED);
+        // Save pairing data. This way we remember the last channel we connected on
+        save_pairing_data();
       }
     }
     else if (connection_state == CONNECTION_STATE_RECONNECTING) {
@@ -78,7 +80,7 @@ void connect_to_peer(uint8_t *mac_addr, uint8_t channel) {
   esp_now_peer_info_t peerInfo = {};
   peerInfo.channel = channel; // Set the channel number (0-14)
   peerInfo.encrypt = false;
-  memcpy(peerInfo.peer_addr, mac_addr, MAC_ADDR_LEN);
+  memcpy(peerInfo.peer_addr, mac_addr, ESP_NOW_ETH_ALEN);
 
   if (esp_now_is_peer_exist(mac_addr)) {
     esp_err_t res = esp_now_del_peer(mac_addr);
@@ -100,7 +102,7 @@ void connect_to_peer(uint8_t *mac_addr, uint8_t channel) {
 void connect_to_default_peer() {
   if (pairing_state == PAIRING_STATE_PAIRED) {
     uint8_t *mac_addr = pairing_settings.remote_addr;
-    connect_to_peer(mac_addr, 1);
+    connect_to_peer(mac_addr, pairing_settings.channel);
   }
 }
 
@@ -113,5 +115,5 @@ void init_connection() {
   if (pairing_state == PAIRING_STATE_PAIRED) {
     connect_to_default_peer();
   }
-  xTaskCreatePinnedToCore(connection_task, "connection_task", 2048, NULL, 20, NULL, 0);
+  xTaskCreatePinnedToCore(connection_task, "connection_task", 4096, NULL, 20, NULL, 0);
 }
