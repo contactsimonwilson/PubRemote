@@ -68,7 +68,15 @@ static void process_data(esp_now_event_t evt) {
   LAST_COMMAND_TIME = 0;
   ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
-  if (pairing_state == PAIRING_STATE_UNPAIRED && len == 6) {
+  bool is_pairing_start = pairing_state == PAIRING_STATE_UNPAIRED && is_pairing_screen_active();
+
+  // Check mac for security on anything other than initial pairing
+  if (!is_same_mac(evt.mac_addr, pairing_settings.remote_addr) && !is_pairing_start) {
+    ESP_LOGD(TAG, "Ignoring data from unknown MAC");
+    return;
+  }
+
+  if (is_pairing_start && len == 6) {
     uint8_t rec_mac[ESP_NOW_ETH_ALEN];
     memcpy(rec_mac, data, ESP_NOW_ETH_ALEN);
     if (!is_same_mac(evt.mac_addr, rec_mac)) {
