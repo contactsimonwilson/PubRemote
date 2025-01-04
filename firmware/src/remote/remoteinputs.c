@@ -27,6 +27,8 @@ static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 
 RemoteDataUnion remote_data;
 JoystickData joystick_data;
+static button_handle_t gpio_btn_handle = NULL;
+static bool power_button_enabled = true;
 
 float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo) {
   float axis = 0;
@@ -167,8 +169,10 @@ static void button_double_click_cb(void *arg, void *usr_data) {
 }
 
 static void button_long_press_cb(void *arg, void *usr_data) {
-  ESP_LOGI(TAG, "BUTTON LONG PRESSS");
-  enter_sleep();
+  ESP_LOGI(TAG, "BUTTON LONG PRESS");
+  if (power_button_enabled) {
+    enter_sleep();
+  }
 }
 
 void reset_button_state() {
@@ -188,13 +192,17 @@ void init_buttons() {
               .active_level = JOYSTICK_BUTTON_LEVEL,
           },
   };
-  button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
-  if (NULL == gpio_btn) {
+  gpio_btn_handle = iot_button_create(&gpio_btn_cfg);
+  if (NULL == gpio_btn_handle) {
     ESP_LOGE(TAG, "Button create failed");
   }
 
-  iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
-  iot_button_register_cb(gpio_btn, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
-  iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_HOLD, button_long_press_cb, NULL);
+  iot_button_register_cb(gpio_btn_handle, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
+  iot_button_register_cb(gpio_btn_handle, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
+  iot_button_register_cb(gpio_btn_handle, BUTTON_LONG_PRESS_UP, button_long_press_cb, NULL);
 #endif
+}
+
+void enable_power_button(bool enable) {
+  power_button_enabled = enable;
 }

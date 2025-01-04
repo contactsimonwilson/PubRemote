@@ -86,6 +86,8 @@ static lv_display_t *lvgl_disp = NULL;
 static lv_indev_t *lvgl_touch_indev = NULL;
 #endif
 
+static bool has_installed_drivers = false;
+
 #if DISP_SH8601
 void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area) {
   uint16_t x1 = area->x1;
@@ -104,10 +106,18 @@ void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area
 #endif
 
 bool LVGL_lock(int timeout_ms) {
+  if (!lv_is_initialized()) {
+    return false;
+  }
+
   return lvgl_port_lock(timeout_ms);
 }
 
 void LVGL_unlock(void) {
+  if (!lv_is_initialized()) {
+    return;
+  }
+
   lvgl_port_unlock();
 }
 
@@ -204,18 +214,20 @@ static esp_err_t app_lcd_init(void) {
 #if TOUCH_ENABLED
 static esp_err_t app_touch_init(void) {
 
-  /* Initilize I2C */
-  const i2c_config_t i2c_conf = {.mode = I2C_MODE_MASTER,
-                                 .sda_io_num = TP_SDA,
-                                 .sda_pullup_en = GPIO_PULLUP_DISABLE,
-                                 .scl_io_num = TP_SCL,
-                                 .scl_pullup_en = GPIO_PULLUP_DISABLE,
-                                 .master.clk_speed = 400000};
+  if (!has_installed_drivers) {
+    /* Initilize I2C */
+    const i2c_config_t i2c_conf = {.mode = I2C_MODE_MASTER,
+                                   .sda_io_num = TP_SDA,
+                                   .sda_pullup_en = GPIO_PULLUP_DISABLE,
+                                   .scl_io_num = TP_SCL,
+                                   .scl_pullup_en = GPIO_PULLUP_DISABLE,
+                                   .master.clk_speed = 400000};
 
-  ESP_LOGI(TAG, "Initializing I2C for display touch");
-  /* Initialize I2C */
-  ESP_ERROR_CHECK(i2c_param_config(TP_I2C_NUM, &i2c_conf));
-  ESP_ERROR_CHECK(i2c_driver_install(TP_I2C_NUM, i2c_conf.mode, 0, 0, 0));
+    ESP_LOGI(TAG, "Initializing I2C for display touch");
+    /* Initialize I2C */
+    ESP_ERROR_CHECK(i2c_param_config(TP_I2C_NUM, &i2c_conf));
+    ESP_ERROR_CHECK(i2c_driver_install(TP_I2C_NUM, i2c_conf.mode, 0, 0, 0));
+  }
 
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
 
@@ -375,7 +387,34 @@ static esp_err_t display_ui() {
   return ESP_FAIL;
 }
 
-void init_display(void) {
+void deinit_display() {
+  ESP_LOGI(TAG, "Deinit display");
+  set_bl_level(0);
+
+  if (lv_is_initialized()) {
+
+    if (LVGL_lock(0)) {
+#if TOUCH_ENABLED
+      // Remove touch
+      ESP_ERROR_CHECK(lvgl_port_remove_touch(lvgl_touch_indev));
+      ESP_ERROR_CHECK(esp_lcd_touch_del(touch_handle));
+#endif
+
+      // Remove panel
+      ESP_ERROR_CHECK(lvgl_port_remove_disp(lvgl_disp));
+      ESP_ERROR_CHECK(esp_lcd_panel_del(lcd_panel));
+      ESP_ERROR_CHECK(esp_lcd_panel_io_del(lcd_io));
+      ESP_ERROR_CHECK(spi_bus_free(LCD_HOST));
+
+      LVGL_unlock();
+    }
+
+    // Stop LVGL
+    ESP_ERROR_CHECK(lvgl_port_deinit());
+  }
+}
+
+void init_display() {
   ESP_LOGI(TAG, "Create LVGL conf");
   /* LCD HW initialization */
   ESP_ERROR_CHECK(app_lcd_init());
@@ -386,4 +425,5 @@ void init_display(void) {
   /* LVGL initialization */
   ESP_ERROR_CHECK(app_lvgl_init());
   ESP_ERROR_CHECK(display_ui());
+  has_installed_drivers = true;
 }
