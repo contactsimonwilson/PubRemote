@@ -42,6 +42,8 @@
   #include "display/co5300/display_driver_co5300.h"
   #include "esp_lcd_co5300.h"
   #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_RGB
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
 
 #if TP_CST816S
@@ -146,17 +148,14 @@ static esp_err_t app_lcd_init(void) {
 #endif
 
   ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
-
   ESP_LOGI(TAG, "Install panel IO");
+
 #if DISP_GC9A01
   const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
-
 #elif DISP_SH8601
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
-
 #elif DISP_CO5300
   const esp_lcd_panel_io_spi_config_t io_config = CO5300_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
-
 #elif DISP_ST7789
   #error "ST7789 not supported"
 #endif
@@ -164,10 +163,7 @@ static esp_err_t app_lcd_init(void) {
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &lcd_io));
 
 #if DISP_GC9A01
-  gc9a01_vendor_config_t vendor_config = {
-
-  };
-
+  gc9a01_vendor_config_t vendor_config = {};
 #elif DISP_SH8601
   sh8601_vendor_config_t vendor_config = {
       .init_cmds = sh8601_lcd_init_cmds,
@@ -177,9 +173,7 @@ static esp_err_t app_lcd_init(void) {
               .use_qspi_interface = 1,
           },
   };
-
 #elif DISP_CO5300
-
   co5300_vendor_config_t vendor_config = {
       .init_cmds = co5300_lcd_init_cmds,
       .init_cmds_size = co5300_get_lcd_init_cmds_size(),
@@ -188,7 +182,6 @@ static esp_err_t app_lcd_init(void) {
               .use_qspi_interface = 1,
           },
   };
-
 #elif DISP_ST7789
   #error "ST7789 not supported"
 #endif
