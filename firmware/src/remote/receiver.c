@@ -206,6 +206,7 @@ static void process_data(esp_now_event_t evt) {
 static void change_channel(uint8_t chan, bool is_pairing) {
   ESP_LOGI(TAG, "Switching to channel %d", chan);
   esp_wifi_set_channel(chan, WIFI_SECOND_CHAN_NONE);
+  pairing_settings.channel = chan;
 
   if (!is_pairing) {
     // Add peer so we can send if we're already paired
@@ -218,7 +219,6 @@ static void change_channel(uint8_t chan, bool is_pairing) {
     peerInfo.encrypt = false;
     memcpy(peerInfo.peer_addr, mac_addr, ESP_NOW_ETH_ALEN);
     esp_now_add_peer(&peerInfo);
-    pairing_settings.channel = chan;
   }
 }
 

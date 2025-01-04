@@ -115,5 +115,5 @@ void init_connection() {
   if (pairing_state == PAIRING_STATE_PAIRED) {
     connect_to_default_peer();
   }
-  xTaskCreatePinnedToCore(connection_task, "connection_task", 2048, NULL, 20, NULL, 0);
+  xTaskCreatePinnedToCore(connection_task, "connection_task", 4096, NULL, 20, NULL, 0);
 }
