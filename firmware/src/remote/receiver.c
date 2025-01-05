@@ -19,7 +19,7 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-RECEIVER";
-#define RX_QUEUE_SIZE 1
+#define RX_QUEUE_SIZE 10
 
 // Structure to hold ESP-NOW data
 typedef struct {
@@ -43,7 +43,7 @@ static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *da
 
 #if RX_QUEUE_SIZE > 1
   // Send to queue for processing in application task
-  if (uxQueueSpacesAvailable() == 0) {
+  if (uxQueueSpacesAvailable(espnow_queue) == 0) {
     // reset the queue
     xQueueReset(espnow_queue);
   }
@@ -68,7 +68,15 @@ static void process_data(esp_now_event_t evt) {
   LAST_COMMAND_TIME = 0;
   ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
-  if (pairing_state == PAIRING_STATE_UNPAIRED && len == 6) {
+  bool is_pairing_start = pairing_state == PAIRING_STATE_UNPAIRED && is_pairing_screen_active();
+
+  // Check mac for security on anything other than initial pairing
+  if (!is_same_mac(evt.mac_addr, pairing_settings.remote_addr) && !is_pairing_start) {
+    ESP_LOGD(TAG, "Ignoring data from unknown MAC");
+    return;
+  }
+
+  if (is_pairing_start && len == 6) {
     uint8_t rec_mac[ESP_NOW_ETH_ALEN];
     memcpy(rec_mac, data, ESP_NOW_ETH_ALEN);
     if (!is_same_mac(evt.mac_addr, rec_mac)) {
@@ -200,7 +208,7 @@ static void process_data(esp_now_event_t evt) {
   }
 }
 
-#define CHANNEL_HOP_INTERVAL_MS 500 // 1 second
+#define CHANNEL_HOP_INTERVAL_MS 200
 #define RECEIVER_TASK_DELAY_MS 5
 
 static void change_channel(uint8_t chan, bool is_pairing) {
