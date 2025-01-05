@@ -30,7 +30,7 @@ JoystickData joystick_data;
 static button_handle_t gpio_btn_handle = NULL;
 static bool power_button_enabled = true;
 
-float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo) {
+float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo, bool invert) {
   float axis = 0;
 
   int mid_val_lower = mid_val - deadband;
@@ -69,7 +69,7 @@ float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, 
   // Round to 2 decimal places
   axis = roundf(axis * 100) / 100;
 
-  return axis;
+  return invert ? -axis : axis;
 }
 
 static void thumbstick_task(void *pvParameters) {
@@ -109,14 +109,16 @@ static void thumbstick_task(void *pvParameters) {
     int16_t y_min = calibration_settings.y_min;
     int16_t x_min = calibration_settings.x_min;
     float expo = calibration_settings.expo;
+    bool invert_y = calibration_settings.invert_y;
 
 #if JOYSTICK_X_ENABLED
     int x_value;
     ESP_ERROR_CHECK(adc_oneshot_read(x_adc_handle, JOYSTICK_X_ADC, &x_value));
     joystick_data.x = x_value;
-    float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo);
+    float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, invert_y);
+    float curr_x = remote_data.data.js_x;
 
-    if (new_x != remote_data.data.js_x) {
+    if (new_x != curr_x) {
       remote_data.data.js_x = new_x;
       trigger_sleep_disrupt = true;
     }
@@ -126,9 +128,10 @@ static void thumbstick_task(void *pvParameters) {
     int y_value;
     ESP_ERROR_CHECK(adc_oneshot_read(y_adc_handle, JOYSTICK_Y_ADC, &y_value));
     joystick_data.y = y_value;
-    float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo);
+    float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, false);
+    float curr_y = remote_data.data.js_y;
 
-    if (new_y != remote_data.data.js_y) {
+    if (new_y != curr_y) {
       remote_data.data.js_y = new_y;
       trigger_sleep_disrupt = true;
     }
