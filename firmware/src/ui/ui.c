@@ -57,6 +57,9 @@ lv_obj_t * ui_MenuBody;
 void ui_event_MenuBackButton(lv_event_t * e);
 lv_obj_t * ui_MenuBackButton;
 lv_obj_t * ui_MenuBackButtonLabel;
+void ui_event_MenuConnectButton(lv_event_t * e);
+lv_obj_t * ui_MenuConnectButton;
+lv_obj_t * ui_MenuConnectButtonLabel;
 void ui_event_MenuAboutButton(lv_event_t * e);
 lv_obj_t * ui_MenuAboutButton;
 lv_obj_t * ui_MenuAboutButtonLabel;
@@ -260,6 +263,15 @@ void ui_event_MenuBackButton(lv_event_t * e)
 
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);
+    }
+}
+
+void ui_event_MenuConnectButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        menu_connect_press(e);
     }
 }
 

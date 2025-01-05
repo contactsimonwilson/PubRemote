@@ -54,6 +54,19 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_align(ui_MenuBackButtonLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_MenuBackButtonLabel, "Back");
 
+    ui_MenuConnectButton = lv_btn_create(ui_MenuBody);
+    lv_obj_set_height(ui_MenuConnectButton, 42);
+    lv_obj_set_width(ui_MenuConnectButton, lv_pct(100));
+    lv_obj_set_align(ui_MenuConnectButton, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_MenuConnectButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_MenuConnectButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_MenuConnectButtonLabel = lv_label_create(ui_MenuConnectButton);
+    lv_obj_set_width(ui_MenuConnectButtonLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_MenuConnectButtonLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_MenuConnectButtonLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_MenuConnectButtonLabel, "Connect");
+
     ui_MenuAboutButton = lv_btn_create(ui_MenuBody);
     lv_obj_set_height(ui_MenuAboutButton, 42);
     lv_obj_set_width(ui_MenuAboutButton, lv_pct(100));
@@ -120,6 +133,7 @@ void ui_MenuScreen_screen_init(void)
     lv_label_set_text(ui_MenuShutdownButtonLabel, "Shutdown");
 
     lv_obj_add_event_cb(ui_MenuBackButton, ui_event_MenuBackButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_MenuConnectButton, ui_event_MenuConnectButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MenuAboutButton, ui_event_MenuAboutButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MenuSettingsButton, ui_event_MenuSettingsButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MenuCalibrateButton, ui_event_MenuCalibrateButton, LV_EVENT_ALL, NULL);
