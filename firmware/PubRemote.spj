@@ -4986,7 +4986,7 @@
                               {
                                 "nid": 1000194,
                                 "strtype": "CALL FUNCTION/Function_name",
-                                "strval": "menu_connect_button_press",
+                                "strval": "menu_connect_press",
                                 "InheritedType": 10
                               },
                               {
@@ -18147,7 +18147,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1084,
+    "backup_cnt": 1085,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
