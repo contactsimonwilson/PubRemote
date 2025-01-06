@@ -8739,7 +8739,7 @@
                           {
                             "nid": 1363302350,
                             "strtype": "DROPDOWN/Options",
-                            "strval": "Disabled\\n2 minutes\\n5 minutes\\n10 minutes",
+                            "strval": "Disabled\\n2 minutes\\n5 minutes\\n10 minutes\\n20 minutes\\n30 minutes",
                             "InheritedType": 10
                           },
                           {
