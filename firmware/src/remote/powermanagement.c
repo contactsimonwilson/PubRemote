@@ -22,9 +22,13 @@
 
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
+#ifndef BAT_ADC_F
+  #define BAT_ADC_F 3
+#endif
+
 float convert_adc_to_battery_volts(int adc_value) {
   // 0 - 4095 -> 0 - 255
-  float val = 3.3 / (1 << 12) * 3 * adc_value;
+  float val = 3.3 / (1 << 12) * BAT_ADC_F * adc_value;
   return roundf(val * 100) / 100;
 }
 
