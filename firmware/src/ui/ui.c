@@ -316,6 +316,9 @@ if ( event_code == LV_EVENT_CLICKED) {
 if ( event_code == LV_EVENT_LONG_PRESSED) {
       shutdown_button_long_press( e );
 }
+if ( event_code == LV_EVENT_PRESSED) {
+      shutdown_button_down( e );
+}
 }
 
 void ui_event_SettingsScreen( lv_event_t * e) {
