@@ -106,10 +106,6 @@ void enter_sleep() {
   }
 }
 
-void enter_sleep_ui(lv_event_t *e) {
-  enter_sleep();
-}
-
 esp_timer_handle_t sleep_timer;
 static SemaphoreHandle_t timer_mutex = NULL;
 

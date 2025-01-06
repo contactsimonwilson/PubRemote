@@ -30,6 +30,8 @@ void save_calibration();
 
 esp_err_t save_pairing_data();
 
+esp_err_t reset_all_settings();
+
 typedef enum {
   AUTO_OFF_DISABLED,
   AUTO_OFF_2_MINUTES,

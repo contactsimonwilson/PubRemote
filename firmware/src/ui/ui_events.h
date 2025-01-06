@@ -19,7 +19,8 @@ void stats_footer_long_press(lv_event_t * e);
 void menu_screen_loaded(lv_event_t * e);
 void menu_screen_unloaded(lv_event_t * e);
 void menu_connect_press(lv_event_t * e);
-void enter_sleep_ui(lv_event_t * e);
+void shutdown_button_press(lv_event_t * e);
+void shutdown_button_long_press(lv_event_t * e);
 void settings_screen_loaded(lv_event_t * e);
 void settings_screen_unloaded(lv_event_t * e);
 void settings_screen_load_start(lv_event_t * e);
@@ -39,6 +40,7 @@ void calibration_settings_primary_button_press(lv_event_t * e);
 void about_screen_loaded(lv_event_t * e);
 void about_screen_unloaded(lv_event_t * e);
 void about_screen_load_start(lv_event_t * e);
+void update_button_press(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/
