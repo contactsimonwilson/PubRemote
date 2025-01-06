@@ -166,3 +166,7 @@ def shutdown_button_press(event_struct):
 def shutdown_button_long_press(event_struct):
     return
 
+
+def shutdown_button_down(event_struct):
+    return
+

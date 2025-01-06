@@ -15,7 +15,7 @@ static bool confirm_reset = false;
 static void set_reset_mode(bool mode) {
   confirm_reset = mode;
   if (confirm_reset) {
-    lv_label_set_text(ui_MenuShutdownButtonLabel, "Factory reset");
+    lv_label_set_text(ui_MenuShutdownButtonLabel, "Factory reset?");
   }
   else {
     lv_label_set_text(ui_MenuShutdownButtonLabel, "Shutdown");
@@ -75,7 +75,15 @@ void menu_connect_press(lv_event_t *e) {
   }
 }
 
+// Track press event so we can bind long and short press events without overlap
+static bool is_press_handled = false;
+
 void shutdown_button_press(lv_event_t *e) {
+  if (is_press_handled) {
+    ESP_LOGI(TAG, "Shutdown button press already handled");
+    return;
+  }
+
   ESP_LOGI(TAG, "Shutdown button press");
   if (!confirm_reset) {
     enter_sleep();
@@ -86,6 +94,15 @@ void shutdown_button_press(lv_event_t *e) {
   }
 }
 void shutdown_button_long_press(lv_event_t *e) {
+  if (is_press_handled) {
+    ESP_LOGI(TAG, "Shutdown button long press already handled");
+    return;
+  }
   ESP_LOGI(TAG, "Shutdown button long press");
   set_reset_mode(!confirm_reset);
+  is_press_handled = true;
+}
+
+void shutdown_button_down(lv_event_t *e) {
+  is_press_handled = false;
 }

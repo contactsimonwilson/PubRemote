@@ -4702,8 +4702,7 @@
                         "InheritedType": 4
                       }
                     ],
-                    "saved_objtypeKey": "BUTTON",
-                    "tree_closed": true
+                    "saved_objtypeKey": "BUTTON"
                   },
                   {
                     "guid": "GUID67352526-250127S4224545",
@@ -6603,6 +6602,71 @@
                               },
                               {
                                 "nid": 1000215,
+                                "strtype": "CALL FUNCTION/Dont_export_function",
+                                "strval": "True",
+                                "InheritedType": 2
+                              }
+                            ],
+                            "InheritedType": 10
+                          }
+                        ],
+                        "InheritedType": 4
+                      },
+                      {
+                        "disabled": false,
+                        "nid": 1000226,
+                        "strtype": "_event/EventHandler",
+                        "strval": "PRESSED",
+                        "childs": [
+                          {
+                            "nid": 1000227,
+                            "strtype": "_event/name",
+                            "strval": "ShutdownButtonDown",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": 1000228,
+                            "strtype": "_event/condition_C",
+                            "strval": "",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": 1000229,
+                            "strtype": "_event/condition_P",
+                            "strval": "",
+                            "InheritedType": 10
+                          },
+                          {
+                            "nid": 1000230,
+                            "strtype": "_event/action",
+                            "strval": "CALL FUNCTION",
+                            "childs": [
+                              {
+                                "nid": 1000231,
+                                "strtype": "CALL FUNCTION/Name",
+                                "strval": "CALL FUNCTION",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1000232,
+                                "strtype": "CALL FUNCTION/Call",
+                                "strval": "<{Function_name}>( event_struct )",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1000233,
+                                "strtype": "CALL FUNCTION/CallC",
+                                "strval": "<{Function_name}>( e );",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1000234,
+                                "strtype": "CALL FUNCTION/Function_name",
+                                "strval": "shutdown_button_down",
+                                "InheritedType": 10
+                              },
+                              {
+                                "nid": 1000235,
                                 "strtype": "CALL FUNCTION/Dont_export_function",
                                 "strval": "True",
                                 "InheritedType": 2
@@ -19033,7 +19097,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1102,
+    "backup_cnt": 1106,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
@@ -19049,7 +19113,7 @@
     "drive_fatfs_path": "",
     "naming": "Name",
     "naming_force_lowercase": false,
-    "nidcnt": 1000216,
+    "nidcnt": 1000236,
     "BitDepth": 16,
     "Name": "SquareLine_Project"
   }
