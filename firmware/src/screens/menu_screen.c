@@ -1,4 +1,5 @@
 #include "esp_log.h"
+#include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <remote/connection.h>
@@ -9,6 +10,18 @@
 
 static const char *TAG = "PUBREMOTE-MENU_SCREEN";
 
+static bool confirm_reset = false;
+
+static void set_reset_mode(bool mode) {
+  confirm_reset = mode;
+  if (confirm_reset) {
+    lv_label_set_text(ui_MenuShutdownButtonLabel, "Factory reset");
+  }
+  else {
+    lv_label_set_text(ui_MenuShutdownButtonLabel, "Shutdown");
+  }
+}
+
 bool is_menu_screen_active() {
   lv_obj_t *active_screen = lv_scr_act();
   return active_screen == ui_MenuScreen;
@@ -17,6 +30,8 @@ bool is_menu_screen_active() {
 // Event handlers
 void menu_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Menu screen loaded");
+
+  set_reset_mode(false);
 
   if (LVGL_lock(0)) {
     if (pairing_state == PAIRING_STATE_PAIRED) {
@@ -58,4 +73,19 @@ void menu_connect_press(lv_event_t *e) {
     _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);
     LVGL_unlock();
   }
+}
+
+void shutdown_button_press(lv_event_t *e) {
+  ESP_LOGI(TAG, "Shutdown button press");
+  if (!confirm_reset) {
+    enter_sleep();
+  }
+  else {
+    reset_all_settings();
+    esp_restart();
+  }
+}
+void shutdown_button_long_press(lv_event_t *e) {
+  ESP_LOGI(TAG, "Shutdown button long press");
+  set_reset_mode(!confirm_reset);
 }

@@ -180,6 +180,9 @@ lv_obj_t *ui_AboutFooter;
 void ui_event_AboutMainActionButton( lv_event_t * e);
 lv_obj_t *ui_AboutMainActionButton;
 lv_obj_t *ui_AboutMainActionButtonLabel;
+void ui_event_UpdateButton( lv_event_t * e);
+lv_obj_t *ui_UpdateButton;
+lv_obj_t *ui_UpdateButtonLabel;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -308,7 +311,10 @@ void ui_event_MenuShutdownButton( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);
 
 if ( event_code == LV_EVENT_CLICKED) {
-      enter_sleep_ui( e );
+      shutdown_button_press( e );
+}
+if ( event_code == LV_EVENT_LONG_PRESSED) {
+      shutdown_button_long_press( e );
 }
 }
 
@@ -449,6 +455,14 @@ void ui_event_AboutMainActionButton( lv_event_t * e) {
 
 if ( event_code == LV_EVENT_CLICKED) {
       _ui_screen_change( &ui_MenuScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MenuScreen_screen_init);
+}
+}
+
+void ui_event_UpdateButton( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+if ( event_code == LV_EVENT_CLICKED) {
+      update_button_press( e );
 }
 }
 

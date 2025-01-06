@@ -38,3 +38,7 @@ void about_screen_loaded(lv_event_t *e) {
 void about_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen unloaded");
 }
+
+void update_button_press(lv_event_t *e) {
+  ESP_LOGI(TAG, "Update button pressed");
+}

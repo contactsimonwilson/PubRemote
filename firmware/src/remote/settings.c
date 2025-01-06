@@ -383,3 +383,7 @@ esp_err_t nvs_read_int(const char *key, uint32_t *value) {
 esp_err_t nvs_read_blob(const char *key, void *value, size_t length) {
   return nvs_read(key, value, NVS_TYPE_BLOB, length);
 }
+
+esp_err_t reset_all_settings() {
+  return nvs_flash_erase();
+}
