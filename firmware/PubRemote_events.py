@@ -150,3 +150,7 @@ def enter_sleep_ui(event_struct):
 def enter_sleep(event_struct):
     return
 
+
+def menu_connect_press(event_struct):
+    return
+

@@ -36,7 +36,7 @@ CalibrationSettings calibration_settings = {
     .y_center = STICK_MID_VAL,
     .deadband = STICK_DEADBAND,
     .expo = STICK_EXPO,
-
+    .invert_y = INVERT_Y_AXIS,
 };
 
 PairingSettings pairing_settings = {
@@ -105,6 +105,7 @@ void save_calibration() {
   nvs_write_int("y_center", calibration_settings.y_center);
   nvs_write_int("deadband", calibration_settings.deadband);
   nvs_write_int("expo", (int)(calibration_settings.expo * EXPO_ADJUST_FACTOR));
+  nvs_write_int("invert_y", calibration_settings.invert_y);
 }
 
 // Function to initialize NVS
@@ -173,7 +174,11 @@ esp_err_t init_settings() {
 
   int16_t expo = STICK_EXPO;
 
-  calibration_settings.expo = nvs_read_int("x_expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
+  calibration_settings.expo = nvs_read_int("expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
+
+  calibration_settings.invert_y = nvs_read_int("invert_y", &calibration_settings.invert_y) == ESP_OK
+                                      ? calibration_settings.invert_y
+                                      : INVERT_Y_AXIS;
 
   // Reading pairing settings
   pairing_settings.secret_code =

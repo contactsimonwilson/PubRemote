@@ -64,6 +64,7 @@ typedef struct {
   uint16_t y_center;
   uint16_t deadband;
   float expo;
+  bool invert_y;
 } CalibrationSettings;
 
 typedef struct {

@@ -10,6 +10,7 @@
 #define STICK_MIN_VAL 0
 #define STICK_DEADBAND 10
 #define STICK_EXPO 1
+#define INVERT_Y_AXIS false
 
 extern const adc_oneshot_chan_cfg_t adc_channel_config;
 
