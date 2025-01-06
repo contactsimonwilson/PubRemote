@@ -37,6 +37,8 @@ typedef enum {
   AUTO_OFF_2_MINUTES,
   AUTO_OFF_5_MINUTES,
   AUTO_OFF_10_MINUTES,
+  AUTO_OFF_20_MINUTES,
+  AUTO_OFF_30_MINUTES,
 } AutoOffOptions;
 
 typedef enum {

@@ -55,6 +55,10 @@ static uint8_t get_auto_off_time_minutes() {
     return 5;
   case AUTO_OFF_10_MINUTES:
     return 10;
+  case AUTO_OFF_20_MINUTES:
+    return 20;
+  case AUTO_OFF_30_MINUTES:
+    return 30;
   default:
     return 0;
   }
