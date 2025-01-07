@@ -30,8 +30,8 @@ int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
   // Core setup
-  init_adcs();
   init_settings();
+  init_adcs();
   init_power_management();
 
   // Peripherals
