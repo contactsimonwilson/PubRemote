@@ -170,3 +170,7 @@ def shutdown_button_long_press(event_struct):
 def shutdown_button_down(event_struct):
     return
 
+
+def startup_sound_select_change(event_struct):
+    return
+

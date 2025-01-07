@@ -54,6 +54,9 @@ void settings_screen_load_start(lv_event_t *e) {
     // Distance units
     lv_dropdown_set_selected(ui_DistanceUnits, device_settings.distance_units);
 
+    // Startup sound
+    lv_dropdown_set_selected(ui_StartupSound, device_settings.startup_sound);
+
     // Theme color
     lv_color_t color = lv_color_hex(device_settings.theme_color);
     lv_colorwheel_set_rgb(ui_ThemeColor, color);
@@ -89,6 +92,11 @@ void temp_units_select_change(lv_event_t *e) {
 void distance_units_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_DistanceUnits);
   device_settings.distance_units = (uint8_t)(val & 0xFF);
+}
+
+void startup_sound_select_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_StartupSound);
+  device_settings.startup_sound = (uint8_t)(val & 0xFF);
 }
 
 void theme_color_picker_change(lv_event_t *e) {

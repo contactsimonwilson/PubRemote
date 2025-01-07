@@ -24,6 +24,7 @@ DeviceSettings device_settings = {
     .auto_off_time = DEFAULT_AUTO_OFF_TIME,
     .temp_units = TEMP_UNITS_CELSIUS,
     .distance_units = DISTANCE_UNITS_METRIC,
+    .startup_sound = STARTUP_SOUND_BEEP,
     .theme_color = COLOR_PRIMARY,
 };
 
@@ -73,6 +74,7 @@ void save_device_settings() {
   nvs_write_int(AUTO_OFF_TIME_KEY, device_settings.auto_off_time);
   nvs_write_int("temp_units", device_settings.temp_units);
   nvs_write_int("distance_units", device_settings.distance_units);
+  nvs_write_int("startup_sound", device_settings.startup_sound);
   nvs_write_int("theme_color", device_settings.theme_color);
 }
 
@@ -148,6 +150,10 @@ esp_err_t init_settings() {
   device_settings.distance_units = nvs_read_int("distance_units", &device_settings.distance_units) == ESP_OK
                                        ? device_settings.distance_units
                                        : DISTANCE_UNITS_METRIC;
+
+  device_settings.startup_sound = nvs_read_int("startup_sound", &device_settings.startup_sound) == ESP_OK
+                                      ? device_settings.startup_sound
+                                      : STARTUP_SOUND_BEEP;
 
   device_settings.theme_color =
       nvs_read_int("theme_color", &device_settings.theme_color) == ESP_OK ? device_settings.theme_color : COLOR_PRIMARY;

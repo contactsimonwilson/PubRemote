@@ -51,6 +51,12 @@ typedef enum {
   DISTANCE_UNITS_IMPERIAL,
 } DistanceUnits;
 
+typedef enum {
+  STARTUP_SOUND_DISABLED,
+  STARTUP_SOUND_BEEP,
+  STARTUP_SOUND_MELODY,
+} StartupSoundOptions;
+
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
@@ -76,6 +82,7 @@ typedef struct {
   AutoOffOptions auto_off_time;
   uint8_t temp_units;
   uint8_t distance_units;
+  uint8_t startup_sound;
   uint32_t theme_color;
 } DeviceSettings;
 
