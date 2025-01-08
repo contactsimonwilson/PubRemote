@@ -10,201 +10,199 @@
 extern "C" {
 #endif
 
-#include "lvgl.h"
+    #include "lvgl.h"
 
 #include "ui_helpers.h"
 #include "ui_events.h"
 
-
 // SCREEN: ui_SplashScreen
 void ui_SplashScreen_screen_init(void);
-void ui_event_SplashScreen(lv_event_t * e);
-extern lv_obj_t * ui_SplashScreen;
-extern lv_obj_t * ui_SplashScreenLogo;
+void ui_event_SplashScreen( lv_event_t * e);
+extern lv_obj_t *ui_SplashScreen;
+extern lv_obj_t *ui_SplashScreenLogo;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_StatsScreen
 void ui_StatsScreen_screen_init(void);
-void ui_event_StatsScreen(lv_event_t * e);
-extern lv_obj_t * ui_StatsScreen;
-extern lv_obj_t * ui_SpeedDial;
-extern lv_obj_t * ui_UtilizationDial;
-extern lv_obj_t * ui_LeftSensor;
-extern lv_obj_t * ui_RightSensor;
-extern lv_obj_t * ui_StatsContent;
-extern lv_obj_t * ui_StatsHeader;
-extern lv_obj_t * ui_RemoteIndicatorContainer;
-extern lv_obj_t * ui_BatteryIndicatorContainer;
-extern lv_obj_t * ui_BatteryOutline;
-extern lv_obj_t * ui_BatteryFill;
-extern lv_obj_t * ui_BatteryTip;
-extern lv_obj_t * ui_RSSIContainer;
-extern lv_obj_t * ui_RSSI1;
-extern lv_obj_t * ui_RSSI2;
-extern lv_obj_t * ui_RSSI3;
-extern lv_obj_t * ui_MessageText;
-void ui_event_StatsBody(lv_event_t * e);
-extern lv_obj_t * ui_StatsBody;
-extern lv_obj_t * ui_PrimaryStat;
-extern lv_obj_t * ui_PrimaryStatUnit;
-extern lv_obj_t * ui_SecondaryStat;
-void ui_event_StatsFooter(lv_event_t * e);
-extern lv_obj_t * ui_StatsFooter;
-extern lv_obj_t * ui_BatteryDisplay;
+void ui_event_StatsScreen( lv_event_t * e);
+extern lv_obj_t *ui_StatsScreen;
+extern lv_obj_t *ui_SpeedDial;
+extern lv_obj_t *ui_UtilizationDial;
+extern lv_obj_t *ui_LeftSensor;
+extern lv_obj_t *ui_RightSensor;
+extern lv_obj_t *ui_StatsContent;
+extern lv_obj_t *ui_StatsHeader;
+extern lv_obj_t *ui_RemoteIndicatorContainer;
+extern lv_obj_t *ui_BatteryIndicatorContainer;
+extern lv_obj_t *ui_BatteryOutline;
+extern lv_obj_t *ui_BatteryFill;
+extern lv_obj_t *ui_BatteryTip;
+extern lv_obj_t *ui_RSSIContainer;
+extern lv_obj_t *ui_RSSI1;
+extern lv_obj_t *ui_RSSI2;
+extern lv_obj_t *ui_RSSI3;
+extern lv_obj_t *ui_MessageText;
+void ui_event_StatsBody( lv_event_t * e);
+extern lv_obj_t *ui_StatsBody;
+extern lv_obj_t *ui_PrimaryStat;
+extern lv_obj_t *ui_PrimaryStatUnit;
+extern lv_obj_t *ui_SecondaryStat;
+void ui_event_StatsFooter( lv_event_t * e);
+extern lv_obj_t *ui_StatsFooter;
+extern lv_obj_t *ui_BatteryDisplay;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_MenuScreen
 void ui_MenuScreen_screen_init(void);
-void ui_event_MenuScreen(lv_event_t * e);
-extern lv_obj_t * ui_MenuScreen;
-extern lv_obj_t * ui_MenuContent;
-extern lv_obj_t * ui_MenuBody;
-void ui_event_MenuBackButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuBackButton;
-extern lv_obj_t * ui_MenuBackButtonLabel;
-void ui_event_MenuConnectButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuConnectButton;
-extern lv_obj_t * ui_MenuConnectButtonLabel;
-void ui_event_MenuAboutButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuAboutButton;
-extern lv_obj_t * ui_MenuAboutButtonLabel;
-void ui_event_MenuSettingsButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuSettingsButton;
-extern lv_obj_t * ui_MenuSettingsButtonLabel;
-void ui_event_MenuCalibrateButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuCalibrateButton;
-extern lv_obj_t * ui_MenuCalibrateButtonLabel;
-void ui_event_MenuPairButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuPairButton;
-extern lv_obj_t * ui_MenuPairButtonLabel;
-void ui_event_MenuShutdownButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuShutdownButton;
-extern lv_obj_t * ui_MenuShutdownButtonLabel;
+void ui_event_MenuScreen( lv_event_t * e);
+extern lv_obj_t *ui_MenuScreen;
+extern lv_obj_t *ui_MenuContent;
+extern lv_obj_t *ui_MenuBody;
+void ui_event_MenuBackButton( lv_event_t * e);
+extern lv_obj_t *ui_MenuBackButton;
+extern lv_obj_t *ui_MenuBackButtonLabel;
+void ui_event_MenuConnectButton( lv_event_t * e);
+extern lv_obj_t *ui_MenuConnectButton;
+extern lv_obj_t *ui_MenuConnectButtonLabel;
+void ui_event_MenuAboutButton( lv_event_t * e);
+extern lv_obj_t *ui_MenuAboutButton;
+extern lv_obj_t *ui_MenuAboutButtonLabel;
+void ui_event_MenuSettingsButton( lv_event_t * e);
+extern lv_obj_t *ui_MenuSettingsButton;
+extern lv_obj_t *ui_MenuSettingsButtonLabel;
+void ui_event_MenuCalibrateButton( lv_event_t * e);
+extern lv_obj_t *ui_MenuCalibrateButton;
+extern lv_obj_t *ui_MenuCalibrateButtonLabel;
+void ui_event_MenuPairButton( lv_event_t * e);
+extern lv_obj_t *ui_MenuPairButton;
+extern lv_obj_t *ui_MenuPairButtonLabel;
+void ui_event_MenuShutdownButton( lv_event_t * e);
+extern lv_obj_t *ui_MenuShutdownButton;
+extern lv_obj_t *ui_MenuShutdownButtonLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_SettingsScreen
 void ui_SettingsScreen_screen_init(void);
-void ui_event_SettingsScreen(lv_event_t * e);
-extern lv_obj_t * ui_SettingsScreen;
-extern lv_obj_t * ui_SettingsContent;
-extern lv_obj_t * ui_SettingsHeader;
-extern lv_obj_t * ui_Selection1;
-extern lv_obj_t * ui_Selection2;
-extern lv_obj_t * ui_Selection3;
-extern lv_obj_t * ui_Selection4;
-extern lv_obj_t * ui_Selection5;
-extern lv_obj_t * ui_Selection6;
-extern lv_obj_t * ui_SettingsBody;
-extern lv_obj_t * ui_BrightnessBody;
-void ui_event_BrightnessSlider(lv_event_t * e);
-extern lv_obj_t * ui_BrightnessSlider;
-extern lv_obj_t * ui_BrightnessLabel;
-extern lv_obj_t * ui_PowerBody;
-void ui_event_AutoOffTime(lv_event_t * e);
-extern lv_obj_t * ui_AutoOffTime;
-extern lv_obj_t * ui_PowerLabel;
-extern lv_obj_t * ui_TempUnitsBody;
-void ui_event_TempUnits(lv_event_t * e);
-extern lv_obj_t * ui_TempUnits;
-extern lv_obj_t * ui_TempUnitsLabel;
-extern lv_obj_t * ui_DistanceUnitsBody;
-void ui_event_DistanceUnits(lv_event_t * e);
-extern lv_obj_t * ui_DistanceUnits;
-extern lv_obj_t * ui_DistanceUnitsLabel;
-extern lv_obj_t * ui_StartupSoundBody;
-void ui_event_StartupSound(lv_event_t * e);
-extern lv_obj_t * ui_StartupSound;
-extern lv_obj_t * ui_StartupSoundLabel;
-extern lv_obj_t * ui_ThemeColorBody;
-void ui_event_ThemeColor(lv_event_t * e);
-extern lv_obj_t * ui_ThemeColor;
-extern lv_obj_t * ui_ThemeColorLabel;
-extern lv_obj_t * ui_SettingsFooter;
-void ui_event_SettingsMainActionButton(lv_event_t * e);
-extern lv_obj_t * ui_SettingsMainActionButton;
-extern lv_obj_t * ui_SettingsMainActionButtonLabel;
+void ui_event_SettingsScreen( lv_event_t * e);
+extern lv_obj_t *ui_SettingsScreen;
+extern lv_obj_t *ui_SettingsContent;
+extern lv_obj_t *ui_SettingsHeader;
+extern lv_obj_t *ui_Selection1;
+extern lv_obj_t *ui_Selection2;
+extern lv_obj_t *ui_Selection3;
+extern lv_obj_t *ui_Selection4;
+extern lv_obj_t *ui_Selection5;
+extern lv_obj_t *ui_Selection6;
+extern lv_obj_t *ui_SettingsBody;
+extern lv_obj_t *ui_BrightnessBody;
+void ui_event_BrightnessSlider( lv_event_t * e);
+extern lv_obj_t *ui_BrightnessSlider;
+extern lv_obj_t *ui_BrightnessLabel;
+extern lv_obj_t *ui_PowerBody;
+void ui_event_AutoOffTime( lv_event_t * e);
+extern lv_obj_t *ui_AutoOffTime;
+extern lv_obj_t *ui_PowerLabel;
+extern lv_obj_t *ui_TempUnitsBody;
+void ui_event_TempUnits( lv_event_t * e);
+extern lv_obj_t *ui_TempUnits;
+extern lv_obj_t *ui_TempUnitsLabel;
+extern lv_obj_t *ui_DistanceUnitsBody;
+void ui_event_DistanceUnits( lv_event_t * e);
+extern lv_obj_t *ui_DistanceUnits;
+extern lv_obj_t *ui_DistanceUnitsLabel;
+extern lv_obj_t *ui_StartupSoundBody;
+void ui_event_StartupSound( lv_event_t * e);
+extern lv_obj_t *ui_StartupSound;
+extern lv_obj_t *ui_StartupSoundLabel;
+extern lv_obj_t *ui_ThemeColorBody;
+void ui_event_ThemeColor( lv_event_t * e);
+extern lv_obj_t *ui_ThemeColor;
+extern lv_obj_t *ui_ThemeColorLabel;
+extern lv_obj_t *ui_SettingsFooter;
+void ui_event_SettingsMainActionButton( lv_event_t * e);
+extern lv_obj_t *ui_SettingsMainActionButton;
+extern lv_obj_t *ui_SettingsMainActionButtonLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_PairingScreen
 void ui_PairingScreen_screen_init(void);
-void ui_event_PairingScreen(lv_event_t * e);
-extern lv_obj_t * ui_PairingScreen;
-extern lv_obj_t * ui_PairingContent;
-extern lv_obj_t * ui_PairingHeader;
-extern lv_obj_t * ui_PairingBody;
-extern lv_obj_t * ui_PairingCode;
-extern lv_obj_t * ui_PairingCodeLabel;
-extern lv_obj_t * ui_PairingFooter;
-void ui_event_PairingMainActionButton(lv_event_t * e);
-extern lv_obj_t * ui_PairingMainActionButton;
-extern lv_obj_t * ui_PairingMainActionButtonLabel;
+void ui_event_PairingScreen( lv_event_t * e);
+extern lv_obj_t *ui_PairingScreen;
+extern lv_obj_t *ui_PairingContent;
+extern lv_obj_t *ui_PairingHeader;
+extern lv_obj_t *ui_PairingBody;
+extern lv_obj_t *ui_PairingCode;
+extern lv_obj_t *ui_PairingCodeLabel;
+extern lv_obj_t *ui_PairingFooter;
+void ui_event_PairingMainActionButton( lv_event_t * e);
+extern lv_obj_t *ui_PairingMainActionButton;
+extern lv_obj_t *ui_PairingMainActionButtonLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_CalibrationScreen
 void ui_CalibrationScreen_screen_init(void);
-void ui_event_CalibrationScreen(lv_event_t * e);
-extern lv_obj_t * ui_CalibrationScreen;
-extern lv_obj_t * ui_CalibrationContent;
-extern lv_obj_t * ui_CalibrationHeader;
-extern lv_obj_t * ui_CalibrationHeaderLabel;
-extern lv_obj_t * ui_CalibrationBody;
-extern lv_obj_t * ui_CalibrationStepContent;
-void ui_event_ExpoSlider(lv_event_t * e);
-extern lv_obj_t * ui_ExpoSlider;
-extern lv_obj_t * ui_StickFlags;
-extern lv_obj_t * ui_InvertX;
-extern lv_obj_t * ui_InvertY;
-extern lv_obj_t * ui_Swap_XY;
-extern lv_obj_t * ui_CalibrationIndicatorContainer;
-extern lv_obj_t * ui_DeadbandIndicator;
-extern lv_obj_t * ui_CalibrationLineVert;
-extern lv_obj_t * ui_CalibrationLineHoriz;
-extern lv_obj_t * ui_PositionIndicatorContainer;
-extern lv_obj_t * ui_PositionIndicatorHoriz;
-extern lv_obj_t * ui_PositionIndicatorVert;
-extern lv_obj_t * ui_CalibrationStepLabel;
-extern lv_obj_t * ui_CalibrationFooter;
-void ui_event_CalibrationSecondaryActionButton(lv_event_t * e);
-extern lv_obj_t * ui_CalibrationSecondaryActionButton;
-extern lv_obj_t * ui_CalibrationSecondaryActionButtonLabel;
-void ui_event_CalibrationPrimaryActionButton(lv_event_t * e);
-extern lv_obj_t * ui_CalibrationPrimaryActionButton;
-extern lv_obj_t * ui_CalibrationPrimaryActionButtonLabel;
+void ui_event_CalibrationScreen( lv_event_t * e);
+extern lv_obj_t *ui_CalibrationScreen;
+extern lv_obj_t *ui_CalibrationContent;
+extern lv_obj_t *ui_CalibrationHeader;
+extern lv_obj_t *ui_CalibrationHeaderLabel;
+extern lv_obj_t *ui_CalibrationBody;
+extern lv_obj_t *ui_CalibrationStepContent;
+void ui_event_ExpoSlider( lv_event_t * e);
+extern lv_obj_t *ui_ExpoSlider;
+extern lv_obj_t *ui_StickFlags;
+extern lv_obj_t *ui_InvertX;
+extern lv_obj_t *ui_InvertY;
+extern lv_obj_t *ui_Swap_XY;
+extern lv_obj_t *ui_CalibrationIndicatorContainer;
+extern lv_obj_t *ui_DeadbandIndicator;
+extern lv_obj_t *ui_CalibrationLineVert;
+extern lv_obj_t *ui_CalibrationLineHoriz;
+extern lv_obj_t *ui_PositionIndicatorContainer;
+extern lv_obj_t *ui_PositionIndicatorHoriz;
+extern lv_obj_t *ui_PositionIndicatorVert;
+extern lv_obj_t *ui_CalibrationStepLabel;
+extern lv_obj_t *ui_CalibrationFooter;
+void ui_event_CalibrationSecondaryActionButton( lv_event_t * e);
+extern lv_obj_t *ui_CalibrationSecondaryActionButton;
+extern lv_obj_t *ui_CalibrationSecondaryActionButtonLabel;
+void ui_event_CalibrationPrimaryActionButton( lv_event_t * e);
+extern lv_obj_t *ui_CalibrationPrimaryActionButton;
+extern lv_obj_t *ui_CalibrationPrimaryActionButtonLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_AboutScreen
 void ui_AboutScreen_screen_init(void);
-void ui_event_AboutScreen(lv_event_t * e);
-extern lv_obj_t * ui_AboutScreen;
-extern lv_obj_t * ui_AboutContent;
-extern lv_obj_t * ui_AboutBody;
-extern lv_obj_t * ui_VersionInfoHeaderLabel;
-extern lv_obj_t * ui_VersionInfoLabel;
-extern lv_obj_t * ui_DebugInfoHeaderLabel;
-extern lv_obj_t * ui_DebugInfoLabel;
-extern lv_obj_t * ui_AboutFooter;
-void ui_event_AboutMainActionButton(lv_event_t * e);
-extern lv_obj_t * ui_AboutMainActionButton;
-extern lv_obj_t * ui_AboutMainActionButtonLabel;
-void ui_event_UpdateButton(lv_event_t * e);
-extern lv_obj_t * ui_UpdateButton;
-extern lv_obj_t * ui_UpdateButtonLabel;
+void ui_event_AboutScreen( lv_event_t * e);
+extern lv_obj_t *ui_AboutScreen;
+extern lv_obj_t *ui_AboutContent;
+extern lv_obj_t *ui_AboutBody;
+extern lv_obj_t *ui_VersionInfoHeaderLabel;
+extern lv_obj_t *ui_VersionInfoLabel;
+extern lv_obj_t *ui_DebugInfoHeaderLabel;
+extern lv_obj_t *ui_DebugInfoLabel;
+extern lv_obj_t *ui_AboutFooter;
+void ui_event_AboutMainActionButton( lv_event_t * e);
+extern lv_obj_t *ui_AboutMainActionButton;
+extern lv_obj_t *ui_AboutMainActionButtonLabel;
+void ui_event_UpdateButton( lv_event_t * e);
+extern lv_obj_t *ui_UpdateButton;
+extern lv_obj_t *ui_UpdateButtonLabel;
 // CUSTOM VARIABLES
 
 // EVENTS
-
-extern lv_obj_t * ui____initial_actions0;
+extern lv_obj_t *ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_icon_png);    // assets/icon.png
+LV_IMG_DECLARE( ui_img_icon_png);   // assets/icon.png
 
 // FONTS
-LV_FONT_DECLARE(ui_font_Inter_14);
-LV_FONT_DECLARE(ui_font_Inter_28);
-LV_FONT_DECLARE(ui_font_Inter_Bold_14);
-LV_FONT_DECLARE(ui_font_Inter_Bold_28);
-LV_FONT_DECLARE(ui_font_Inter_Bold_48);
-LV_FONT_DECLARE(ui_font_Inter_Bold_96);
+LV_FONT_DECLARE( ui_font_Inter_14);
+LV_FONT_DECLARE( ui_font_Inter_28);
+LV_FONT_DECLARE( ui_font_Inter_Bold_14);
+LV_FONT_DECLARE( ui_font_Inter_Bold_28);
+LV_FONT_DECLARE( ui_font_Inter_Bold_48);
+LV_FONT_DECLARE( ui_font_Inter_Bold_96);
 
 // UI INIT
 void ui_init(void);

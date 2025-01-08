@@ -8745,10 +8745,21 @@
                             "strval": "DEFAULT",
                             "childs": [
                               {
+                                "nid": 11110,
+                                "strtype": "_style/Padding",
+                                "intarray": [
+                                  40,
+                                  40,
+                                  0,
+                                  0
+                                ],
+                                "InheritedType": 7
+                              },
+                              {
                                 "nid": 1590260633,
                                 "strtype": "_style/Padding_RowCol",
                                 "intarray": [
-                                  10,
+                                  20,
                                   0
                                 ],
                                 "InheritedType": 7
@@ -8771,8 +8782,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID43651174-826403S330623322",
@@ -9342,6 +9352,17 @@
                             "strval": "DEFAULT",
                             "childs": [
                               {
+                                "nid": 11110,
+                                "strtype": "_style/Padding",
+                                "intarray": [
+                                  40,
+                                  40,
+                                  0,
+                                  0
+                                ],
+                                "InheritedType": 7
+                              },
+                              {
                                 "nid": -1432308209,
                                 "strtype": "_style/Padding_RowCol",
                                 "intarray": [
@@ -9368,7 +9389,8 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER"
+                    "saved_objtypeKey": "CONTAINER",
+                    "tree_closed": true
                   },
                   {
                     "guid": "GUID6183281-826406S7713322",
@@ -9938,6 +9960,17 @@
                             "strtype": "_style/StyleState",
                             "strval": "DEFAULT",
                             "childs": [
+                              {
+                                "nid": 11110,
+                                "strtype": "_style/Padding",
+                                "intarray": [
+                                  49,
+                                  40,
+                                  0,
+                                  0
+                                ],
+                                "InheritedType": 7
+                              },
                               {
                                 "nid": -1432308209,
                                 "strtype": "_style/Padding_RowCol",
@@ -10537,6 +10570,17 @@
                             "strval": "DEFAULT",
                             "childs": [
                               {
+                                "nid": 11110,
+                                "strtype": "_style/Padding",
+                                "intarray": [
+                                  40,
+                                  40,
+                                  0,
+                                  0
+                                ],
+                                "InheritedType": 7
+                              },
+                              {
                                 "nid": -1432308209,
                                 "strtype": "_style/Padding_RowCol",
                                 "intarray": [
@@ -11134,6 +11178,17 @@
                             "strval": "DEFAULT",
                             "childs": [
                               {
+                                "nid": 11110,
+                                "strtype": "_style/Padding",
+                                "intarray": [
+                                  40,
+                                  40,
+                                  0,
+                                  0
+                                ],
+                                "InheritedType": 7
+                              },
+                              {
                                 "nid": -1432308209,
                                 "strtype": "_style/Padding_RowCol",
                                 "intarray": [
@@ -11160,7 +11215,8 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER"
+                    "saved_objtypeKey": "CONTAINER",
+                    "tree_closed": true
                   },
                   {
                     "guid": "GUID19851876-826418S7563322",
@@ -11643,6 +11699,17 @@
                             "strval": "DEFAULT",
                             "childs": [
                               {
+                                "nid": 11110,
+                                "strtype": "_style/Padding",
+                                "intarray": [
+                                  40,
+                                  40,
+                                  0,
+                                  0
+                                ],
+                                "InheritedType": 7
+                              },
+                              {
                                 "nid": -1432308209,
                                 "strtype": "_style/Padding_RowCol",
                                 "intarray": [
@@ -11780,36 +11847,7 @@
                   },
                   {
                     "part": "lv.PART.MAIN",
-                    "childs": [
-                      {
-                        "nid": 10000,
-                        "strtype": "_style/StyleState",
-                        "strval": "DEFAULT",
-                        "childs": [
-                          {
-                            "nid": 11110,
-                            "strtype": "_style/Padding",
-                            "intarray": [
-                              40,
-                              40,
-                              0,
-                              30
-                            ],
-                            "InheritedType": 7
-                          },
-                          {
-                            "nid": 11120,
-                            "strtype": "_style/Padding_RowCol",
-                            "intarray": [
-                              0,
-                              80
-                            ],
-                            "InheritedType": 7
-                          }
-                        ],
-                        "InheritedType": 1
-                      }
-                    ],
+                    "childs": [],
                     "nid": 1010,
                     "strtype": "CONTAINER/Style_main",
                     "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -19835,7 +19873,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1112,
+    "backup_cnt": 1117,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
