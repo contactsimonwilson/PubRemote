@@ -18,10 +18,8 @@ static void scroll_event_cb(lv_event_t *e) {
 
   lv_coord_t visible_width = lv_obj_get_width(cont);
   lv_coord_t scroll_x = lv_obj_get_scroll_x(cont);
-  float scroll_prop = ((float)scroll_x) / (visible_width * (total_items - 1));
-  uint8_t page_index = (uint8_t)(scroll_prop * total_items);
+  uint8_t page_index = (scroll_x + (visible_width / 2)) / visible_width;
 
-  // ESP_LOGI(TAG, "page_index: %f", scroll_prop);
   // Ensure we don't exceed total items
   uint8_t current_page = clampu8(page_index, 0, total_items - 1);
 
