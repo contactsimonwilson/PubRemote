@@ -21,6 +21,25 @@ static void scale_padding(lv_obj_t *obj) {
   lv_obj_set_style_pad_bottom(obj, (lv_coord_t)(bottom * SCALE_FACTOR), LV_STATE_DEFAULT);
 }
 
+static void scale_border(lv_obj_t *obj) {
+  if (obj == NULL)
+    return;
+
+  // Border size
+  // Get current border size
+  lv_coord_t border_width = lv_obj_get_style_border_width(obj, 0);
+
+  // Scale and set new border size using SCALE_FACTOR
+  lv_obj_set_style_border_width(obj, (lv_coord_t)(border_width * SCALE_FACTOR), LV_STATE_DEFAULT);
+
+  // Border radius
+  // Get current border radius
+  lv_coord_t radius = lv_obj_get_style_radius(obj, 0);
+
+  // Scale and set new border radius using SCALE_FACTOR
+  lv_obj_set_style_radius(obj, (lv_coord_t)(radius * SCALE_FACTOR), LV_STATE_DEFAULT);
+}
+
 static void scale_arc_width(lv_obj_t *obj) {
   if (obj == NULL || lv_obj_check_type(obj, &lv_arc_class) == false)
     return;
@@ -30,6 +49,7 @@ static void scale_arc_width(lv_obj_t *obj) {
 
   // Scale and set new arc width using SCALE_FACTOR
   lv_obj_set_style_arc_width(obj, (lv_coord_t)(width * SCALE_FACTOR), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_arc_width(obj, (lv_coord_t)(width * SCALE_FACTOR), LV_PART_INDICATOR | LV_STATE_DEFAULT);
 }
 
 static void scale_dimensions(lv_obj_t *obj) {
@@ -200,6 +220,7 @@ static void process_children_recursive(lv_obj_t *parent, void (*callback)(lv_obj
 
 static void scale_element(lv_obj_t *element) {
   scale_padding(element);
+  scale_border(element);
   scale_dimensions(element);
   scale_arc_width(element);
   scale_text(element);
