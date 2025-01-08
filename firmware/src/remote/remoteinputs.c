@@ -111,30 +111,46 @@ static void thumbstick_task(void *pvParameters) {
     float expo = calibration_settings.expo;
     bool invert_y = calibration_settings.invert_y;
 
+    esp_err_t read_err;
 #if JOYSTICK_X_ENABLED
     int x_value;
-    ESP_ERROR_CHECK(adc_oneshot_read(x_adc_handle, JOYSTICK_X_ADC, &x_value));
-    joystick_data.x = x_value;
-    float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, invert_y);
-    float curr_x = remote_data.data.js_x;
+    read_err = adc_oneshot_read(x_adc_handle, JOYSTICK_X_ADC, &x_value);
 
-    if (new_x != curr_x) {
-      remote_data.data.js_x = new_x;
-      trigger_sleep_disrupt = true;
+    if (read_err == ESP_OK) {
+      joystick_data.x = x_value;
+      float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, invert_y);
+      float curr_x = remote_data.data.js_x;
+
+      if (new_x != curr_x) {
+        remote_data.data.js_x = new_x;
+        trigger_sleep_disrupt = true;
+      }
     }
+    else {
+      ESP_LOGE(TAG, "Error reading X axis: %d", read_err);
+    }
+
 #endif
 
 #if JOYSTICK_Y_ENABLED
     int y_value;
-    ESP_ERROR_CHECK(adc_oneshot_read(y_adc_handle, JOYSTICK_Y_ADC, &y_value));
-    joystick_data.y = y_value;
-    float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, false);
-    float curr_y = remote_data.data.js_y;
+    read_err = adc_oneshot_read(y_adc_handle, JOYSTICK_Y_ADC, &y_value);
 
-    if (new_y != curr_y) {
-      remote_data.data.js_y = new_y;
-      trigger_sleep_disrupt = true;
+    if (read_err == ESP_OK) {
+
+      joystick_data.y = y_value;
+      float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, false);
+      float curr_y = remote_data.data.js_y;
+
+      if (new_y != curr_y) {
+        remote_data.data.js_y = new_y;
+        trigger_sleep_disrupt = true;
+      }
     }
+    else {
+      ESP_LOGE(TAG, "Error reading Y axis: %d", read_err);
+    }
+
 #endif
 
     if (trigger_sleep_disrupt) {
