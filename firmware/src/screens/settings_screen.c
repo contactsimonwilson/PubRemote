@@ -16,12 +16,14 @@ static void scroll_event_cb(lv_event_t *e) {
   lv_obj_t *cont = lv_event_get_target(e);
   uint8_t total_items = lv_obj_get_child_cnt(cont);
 
-  lv_coord_t visible_height = lv_obj_get_width(cont);
+  lv_coord_t visible_width = lv_obj_get_width(cont);
   lv_coord_t scroll_x = lv_obj_get_scroll_x(cont);
-  uint32_t page_index = (scroll_x + (visible_height / 2)) / visible_height;
+  float scroll_prop = ((float)scroll_x) / (visible_width * (total_items - 1));
+  uint8_t page_index = (uint8_t)(scroll_prop * total_items);
 
+  // ESP_LOGI(TAG, "page_index: %f", scroll_prop);
   // Ensure we don't exceed total items
-  uint8_t current_page = clampu8((uint8_t)page_index, 0, total_items - 1);
+  uint8_t current_page = clampu8(page_index, 0, total_items - 1);
 
   if (LVGL_lock(-1)) {
     for (uint8_t i = 0; i < total_items; i++) {
