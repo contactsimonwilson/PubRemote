@@ -75,7 +75,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define LVGL_TASK_CPU_AFFINITY (portNUM_PROCESSORS - 1)
 #define LVGL_TASK_STACK_SIZE (6 * 1024)
 #define LVGL_TASK_PRIORITY 20
-#define BUFFER_LINES ((int)(LV_VER_RES / 10))
+#define BUFFER_LINES ((int)(LV_VER_RES / 8))
 #define BUFFER_SIZE (LV_HOR_RES * BUFFER_LINES)
 #define MAX_TRAN_SIZE ((int)LV_HOR_RES * BUFFER_LINES * sizeof(uint16_t))
 
