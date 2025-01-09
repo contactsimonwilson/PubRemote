@@ -194,7 +194,7 @@ extern lv_obj_t *ui_UpdateButtonLabel;
 extern lv_obj_t *ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE( ui_img_icon_png);   // assets/icon.png
+LV_IMG_DECLARE(ui_img_icon2_png);    // assets/icon2.png
 
 // FONTS
 LV_FONT_DECLARE( ui_font_Inter_14);
