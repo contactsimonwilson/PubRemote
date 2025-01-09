@@ -58,8 +58,13 @@ void settings_screen_load_start(lv_event_t *e) {
     lv_dropdown_set_selected(ui_StartupSound, device_settings.startup_sound);
 
     // Theme color
-    lv_color_t color = lv_color_hex(device_settings.theme_color);
-    lv_colorwheel_set_rgb(ui_ThemeColor, color);
+    lv_colorwheel_set_rgb(ui_ThemeColor, lv_color_hex(device_settings.theme_color));
+
+    // Dark text
+    if (device_settings.dark_text == DARK_TEXT_ENABLED) {
+      lv_obj_add_state(ui_DarkText, LV_STATE_CHECKED);
+    }
+
     LVGL_unlock();
   }
 }
@@ -102,6 +107,14 @@ void startup_sound_select_change(lv_event_t *e) {
 void theme_color_picker_change(lv_event_t *e) {
   lv_color_t val = lv_colorwheel_get_rgb(ui_ThemeColor);
   device_settings.theme_color = lv_color_to32(val);
+  reload_theme();
+}
+
+void dark_text_slider_change(lv_event_t *e) {
+  // Toggle dark text setting
+  device_settings.dark_text = device_settings.dark_text ? DARK_TEXT_DISABLED : DARK_TEXT_ENABLED;
+
+  // Reload the theme
   reload_theme();
 }
 

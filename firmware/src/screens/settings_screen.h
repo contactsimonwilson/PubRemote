@@ -13,6 +13,7 @@ void temp_units_select_change(lv_event_t *e);
 void distance_units_select_change(lv_event_t *e);
 void startup_sound_select_change(lv_event_t *e);
 void theme_color_picker_change(lv_event_t *e);
+void theme_text_picker_change(lv_event_t *e);
 void settings_save(lv_event_t *e);
 
 #endif

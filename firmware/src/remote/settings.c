@@ -18,6 +18,7 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 
 static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+static const DarkTextOptions DEFAULT_DARK_TEXT = DARK_TEXT_DISABLED;
 
 DeviceSettings device_settings = {
     .bl_level = BL_LEVEL_DEFAULT,
@@ -26,6 +27,7 @@ DeviceSettings device_settings = {
     .distance_units = DISTANCE_UNITS_METRIC,
     .startup_sound = STARTUP_SOUND_BEEP,
     .theme_color = COLOR_PRIMARY,
+    .dark_text = DEFAULT_DARK_TEXT,
 };
 
 CalibrationSettings calibration_settings = {
@@ -76,6 +78,7 @@ void save_device_settings() {
   nvs_write_int("distance_units", device_settings.distance_units);
   nvs_write_int("startup_sound", device_settings.startup_sound);
   nvs_write_int("theme_color", device_settings.theme_color);
+  nvs_write_int("dark_text", device_settings.dark_text);
 }
 
 esp_err_t save_pairing_data() {
@@ -157,6 +160,9 @@ esp_err_t init_settings() {
 
   device_settings.theme_color =
       nvs_read_int("theme_color", &device_settings.theme_color) == ESP_OK ? device_settings.theme_color : COLOR_PRIMARY;
+
+  device_settings.dark_text =
+      nvs_read_int("dark_text", &device_settings.dark_text) == ESP_OK ? device_settings.dark_text : DARK_TEXT_DISABLED;
 
   // Reading calibration settings
   calibration_settings.x_min =
