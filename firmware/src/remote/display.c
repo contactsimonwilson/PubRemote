@@ -38,6 +38,14 @@
   #include "display/sh8601/display_driver_sh8601.h"
   #include "esp_lcd_sh8601.h"
   #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_RGB
+#elif DISP_CO5300
+  #define SW_ROTATE 1
+  #define ROUNDER_CALLBACK 1
+  #include "display/sh8601/display_driver_sh8601.h"
+  #include "esp_lcd_sh8601.h"
+  #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_RGB
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
 
 #if TP_CST816S
@@ -64,7 +72,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 // LVGL
 #define LVGL_TICK_PERIOD_MS 5
 #define LVGL_TASK_MAX_DELAY_MS 500
-#define LVGL_TASK_CPU_AFFINITY -1
+#define LVGL_TASK_CPU_AFFINITY (portNUM_PROCESSORS - 1)
 #define LVGL_TASK_STACK_SIZE (6 * 1024)
 #define LVGL_TASK_PRIORITY 20
 #define BUFFER_LINES ((int)(LV_VER_RES / 10))
@@ -86,7 +94,9 @@ static lv_display_t *lvgl_disp = NULL;
 static lv_indev_t *lvgl_touch_indev = NULL;
 #endif
 
-#if DISP_SH8601
+static bool has_installed_drivers = false;
+
+#if ROUNDER_CALLBACK
 void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area) {
   uint16_t x1 = area->x1;
   uint16_t x2 = area->x2;
@@ -104,10 +114,18 @@ void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area
 #endif
 
 bool LVGL_lock(int timeout_ms) {
+  if (!lv_is_initialized()) {
+    return false;
+  }
+
   return lvgl_port_lock(timeout_ms);
 }
 
 void LVGL_unlock(void) {
+  if (!lv_is_initialized()) {
+    return;
+  }
+
   lvgl_port_unlock();
 }
 
@@ -124,27 +142,30 @@ static esp_err_t app_lcd_init(void) {
 #elif DISP_SH8601
   const spi_bus_config_t buscfg =
       SH8601_PANEL_BUS_QSPI_CONFIG(DISP_CLK, DISP_SDIO0, DISP_SDIO1, DISP_SDIO2, DISP_SDIO3, MAX_TRAN_SIZE);
+#elif DISP_CO5300
+  const spi_bus_config_t buscfg =
+      SH8601_PANEL_BUS_QSPI_CONFIG(DISP_CLK, DISP_SDIO0, DISP_SDIO1, DISP_SDIO2, DISP_SDIO3, MAX_TRAN_SIZE);
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
-  ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
+  ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &buscfg, SPI_DMA_CH_AUTO));
   ESP_LOGI(TAG, "Install panel IO");
+
 #if DISP_GC9A01
   const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
-
 #elif DISP_SH8601
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
-
+#elif DISP_CO5300
+  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, DISP_DC, NULL);
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
   // Attach the LCD to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &lcd_io));
 
-  ESP_LOGI(TAG, "Install LCD driver of sh8601");
-
 #if DISP_GC9A01
-  gc9a01_vendor_config_t vendor_config = {
-
-  };
-
+  gc9a01_vendor_config_t vendor_config = {};
 #elif DISP_SH8601
   sh8601_vendor_config_t vendor_config = {
       .init_cmds = sh8601_lcd_init_cmds,
@@ -154,7 +175,19 @@ static esp_err_t app_lcd_init(void) {
               .use_qspi_interface = 1,
           },
   };
+#elif DISP_CO5300
+  sh8601_vendor_config_t vendor_config = {
+      .init_cmds = co5300_lcd_init_cmds,
+      .init_cmds_size = co5300_get_lcd_init_cmds_size(),
+      .flags =
+          {
+              .use_qspi_interface = 1,
+          },
+  };
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
+
   const esp_lcd_panel_dev_config_t panel_config = {
       .reset_gpio_num = DISP_RST,
       .rgb_ele_order = RGB_ELE_ORDER,
@@ -168,6 +201,11 @@ static esp_err_t app_lcd_init(void) {
 #elif DISP_SH8601
   ESP_LOGI(TAG, "Install SH8601 panel driver");
   esp_err_t init_err = esp_lcd_new_panel_sh8601(lcd_io, &panel_config, &lcd_panel);
+#elif DISP_CO5300
+  ESP_LOGI(TAG, "Install CO5300 panel driver");
+  esp_err_t init_err = esp_lcd_new_panel_sh8601(lcd_io, &panel_config, &lcd_panel);
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
 
   if (init_err != ESP_OK) {
@@ -190,6 +228,11 @@ static esp_err_t app_lcd_init(void) {
   invert_color = true;
 #elif DISP_SH8601
   invert_color = false;
+#elif DISP_CO5300
+  invert_color = false;
+  esp_lcd_panel_set_gap(lcd_panel, 20, 0);
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
 
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(lcd_panel, invert_color));
@@ -204,18 +247,20 @@ static esp_err_t app_lcd_init(void) {
 #if TOUCH_ENABLED
 static esp_err_t app_touch_init(void) {
 
-  /* Initilize I2C */
-  const i2c_config_t i2c_conf = {.mode = I2C_MODE_MASTER,
-                                 .sda_io_num = TP_SDA,
-                                 .sda_pullup_en = GPIO_PULLUP_DISABLE,
-                                 .scl_io_num = TP_SCL,
-                                 .scl_pullup_en = GPIO_PULLUP_DISABLE,
-                                 .master.clk_speed = 400000};
+  if (!has_installed_drivers) {
+    /* Initilize I2C */
+    const i2c_config_t i2c_conf = {.mode = I2C_MODE_MASTER,
+                                   .sda_io_num = TP_SDA,
+                                   .sda_pullup_en = GPIO_PULLUP_DISABLE,
+                                   .scl_io_num = TP_SCL,
+                                   .scl_pullup_en = GPIO_PULLUP_DISABLE,
+                                   .master.clk_speed = 400000};
 
-  ESP_LOGI(TAG, "Initializing I2C for display touch");
-  /* Initialize I2C */
-  ESP_ERROR_CHECK(i2c_param_config(TP_I2C_NUM, &i2c_conf));
-  ESP_ERROR_CHECK(i2c_driver_install(TP_I2C_NUM, i2c_conf.mode, 0, 0, 0));
+    ESP_LOGI(TAG, "Initializing I2C for display touch");
+    /* Initialize I2C */
+    ESP_ERROR_CHECK(i2c_param_config(TP_I2C_NUM, &i2c_conf));
+    ESP_ERROR_CHECK(i2c_driver_install(TP_I2C_NUM, i2c_conf.mode, 0, 0, 0));
+  }
 
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
 
@@ -297,11 +342,17 @@ static esp_err_t app_lvgl_init(void) {
 #elif DISP_SH8601
                                                     .mirror_x = false,
                                                     .mirror_y = false,
+
+#elif DISP_CO5300
+                                                    .mirror_x = false,
+                                                    .mirror_y = false,
+#elif DISP_ST7789
+  #error "ST7789 not supported"
 #endif
                                                 },
                                             .flags = {
                                                 .buff_dma = true,
-                                                .buff_spiram = false,
+                                                .buff_spiram = true,
                                                 .full_refresh = false,
                                                 .direct_mode = false,
                                                 .swap_bytes = false,
@@ -313,7 +364,8 @@ static esp_err_t app_lvgl_init(void) {
   lvgl_disp = lvgl_port_add_disp(&disp_cfg);
 
 #if ROUNDER_CALLBACK
-  lv_display_add_event_cb(lvgl_disp, LVGL_port_rounder_callback, LV_EVENT_INVALIDATE_AREA, NULL);
+// TODO - FIX
+// lv_display_add_event_cb(lvgl_disp, LVGL_port_rounder_callback, LV_EVENT_INVALIDATE_AREA, NULL);
 #endif
 
   lv_disp_set_rotation(lvgl_disp, DISP_ROTATE);
@@ -330,6 +382,23 @@ static esp_err_t app_lvgl_init(void) {
   return ESP_OK;
 }
 
+#if SCREEN_TEST_UI
+static void event_handler(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+
+  if (code == LV_EVENT_CLICKED) {
+    LV_LOG_USER("Clicked");
+    ESP_LOGI(TAG, "Clicked");
+    LVGL_lock(0);
+    ui_init();
+    LVGL_unlock();
+  }
+  else if (code == LV_EVENT_VALUE_CHANGED) {
+    LV_LOG_USER("Toggled");
+  }
+}
+#endif
+
 static esp_err_t display_ui() {
   ESP_LOGI(TAG, "Display UI");
 
@@ -338,9 +407,12 @@ static esp_err_t display_ui() {
     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFF69B4), LV_PART_MAIN);
     lv_obj_t *btn = lv_btn_create(lv_scr_act());
     lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_event_cb(btn, event_handler, LV_EVENT_ALL, NULL);
+
     lv_obj_t *label = lv_label_create(btn);
     lv_label_set_text(label, "Hello world");
     lv_obj_center(label);
+    // lv_demo_widgets();
 #else
     ui_init(); // Generated SL UI
 #endif
@@ -355,7 +427,34 @@ static esp_err_t display_ui() {
   return ESP_FAIL;
 }
 
-void init_display(void) {
+void deinit_display() {
+  ESP_LOGI(TAG, "Deinit display");
+  set_bl_level(0);
+
+  if (lv_is_initialized()) {
+
+    if (LVGL_lock(0)) {
+#if TOUCH_ENABLED
+      // Remove touch
+      ESP_ERROR_CHECK(lvgl_port_remove_touch(lvgl_touch_indev));
+      ESP_ERROR_CHECK(esp_lcd_touch_del(touch_handle));
+#endif
+
+      // Remove panel
+      ESP_ERROR_CHECK(lvgl_port_remove_disp(lvgl_disp));
+      ESP_ERROR_CHECK(esp_lcd_panel_del(lcd_panel));
+      ESP_ERROR_CHECK(esp_lcd_panel_io_del(lcd_io));
+      ESP_ERROR_CHECK(spi_bus_free(LCD_HOST));
+
+      LVGL_unlock();
+    }
+
+    // Stop LVGL
+    ESP_ERROR_CHECK(lvgl_port_deinit());
+  }
+}
+
+void init_display() {
   ESP_LOGI(TAG, "Create LVGL conf");
   /* LCD HW initialization */
   ESP_ERROR_CHECK(app_lcd_init());
@@ -366,4 +465,5 @@ void init_display(void) {
   /* LVGL initialization */
   ESP_ERROR_CHECK(app_lvgl_init());
   ESP_ERROR_CHECK(display_ui());
+  has_installed_drivers = true;
 }

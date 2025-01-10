@@ -7,95 +7,110 @@
 
 void ui_AboutScreen_screen_init(void)
 {
-    ui_AboutScreen = lv_obj_create(NULL);
-    lv_obj_remove_flag(ui_AboutScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_AboutScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_AboutScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+ui_AboutScreen = lv_obj_create(NULL);
+lv_obj_remove_flag( ui_AboutScreen, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_bg_color(ui_AboutScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_AboutScreen, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-    ui_AboutContent = lv_obj_create(ui_AboutScreen);
-    lv_obj_remove_style_all(ui_AboutContent);
-    lv_obj_set_width(ui_AboutContent, lv_pct(100));
-    lv_obj_set_height(ui_AboutContent, lv_pct(100));
-    lv_obj_set_align(ui_AboutContent, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_AboutContent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_AboutContent, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_remove_flag(ui_AboutContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_text_font(ui_AboutContent, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+ui_AboutContent = lv_obj_create(ui_AboutScreen);
+lv_obj_remove_style_all(ui_AboutContent);
+lv_obj_set_width( ui_AboutContent, lv_pct(100));
+lv_obj_set_height( ui_AboutContent, lv_pct(100));
+lv_obj_set_align( ui_AboutContent, LV_ALIGN_CENTER );
+lv_obj_set_flex_flow(ui_AboutContent,LV_FLEX_FLOW_COLUMN);
+lv_obj_set_flex_align(ui_AboutContent, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+lv_obj_remove_flag( ui_AboutContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_text_font(ui_AboutContent, &ui_font_Inter_14, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-    ui_AboutBody = lv_obj_create(ui_AboutContent);
-    lv_obj_remove_style_all(ui_AboutBody);
-    lv_obj_set_width(ui_AboutBody, lv_pct(65));
-    lv_obj_set_height(ui_AboutBody, lv_pct(75));
-    lv_obj_set_align(ui_AboutBody, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_AboutBody, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_AboutBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_remove_flag(ui_AboutBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_scroll_dir(ui_AboutBody, LV_DIR_VER);
-    lv_obj_set_style_pad_left(ui_AboutBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_AboutBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_AboutBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_AboutBody, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+ui_AboutBody = lv_obj_create(ui_AboutContent);
+lv_obj_remove_style_all(ui_AboutBody);
+lv_obj_set_width( ui_AboutBody, lv_pct(65));
+lv_obj_set_height( ui_AboutBody, lv_pct(75));
+lv_obj_set_align( ui_AboutBody, LV_ALIGN_CENTER );
+lv_obj_set_flex_flow(ui_AboutBody,LV_FLEX_FLOW_COLUMN);
+lv_obj_set_flex_align(ui_AboutBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+lv_obj_remove_flag( ui_AboutBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_scroll_dir(ui_AboutBody, LV_DIR_VER);
+lv_obj_set_style_pad_left(ui_AboutBody, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_right(ui_AboutBody, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_top(ui_AboutBody, 40, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_bottom(ui_AboutBody, 20, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-    ui_VersionInfoHeaderLabel = lv_label_create(ui_AboutBody);
-    lv_obj_set_width(ui_VersionInfoHeaderLabel, lv_pct(100));
-    lv_obj_set_height(ui_VersionInfoHeaderLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_VersionInfoHeaderLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_VersionInfoHeaderLabel, "Build info");
-    lv_obj_set_style_text_font(ui_VersionInfoHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+ui_VersionInfoHeaderLabel = lv_label_create(ui_AboutBody);
+lv_obj_set_width( ui_VersionInfoHeaderLabel, lv_pct(100));
+lv_obj_set_height( ui_VersionInfoHeaderLabel, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_align( ui_VersionInfoHeaderLabel, LV_ALIGN_CENTER );
+lv_label_set_text(ui_VersionInfoHeaderLabel,"Build info");
+lv_obj_set_style_text_font(ui_VersionInfoHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-    ui_VersionInfoLabel = lv_label_create(ui_AboutBody);
-    lv_obj_set_width(ui_VersionInfoLabel, lv_pct(100));
-    lv_obj_set_height(ui_VersionInfoLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_VersionInfoLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_VersionInfoLabel, "Version: unknown\nType: unknown\nHash: unknown");
+ui_VersionInfoLabel = lv_label_create(ui_AboutBody);
+lv_obj_set_width( ui_VersionInfoLabel, lv_pct(100));
+lv_obj_set_height( ui_VersionInfoLabel, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_align( ui_VersionInfoLabel, LV_ALIGN_CENTER );
+lv_label_set_text(ui_VersionInfoLabel,"Version: unknown\nType: unknown\nHash: unknown");
 
-    ui_DebugInfoHeaderLabel = lv_label_create(ui_AboutBody);
-    lv_obj_set_width(ui_DebugInfoHeaderLabel, lv_pct(100));
-    lv_obj_set_height(ui_DebugInfoHeaderLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_DebugInfoHeaderLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_DebugInfoHeaderLabel, "Debug info");
-    lv_obj_set_style_text_font(ui_DebugInfoHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui_DebugInfoHeaderLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_DebugInfoHeaderLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_DebugInfoHeaderLabel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_DebugInfoHeaderLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+ui_DebugInfoHeaderLabel = lv_label_create(ui_AboutBody);
+lv_obj_set_width( ui_DebugInfoHeaderLabel, lv_pct(100));
+lv_obj_set_height( ui_DebugInfoHeaderLabel, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_align( ui_DebugInfoHeaderLabel, LV_ALIGN_CENTER );
+lv_label_set_text(ui_DebugInfoHeaderLabel,"Debug info");
+lv_obj_set_style_text_font(ui_DebugInfoHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_left(ui_DebugInfoHeaderLabel, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_right(ui_DebugInfoHeaderLabel, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_top(ui_DebugInfoHeaderLabel, 10, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_bottom(ui_DebugInfoHeaderLabel, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-    ui_DebugInfoLabel = lv_label_create(ui_AboutBody);
-    lv_obj_set_width(ui_DebugInfoLabel, lv_pct(100));
-    lv_obj_set_height(ui_DebugInfoLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_DebugInfoLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_DebugInfoLabel, "Battery: unknown");
+ui_DebugInfoLabel = lv_label_create(ui_AboutBody);
+lv_obj_set_width( ui_DebugInfoLabel, lv_pct(100));
+lv_obj_set_height( ui_DebugInfoLabel, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_align( ui_DebugInfoLabel, LV_ALIGN_CENTER );
+lv_label_set_text(ui_DebugInfoLabel,"Battery: unknown");
 
-    ui_AboutFooter = lv_obj_create(ui_AboutContent);
-    lv_obj_remove_style_all(ui_AboutFooter);
-    lv_obj_set_width(ui_AboutFooter, lv_pct(65));
-    lv_obj_set_height(ui_AboutFooter, lv_pct(25));
-    lv_obj_set_align(ui_AboutFooter, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_AboutFooter, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_AboutFooter, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
-    lv_obj_remove_flag(ui_AboutFooter, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_pad_left(ui_AboutFooter, 48, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_AboutFooter, 48, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_AboutFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_AboutFooter, 24, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_row(ui_AboutFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_AboutFooter, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
+ui_AboutFooter = lv_obj_create(ui_AboutContent);
+lv_obj_remove_style_all(ui_AboutFooter);
+lv_obj_set_width( ui_AboutFooter, lv_pct(65));
+lv_obj_set_height( ui_AboutFooter, lv_pct(25));
+lv_obj_set_align( ui_AboutFooter, LV_ALIGN_CENTER );
+lv_obj_set_flex_flow(ui_AboutFooter,LV_FLEX_FLOW_ROW);
+lv_obj_set_flex_align(ui_AboutFooter, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+lv_obj_remove_flag( ui_AboutFooter, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_pad_left(ui_AboutFooter, 48, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_right(ui_AboutFooter, 48, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_top(ui_AboutFooter, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_bottom(ui_AboutFooter, 24, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_row(ui_AboutFooter, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_column(ui_AboutFooter, 12, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-    ui_AboutMainActionButton = lv_button_create(ui_AboutFooter);
-    lv_obj_set_width(ui_AboutMainActionButton, 80);
-    lv_obj_set_height(ui_AboutMainActionButton, 42);
-    lv_obj_set_align(ui_AboutMainActionButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_AboutMainActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_AboutMainActionButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_text_font(ui_AboutMainActionButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+ui_AboutMainActionButton = lv_button_create(ui_AboutFooter);
+lv_obj_set_width( ui_AboutMainActionButton, 80);
+lv_obj_set_height( ui_AboutMainActionButton, 42);
+lv_obj_set_align( ui_AboutMainActionButton, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_AboutMainActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_remove_flag( ui_AboutMainActionButton, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_text_font(ui_AboutMainActionButton, &ui_font_Inter_Bold_14, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-    ui_AboutMainActionButtonLabel = lv_label_create(ui_AboutMainActionButton);
-    lv_obj_set_width(ui_AboutMainActionButtonLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_AboutMainActionButtonLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_AboutMainActionButtonLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_AboutMainActionButtonLabel, "Back");
+ui_AboutMainActionButtonLabel = lv_label_create(ui_AboutMainActionButton);
+lv_obj_set_width( ui_AboutMainActionButtonLabel, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_AboutMainActionButtonLabel, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_align( ui_AboutMainActionButtonLabel, LV_ALIGN_CENTER );
+lv_label_set_text(ui_AboutMainActionButtonLabel,"Back");
 
-    lv_obj_add_event_cb(ui_AboutMainActionButton, ui_event_AboutMainActionButton, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_AboutScreen, ui_event_AboutScreen, LV_EVENT_ALL, NULL);
+ui_UpdateButton = lv_button_create(ui_AboutFooter);
+lv_obj_set_width( ui_UpdateButton, 60);
+lv_obj_set_height( ui_UpdateButton, 42);
+lv_obj_set_align( ui_UpdateButton, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_UpdateButton, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_remove_flag( ui_UpdateButton, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_text_font(ui_UpdateButton, &ui_font_Inter_Bold_14, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_UpdateButtonLabel = lv_label_create(ui_UpdateButton);
+lv_obj_set_width( ui_UpdateButtonLabel, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_UpdateButtonLabel, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_align( ui_UpdateButtonLabel, LV_ALIGN_CENTER );
+lv_label_set_text(ui_UpdateButtonLabel,"Update");
+
+lv_obj_add_event_cb(ui_AboutMainActionButton, ui_event_AboutMainActionButton, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(ui_UpdateButton, ui_event_UpdateButton, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(ui_AboutScreen, ui_event_AboutScreen, LV_EVENT_ALL, NULL);
 
 }

@@ -29,16 +29,19 @@ static const char *TAG = "PUBREMOTE-MAIN";
 int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
-  init_adcs();
+  // Core setup
   init_settings();
+  init_adcs();
   init_power_management();
+
+  // Peripherals
   init_led();
   init_buzzer();
   init_buttons();
   init_thumbstick();
   init_display();
 
-  // Init radio comms
+  // Comms
   init_espnow();
   init_connection();
   init_receiver();

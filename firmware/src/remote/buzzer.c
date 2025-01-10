@@ -6,6 +6,7 @@
 #include "esp_wifi.h"
 #include "led_strip.h"
 #include "nvs_flash.h"
+#include "settings.h"
 #include <driver/ledc.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
@@ -120,6 +121,11 @@ void init_buzzer() {
   };
   ledc_channel_config(&channel_conf);
 
-  play_melody();
+  if (device_settings.startup_sound == STARTUP_SOUND_MELODY) {
+    play_melody();
+  }
+  else if (device_settings.startup_sound == STARTUP_SOUND_BEEP) {
+    play_note(NOTE_C5, 100, 300);
+  }
 #endif
 }

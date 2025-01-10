@@ -16,12 +16,12 @@ static void scroll_event_cb(lv_event_t *e) {
   lv_obj_t *cont = lv_event_get_target(e);
   uint8_t total_items = lv_obj_get_child_cnt(cont);
 
-  lv_coord_t visible_height = lv_obj_get_width(cont);
+  lv_coord_t visible_width = lv_obj_get_width(cont);
   lv_coord_t scroll_x = lv_obj_get_scroll_x(cont);
-  uint32_t page_index = (scroll_x + (visible_height / 2)) / visible_height;
+  uint8_t page_index = (scroll_x + (visible_width / 2)) / visible_width;
 
   // Ensure we don't exceed total items
-  uint8_t current_page = clampu8((uint8_t)page_index, 0, total_items - 1);
+  uint8_t current_page = clampu8(page_index, 0, total_items - 1);
 
   if (LVGL_lock(-1)) {
     for (uint8_t i = 0; i < total_items; i++) {
@@ -53,6 +53,9 @@ void settings_screen_load_start(lv_event_t *e) {
 
     // Distance units
     lv_dropdown_set_selected(ui_DistanceUnits, device_settings.distance_units);
+
+    // Startup sound
+    lv_dropdown_set_selected(ui_StartupSound, device_settings.startup_sound);
 
     // Theme color
     lv_color_t color = lv_color_hex(device_settings.theme_color);
@@ -89,6 +92,11 @@ void temp_units_select_change(lv_event_t *e) {
 void distance_units_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_DistanceUnits);
   device_settings.distance_units = (uint8_t)(val & 0xFF);
+}
+
+void startup_sound_select_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_StartupSound);
+  device_settings.startup_sound = (uint8_t)(val & 0xFF);
 }
 
 void theme_color_picker_change(lv_event_t *e) {

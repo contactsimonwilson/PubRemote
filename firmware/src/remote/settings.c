@@ -24,6 +24,7 @@ DeviceSettings device_settings = {
     .auto_off_time = DEFAULT_AUTO_OFF_TIME,
     .temp_units = TEMP_UNITS_CELSIUS,
     .distance_units = DISTANCE_UNITS_METRIC,
+    .startup_sound = STARTUP_SOUND_BEEP,
     .theme_color = COLOR_PRIMARY,
 };
 
@@ -36,12 +37,14 @@ CalibrationSettings calibration_settings = {
     .y_center = STICK_MID_VAL,
     .deadband = STICK_DEADBAND,
     .expo = STICK_EXPO,
-
+    .invert_y = INVERT_Y_AXIS,
 };
 
 PairingSettings pairing_settings = {
     .remote_addr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, // Use 0xFF for -1 as uint8_t is unsigned
-    .secret_code = DEFAULT_PAIRING_SECRET_CODE};
+    .secret_code = DEFAULT_PAIRING_SECRET_CODE,
+    .channel = 1,
+};
 
 static uint8_t get_auto_off_time_minutes() {
   switch (device_settings.auto_off_time) {
@@ -53,6 +56,10 @@ static uint8_t get_auto_off_time_minutes() {
     return 5;
   case AUTO_OFF_10_MINUTES:
     return 10;
+  case AUTO_OFF_20_MINUTES:
+    return 20;
+  case AUTO_OFF_30_MINUTES:
+    return 30;
   default:
     return 0;
   }
@@ -67,6 +74,7 @@ void save_device_settings() {
   nvs_write_int(AUTO_OFF_TIME_KEY, device_settings.auto_off_time);
   nvs_write_int("temp_units", device_settings.temp_units);
   nvs_write_int("distance_units", device_settings.distance_units);
+  nvs_write_int("startup_sound", device_settings.startup_sound);
   nvs_write_int("theme_color", device_settings.theme_color);
 }
 
@@ -75,6 +83,12 @@ esp_err_t save_pairing_data() {
   esp_err_t err = nvs_write_int("secret_code", pairing_settings.secret_code);
   if (err != ESP_OK) {
     ESP_LOGE(TAG, "Error saving secret code!");
+    return err;
+  }
+
+  err = nvs_write_int("channel", pairing_settings.channel);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Error saving channel!");
     return err;
   }
 
@@ -97,6 +111,7 @@ void save_calibration() {
   nvs_write_int("y_center", calibration_settings.y_center);
   nvs_write_int("deadband", calibration_settings.deadband);
   nvs_write_int("expo", (int)(calibration_settings.expo * EXPO_ADJUST_FACTOR));
+  nvs_write_int("invert_y", calibration_settings.invert_y);
 }
 
 // Function to initialize NVS
@@ -136,6 +151,10 @@ esp_err_t init_settings() {
                                        ? device_settings.distance_units
                                        : DISTANCE_UNITS_METRIC;
 
+  device_settings.startup_sound = nvs_read_int("startup_sound", &device_settings.startup_sound) == ESP_OK
+                                      ? device_settings.startup_sound
+                                      : STARTUP_SOUND_BEEP;
+
   device_settings.theme_color =
       nvs_read_int("theme_color", &device_settings.theme_color) == ESP_OK ? device_settings.theme_color : COLOR_PRIMARY;
 
@@ -165,13 +184,20 @@ esp_err_t init_settings() {
 
   int16_t expo = STICK_EXPO;
 
-  calibration_settings.expo = nvs_read_int("x_expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
+  calibration_settings.expo = nvs_read_int("expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
+
+  calibration_settings.invert_y = nvs_read_int("invert_y", &calibration_settings.invert_y) == ESP_OK
+                                      ? calibration_settings.invert_y
+                                      : INVERT_Y_AXIS;
 
   // Reading pairing settings
   pairing_settings.secret_code =
       nvs_read_int("secret_code", &pairing_settings.secret_code) == ESP_OK ? pairing_settings.secret_code : -1;
 
-  uint8_t remote_addr[MAC_ADDR_LEN];
+  pairing_settings.channel =
+      nvs_read_int("channel", &pairing_settings.channel) == ESP_OK ? pairing_settings.channel : 1;
+
+  uint8_t remote_addr[ESP_NOW_ETH_ALEN];
   err = nvs_read_blob("remote_addr", &remote_addr, sizeof(remote_addr));
   if (err == ESP_OK) {
     memcpy(pairing_settings.remote_addr, remote_addr, sizeof(remote_addr));
@@ -366,4 +392,8 @@ esp_err_t nvs_read_int(const char *key, uint32_t *value) {
 // Function to read a blob from NVS
 esp_err_t nvs_read_blob(const char *key, void *value, size_t length) {
   return nvs_read(key, value, NVS_TYPE_BLOB, length);
+}
+
+esp_err_t reset_all_settings() {
+  return nvs_flash_erase();
 }

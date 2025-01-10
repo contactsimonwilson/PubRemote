@@ -147,15 +147,17 @@ void calibration_task(void *pvParameters) {
     if (LVGL_lock(-1)) {
 // Get values using current calibration data
 #if JOYSTICK_X_ENABLED
-      float curr_x_val = convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
-                                             calibration_data.x_max, calibration_data.deadband, calibration_data.expo);
+      float curr_x_val =
+          convert_adc_to_axis(joystick_data.x, calibration_data.x_min, calibration_data.x_center,
+                              calibration_data.x_max, calibration_data.deadband, calibration_data.expo, false);
 #else
       float curr_x_val = 0;
 #endif
 
 #if JOYSTICK_Y_ENABLED
       float curr_y_val = convert_adc_to_axis(joystick_data.y, calibration_data.y_min, calibration_data.y_center,
-                                             calibration_data.y_max, calibration_data.deadband, calibration_data.expo);
+                                             calibration_data.y_max, calibration_data.deadband, calibration_data.expo,
+                                             calibration_data.invert_y);
 #else
       float curr_y_val = 0;
 #endif
@@ -167,7 +169,7 @@ void calibration_task(void *pvParameters) {
 
       LVGL_unlock();
     }
-    vTaskDelay(pdMS_TO_TICKS(LV_CONF_DEF_REFR_PERIOD));
+    vTaskDelay(pdMS_TO_TICKS(LV_DEF_REFR_PERIOD));
   }
 
   ESP_LOGI(TAG, "Calibration task ended");
@@ -179,6 +181,7 @@ void update_calibration_screen() {
     lv_obj_clear_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN); // show on every step except expo
     lv_obj_add_flag(ui_DeadbandIndicator, LV_OBJ_FLAG_HIDDEN);               // Hide for every step except deadband
     lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);                      // Hide for every step except expo
+    lv_obj_add_flag(ui_StickFlags, LV_OBJ_FLAG_HIDDEN);                      // Hide for every step except flags
 
     switch (calibration_step) {
     case CALIBRATION_STEP_START:
@@ -207,6 +210,20 @@ void update_calibration_screen() {
       lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
       lv_obj_clear_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);
       break;
+    case CALIBRATION_STEP_STICK_FLAGS:
+      lv_obj_add_flag(ui_CalibrationIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+      lv_label_set_text(ui_CalibrationStepLabel, "Axis options");
+      lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Next");
+      lv_obj_clear_flag(ui_StickFlags, LV_OBJ_FLAG_HIDDEN);
+
+      if (calibration_data.invert_y) {
+        lv_obj_add_state(ui_InvertY, LV_STATE_CHECKED);
+      }
+      else {
+        lv_obj_clear_state(ui_InvertY, LV_STATE_CHECKED);
+      }
+
+      break;
     case CALIBRATION_STEP_DONE:
       lv_label_set_text(ui_CalibrationStepLabel, "Calibration complete!");
       lv_label_set_text(ui_CalibrationPrimaryActionButtonLabel, "Save");
@@ -225,6 +242,7 @@ static void reset_calibration_data() {
   calibration_data.y_max = STICK_MAX_VAL;
   calibration_data.deadband = STICK_DEADBAND;
   calibration_data.expo = STICK_EXPO;
+  calibration_data.invert_y = INVERT_Y_AXIS;
 }
 
 static void load_current_calibration_data() {
@@ -236,6 +254,7 @@ static void load_current_calibration_data() {
   calibration_data.y_max = calibration_settings.y_max;
   calibration_data.deadband = calibration_settings.deadband;
   calibration_data.expo = calibration_settings.expo;
+  calibration_data.invert_y = calibration_settings.invert_y;
 }
 
 // Event handlers
@@ -278,6 +297,9 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
   }
   else if (calibration_step == CALIBRATION_STEP_EXPO) {
     calibration_data.expo = expo;
+  }
+  else if (calibration_step == CALIBRATION_STEP_STICK_FLAGS) {
+    calibration_data.invert_y = lv_obj_has_state(ui_InvertY, LV_STATE_CHECKED);
   }
   else if (calibration_step >= CALIBRATION_STEP_DONE) {
     calibration_settings = calibration_data;

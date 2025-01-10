@@ -1,6 +1,7 @@
 #include "esp_now.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
+#include "settings.h"
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
 #include <nvs.h>
@@ -23,6 +24,7 @@ void init_espnow() {
   ESP_ERROR_CHECK(esp_wifi_init(&cfg)); // You might not need a WiFi config
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
   ESP_ERROR_CHECK(esp_wifi_start());
+  ESP_ERROR_CHECK(esp_wifi_set_channel(pairing_settings.channel, WIFI_SECOND_CHAN_NONE));
 
   // Initialize ESP-NOW
   ESP_ERROR_CHECK(esp_now_init());

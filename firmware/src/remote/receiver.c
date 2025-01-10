@@ -7,6 +7,7 @@
 #include "esp_wifi.h"
 #include "peers.h"
 #include "powermanagement.h"
+#include "screens/pairing_screen.h"
 #include "stats.h"
 #include "time.h"
 #include "utilities/conversion_utils.h"
@@ -18,13 +19,14 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-RECEIVER";
-#define RX_QUEUE_SIZE 1
+#define RX_QUEUE_SIZE 10
 
 // Structure to hold ESP-NOW data
 typedef struct {
   uint8_t mac_addr[ESP_NOW_ETH_ALEN];
   uint8_t *data;
   int len;
+  uint8_t chan;
 } esp_now_event_t;
 
 static QueueHandle_t espnow_queue;
@@ -37,10 +39,11 @@ static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *da
   evt.data = malloc(len);
   memcpy(evt.data, data, len);
   evt.len = len;
+  evt.chan = recv_info->rx_ctrl->channel;
 
 #if RX_QUEUE_SIZE > 1
   // Send to queue for processing in application task
-  if (uxQueueSpacesAvailable() == 0) {
+  if (uxQueueSpacesAvailable(espnow_queue) == 0) {
     // reset the queue
     xQueueReset(espnow_queue);
   }
@@ -54,6 +57,10 @@ static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *da
   }
 }
 
+static bool is_same_mac(const uint8_t *mac1, const uint8_t *mac2) {
+  return memcmp(mac1, mac2, ESP_NOW_ETH_ALEN) == 0;
+}
+
 static void process_data(esp_now_event_t evt) {
   uint8_t *data = evt.data;
   int len = evt.len;
@@ -61,8 +68,22 @@ static void process_data(esp_now_event_t evt) {
   LAST_COMMAND_TIME = 0;
   ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
-  if (pairing_state == PAIRING_STATE_UNPAIRED && len == 6) {
-    memcpy(pairing_settings.remote_addr, data, 6);
+  bool is_pairing_start = pairing_state == PAIRING_STATE_UNPAIRED && is_pairing_screen_active();
+
+  // Check mac for security on anything other than initial pairing
+  if (!is_same_mac(evt.mac_addr, pairing_settings.remote_addr) && !is_pairing_start) {
+    ESP_LOGD(TAG, "Ignoring data from unknown MAC");
+    return;
+  }
+
+  if (is_pairing_start && len == 6) {
+    uint8_t rec_mac[ESP_NOW_ETH_ALEN];
+    memcpy(rec_mac, data, ESP_NOW_ETH_ALEN);
+    if (!is_same_mac(evt.mac_addr, rec_mac)) {
+      ESP_LOGE(TAG, "MAC Address mismatch on pairing request");
+      return;
+    }
+    memcpy(pairing_settings.remote_addr, rec_mac, ESP_NOW_ETH_ALEN);
     ESP_LOGI(TAG, "Got Pairing request from VESC Express");
     ESP_LOGI(TAG, "packet Length: %d", len);
     ESP_LOGI(TAG, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", data[0], data[1], data[2], data[3], data[4], data[5]);
@@ -71,14 +92,21 @@ static void process_data(esp_now_event_t evt) {
     uint8_t TEST[1] = {420}; // TODO - FIX THIS
     // Do this internally as we don't want it to change connection state
     esp_now_peer_info_t peerInfo = {};
-    peerInfo.channel = 1; // Set the channel number (0-14)
+    peerInfo.channel = evt.chan; // Set the channel number (0-14)
     peerInfo.encrypt = false;
     memcpy(peerInfo.peer_addr, pairing_settings.remote_addr, sizeof(pairing_settings.remote_addr));
+    pairing_settings.channel = evt.chan;
     // ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
     uint8_t *mac_addr = pairing_settings.remote_addr;
-    if (!esp_now_is_peer_exist(mac_addr)) {
-      esp_now_add_peer(&peerInfo);
+
+    if (esp_now_is_peer_exist(mac_addr)) {
+      esp_err_t res = esp_now_del_peer(mac_addr);
+      if (res != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to delete peer");
+      }
     }
+
+    esp_now_add_peer(&peerInfo);
 
     esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&TEST, sizeof(TEST));
     if (result != ESP_OK) {
@@ -180,17 +208,64 @@ static void process_data(esp_now_event_t evt) {
   }
 }
 
+#define CHANNEL_HOP_INTERVAL_MS 200
+#define RECEIVER_TASK_DELAY_MS 5
+
+static void change_channel(uint8_t chan, bool is_pairing) {
+  ESP_LOGI(TAG, "Switching to channel %d", chan);
+  esp_wifi_set_channel(chan, WIFI_SECOND_CHAN_NONE);
+  pairing_settings.channel = chan;
+
+  if (!is_pairing) {
+    // Add peer so we can send if we're already paired
+    uint8_t *mac_addr = pairing_settings.remote_addr;
+    if (esp_now_is_peer_exist(mac_addr)) {
+      esp_now_del_peer(mac_addr);
+    }
+    esp_now_peer_info_t peerInfo = {};
+    peerInfo.channel = chan;
+    peerInfo.encrypt = false;
+    memcpy(peerInfo.peer_addr, mac_addr, ESP_NOW_ETH_ALEN);
+    esp_now_add_peer(&peerInfo);
+  }
+}
+
 static void receiver_task(void *pvParameters) {
   espnow_queue = xQueueCreate(RX_QUEUE_SIZE, sizeof(esp_now_event_t));
   ESP_ERROR_CHECK(esp_now_register_recv_cb(on_data_recv));
   ESP_LOGI(TAG, "Registered RX callback");
   esp_now_event_t evt;
+  // Hop through channels if in pairing mode or connecting
+  uint64_t channel_switch_time_ms = 0;
+
   while (1) {
-    if (xQueueReceive(espnow_queue, &evt, portMAX_DELAY) == pdTRUE) {
+    if (xQueueReceive(espnow_queue, &evt, 0) == pdTRUE) {
       process_data(evt);
       free(evt.data);
+      // reset channel switch time
+      channel_switch_time_ms = 0;
     }
-    vTaskDelay(pdMS_TO_TICKS(1));
+    else {
+      bool is_pairing = pairing_state == PAIRING_STATE_UNPAIRED && is_pairing_screen_active();
+      bool is_connecting = connection_state == CONNECTION_STATE_CONNECTING;
+      // Nothing received while connecting or pairing - hop through channels
+      if (is_connecting || is_pairing) {
+        if (channel_switch_time_ms > CHANNEL_HOP_INTERVAL_MS) {
+          // Hop to next channel
+          uint8_t next_channel = (pairing_settings.channel % 11) + 1;
+          change_channel(next_channel, is_pairing);
+          channel_switch_time_ms = 0;
+        }
+        else {
+          channel_switch_time_ms += RECEIVER_TASK_DELAY_MS;
+        }
+      }
+      else {
+        // reset channel switch time
+        channel_switch_time_ms = 0;
+      }
+    }
+    vTaskDelay(pdMS_TO_TICKS(RECEIVER_TASK_DELAY_MS));
   }
 
   // The task will not reach this point as it runs indefinitely

@@ -143,6 +143,34 @@ def about_screen_load_start(event_struct):
     return
 
 
-def enter_sleep_ui(event_struct):
+def enter_sleep(event_struct):
+    return
+
+
+def menu_connect_press(event_struct):
+    return
+
+
+def reset_button_press(event_struct):
+    return
+
+
+def update_button_press(event_struct):
+    return
+
+
+def shutdown_button_press(event_struct):
+    return
+
+
+def shutdown_button_long_press(event_struct):
+    return
+
+
+def shutdown_button_down(event_struct):
+    return
+
+
+def startup_sound_select_change(event_struct):
     return
 

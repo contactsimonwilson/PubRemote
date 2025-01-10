@@ -1,10 +1,10 @@
-#include <core/lv_obj.h>
 #ifndef __SETTINGS_H
-  #define __SETTINGS_H
-
-  #include "esp_system.h"
-  #include "nvs_flash.h"
-  #include <remote/receiver.h>
+#define __SETTINGS_H
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include <core/lv_obj.h>
+#include <esp_now.h>
+#include <remote/receiver.h>
 
 // Function to initialize NVS
 esp_err_t init_nvs();
@@ -30,11 +30,15 @@ void save_calibration();
 
 esp_err_t save_pairing_data();
 
+esp_err_t reset_all_settings();
+
 typedef enum {
   AUTO_OFF_DISABLED,
   AUTO_OFF_2_MINUTES,
   AUTO_OFF_5_MINUTES,
   AUTO_OFF_10_MINUTES,
+  AUTO_OFF_20_MINUTES,
+  AUTO_OFF_30_MINUTES,
 } AutoOffOptions;
 
 typedef enum {
@@ -47,12 +51,18 @@ typedef enum {
   DISTANCE_UNITS_IMPERIAL,
 } DistanceUnits;
 
-  #define DEFAULT_PAIRING_SECRET_CODE -1
-  #define MAC_ADDR_LEN 6
+typedef enum {
+  STARTUP_SOUND_DISABLED,
+  STARTUP_SOUND_BEEP,
+  STARTUP_SOUND_MELODY,
+} StartupSoundOptions;
+
+#define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
   uint32_t secret_code;
-  uint8_t remote_addr[MAC_ADDR_LEN];
+  uint8_t remote_addr[ESP_NOW_ETH_ALEN];
+  uint8_t channel;
 } PairingSettings;
 
 typedef struct {
@@ -64,6 +74,7 @@ typedef struct {
   uint16_t y_center;
   uint16_t deadband;
   float expo;
+  bool invert_y;
 } CalibrationSettings;
 
 typedef struct {
@@ -71,6 +82,7 @@ typedef struct {
   AutoOffOptions auto_off_time;
   uint8_t temp_units;
   uint8_t distance_units;
+  uint8_t startup_sound;
   uint32_t theme_color;
 } DeviceSettings;
 

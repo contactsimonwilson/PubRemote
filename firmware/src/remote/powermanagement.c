@@ -1,5 +1,7 @@
 #include "powermanagement.h"
 #include "adc.h"
+#include "buzzer.h"
+#include "display.h"
 #include "driver/gpio.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_log.h"
@@ -15,45 +17,96 @@
 #include <freertos/queue.h>
 #include <freertos/task.h>
 #include <math.h>
+#include <remote/connection.h>
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
+#ifndef BAT_ADC_F
+  #define BAT_ADC_F 3
+#endif
+
 float convert_adc_to_battery_volts(int adc_value) {
   // 0 - 4095 -> 0 - 255
-  float val = 3.3 / (1 << 12) * 3 * adc_value;
+  float val = 3.3 / (1 << 12) * BAT_ADC_F * adc_value;
   return roundf(val * 100) / 100;
 }
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
+#define FORCE_LIGHT_SLEEP 0         // DEBUG: Force light sleep mode
 
-void enter_sleep() {
-#if (JOYSTICK_BUTTON_PIN <= 21)
-  esp_deep_sleep_start();
-#else
-  esp_light_sleep_start();
-#endif
-}
-
-void enter_sleep_ui(lv_event_t *e) {
-  enter_sleep();
-}
-
-void check_button_press() {
+static bool check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
   while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL) { // Check if button is still pressed
     if ((esp_timer_get_time() - pressStartTime) >= (REQUIRED_PRESS_TIME_MS * 1000)) {
       ESP_LOGI(TAG, "Button has been pressed for 2 seconds.");
-      // Perform the desired action after confirmation of long press
-      // maybe show start up screen or buzzer, etc.?
       break;
     }
     vTaskDelay(pdMS_TO_TICKS(10)); // Delay to allow for time checking without busy waiting
   }
-  while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL)
-    ; // wait for button release
+  while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL) {
+    // wait for button release
+  }
   if ((esp_timer_get_time() - pressStartTime) < (REQUIRED_PRESS_TIME_MS * 1000)) {
-    enter_sleep(); // Go back to sleep if condition not met
+    ESP_LOGI(TAG, "Button press time was less than 2 seconds. Ignoring.");
+    return false;
+  }
+
+  return true;
+}
+
+static esp_err_t enable_wake() {
+  esp_err_t res = ESP_OK;
+
+  if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !FORCE_LIGHT_SLEEP) {
+    res = esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL);
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
+    }
+  }
+  else {
+    ESP_LOGI(TAG, "Button pin is not valid for wake-up. Using light sleep instead.");
+    res = gpio_wakeup_enable(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL ? GPIO_INTR_HIGH_LEVEL : GPIO_INTR_LOW_LEVEL);
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
+    }
+    res = esp_sleep_enable_gpio_wakeup();
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
+    }
+  }
+
+  return res;
+}
+
+void enter_sleep() {
+  if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !FORCE_LIGHT_SLEEP) {
+    ESP_LOGI(TAG, "Entering deep sleep mode");
+    esp_deep_sleep_start();
+  }
+  else {
+    // Disable some things while in light sleep
+    update_connection_state(CONNECTION_STATE_DISCONNECTED);
+    enable_power_button(false);
+    deinit_display();
+
+    ESP_LOGI(TAG, "Entering light sleep mode");
+    enable_wake();
+    esp_light_sleep_start();
+
+    // Light sleep resumes code execution after wake-up
+    ESP_LOGI(TAG, "Woke up from light sleep mode");
+    if (!check_button_press()) {
+      ESP_LOGI(TAG, "Button was not pressed. Entering sleep mode.");
+      enter_sleep();
+    }
+    else {
+      ESP_LOGI(TAG, "Button was pressed. Resuming from light sleep.");
+      // reinit everything
+      enable_power_button(true);
+      init_display();
+      play_melody();
+    }
   }
 }
 
@@ -74,8 +127,8 @@ void sleep_timer_callback(void *arg) {
   // Take mutex if you're modifying shared resources
   if (xSemaphoreTake(timer_mutex, portMAX_DELAY) == pdTRUE) {
     // Enter deep sleep mode when the deep sleep timer expires
-    ESP_LOGI(TAG, "Deep sleep timer expired. Entering deep sleep mode.");
-    esp_deep_sleep_start();
+    ESP_LOGI(TAG, "Sleep timer expired. Entering sleep mode.");
+    enter_sleep();
 
     xSemaphoreGive(timer_mutex);
   }
@@ -111,10 +164,10 @@ void reset_sleep_timer() {
 
   // Create new timer
   esp_timer_create_args_t sleep_timer_args = {
-      .callback = sleep_timer_callback, .arg = NULL, .dispatch_method = ESP_TIMER_TASK, .name = "DeepSleepTimer"};
+      .callback = sleep_timer_callback, .arg = NULL, .dispatch_method = ESP_TIMER_TASK, .name = "SleepTimer"};
   ESP_ERROR_CHECK(esp_timer_create(&sleep_timer_args, &sleep_timer));
   ESP_ERROR_CHECK(esp_timer_start_once(sleep_timer, duration_ms * 1000));
-  ESP_LOGD(TAG, "Deep sleep timer started for %d ms", duration_ms);
+  ESP_LOGD(TAG, "Sleep timer started for %d ms", duration_ms);
 
   xSemaphoreGive(timer_mutex);
 }
@@ -139,15 +192,18 @@ void power_management_task(void *pvParameters) {
 }
 
 void init_power_management() {
+  enable_wake();
   init_sleep_timer();
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
-  esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL);
+  ESP_LOGI(TAG, "Wake-up reason: %d", wakeup_reason);
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: { // Wake-up caused by external signal using RTC_IO
     ESP_LOGI(TAG, "Woken up by external signal on EXT0.");
     // Proceed to check if the button is still pressed
-    check_button_press();
+    if (!check_button_press()) {
+      enter_sleep();
+    }
     break;
   }
   case ESP_SLEEP_WAKEUP_EXT1:

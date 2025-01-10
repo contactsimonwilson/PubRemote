@@ -14,8 +14,8 @@ bool is_pairing_screen_active() {
 // Event handlers
 void pairing_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Pairing screen loaded");
-  pairing_state = PAIRING_STATE_UNPAIRED;
   update_connection_state(CONNECTION_STATE_DISCONNECTED);
+  pairing_state = PAIRING_STATE_UNPAIRED;
 }
 
 void pairing_screen_unloaded(lv_event_t *e) {

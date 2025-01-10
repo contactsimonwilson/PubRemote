@@ -2,12 +2,26 @@ Import("env")
 from datetime import datetime
 import hashlib
 
+build_type = env["PIOENV"]
+
+major_version = 0
+minor_version = 0
+patch_version = 4
+
 def generate_build_id():
     # Get current timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H")
+    timestamp = datetime.now().strftime("%Y%m%d")
+
+    env_name = env["PIOENV"]
+
+    # Create version string
+    version = f"{major_version}.{minor_version}.{patch_version}"
     
+    # Combine version and timestamp for hashing
+    content_to_hash = f"{env_name}_{version}_{timestamp}"
+
     # Create a hash of timestamp for shorter unique ID
-    hash_object = hashlib.md5(timestamp.encode())
+    hash_object = hashlib.md5(content_to_hash.encode())
     build_hash = hash_object.hexdigest()[:8]
     
     # Combine timestamp and hash
@@ -16,4 +30,9 @@ def generate_build_id():
 
 # Add build ID to environment
 build_id = generate_build_id()
+
+env.Append(BUILD_FLAGS=[f'-D BUILD_TYPE=\\"{build_type}\\"'])
 env.Append(BUILD_FLAGS=[f'-D BUILD_ID=\\"{build_id}\\"'])
+env.Append(BUILD_FLAGS=[f'-D VERSION_MAJOR={major_version}'])
+env.Append(BUILD_FLAGS=[f'-D VERSION_MINOR={minor_version}'])
+env.Append(BUILD_FLAGS=[f'-D VERSION_PATCH={patch_version}'])
