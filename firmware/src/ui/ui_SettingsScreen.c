@@ -125,14 +125,10 @@ ui_BrightnessSlider = lv_slider_create(ui_BrightnessBody);
 lv_slider_set_range(ui_BrightnessSlider, 10,255);
 lv_slider_set_value( ui_BrightnessSlider, 0, LV_ANIM_OFF);
 if (lv_slider_get_mode(ui_BrightnessSlider)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_BrightnessSlider, 0, LV_ANIM_OFF);
-lv_obj_set_height( ui_BrightnessSlider, 10);
+lv_obj_set_height( ui_BrightnessSlider, 15);
 lv_obj_set_width( ui_BrightnessSlider, lv_pct(100));
 lv_obj_set_align( ui_BrightnessSlider, LV_ALIGN_CENTER );
 lv_obj_clear_flag( ui_BrightnessSlider, LV_OBJ_FLAG_GESTURE_BUBBLE );    /// Flags
-lv_obj_set_style_pad_left(ui_BrightnessSlider, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_pad_right(ui_BrightnessSlider, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_pad_top(ui_BrightnessSlider, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_pad_bottom(ui_BrightnessSlider, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 
 ui_BrightnessLabel = lv_label_create(ui_BrightnessBody);

@@ -8299,7 +8299,7 @@
                             "strtype": "OBJECT/Size",
                             "intarray": [
                               100,
-                              10
+                              15
                             ],
                             "InheritedType": 7
                           },
@@ -8358,27 +8358,7 @@
                           },
                           {
                             "part": "lv.PART.MAIN",
-                            "childs": [
-                              {
-                                "nid": 10000,
-                                "strtype": "_style/StyleState",
-                                "strval": "DEFAULT",
-                                "childs": [
-                                  {
-                                    "nid": 11110,
-                                    "strtype": "_style/Padding",
-                                    "intarray": [
-                                      0,
-                                      0,
-                                      0,
-                                      0
-                                    ],
-                                    "InheritedType": 7
-                                  }
-                                ],
-                                "InheritedType": 1
-                              }
-                            ],
+                            "childs": [],
                             "nid": -631482455,
                             "strtype": "SLIDER/Style_main",
                             "strval": "lv.PART.MAIN, Rectangle, Pad, Transform",
@@ -19873,7 +19853,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1117,
+    "backup_cnt": 1119,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
