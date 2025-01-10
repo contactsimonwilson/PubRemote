@@ -5,8 +5,9 @@
 #define SCALE_FACTOR ((float)LV_HOR_RES / BASE_RES)
 
 static void scale_padding(lv_obj_t *obj) {
-  if (obj == NULL)
+  if (obj == NULL) {
     return;
+  }
 
   // Get current padding values
   lv_coord_t left = lv_obj_get_style_pad_left(obj, 0);
@@ -22,8 +23,9 @@ static void scale_padding(lv_obj_t *obj) {
 }
 
 static void scale_border(lv_obj_t *obj) {
-  if (obj == NULL)
+  if (obj == NULL || lv_obj_check_type(obj, &lv_slider_class)) {
     return;
+  }
 
   // Border size
   // Get current border size
@@ -40,8 +42,8 @@ static void scale_border(lv_obj_t *obj) {
   lv_obj_set_style_radius(obj, (lv_coord_t)(radius * SCALE_FACTOR), LV_STATE_DEFAULT);
 }
 
-static void scale_arc_width(lv_obj_t *obj) {
-  if (obj == NULL || lv_obj_check_type(obj, &lv_arc_class) == false)
+static void scale_arc(lv_obj_t *obj) {
+  if (obj == NULL || !lv_obj_check_type(obj, &lv_arc_class))
     return;
 
   // Get current arc width
@@ -111,15 +113,12 @@ static uint8_t get_font_size(lv_font_t *font) {
 }
 
 void scale_text(lv_obj_t *obj) {
-  if (obj == NULL || (!lv_obj_check_type(obj, &lv_label_class) && !lv_obj_check_type(obj, &lv_dropdown_class))) {
+  if (obj == NULL || !(lv_obj_check_type(obj, &lv_label_class) || lv_obj_check_type(obj, &lv_dropdown_class) ||
+                       lv_obj_check_type(obj, &lv_dropdownlist_class))) {
     return;
   }
 
-  uint32_t parts[] = {
-      LV_PART_MAIN,
-      // LV_PART_ITEMS,
-      // LV_PART_SELECTED
-  };
+  uint32_t parts[] = {LV_PART_MAIN, LV_PART_ITEMS, LV_PART_SELECTED};
 
   for (size_t i = 0; i < sizeof(parts) / sizeof(parts[0]); i++) {
     uint32_t part = parts[i];
@@ -203,7 +202,6 @@ static void scale_position(lv_obj_t *obj) {
  * @param callback Function to call for each child
  */
 static void process_children_recursive(lv_obj_t *parent, void (*callback)(lv_obj_t *obj)) {
-  // callback(parent);
   uint32_t child_cnt = lv_obj_get_child_cnt(parent);
 
   for (uint32_t i = 0; i < child_cnt; i++) {
@@ -222,9 +220,9 @@ static void scale_element(lv_obj_t *element) {
   scale_padding(element);
   scale_border(element);
   scale_dimensions(element);
-  scale_arc_width(element);
-  scale_text(element);
   scale_position(element);
+  scale_text(element);
+  scale_arc(element);
 
   // Mark the style as modified
   lv_obj_mark_layout_as_dirty(element);
