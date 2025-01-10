@@ -174,3 +174,7 @@ def shutdown_button_down(event_struct):
 def startup_sound_select_change(event_struct):
     return
 
+
+def dark_text_slider_change(event_struct):
+    return
+

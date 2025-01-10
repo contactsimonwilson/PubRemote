@@ -1,13 +1,39 @@
 {
   "deftheme": {
     "name": "Default",
-    "properties": []
+    "properties": [
+      {
+        "nid": 1000236,
+        "strtype": "THEME_COLOR",
+        "strval": "Text",
+        "intarray": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "InheritedType": 0
+      }
+    ]
   },
   "themes": [
     {
-      "name": "Alternative",
-      "properties": []
+      "name": "Dark",
+      "properties": [
+        {
+          "nid": 1000236,
+          "strtype": "THEME_COLOR",
+          "strval": "Text",
+          "intarray": [
+            0,
+            0,
+            0,
+            255
+          ],
+          "InheritedType": 0
+        }
+      ]
     }
   ],
-  "selected_theme": "Alternative"
+  "selected_theme": "Default"
 }
