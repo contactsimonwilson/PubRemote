@@ -52,7 +52,7 @@
   #include "esp_lcd_touch_cst816s.h"
   #define TOUCH_ENABLED 1
 #elif TP_FT3168
-  #include "esp_lcd_touch_ft5x06.h"
+  #include "esp_lcd_touch_ft3168.h"
   #define TOUCH_ENABLED 1
 #endif
 
@@ -267,7 +267,7 @@ static esp_err_t app_touch_init(void) {
   #if TP_CST816S
   esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_CST816S_CONFIG();
   #elif TP_FT3168
-  esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_FT5x06_CONFIG();
+  esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_FT3168_CONFIG();
   #endif
   // Attach the TOUCH to the I2C bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)TP_I2C_NUM, &tp_io_config, &tp_io_handle));
@@ -290,7 +290,7 @@ static esp_err_t app_touch_init(void) {
   ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_cst816s(tp_io_handle, &tp_cfg, &touch_handle));
   #elif TP_FT3168
   ESP_LOGI(TAG, "Initialize touch controller FT3168");
-  ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_ft5x06(tp_io_handle, &tp_cfg, &touch_handle));
+  ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_ft3168(tp_io_handle, &tp_cfg, &touch_handle));
   #endif
 
   return ESP_OK;
