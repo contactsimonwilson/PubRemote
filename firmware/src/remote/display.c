@@ -155,7 +155,10 @@ static esp_err_t app_lcd_init(void) {
 #if DISP_GC9A01
   const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
 #elif DISP_SH8601
-  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
+  esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
+  #if (SW_ROTATE && DISP_ROTATE)
+  io_config.pclk_hz = 32 * 1000 * 1000; // Fix for weird screen tearing effect
+  #endif
 #elif DISP_CO5300
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, DISP_DC, NULL);
 #elif DISP_ST7789
