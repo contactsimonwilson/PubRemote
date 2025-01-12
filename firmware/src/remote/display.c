@@ -402,6 +402,7 @@ static esp_err_t display_ui() {
   ESP_LOGI(TAG, "Display UI");
 
   if (LVGL_lock(0)) {
+    reload_theme();
 #if SCREEN_TEST_UI // Useful for debugging mutexes and any sl generated code
     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFF69B4), LV_PART_MAIN);
     lv_obj_t *btn = lv_btn_create(lv_scr_act());
@@ -413,10 +414,19 @@ static esp_err_t display_ui() {
     lv_obj_center(label);
     // lv_demo_widgets();
 #else
-    ui_init(); // Generated SL UI
+    // ui_init(); // Generated SL UI
+    // Use generated ui_init() function here without theme apply
+    ui_SplashScreen_screen_init();
+    ui_StatsScreen_screen_init();
+    ui_MenuScreen_screen_init();
+    ui_SettingsScreen_screen_init();
+    ui_PairingScreen_screen_init();
+    ui_CalibrationScreen_screen_init();
+    ui_AboutScreen_screen_init();
+    ui____initial_actions0 = lv_obj_create(NULL);
+    lv_disp_load_scr(ui_SplashScreen);
 #endif
     apply_ui_scale(NULL);
-    reload_theme();
     LVGL_unlock();
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));
