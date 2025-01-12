@@ -26,6 +26,8 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_remove_style_all(ui_MenuBody);
     lv_obj_set_width(ui_MenuBody, lv_pct(100));
     lv_obj_set_height(ui_MenuBody, lv_pct(100));
+    lv_obj_set_x(ui_MenuBody, 0);
+    lv_obj_set_y(ui_MenuBody, -1);
     lv_obj_set_align(ui_MenuBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_MenuBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_MenuBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -58,8 +60,9 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_height(ui_MenuConnectButton, 42);
     lv_obj_set_width(ui_MenuConnectButton, lv_pct(100));
     lv_obj_set_align(ui_MenuConnectButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuConnectButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_MenuConnectButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(ui_MenuConnectButton,
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
 
     ui_MenuConnectButtonLabel = lv_label_create(ui_MenuConnectButton);
     lv_obj_set_width(ui_MenuConnectButtonLabel, LV_SIZE_CONTENT);   /// 1
@@ -71,8 +74,9 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_height(ui_MenuAboutButton, 42);
     lv_obj_set_width(ui_MenuAboutButton, lv_pct(100));
     lv_obj_set_align(ui_MenuAboutButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuAboutButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_MenuAboutButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(ui_MenuAboutButton,
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
 
     ui_MenuAboutButtonLabel = lv_label_create(ui_MenuAboutButton);
     lv_obj_set_width(ui_MenuAboutButtonLabel, LV_SIZE_CONTENT);   /// 1
@@ -84,8 +88,9 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_height(ui_MenuSettingsButton, 42);
     lv_obj_set_width(ui_MenuSettingsButton, lv_pct(100));
     lv_obj_set_align(ui_MenuSettingsButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuSettingsButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_MenuSettingsButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(ui_MenuSettingsButton,
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
 
     ui_MenuSettingsButtonLabel = lv_label_create(ui_MenuSettingsButton);
     lv_obj_set_width(ui_MenuSettingsButtonLabel, LV_SIZE_CONTENT);   /// 1
@@ -97,8 +102,9 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_height(ui_MenuCalibrateButton, 42);
     lv_obj_set_width(ui_MenuCalibrateButton, lv_pct(100));
     lv_obj_set_align(ui_MenuCalibrateButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuCalibrateButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_MenuCalibrateButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(ui_MenuCalibrateButton,
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
 
     ui_MenuCalibrateButtonLabel = lv_label_create(ui_MenuCalibrateButton);
     lv_obj_set_width(ui_MenuCalibrateButtonLabel, LV_SIZE_CONTENT);   /// 1
@@ -110,8 +116,9 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_height(ui_MenuPairButton, 42);
     lv_obj_set_width(ui_MenuPairButton, lv_pct(100));
     lv_obj_set_align(ui_MenuPairButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuPairButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_MenuPairButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(ui_MenuPairButton,
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
 
     ui_MenuPairButtonLabel = lv_label_create(ui_MenuPairButton);
     lv_obj_set_width(ui_MenuPairButtonLabel, LV_SIZE_CONTENT);   /// 1
@@ -123,8 +130,9 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_height(ui_MenuShutdownButton, 42);
     lv_obj_set_width(ui_MenuShutdownButton, lv_pct(100));
     lv_obj_set_align(ui_MenuShutdownButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuShutdownButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_MenuShutdownButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(ui_MenuShutdownButton,
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
 
     ui_MenuShutdownButtonLabel = lv_label_create(ui_MenuShutdownButton);
     lv_obj_set_width(ui_MenuShutdownButtonLabel, LV_SIZE_CONTENT);   /// 1

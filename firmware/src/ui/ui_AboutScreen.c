@@ -26,6 +26,8 @@ void ui_AboutScreen_screen_init(void)
     lv_obj_remove_style_all(ui_AboutBody);
     lv_obj_set_width(ui_AboutBody, lv_pct(100));
     lv_obj_set_height(ui_AboutBody, lv_pct(75));
+    lv_obj_set_x(ui_AboutBody, 18);
+    lv_obj_set_y(ui_AboutBody, -114);
     lv_obj_set_align(ui_AboutBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_AboutBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_AboutBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
