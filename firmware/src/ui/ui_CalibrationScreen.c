@@ -24,7 +24,7 @@ void ui_CalibrationScreen_screen_init(void)
 
     ui_CalibrationHeader = lv_obj_create(ui_CalibrationContent);
     lv_obj_remove_style_all(ui_CalibrationHeader);
-    lv_obj_set_width(ui_CalibrationHeader, lv_pct(65));
+    lv_obj_set_width(ui_CalibrationHeader, 100);
     lv_obj_set_height(ui_CalibrationHeader, lv_pct(25));
     lv_obj_set_align(ui_CalibrationHeader, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_CalibrationHeader, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -38,14 +38,14 @@ void ui_CalibrationScreen_screen_init(void)
 
     ui_CalibrationBody = lv_obj_create(ui_CalibrationContent);
     lv_obj_remove_style_all(ui_CalibrationBody);
-    lv_obj_set_width(ui_CalibrationBody, lv_pct(100));
+    lv_obj_set_width(ui_CalibrationBody, lv_pct(65));
     lv_obj_set_height(ui_CalibrationBody, lv_pct(50));
     lv_obj_set_align(ui_CalibrationBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_CalibrationBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_CalibrationBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_add_flag(ui_CalibrationBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
     lv_obj_clear_flag(ui_CalibrationBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_pad_row(ui_CalibrationBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_CalibrationBody, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(ui_CalibrationBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_CalibrationStepContent = lv_obj_create(ui_CalibrationBody);
@@ -181,14 +181,18 @@ void ui_CalibrationScreen_screen_init(void)
     lv_obj_set_height(ui_CalibrationFooter, lv_pct(25));
     lv_obj_set_align(ui_CalibrationFooter, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_CalibrationFooter, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_CalibrationFooter, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_align(ui_CalibrationFooter, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
     lv_obj_clear_flag(ui_CalibrationFooter, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_pad_left(ui_CalibrationFooter, 48, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_CalibrationFooter, 48, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_CalibrationFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_CalibrationFooter, 24, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_row(ui_CalibrationFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_CalibrationFooter, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_CalibrationFooter, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_CalibrationSecondaryActionButton = lv_btn_create(ui_CalibrationFooter);
+    lv_obj_set_width(ui_CalibrationSecondaryActionButton, 60);
     lv_obj_set_height(ui_CalibrationSecondaryActionButton, 42);
-    lv_obj_set_width(ui_CalibrationSecondaryActionButton, lv_pct(35));
     lv_obj_set_align(ui_CalibrationSecondaryActionButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_CalibrationSecondaryActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_CalibrationSecondaryActionButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -202,8 +206,8 @@ void ui_CalibrationScreen_screen_init(void)
     lv_label_set_text(ui_CalibrationSecondaryActionButtonLabel, "Cancel");
 
     ui_CalibrationPrimaryActionButton = lv_btn_create(ui_CalibrationFooter);
+    lv_obj_set_width(ui_CalibrationPrimaryActionButton, 60);
     lv_obj_set_height(ui_CalibrationPrimaryActionButton, 42);
-    lv_obj_set_width(ui_CalibrationPrimaryActionButton, lv_pct(35));
     lv_obj_set_align(ui_CalibrationPrimaryActionButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_CalibrationPrimaryActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_CalibrationPrimaryActionButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
