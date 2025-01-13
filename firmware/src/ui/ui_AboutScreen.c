@@ -34,7 +34,7 @@ void ui_AboutScreen_screen_init(void)
     lv_obj_set_style_pad_left(ui_AboutBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_AboutBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_AboutBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_AboutBody, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_AboutBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_VersionInfoHeaderLabel = lv_label_create(ui_AboutBody);
     lv_obj_set_width(ui_VersionInfoHeaderLabel, lv_pct(100));

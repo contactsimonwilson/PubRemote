@@ -18540,7 +18540,7 @@
                               40,
                               40,
                               40,
-                              20
+                              0
                             ],
                             "InheritedType": 7
                           }
@@ -19857,7 +19857,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1142,
+    "backup_cnt": 1144,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
