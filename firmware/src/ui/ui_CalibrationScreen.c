@@ -24,7 +24,7 @@ void ui_CalibrationScreen_screen_init(void)
 
     ui_CalibrationHeader = lv_obj_create(ui_CalibrationContent);
     lv_obj_remove_style_all(ui_CalibrationHeader);
-    lv_obj_set_width(ui_CalibrationHeader, 100);
+    lv_obj_set_width(ui_CalibrationHeader, lv_pct(100));
     lv_obj_set_height(ui_CalibrationHeader, lv_pct(25));
     lv_obj_set_align(ui_CalibrationHeader, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_CalibrationHeader, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags

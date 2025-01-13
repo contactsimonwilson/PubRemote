@@ -14479,7 +14479,7 @@
                   },
                   {
                     "nid": 2062367634,
-                    "flags": 33,
+                    "flags": 34,
                     "strtype": "OBJECT/Size",
                     "intarray": [
                       100,
@@ -19857,7 +19857,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1140,
+    "backup_cnt": 1142,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
