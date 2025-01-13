@@ -26,6 +26,8 @@ void ui_AboutScreen_screen_init(void)
     lv_obj_remove_style_all(ui_AboutBody);
     lv_obj_set_width(ui_AboutBody, lv_pct(65));
     lv_obj_set_height(ui_AboutBody, lv_pct(75));
+    lv_obj_set_x(ui_AboutBody, 18);
+    lv_obj_set_y(ui_AboutBody, -114);
     lv_obj_set_align(ui_AboutBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_AboutBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_AboutBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -68,12 +70,16 @@ void ui_AboutScreen_screen_init(void)
 
     ui_AboutFooter = lv_obj_create(ui_AboutContent);
     lv_obj_remove_style_all(ui_AboutFooter);
-    lv_obj_set_width(ui_AboutFooter, lv_pct(65));
+    lv_obj_set_width(ui_AboutFooter, lv_pct(100));
     lv_obj_set_height(ui_AboutFooter, lv_pct(25));
     lv_obj_set_align(ui_AboutFooter, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_AboutFooter, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_AboutFooter, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_AboutFooter, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_pad_left(ui_AboutFooter, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_AboutFooter, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_AboutFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_AboutFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_AboutMainActionButton = lv_btn_create(ui_AboutFooter);
     lv_obj_set_width(ui_AboutMainActionButton, 80);
