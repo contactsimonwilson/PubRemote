@@ -373,8 +373,8 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_style_pad_column(ui_DarkTextBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_DarkText = lv_switch_create(ui_DarkTextBody);
-    lv_obj_set_height(ui_DarkText, 20);
-    lv_obj_set_width(ui_DarkText, lv_pct(35));
+    lv_obj_set_height(ui_DarkText, 25);
+    lv_obj_set_width(ui_DarkText, lv_pct(50));
     lv_obj_set_x(ui_DarkText, 31);
     lv_obj_set_y(ui_DarkText, -12);
     lv_obj_set_align(ui_DarkText, LV_ALIGN_CENTER);

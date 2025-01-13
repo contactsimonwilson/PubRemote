@@ -8914,8 +8914,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID43651174-826403S330623322",
@@ -9522,8 +9521,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID6183281-826406S7713322",
@@ -10740,8 +10738,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID48163477-80357S2445648",
@@ -11348,8 +11345,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID19851876-826418S7563322",
@@ -11926,8 +11922,8 @@
                             "flags": 18,
                             "strtype": "OBJECT/Size",
                             "intarray": [
-                              35,
-                              20
+                              50,
+                              25
                             ],
                             "InheritedType": 7
                           },
@@ -12350,7 +12346,8 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER"
+                    "saved_objtypeKey": "CONTAINER",
+                    "tree_closed": true
                   }
                 ],
                 "dont_export": false,
@@ -20469,7 +20466,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1151,
+    "backup_cnt": 1152,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
