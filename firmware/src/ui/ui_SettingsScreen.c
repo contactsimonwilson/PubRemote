@@ -105,8 +105,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_SettingsBody, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_SettingsBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_add_flag(ui_SettingsBody, LV_OBJ_FLAG_SCROLL_ONE);     /// Flags
-    lv_obj_clear_flag(ui_SettingsBody, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SCROLL_ELASTIC |
-                      LV_OBJ_FLAG_SCROLL_MOMENTUM);     /// Flags
+    lv_obj_clear_flag(ui_SettingsBody, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SCROLL_MOMENTUM);      /// Flags
     lv_obj_set_scrollbar_mode(ui_SettingsBody, LV_SCROLLBAR_MODE_ACTIVE);
     lv_obj_set_scroll_dir(ui_SettingsBody, LV_DIR_HOR);
 
