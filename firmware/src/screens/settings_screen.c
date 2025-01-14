@@ -1,5 +1,6 @@
 #include "esp_log.h"
 #include "utilities/number_utils.h"
+#include "utilities/screen_utils.h"
 #include "utilities/theme_utils.h"
 #include <remote/display.h>
 #include <remote/settings.h>
@@ -37,6 +38,7 @@ static void scroll_event_cb(lv_event_t *e) {
 void settings_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen load start");
   if (LVGL_lock(-1)) {
+    apply_ui_scale(NULL);
     // Set the scroll snap
     lv_obj_set_scroll_snap_x(ui_SettingsBody, LV_SCROLL_SNAP_CENTER);
     lv_obj_add_event_cb(ui_SettingsBody, scroll_event_cb, LV_EVENT_SCROLL, NULL);

@@ -1,6 +1,7 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
 #include "remote/display.h"
+#include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>
 #include <remote/connection.h>
@@ -201,6 +202,11 @@ void update_stats_screen_display() {
 }
 
 // Event handlers
+void stats_screen_load_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Stats screen load start");
+  // Permanent screen - don't apply scale
+}
+
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
   update_stats_screen_display();

@@ -1,5 +1,6 @@
 #include "esp_log.h"
 #include "remote/display.h"
+#include "utilities/screen_utils.h"
 #include <remote/stats.h>
 #include <stdio.h>
 #include <ui/ui.h>
@@ -15,6 +16,7 @@ bool is_about_screen_active() {
 void about_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen load start");
   if (LVGL_lock(0)) {
+    apply_ui_scale(NULL);
 
     // set the version number
     char *formattedString;

@@ -155,7 +155,22 @@ static esp_err_t app_lcd_init(void) {
 #if DISP_GC9A01
   const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
 #elif DISP_SH8601
-  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
+  // const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
+  const esp_lcd_panel_io_spi_config_t io_config = {
+      .cs_gpio_num = DISP_CS,
+      .dc_gpio_num = -1,
+      .spi_mode = 0,
+      .pclk_hz = 60 * 1000 * 1000, // Boost to 80Mhz
+      .trans_queue_depth = 10,
+      .on_color_trans_done = NULL,
+      .user_ctx = NULL,
+      .lcd_cmd_bits = 32,
+      .lcd_param_bits = 8,
+      .flags =
+          {
+              .quad_mode = true,
+          },
+  };
 #elif DISP_CO5300
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, DISP_DC, NULL);
 #elif DISP_ST7789
@@ -416,17 +431,14 @@ static esp_err_t display_ui() {
 #else
     // ui_init(); // Generated SL UI
     // Use generated ui_init() function here without theme apply
+    ui____initial_actions0 = lv_obj_create(NULL);
     ui_SplashScreen_screen_init();
     ui_StatsScreen_screen_init();
     ui_MenuScreen_screen_init();
-    ui_SettingsScreen_screen_init();
-    ui_PairingScreen_screen_init();
-    ui_CalibrationScreen_screen_init();
-    ui_AboutScreen_screen_init();
-    ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_SplashScreen);
+    apply_ui_scale(ui_StatsScreen);
+    apply_ui_scale(ui_MenuScreen);
 #endif
-    apply_ui_scale(NULL);
     LVGL_unlock();
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));

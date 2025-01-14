@@ -1,6 +1,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "remote/screen.h"
+#include "utilities/screen_utils.h"
 #include <colors.h>
 #include <remote/display.h>
 #include <remote/remoteinputs.h>
@@ -258,6 +259,14 @@ static void load_current_calibration_data() {
 }
 
 // Event handlers
+void calibration_screen_load_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Calibration screen load start");
+  if (LVGL_lock(0)) {
+    apply_ui_scale(NULL);
+    LVGL_unlock();
+  }
+}
+
 void calibration_screen_loaded(lv_event_t *e) {
   calibration_step = 0;
   load_current_calibration_data();
