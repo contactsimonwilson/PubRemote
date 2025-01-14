@@ -2,21 +2,38 @@
 #include "remote/buzzer.h"
 #include <remote/settings.h>
 
-/* Get and copy current theme */
-static lv_theme_t *get_new_theme(lv_color_t color_primary, lv_color_t color_secondary) {
-  /* Get the current theme */
-  lv_disp_t *disp = lv_disp_get_default();
-  // lv_theme_t *current_theme = lv_disp_get_theme(disp);
+static lv_theme_apply_cb_t theme_apply_cb;
 
-  /* Create a new theme based on the current one */
-  lv_theme_t *new_theme = lv_theme_default_init(disp, color_primary, color_secondary, true, LV_FONT_DEFAULT);
+static void custom_theme_apply_cb(lv_theme_t *theme, lv_obj_t *obj) {
+  // Apply original styles from theme
+  if (theme_apply_cb) {
+    theme_apply_cb(theme, obj);
+  }
 
-  return new_theme;
+  // Apply custom styles
+  if (lv_obj_check_type(obj, &lv_btn_class)) {
+    // Set dark text if needed
+    if (device_settings.dark_text) {
+      lv_obj_set_style_text_color(obj, lv_color_hex(0x000000), LV_PART_MAIN);
+    }
+    else {
+      lv_obj_set_style_text_color(obj, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    }
+  }
 }
 
 void reload_theme() {
+  /* Set primary color from settings */
   lv_color_t primary_color = lv_color_hex(device_settings.theme_color);
-  // Use some settings from ui.c
-  lv_theme_t *new_theme = get_new_theme(primary_color, lv_palette_main(LV_PALETTE_RED));
+
+  /* Create a new theme based on the current one */
+  lv_theme_t *new_theme = lv_theme_default_init(lv_disp_get_default(), primary_color, lv_palette_main(LV_PALETTE_RED),
+                                                true, LV_FONT_DEFAULT);
+
+  /* Add theme apply callback function */
+  theme_apply_cb = new_theme->apply_cb;
+  lv_theme_set_apply_cb(new_theme, custom_theme_apply_cb);
+
+  /* Set the new theme */
   lv_disp_set_theme(lv_disp_get_default(), new_theme);
 }

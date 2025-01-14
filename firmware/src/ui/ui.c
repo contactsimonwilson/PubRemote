@@ -90,6 +90,7 @@ lv_obj_t * ui_Selection3;
 lv_obj_t * ui_Selection4;
 lv_obj_t * ui_Selection5;
 lv_obj_t * ui_Selection6;
+lv_obj_t * ui_Selection7;
 lv_obj_t * ui_SettingsBody;
 lv_obj_t * ui_BrightnessBody;
 void ui_event_BrightnessSlider(lv_event_t * e);
@@ -115,6 +116,10 @@ lv_obj_t * ui_ThemeColorBody;
 void ui_event_ThemeColor(lv_event_t * e);
 lv_obj_t * ui_ThemeColor;
 lv_obj_t * ui_ThemeColorLabel;
+lv_obj_t * ui_DarkTextBody;
+void ui_event_DarkText(lv_event_t * e);
+lv_obj_t * ui_DarkText;
+lv_obj_t * ui_DarkTextLabel;
 lv_obj_t * ui_SettingsFooter;
 void ui_event_SettingsMainActionButton(lv_event_t * e);
 lv_obj_t * ui_SettingsMainActionButton;
@@ -405,6 +410,15 @@ void ui_event_ThemeColor(lv_event_t * e)
 
     if(event_code == LV_EVENT_VALUE_CHANGED) {
         theme_color_picker_change(e);
+    }
+}
+
+void ui_event_DarkText(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        dark_text_switch_change(e);
     }
 }
 

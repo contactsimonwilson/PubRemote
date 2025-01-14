@@ -57,6 +57,11 @@ typedef enum {
   STARTUP_SOUND_MELODY,
 } StartupSoundOptions;
 
+typedef enum {
+  DARK_TEXT_DISABLED,
+  DARK_TEXT_ENABLED,
+} DarkTextOptions;
+
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
@@ -84,6 +89,7 @@ typedef struct {
   uint8_t distance_units;
   uint8_t startup_sound;
   uint32_t theme_color;
+  uint8_t dark_text;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();

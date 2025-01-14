@@ -97,6 +97,16 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_style_bg_color(ui_Selection6, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_Selection6, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_Selection7 = lv_obj_create(ui_SettingsHeader);
+    lv_obj_remove_style_all(ui_Selection7);
+    lv_obj_set_width(ui_Selection7, 10);
+    lv_obj_set_height(ui_Selection7, 10);
+    lv_obj_set_align(ui_Selection7, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_Selection7, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_radius(ui_Selection7, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_Selection7, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Selection7, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     ui_SettingsBody = lv_obj_create(ui_SettingsContent);
     lv_obj_remove_style_all(ui_SettingsBody);
     lv_obj_set_width(ui_SettingsBody, lv_pct(100));
@@ -345,6 +355,39 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_align(ui_ThemeColorLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_ThemeColorLabel, "Theme color");
 
+    ui_DarkTextBody = lv_obj_create(ui_SettingsBody);
+    lv_obj_remove_style_all(ui_DarkTextBody);
+    lv_obj_set_width(ui_DarkTextBody, lv_pct(100));
+    lv_obj_set_height(ui_DarkTextBody, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_DarkTextBody, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_DarkTextBody, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_DarkTextBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_DarkTextBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    lv_obj_set_style_pad_left(ui_DarkTextBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_DarkTextBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_DarkTextBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_DarkTextBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_DarkTextBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_DarkTextBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DarkText = lv_switch_create(ui_DarkTextBody);
+    lv_obj_set_height(ui_DarkText, 25);
+    lv_obj_set_width(ui_DarkText, lv_pct(50));
+    lv_obj_set_x(ui_DarkText, 31);
+    lv_obj_set_y(ui_DarkText, -12);
+    lv_obj_set_align(ui_DarkText, LV_ALIGN_CENTER);
+
+
+    ui_DarkTextLabel = lv_label_create(ui_DarkTextBody);
+    lv_obj_set_width(ui_DarkTextLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_DarkTextLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_DarkTextLabel, 19);
+    lv_obj_set_y(ui_DarkTextLabel, 38);
+    lv_obj_set_align(ui_DarkTextLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_DarkTextLabel, "Dark text");
+
     ui_SettingsFooter = lv_obj_create(ui_SettingsContent);
     lv_obj_remove_style_all(ui_SettingsFooter);
     lv_obj_set_width(ui_SettingsFooter, lv_pct(100));
@@ -376,6 +419,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_add_event_cb(ui_DistanceUnits, ui_event_DistanceUnits, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StartupSound, ui_event_StartupSound, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ThemeColor, ui_event_ThemeColor, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_DarkText, ui_event_DarkText, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsMainActionButton, ui_event_SettingsMainActionButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsScreen, ui_event_SettingsScreen, LV_EVENT_ALL, NULL);
 
