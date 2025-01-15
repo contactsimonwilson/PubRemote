@@ -1,0 +1,53 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# References: 
+# https://github.com/release-drafter/release-drafter
+# https://docs.platformio.org/en/stable/integration/ci/github-actions.html
+jobs:
+  build_and_release:
+    if: github.repository == 'contactsimonwilson/PubRemote'
+    
+    permissions:
+      # Write permission is required to create a github release
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+          
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build PlatformIO Project
+        run: pio run
+
+      - name: Attach ZIPs
+        uses: softprops/action-gh-release@v2
+        with: 
+          files: "*.zip"
+          fail_on_unmatched_files: true
+          generate_release_notes: true
