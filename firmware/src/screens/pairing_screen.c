@@ -1,4 +1,5 @@
 #include "esp_log.h"
+#include "utilities/screen_utils.h"
 #include <remote/connection.h>
 #include <remote/display.h>
 #include <remote/receiver.h>
@@ -12,6 +13,14 @@ bool is_pairing_screen_active() {
 }
 
 // Event handlers
+void pairing_screen_load_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Pairing screen load start");
+  if (LVGL_lock(0)) {
+    apply_ui_scale(NULL);
+    LVGL_unlock();
+  }
+}
+
 void pairing_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Pairing screen loaded");
   update_connection_state(CONNECTION_STATE_DISCONNECTED);

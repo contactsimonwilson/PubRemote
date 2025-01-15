@@ -178,3 +178,19 @@ def startup_sound_select_change(event_struct):
 def dark_text_switch_change(event_struct):
     return
 
+
+def stats_screen_load_start(event_struct):
+    return
+
+
+def menu_screen_load_start(event_struct):
+    return
+
+
+def pairing_screen_load_start(event_struct):
+    return
+
+
+def calibration_screen_load_start(event_struct):
+    return
+

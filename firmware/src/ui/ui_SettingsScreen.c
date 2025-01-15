@@ -9,6 +9,7 @@ void ui_SettingsScreen_screen_init(void)
 {
     ui_SettingsScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_SettingsScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_event_cb(ui_SettingsScreen, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_SettingsScreen);
     lv_obj_set_style_bg_color(ui_SettingsScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_SettingsScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 

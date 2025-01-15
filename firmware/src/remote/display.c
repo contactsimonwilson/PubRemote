@@ -416,17 +416,14 @@ static esp_err_t display_ui() {
 #else
     // ui_init(); // Generated SL UI
     // Use generated ui_init() function here without theme apply
+    ui____initial_actions0 = lv_obj_create(NULL);
     ui_SplashScreen_screen_init();
     ui_StatsScreen_screen_init();
     ui_MenuScreen_screen_init();
-    ui_SettingsScreen_screen_init();
-    ui_PairingScreen_screen_init();
-    ui_CalibrationScreen_screen_init();
-    ui_AboutScreen_screen_init();
-    ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_SplashScreen);
+    apply_ui_scale(ui_StatsScreen);
+    apply_ui_scale(ui_MenuScreen);
 #endif
-    apply_ui_scale(NULL);
     LVGL_unlock();
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(200));

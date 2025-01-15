@@ -9,6 +9,7 @@ void ui_CalibrationScreen_screen_init(void)
 {
     ui_CalibrationScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_CalibrationScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_event_cb(ui_CalibrationScreen, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_CalibrationScreen);
     lv_obj_set_style_bg_color(ui_CalibrationScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_CalibrationScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
