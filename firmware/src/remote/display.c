@@ -155,22 +155,7 @@ static esp_err_t app_lcd_init(void) {
 #if DISP_GC9A01
   const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
 #elif DISP_SH8601
-  // const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
-  const esp_lcd_panel_io_spi_config_t io_config = {
-      .cs_gpio_num = DISP_CS,
-      .dc_gpio_num = -1,
-      .spi_mode = 0,
-      .pclk_hz = 60 * 1000 * 1000, // Boost to 80Mhz
-      .trans_queue_depth = 10,
-      .on_color_trans_done = NULL,
-      .user_ctx = NULL,
-      .lcd_cmd_bits = 32,
-      .lcd_param_bits = 8,
-      .flags =
-          {
-              .quad_mode = true,
-          },
-  };
+  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
 #elif DISP_CO5300
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, DISP_DC, NULL);
 #elif DISP_ST7789
