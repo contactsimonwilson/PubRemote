@@ -9,3 +9,6 @@ autosave/
 managed_components/
 .DS_Store
 sdkconfig.*.old
+
+# Compiled release zips
+*.zip
