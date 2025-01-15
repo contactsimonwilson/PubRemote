@@ -1,9 +1,8 @@
-name: Publish Release
+name: Nightly Builds
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  schedule:
+    - cron: "59 23 * * *"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -27,6 +26,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master
 
       - uses: actions/cache@v4
         with:
@@ -45,9 +46,15 @@ jobs:
       - name: Build PlatformIO Project
         run: pio run
 
+      - name: Get Current Date
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
       - name: Attach ZIPs and Publish
         uses: softprops/action-gh-release@v2
         with: 
           files: "*.zip"
+          name: "${{ env.TODAY }} Nightly Build"
+          prerelease: true
+          tag_name: "nightly/build-${{ env.TODAY }}"
           fail_on_unmatched_files: true
           generate_release_notes: true
