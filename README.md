@@ -1,3 +1,5 @@
+[![Publish Release](https://github.com/contactsimonwilson/PubRemote/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/contactsimonwilson/PubRemote/actions/workflows/release.yml)
+
 # Pubmote AKA Pubremote
 
 Welcome to Pubmote!
