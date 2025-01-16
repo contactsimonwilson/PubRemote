@@ -241,7 +241,10 @@ export class ESPService {
     bootloader: File;
     partitionTable: File;
     application: File;
-  }, eraseFlash: boolean = true): Promise<void> {
+  }, eraseFlash: boolean = true, onFlashProgess: (update: {
+    status: string;
+    progress: number;
+  }) => void): Promise<void> {
     if (!this.espLoader) {
       throw new Error("Not connected to device");
     }
@@ -253,41 +256,63 @@ export class ESPService {
       this.log("Rebooting into bootloader...");
       await this.espLoader.main();
       await this.espLoader.sync();
-      
+
       if (eraseFlash) {
         this.log("Erasing flash...");
         await this.espLoader.eraseFlash();
       }
 
-      const files = [
+
+      const files: Array<{
+        data: string;
+        address: number;
+        name: string;
+      }> = [
+      ];
+
+      if (firmware.bootloader) {
+        files.push(
         {
           data: await this.readFileAsString(firmware.bootloader),
           address: 0x0,
           name: "Bootloader",
-        },
+        });
+
+      }
+      if (firmware.partitionTable) {
+        files.push(
         {
           data: await this.readFileAsString(firmware.partitionTable),
           address: 0x8000,
           name: "Partition Table",
-        },
-        {
+        });
+      }
+
+      if (firmware.application) {
+        files.push({
           data: await this.readFileAsString(firmware.application),
           address: 0x10000,
           name: "Application",
-        },
-      ];
+        });
+      }
+
 
       this.log("Writing firmware...");
       await this.espLoader.writeFlash({
         fileArray: files.map(({ data, address }) => ({ data, address })),
         flashSize: "keep",
-        eraseAll: false,
+        eraseAll: false, // Handled above
         compress: true,
         flashFreq: "keep",
         flashMode: "keep",
         reportProgress: (fileIndex: number, written: number, total: number) => {
-          const percentage = Math.round((written / total) * 100);
-          this.log(`Writing ${files[fileIndex].name}: ${percentage}%`);
+          const progress = written / total;
+          const overallProgress = (fileIndex + progress) / files.length;
+          onFlashProgess?.({
+            status: `Writing ${files[fileIndex].name}...`,
+            progress: overallProgress,
+          });
+          this.log(`Writing ${files[fileIndex].name}: ${Math.round(progress * 100)}%`);
         },
       });
 

@@ -39,7 +39,7 @@ export function useFirmware() {
           const variants = release.assets
             .filter(asset => asset.name.endsWith('.zip'))
             .map(asset => {
-              const variant = asset.name.replace(/^firmware_(.+)\.zip$/, '$1');
+              const variant = asset.name.replace('.zip', '');
               return {
                 variant,
                 zipUrl: asset.browser_download_url,
