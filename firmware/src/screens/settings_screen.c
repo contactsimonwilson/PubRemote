@@ -118,6 +118,15 @@ void dark_text_switch_change(lv_event_t *e) {
 
   // Reload the theme
   reload_theme();
+  lv_coord_t scroll_x = lv_obj_get_scroll_x(ui_SettingsBody);
+
+  lv_obj_t *new_scr = lv_obj_create(NULL);
+  lv_scr_load(new_scr); // This automatically deletes the old screen
+
+  reload_screens();
+
+  lv_scr_load(ui_SettingsScreen);
+  lv_obj_scroll_to(ui_SettingsBody, scroll_x, 0, LV_ANIM_OFF); // No animation
 }
 
 void settings_save(lv_event_t *e) {

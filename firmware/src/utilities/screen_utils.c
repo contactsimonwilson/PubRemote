@@ -1,6 +1,8 @@
 #include "screen_utils.h"
 #include "lvgl.h"
+#include "remote/display.h"
 #include <ui/ui.h>
+
 #define BASE_RES 240
 #define SCALE_FACTOR ((float)LV_HOR_RES / BASE_RES)
 
@@ -246,5 +248,14 @@ void apply_ui_scale(lv_obj_t *element) {
   if (element == NULL) {
     process_children_recursive(lv_scr_act(), scale_element);
     return;
+  }
+}
+
+void reload_screens() {
+  if (LVGL_lock(-1)) {
+    ui_SettingsScreen_screen_init();
+    ui_MenuScreen_screen_init();
+    ui_StatsScreen_screen_init();
+    LVGL_unlock();
   }
 }
