@@ -182,8 +182,8 @@ static void update_board_battery_display() {
   char *formattedString;
 
   asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
-
   lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+    
   free(formattedString);
 
   last_value = remoteStats.batteryPercentage;
