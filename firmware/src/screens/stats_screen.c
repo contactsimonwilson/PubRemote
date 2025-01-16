@@ -170,7 +170,7 @@ static void update_footpad_display() {
 static void update_board_battery_display() {
   static uint8_t last_value = 0;
 
-  // Reset display to show 0% batter if disconnected
+  // Reset display to show 0% battery if disconnected
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
     remoteStats.batteryPercentage = 0.0;
   }
