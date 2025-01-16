@@ -173,14 +173,14 @@ static void update_footpad_display() {
 }
 
 static void update_board_battery_display() {
-  static uint8_t last_value = 0;
+  static uint8_t last_board_battery_value = 0;
 
   // Reset display to show 0% battery if disconnected
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
     remoteStats.batteryPercentage = 0.0;
   }
 
-  if (last_value == remoteStats.batteryPercentage) {
+  if (last_board_battery_value == remoteStats.batteryPercentage) {
     return;
   }
 
@@ -191,28 +191,42 @@ static void update_board_battery_display() {
 
   free(formattedString);
 
-  last_value = remoteStats.batteryPercentage;
+  last_board_battery_value = remoteStats.batteryPercentage;
 }
 
 static void update_remote_battery_display() {
-  static uint8_t last_value = 0;
+  static uint8_t last_remote_battery_value = 0;
 
-  if (last_value == remoteStats.remoteBatteryPercentage) {
+  if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
     return;
   }
 
-  // Show low battery indicator
-  if (remoteStats.remoteBatteryPercentage < 20 && lv_obj_has_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN)) {
-    lv_obj_clear_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+  // Array of LVGL objects representing the battery levels
+  lv_obj_t *battery_elements[] = {ui_BatteryFillEmpty, ui_BatteryFill25, ui_BatteryFill50, ui_BatteryFill75,
+                                  ui_BatteryFillFull};
+
+  // Define the ranges for each element
+  int battery_ranges[][2] = {
+      {0, 19},  // ui_BatteryFillEmpty
+      {20, 34}, // ui_BatteryFill25
+      {35, 49}, // ui_BatteryFill50
+      {50, 74}, // ui_BatteryFill75
+      {75, 100} // ui_BatteryFillFull
+  };
+
+  // Determine the active element based on the percentage
+  for (int i = 0; i < 5; i++) {
+    if (remoteStats.remoteBatteryPercentage >= battery_ranges[i][0] &&
+        remoteStats.remoteBatteryPercentage <= battery_ranges[i][1] &&
+        lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
+      lv_obj_clear_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
+    }
+    else {
+      lv_obj_add_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
+    }
   }
 
-  // Hide low battery indicator
-  else if (remoteStats.remoteBatteryPercentage > 21 &&
-           !lv_obj_has_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN)) {
-    lv_obj_add_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
-  }
-
-  last_value = remoteStats.remoteBatteryPercentage;
+  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
 }
 
 void update_stats_screen_display() {
