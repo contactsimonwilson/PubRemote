@@ -239,7 +239,7 @@
           {
             "nid": -186689694,
             "strtype": "SCREEN/Temporary",
-            "strval": "False",
+            "strval": "True",
             "InheritedType": 2
           },
           {
@@ -4381,6 +4381,71 @@
               }
             ],
             "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": 1000246,
+            "strtype": "_event/EventHandler",
+            "strval": "SCREEN_LOAD_START",
+            "childs": [
+              {
+                "nid": 1000247,
+                "strtype": "_event/name",
+                "strval": "StatsScreenLoadStart",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000248,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000249,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000250,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 1000251,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000252,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000253,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000254,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "stats_screen_load_start",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000255,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
           }
         ],
         "saved_objtypeKey": "SCREEN"
@@ -7217,6 +7282,71 @@
                   },
                   {
                     "nid": 178996270,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": 1000256,
+            "strtype": "_event/EventHandler",
+            "strval": "SCREEN_LOAD_START",
+            "childs": [
+              {
+                "nid": 1000257,
+                "strtype": "_event/name",
+                "strval": "MenuScreenLoadStart",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000258,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000259,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000260,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 1000261,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000262,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000263,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000264,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "menu_screen_load_start",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000265,
                     "strtype": "CALL FUNCTION/Dont_export_function",
                     "strval": "True",
                     "InheritedType": 2
@@ -13203,7 +13333,7 @@
           {
             "nid": -1145593535,
             "strtype": "SCREEN/Temporary",
-            "strval": "False",
+            "strval": "True",
             "InheritedType": 2
           },
           {
@@ -14710,7 +14840,7 @@
           {
             "nid": -1654379627,
             "strtype": "SCREEN/Temporary",
-            "strval": "False",
+            "strval": "True",
             "InheritedType": 2
           },
           {
@@ -14869,6 +14999,71 @@
                   },
                   {
                     "nid": -55587864,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": 1000266,
+            "strtype": "_event/EventHandler",
+            "strval": "SCREEN_LOAD_START",
+            "childs": [
+              {
+                "nid": 1000267,
+                "strtype": "_event/name",
+                "strval": "PairingScreenLoadStart",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000268,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000269,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000270,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 1000271,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000272,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000273,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000274,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "pairing_screen_load_start",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000275,
                     "strtype": "CALL FUNCTION/Dont_export_function",
                     "strval": "True",
                     "InheritedType": 2
@@ -18309,7 +18504,7 @@
           {
             "nid": 1549979636,
             "strtype": "SCREEN/Temporary",
-            "strval": "False",
+            "strval": "True",
             "InheritedType": 2
           },
           {
@@ -18468,6 +18663,71 @@
                   },
                   {
                     "nid": -1788045610,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
+                  }
+                ],
+                "InheritedType": 10
+              }
+            ],
+            "InheritedType": 4
+          },
+          {
+            "disabled": false,
+            "nid": 1000276,
+            "strtype": "_event/EventHandler",
+            "strval": "SCREEN_LOAD_START",
+            "childs": [
+              {
+                "nid": 1000277,
+                "strtype": "_event/name",
+                "strval": "CalibrationScreenLoadStart",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000278,
+                "strtype": "_event/condition_C",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000279,
+                "strtype": "_event/condition_P",
+                "strval": "",
+                "InheritedType": 10
+              },
+              {
+                "nid": 1000280,
+                "strtype": "_event/action",
+                "strval": "CALL FUNCTION",
+                "childs": [
+                  {
+                    "nid": 1000281,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000282,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000283,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000284,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "calibration_screen_load_start",
+                    "InheritedType": 10
+                  },
+                  {
+                    "nid": 1000285,
                     "strtype": "CALL FUNCTION/Dont_export_function",
                     "strval": "True",
                     "InheritedType": 2
@@ -20187,7 +20447,7 @@
           {
             "nid": -1654379627,
             "strtype": "SCREEN/Temporary",
-            "strval": "False",
+            "strval": "True",
             "InheritedType": 2
           },
           {
@@ -20466,7 +20726,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1152,
+    "backup_cnt": 1165,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
@@ -20482,7 +20742,7 @@
     "drive_fatfs_path": "",
     "naming": "Name",
     "naming_force_lowercase": false,
-    "nidcnt": 1000246,
+    "nidcnt": 1000286,
     "BitDepth": 16,
     "Name": "SquareLine_Project"
   }

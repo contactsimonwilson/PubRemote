@@ -235,6 +235,9 @@ void ui_event_StatsScreen(lv_event_t * e)
     if(event_code == LV_EVENT_SCREEN_UNLOADED) {
         stats_screen_unloaded(e);
     }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        stats_screen_load_start(e);
+    }
 }
 
 void ui_event_StatsBody(lv_event_t * e)
@@ -272,6 +275,9 @@ void ui_event_MenuScreen(lv_event_t * e)
     }
     if(event_code == LV_EVENT_SCREEN_UNLOADED) {
         menu_screen_unloaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        menu_screen_load_start(e);
     }
 }
 
@@ -442,6 +448,9 @@ void ui_event_PairingScreen(lv_event_t * e)
     if(event_code == LV_EVENT_SCREEN_UNLOADED) {
         pairing_screen_unloaded(e);
     }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        pairing_screen_load_start(e);
+    }
 }
 
 void ui_event_PairingMainActionButton(lv_event_t * e)
@@ -462,6 +471,9 @@ void ui_event_CalibrationScreen(lv_event_t * e)
     }
     if(event_code == LV_EVENT_SCREEN_UNLOADED) {
         calibration_screen_unloaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        calibration_screen_load_start(e);
     }
 }
 
@@ -537,10 +549,6 @@ void ui_init(void)
     ui_SplashScreen_screen_init();
     ui_StatsScreen_screen_init();
     ui_MenuScreen_screen_init();
-    ui_SettingsScreen_screen_init();
-    ui_PairingScreen_screen_init();
-    ui_CalibrationScreen_screen_init();
-    ui_AboutScreen_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_SplashScreen);
 }

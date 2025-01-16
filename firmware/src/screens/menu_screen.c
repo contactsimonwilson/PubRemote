@@ -2,6 +2,7 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "utilities/screen_utils.h"
 #include <remote/connection.h>
 #include <remote/display.h>
 #include <remote/powermanagement.h>
@@ -28,6 +29,11 @@ bool is_menu_screen_active() {
 }
 
 // Event handlers
+void menu_screen_load_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Menu screen load start");
+  // Permanent screen - don't apply scale
+}
+
 void menu_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Menu screen loaded");
 

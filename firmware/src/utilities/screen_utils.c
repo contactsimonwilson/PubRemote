@@ -1,6 +1,8 @@
 #include "screen_utils.h"
 #include "lvgl.h"
+#include "remote/display.h"
 #include <ui/ui.h>
+
 #define BASE_RES 240
 #define SCALE_FACTOR ((float)LV_HOR_RES / BASE_RES)
 
@@ -202,6 +204,10 @@ static void scale_position(lv_obj_t *obj) {
  * @param callback Function to call for each child
  */
 static void process_children_recursive(lv_obj_t *parent, void (*callback)(lv_obj_t *obj)) {
+  if (parent == NULL) {
+    return;
+  }
+
   uint32_t child_cnt = lv_obj_get_child_cnt(parent);
 
   for (uint32_t i = 0; i < child_cnt; i++) {
@@ -239,16 +245,17 @@ void apply_ui_scale(lv_obj_t *element) {
     return;
   }
 
-  if (ui_SplashScreen == NULL) {
+  if (element == NULL) {
     process_children_recursive(lv_scr_act(), scale_element);
     return;
   }
+}
 
-  process_children_recursive(ui_SplashScreen, scale_element);
-  process_children_recursive(ui_StatsScreen, scale_element);
-  process_children_recursive(ui_MenuScreen, scale_element);
-  process_children_recursive(ui_SettingsScreen, scale_element);
-  process_children_recursive(ui_CalibrationScreen, scale_element);
-  process_children_recursive(ui_PairingScreen, scale_element);
-  process_children_recursive(ui_AboutScreen, scale_element);
+void reload_screens() {
+  if (LVGL_lock(-1)) {
+    ui_SettingsScreen_screen_init();
+    ui_MenuScreen_screen_init();
+    ui_StatsScreen_screen_init();
+    LVGL_unlock();
+  }
 }
