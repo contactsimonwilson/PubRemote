@@ -8,6 +8,7 @@
 #include "peers.h"
 #include "receiver.h"
 #include "remoteinputs.h"
+#include "screens/stats_screen.h"
 #include "time.h"
 #include <remote/settings.h>
 #include <stdbool.h>
@@ -51,8 +52,9 @@ static void transmitter_task(void *pvParameters) {
     //   continue;
     // }
 
-    if (connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
-        connection_state == CONNECTION_STATE_CONNECTING) {
+    if (is_stats_screen_active() &&
+        (connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
+         connection_state == CONNECTION_STATE_CONNECTING)) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
