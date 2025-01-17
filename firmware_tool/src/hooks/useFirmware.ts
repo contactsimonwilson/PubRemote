@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { FirmwareVersion } from '../types';
+import { FirmwareVersion, ReleaseType } from '../types';
+import sortBy from 'lodash/sortBy';
+import uniqBy from 'lodash/uniqBy';
 
 const GITHUB_REPO = 'contactsimonwilson/pubremote';
 const GITHUB_API = 'https://api.github.com';
@@ -35,7 +37,7 @@ export function useFirmware() {
         
         const releases: GitHubRelease[] = await response.json();
         
-        const firmwareVersions: FirmwareVersion[] = releases.map(release => {
+        let firmwareVersions: FirmwareVersion[] = releases.map(release => {
           const variants = release.assets
             .filter(asset => asset.name.endsWith('.zip'))
             .map(asset => {
@@ -47,13 +49,34 @@ export function useFirmware() {
               };
             });
 
+          let releaseType: ReleaseType = release.prerelease ? ReleaseType.Prerelease : ReleaseType.Release;
+          if (release.prerelease && release.tag_name.toLowerCase().includes('nightly')) {
+            releaseType = ReleaseType.Nightly;
+          }
+
           return {
             version: release.tag_name,
             date: release.published_at,
-            prerelease: release.prerelease,
+            releaseType,
             variants,
           };
         }).filter(version => version.variants.length > 0);
+
+        firmwareVersions = sortBy(firmwareVersions, v => {
+          // Order by release type
+          if (v.releaseType === ReleaseType.Release) {
+            return 0;
+          }
+
+          if (v.releaseType === ReleaseType.Prerelease) {
+            return 1;
+          }
+
+          return 2;
+        });
+
+        firmwareVersions = uniqBy(firmwareVersions, 'releaseType');
+
 
         setVersions(firmwareVersions);
         setLoading(false);
