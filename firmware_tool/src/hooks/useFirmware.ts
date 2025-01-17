@@ -7,6 +7,7 @@ const GITHUB_REPO = 'contactsimonwilson/pubremote';
 const GITHUB_API = 'https://api.github.com';
 
 interface GitHubRelease {
+  name: string;
   tag_name: string;
   published_at: string;
   prerelease: boolean;
@@ -54,8 +55,14 @@ export function useFirmware() {
             releaseType = ReleaseType.Nightly;
           }
 
+          let releaseName = release.name;
+
+          if (releaseType === ReleaseType.Nightly) {
+            releaseName = releaseName.replace(' Nightly Build', '');
+          }
+
           return {
-            version: release.tag_name,
+            version: releaseName,
             date: release.published_at,
             releaseType,
             variants,
