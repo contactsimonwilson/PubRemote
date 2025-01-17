@@ -125,7 +125,9 @@ void dark_text_switch_change(lv_event_t *e) {
 
   reload_screens();
 
+  ui_SettingsScreen_screen_init();
   lv_scr_load(ui_SettingsScreen);
+  settings_screen_load_start(NULL);
   lv_obj_scroll_to(ui_SettingsBody, scroll_x, 0, LV_ANIM_OFF); // No animation
 }
 
