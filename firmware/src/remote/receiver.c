@@ -251,8 +251,9 @@ static void receiver_task(void *pvParameters) {
       // Nothing received while connecting or pairing - hop through channels
       if (is_connecting || is_pairing) {
         if (channel_switch_time_ms > CHANNEL_HOP_INTERVAL_MS) {
-          // Hop to next channel
-          uint8_t next_channel = (pairing_settings.channel % 11) + 1;
+// Hop to next channel
+#define NUM_AVAIL_WIFI_CHANNELS 14
+          uint8_t next_channel = (pairing_settings.channel % NUM_AVAIL_WIFI_CHANNELS) + 1;
           change_channel(next_channel, is_pairing);
           channel_switch_time_ms = 0;
         }

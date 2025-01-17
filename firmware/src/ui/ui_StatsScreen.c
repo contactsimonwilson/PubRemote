@@ -113,7 +113,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_RemoteIndicatorContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_RemoteIndicatorContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_RemoteIndicatorContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_pad_row(ui_RemoteIndicatorContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(ui_RemoteIndicatorContainer, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -151,7 +150,7 @@ void ui_StatsScreen_screen_init(void)
 
     ui_BatteryTip = lv_obj_create(ui_BatteryIndicatorContainer);
     lv_obj_remove_style_all(ui_BatteryTip);
-    lv_obj_set_width(ui_BatteryTip, 1);
+    lv_obj_set_width(ui_BatteryTip, 3);
     lv_obj_set_height(ui_BatteryTip, 4);
     lv_obj_set_align(ui_BatteryTip, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_BatteryTip, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -165,6 +164,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_RSSIContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_RSSIContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_RSSIContainer, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_START);
+    lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_RSSI1 = lv_obj_create(ui_RSSIContainer);
@@ -260,25 +260,27 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_x(ui_StatsFooter, 69);
     lv_obj_set_y(ui_StatsFooter, -16);
     lv_obj_set_align(ui_StatsFooter, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_StatsFooter, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_StatsFooter, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_StatsFooter, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_StatsFooter, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_StatsFooter, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_pad_left(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_StatsFooter, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_StatsFooter, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_BatteryDisplay = lv_label_create(ui_StatsFooter);
-    lv_obj_set_width(ui_BatteryDisplay, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_BatteryDisplay, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_BatteryDisplay, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_BatteryDisplay, LV_LABEL_LONG_CLIP);
-    lv_label_set_text(ui_BatteryDisplay, "0%");
-    lv_obj_set_style_text_font(ui_BatteryDisplay, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_BatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_BatteryDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_BoardBatteryDisplay = lv_label_create(ui_StatsFooter);
+    lv_obj_set_width(ui_BoardBatteryDisplay, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_BoardBatteryDisplay, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_BoardBatteryDisplay, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_BoardBatteryDisplay, LV_LABEL_LONG_CLIP);
+    lv_label_set_text(ui_BoardBatteryDisplay, "0%");
+    lv_obj_set_style_text_font(ui_BoardBatteryDisplay, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_BoardBatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_BoardBatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_BoardBatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_BoardBatteryDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_StatsBody, ui_event_StatsBody, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsFooter, ui_event_StatsFooter, LV_EVENT_ALL, NULL);

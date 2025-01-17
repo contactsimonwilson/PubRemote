@@ -167,19 +167,47 @@ static void update_footpad_display() {
   last_value = remoteStats.switchState;
 }
 
-static void update_battery_display() {
+static void update_board_battery_display() {
   static uint8_t last_value = 0;
+
+  // Reset display to show 0% battery if disconnected
+  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
+    remoteStats.batteryPercentage = 0.0;
+  }
 
   if (last_value == remoteStats.batteryPercentage) {
     return;
   }
 
   char *formattedString;
+
   asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
-  lv_label_set_text(ui_BatteryDisplay, formattedString);
+  lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+    
   free(formattedString);
 
   last_value = remoteStats.batteryPercentage;
+}
+
+static void update_remote_battery_display() {
+  static uint8_t last_value = 0;
+
+  if (last_value == remoteStats.remoteBatteryPercentage) {
+    return;
+  }
+
+  // Show low battery indicator
+  if (remoteStats.remoteBatteryPercentage < 20 && lv_obj_has_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_clear_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+
+  // Hide low battery indicator
+  else if (remoteStats.remoteBatteryPercentage > 21 &&
+           !lv_obj_has_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_add_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+
+  last_value = remoteStats.remoteBatteryPercentage;
 }
 
 void update_stats_screen_display() {
@@ -196,7 +224,8 @@ void update_stats_screen_display() {
     update_primary_stat_display();
     update_secondary_stat_display();
     update_footpad_display();
-    update_battery_display();
+    update_board_battery_display();
+    update_remote_battery_display();
     LVGL_unlock();
   }
 }
