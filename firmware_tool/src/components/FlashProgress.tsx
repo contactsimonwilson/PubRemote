@@ -62,7 +62,7 @@ export function FlashProgress({ progress, isDeviceConnected = false, eraseFlash,
             type="checkbox"
             checked={eraseFlash}
             onChange={(e) => onEraseFlashChange(e.target.checked)}
-            disabled={progress.status !== 'idle'}
+            disabled={!['complete', 'idle'].includes(progress.status)}
             className="rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900"
           />
           Erase flash

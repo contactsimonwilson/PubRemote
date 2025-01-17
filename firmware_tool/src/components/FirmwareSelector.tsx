@@ -1,6 +1,6 @@
 import React from 'react';
 import { Upload, Check, HardDrive, Table, Cpu, Archive, Tag, X } from 'lucide-react';
-import { FirmwareFiles } from '../types';
+import { FirmwareFiles, ReleaseType } from '../types';
 import { useFirmware } from '../hooks/useFirmware';
 import { Dropdown } from './ui/Dropdown';
 import { Badge } from './ui/Badge';
@@ -193,10 +193,12 @@ export function FirmwareSelector({ onSelectFirmware }: Props) {
     }
   };
 
-  const versionOptions = versions.flatMap(version =>
-    version.variants.map(variant => ({
+  const versionOptions = versions.flatMap((version) =>
+    version.variants.map((variant) => ({
       value: variant.zipUrl,
-      tooltip: `Version ${version.version} (${variant.variant}) - ${new Date(version.date).toLocaleDateString()}`,
+      tooltip: `Version ${version.version} (${variant.variant}) - ${new Date(
+        version.date
+      ).toLocaleDateString()}`,
       label: (
         <div className="flex items-center justify-between w-full">
           <div className="flex-1 truncate">
@@ -206,9 +208,14 @@ export function FirmwareSelector({ onSelectFirmware }: Props) {
               {new Date(version.date).toLocaleDateString()}
             </span>
           </div>
-          {version.prerelease && (
+          {version.releaseType === ReleaseType.Prerelease && (
             <Badge variant="warning" className="ml-2 flex-shrink-0">
-              Pre-release
+              Prerelease
+            </Badge>
+          )}
+          {version.releaseType === ReleaseType.Nightly && (
+            <Badge variant="destructive" className="ml-2 flex-shrink-0">
+              Nightly
             </Badge>
           )}
         </div>

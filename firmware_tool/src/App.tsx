@@ -64,9 +64,12 @@ function App() {
       if (eraseFlash) {
         setFlashProgress({ status: 'erasing', progress: 20 });
       }
-      setFlashProgress({ status: 'flashing', progress: 50 });
 
-      await espService.flash(selectedFirmware, eraseFlash);
+      const currentProgress = 20;
+
+      await espService.flash(selectedFirmware, eraseFlash, status => {
+        setFlashProgress({ status: 'flashing', progress: Math.round(currentProgress + status.progress * (100 - currentProgress)) });
+      });
 
       setFlashProgress({ status: 'complete', progress: 100 });
       handleDisconnect();
@@ -116,7 +119,7 @@ function App() {
                 disabled={
                   !selectedFirmware ||
                   !deviceInfo.connected ||
-                  flashProgress.status !== 'idle'
+                  !['complete', 'idle'].includes(flashProgress.status)
                 }
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-700"
               >
