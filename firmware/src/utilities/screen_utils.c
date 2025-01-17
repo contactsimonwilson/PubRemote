@@ -253,9 +253,10 @@ void apply_ui_scale(lv_obj_t *element) {
 
 void reload_screens() {
   if (LVGL_lock(-1)) {
-    ui_SettingsScreen_screen_init();
     ui_MenuScreen_screen_init();
     ui_StatsScreen_screen_init();
+    apply_ui_scale(ui_StatsScreen);
+    apply_ui_scale(ui_MenuScreen);
     LVGL_unlock();
   }
 }
