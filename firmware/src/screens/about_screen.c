@@ -20,13 +20,16 @@ void about_screen_load_start(lv_event_t *e) {
 
     // set the version number
     char *formattedString;
+
     asprintf(&formattedString, "Version: %d.%d.%d\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
              BUILD_TYPE, BUILD_ID);
 
     lv_label_set_text(ui_VersionInfoLabel, formattedString);
 
-    asprintf(&formattedString, "Battery: %.2fV", remoteStats.remoteBatteryVoltage);
+    asprintf(&formattedString, "Battery: %.2fV | %d%%", remoteStats.remoteBatteryVoltage,
+             remoteStats.remoteBatteryPercentage);
     lv_label_set_text(ui_DebugInfoLabel, formattedString);
+
     LVGL_unlock();
 
     free(formattedString);

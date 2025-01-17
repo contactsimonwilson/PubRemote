@@ -50,7 +50,7 @@ extern lv_obj_t * ui_PrimaryStatUnit;
 extern lv_obj_t * ui_SecondaryStat;
 void ui_event_StatsFooter(lv_event_t * e);
 extern lv_obj_t * ui_StatsFooter;
-extern lv_obj_t * ui_BatteryDisplay;
+extern lv_obj_t * ui_BoardBatteryDisplay;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_MenuScreen
@@ -65,9 +65,6 @@ extern lv_obj_t * ui_MenuBackButtonLabel;
 void ui_event_MenuConnectButton(lv_event_t * e);
 extern lv_obj_t * ui_MenuConnectButton;
 extern lv_obj_t * ui_MenuConnectButtonLabel;
-void ui_event_MenuAboutButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuAboutButton;
-extern lv_obj_t * ui_MenuAboutButtonLabel;
 void ui_event_MenuSettingsButton(lv_event_t * e);
 extern lv_obj_t * ui_MenuSettingsButton;
 extern lv_obj_t * ui_MenuSettingsButtonLabel;
@@ -77,6 +74,9 @@ extern lv_obj_t * ui_MenuCalibrateButtonLabel;
 void ui_event_MenuPairButton(lv_event_t * e);
 extern lv_obj_t * ui_MenuPairButton;
 extern lv_obj_t * ui_MenuPairButtonLabel;
+void ui_event_MenuAboutButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuAboutButton;
+extern lv_obj_t * ui_MenuAboutButtonLabel;
 void ui_event_MenuShutdownButton(lv_event_t * e);
 extern lv_obj_t * ui_MenuShutdownButton;
 extern lv_obj_t * ui_MenuShutdownButtonLabel;
