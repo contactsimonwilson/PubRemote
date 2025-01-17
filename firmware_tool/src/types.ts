@@ -18,11 +18,17 @@ export interface FlashProgress {
   error?: string;
 }
 
+export enum ReleaseType {
+  Release = 'release',
+  Prerelease = 'prerelease',
+  Nightly = 'nightly',
+}
+
 export interface FirmwareVersion {
   version: string;
   date: string;
   variants: FirmwareVariant[];
-  prerelease: boolean;
+  releaseType: ReleaseType;
 }
 
 export interface FirmwareFiles {
