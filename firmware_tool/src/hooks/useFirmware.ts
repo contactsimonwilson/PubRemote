@@ -70,16 +70,20 @@ export function useFirmware() {
         }).filter(version => version.variants.length > 0);
 
         firmwareVersions = sortBy(firmwareVersions, v => {
+          let order = 2;
+
           // Order by release type
           if (v.releaseType === ReleaseType.Release) {
-            return 0;
+            order = 0;
           }
 
           if (v.releaseType === ReleaseType.Prerelease) {
-            return 1;
+            order = 1;
           }
 
-          return 2;
+          const secondarySort = 1 - parseFloat(`.${new Date(v.date).valueOf()}`); // Newest first
+
+          return parseFloat(`${order}.${secondarySort}`);
         });
 
         firmwareVersions = uniqBy(firmwareVersions, 'releaseType');
