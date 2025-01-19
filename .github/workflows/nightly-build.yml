@@ -55,6 +55,6 @@ jobs:
           files: "*.zip"
           name: "${{ env.TODAY }} Nightly Build"
           prerelease: true
-          tag_name: "nightly/build-${{ env.TODAY }}"
+          tag_name: "nightly"
           fail_on_unmatched_files: true
           generate_release_notes: true
