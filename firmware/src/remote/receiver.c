@@ -98,17 +98,22 @@ static void process_data(esp_now_event_t evt) {
     pairing_settings.channel = evt.chan;
     // ESP_ERROR_CHECK(esp_now_add_peer(&peerInfo));
     uint8_t *mac_addr = pairing_settings.remote_addr;
+    esp_err_t result = ESP_FAIL;
 
-    if (esp_now_is_peer_exist(mac_addr)) {
-      esp_err_t res = esp_now_del_peer(mac_addr);
-      if (res != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to delete peer");
+    if (channel_lock()) {
+      if (esp_now_is_peer_exist(mac_addr)) {
+        esp_err_t res = esp_now_del_peer(mac_addr);
+        if (res != ESP_OK) {
+          ESP_LOGE(TAG, "Failed to delete peer");
+        }
       }
+
+      esp_now_add_peer(&peerInfo);
+
+      result = esp_now_send(mac_addr, (uint8_t *)&TEST, sizeof(TEST));
+      channel_unlock();
     }
 
-    esp_now_add_peer(&peerInfo);
-
-    esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&TEST, sizeof(TEST));
     if (result != ESP_OK) {
       // Handle error if needed
       ESP_LOGE(TAG, "Error sending pairing data: %d", result);
@@ -211,8 +216,27 @@ static void process_data(esp_now_event_t evt) {
 #define CHANNEL_HOP_INTERVAL_MS 200
 #define RECEIVER_TASK_DELAY_MS 5
 
+// Mutex to protect channel switching
+static SemaphoreHandle_t channel_mutex;
+
+bool channel_lock() {
+  if (channel_mutex == NULL) {
+    channel_mutex = xSemaphoreCreateMutex();
+  }
+  return xSemaphoreTake(channel_mutex, pdMS_TO_TICKS(1000)) == pdTRUE;
+}
+
+void channel_unlock() {
+  if (channel_mutex == NULL) {
+    channel_mutex = xSemaphoreCreateMutex();
+  }
+  xSemaphoreGive(channel_mutex);
+}
+
 static void change_channel(uint8_t chan, bool is_pairing) {
   ESP_LOGI(TAG, "Switching to channel %d", chan);
+  channel_lock();
+
   esp_wifi_set_channel(chan, WIFI_SECOND_CHAN_NONE);
   pairing_settings.channel = chan;
 
@@ -228,6 +252,7 @@ static void change_channel(uint8_t chan, bool is_pairing) {
     memcpy(peerInfo.peer_addr, mac_addr, ESP_NOW_ETH_ALEN);
     esp_now_add_peer(&peerInfo);
   }
+  channel_unlock();
 }
 
 static void receiver_task(void *pvParameters) {
