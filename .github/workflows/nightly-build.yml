@@ -2,7 +2,7 @@ name: Nightly Builds
 
 on:
   schedule:
-    - cron: "30 23 * * *"
+    - cron: "30 23 * * *" 
 
 concurrency:
   group: ${{ github.workflow }}
@@ -15,8 +15,44 @@ permissions:
 # https://github.com/softprops/action-gh-release
 # https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
+  delete_old_release:
+    if: github.repository == 'contactsimonwilson/PubRemote'
+    
+    permissions:
+      # Write permission is required to create a github release
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Check for Tag
+        id: check_for_tag
+        run: |
+          TAG_NAME="nightly"
+          git fetch --tags
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "TAG_FOUND=YES" >> $GITHUB_ENV
+          else
+            echo "TAG_FOUND=NO" >> $GITHUB_ENV
+          fi
+
+      # Delete the release if it already exists
+      - name: Delete tag
+        if: ${{ env.TAG_FOUND == 'YES' }}
+        run: gh release delete nightly --cleanup-tag 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for 2 seconds
+        run: sleep 2
+         
   build_and_release:
     if: github.repository == 'contactsimonwilson/PubRemote'
+    needs: "delete_old_release"
     
     permissions:
       # Write permission is required to create a github release
