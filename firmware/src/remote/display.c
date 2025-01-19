@@ -63,7 +63,7 @@
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define LCD_HOST SPI2_HOST
-#define TP_I2C_NUM 0
+#define TP_I2C_NUM I2C_NUM_0
 
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
