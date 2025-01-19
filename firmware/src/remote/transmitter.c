@@ -65,16 +65,19 @@ static void transmitter_task(void *pvParameters) {
       memcpy(combined_data + sizeof(int32_t), remote_data.bytes, sizeof(remote_data.bytes));
 
       uint8_t *mac_addr = pairing_settings.remote_addr;
-      esp_err_t result = esp_now_send(mac_addr, combined_data, sizeof(combined_data));
-      if (result != ESP_OK) {
-        // Handle error if needed
-        uint8_t chann = pairing_settings.channel;
-        uint8_t wifi_chann;
-        wifi_second_chan_t secondary_channel;
-        uint8_t peer_chann = get_peer_channel(mac_addr);
-        esp_wifi_get_channel(&wifi_chann, &secondary_channel);
-        ESP_LOGE(TAG, "Error sending remote data: %d  - Channel: %d, WiFi Channel: %d, Peer Channel: %d", result, chann,
-                 wifi_chann, peer_chann);
+      if (channel_lock()) {
+        esp_err_t result = esp_now_send(mac_addr, combined_data, sizeof(combined_data));
+        if (result != ESP_OK) {
+          // Handle error if needed
+          uint8_t chann = pairing_settings.channel;
+          uint8_t wifi_chann;
+          wifi_second_chan_t secondary_channel;
+          uint8_t peer_chann = get_peer_channel(mac_addr);
+          esp_wifi_get_channel(&wifi_chann, &secondary_channel);
+          ESP_LOGE(TAG, "Error sending remote data: %d  - Channel: %d, WiFi Channel: %d, Peer Channel: %d", result,
+                   chann, wifi_chann, peer_chann);
+        }
+        channel_unlock();
       }
 
       LAST_COMMAND_TIME = newTime;
