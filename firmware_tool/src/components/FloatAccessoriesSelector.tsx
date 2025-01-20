@@ -1,21 +1,21 @@
 import { Tag } from 'lucide-react';
-import { FirmwareVersion } from '../types';
+import { FirmwareVersion, ReleaseType } from '../types';
 import { Badge } from './ui/Badge';
 import { Dropdown } from './ui/Dropdown';
 
 export function FloatAccessoriesSelector() {
   const versions = [
     {
-      version: "v2.2.0",
-      date: "1/3/2025",
+      version: "v2.4.0",
+      date: "1/20/2025",
       variants: [
         {
-          zipUrl: "/float_accessories/float_accessories-2.2.vescpkg.zip",
-          date: "1/3/2025",
-          variant: "Release"
+          zipUrl: "/float_accessories/float_accessories-2.4.vescpkg.zip",
+          date: "1/20/2025",
+          variant: "float_accessories-2.4.vescpkg"
         }
       ],
-      prerelease: false
+      releaseType: ReleaseType.Release
     }
   ] as FirmwareVersion[];
 
@@ -32,9 +32,19 @@ export function FloatAccessoriesSelector() {
               {new Date(version.date).toLocaleDateString()}
             </span>
           </div>
-          {version.prerelease && (
+          {version.releaseType === ReleaseType.Prerelease && (
             <Badge variant="warning" className="ml-2 flex-shrink-0">
-              Pre-release
+              Prerelease
+            </Badge>
+          )}
+          {version.releaseType === ReleaseType.Nightly && (
+            <Badge variant="destructive" className="ml-2 flex-shrink-0">
+              Nightly
+            </Badge>
+          )}
+          {version.releaseType === ReleaseType.Release && (
+            <Badge variant="default" className="ml-2 flex-shrink-0">
+              Release
             </Badge>
           )}
         </div>
