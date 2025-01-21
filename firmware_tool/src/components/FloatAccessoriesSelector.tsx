@@ -32,6 +32,11 @@ export function FloatAccessoriesSelector() {
               {new Date(version.date).toLocaleDateString()}
             </span>
           </div>
+          {version.releaseType === ReleaseType.Release && (
+            <Badge variant="default" className="ml-2 flex-shrink-0">
+              Stable
+            </Badge>
+          )}
           {version.releaseType === ReleaseType.Prerelease && (
             <Badge variant="warning" className="ml-2 flex-shrink-0">
               Prerelease
@@ -40,11 +45,6 @@ export function FloatAccessoriesSelector() {
           {version.releaseType === ReleaseType.Nightly && (
             <Badge variant="destructive" className="ml-2 flex-shrink-0">
               Nightly
-            </Badge>
-          )}
-          {version.releaseType === ReleaseType.Release && (
-            <Badge variant="default" className="ml-2 flex-shrink-0">
-              Release
             </Badge>
           )}
         </div>
