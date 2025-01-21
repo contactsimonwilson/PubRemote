@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Set your default branch here
+      - contactsimonwilson-patch-1  # Set your default branch here
 
 jobs:
   build-and-deploy:
