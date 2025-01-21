@@ -1,5 +1,6 @@
 name: Publish Release
 
+# Run on every semantic version tag
 on:
   push:
     tags:

@@ -1,12 +1,17 @@
 name: Deploy to GitHub Pages
 
+# Run on every push to master under the firmware tool path
 on:
   push:
     branches:
-      - master  # Set your default branch here
+      - master
+    paths:
+      - firmware_tool/**
 
 jobs:
   build-and-deploy:
+    if: github.repository == 'contactsimonwilson/PubRemote'
+
     runs-on: ubuntu-latest
     
     steps:
@@ -16,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Specify your Node.js version
+          node-version: '20'
           
       - name: Install dependencies
         working-directory: ./firmware_tool  # Change to the firmware_tool directory

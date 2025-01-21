@@ -1,6 +1,6 @@
-# See https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 name: PlatformIO CI
 
+# Run on every opened, reopened, or updated PR
 on:
   pull_request:
     types: 
@@ -10,6 +10,8 @@ on:
     branches:
       - master
 
+# References: 
+# https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
   build:
     if: github.repository == 'contactsimonwilson/PubRemote'
