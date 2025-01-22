@@ -48,10 +48,13 @@ static void update_speed_dial_display() {
   if (remoteStats.speed > max_speed) {
     max_speed = (uint8_t)remoteStats.speed;
     // Set range based on max speed
+
     lv_arc_set_range(ui_SpeedDial, 0, max_speed);
+    lv_bar_set_range(ui_SpeedBar, 0, max_speed);
   }
 
   lv_arc_set_value(ui_SpeedDial, remoteStats.speed);
+  lv_bar_set_value(ui_SpeedBar, remoteStats.speed, LV_ANIM_OFF);
   last_value = remoteStats.speed;
 }
 
@@ -62,8 +65,8 @@ static void update_utilization_dial_display() {
     return;
   }
 
-  // TODO - use max proportional value
   lv_arc_set_value(ui_UtilizationDial, remoteStats.dutyCycle);
+  lv_bar_set_value(ui_UtilizationBar, remoteStats.dutyCycle, LV_ANIM_OFF);
 
   // set arc color
   lv_color_t color = lv_color_hex(COLOR_STRUCTURE);
@@ -79,6 +82,8 @@ static void update_utilization_dial_display() {
   }
 
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(ui_UtilizationBar, lv_color_hex(0x282828), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
   last_value = remoteStats.dutyCycle;
 }
 
@@ -183,7 +188,7 @@ static void update_board_battery_display() {
 
   asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
   lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
-    
+
   free(formattedString);
 
   last_value = remoteStats.batteryPercentage;
@@ -234,6 +239,21 @@ void update_stats_screen_display() {
 void stats_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen load start");
   // Permanent screen - don't apply scale
+
+  if (LVGL_lock(-1)) {
+#if UI_SHAPE
+    lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
+#else
+    lv_obj_add_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+#endif
+    LVGL_unlock();
+  }
 }
 
 void stats_screen_loaded(lv_event_t *e) {
