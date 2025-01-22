@@ -240,16 +240,14 @@ static void update_remote_battery_display() {
     // Check if the remote battery percentage is within the range
     if (remoteStats.remoteBatteryPercentage >= battery_ranges[i][0] &&
         remoteStats.remoteBatteryPercentage <= battery_ranges[i][1]) {
-      // Show it if not already shown
-      if (lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
-        lv_obj_clear_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
+      // Show the element
+      lv_obj_clear_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
 
-        // Update the active range index
-        last_remote_battery_range_index = i;
-      }
+      // Update the active range index
+      last_remote_battery_range_index = i;
     }
-    // Otherwise hide it if not already hidden
-    else if (!lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
+    else {
+      // Hide the element
       lv_obj_add_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
     }
   }
