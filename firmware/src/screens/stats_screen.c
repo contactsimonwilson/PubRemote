@@ -198,15 +198,15 @@ static void update_board_battery_display() {
 
 static void update_remote_battery_display() {
   static uint8_t last_remote_battery_value = 0;
-  static uint8_t last_remote_battery_range_index = 10;
+  static uint8_t last_remote_battery_range_index = 10; // Initialize with sentinel value
 
   // See if the remote battery percentage has changed
   if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
     return;
   }
-  else {
-    last_remote_battery_value = remoteStats.remoteBatteryPercentage;
-  }
+
+  // Update the last remote battery percentage
+  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
 
   // Array of LVGL objects representing the battery levels
   lv_obj_t *battery_elements[] = {ui_BatteryFillEmpty, ui_BatteryFill25, ui_BatteryFill50, ui_BatteryFill75,
@@ -221,24 +221,36 @@ static void update_remote_battery_display() {
       {75, 100} // ui_BatteryFillFull
   };
 
-  // See if the battery range has changed
-  if (last_remote_battery_range_index != 10 &&
-      remoteStats.remoteBatteryPercentage >= battery_ranges[last_remote_battery_range_index][0] &&
-      remoteStats.remoteBatteryPercentage <= battery_ranges[last_remote_battery_range_index][1]) {
-    return;
+  // Check if the battery range has changed with hysteresis
+  const int hysteresis = 2;
+  if (last_remote_battery_range_index != 10) {
+    // Define current bounds
+    const int lower_bound = battery_ranges[last_remote_battery_range_index][0];
+    const int upper_bound = battery_ranges[last_remote_battery_range_index][1];
+
+    // If the battery range has not changed, return
+    if (remoteStats.remoteBatteryPercentage >= lower_bound - hysteresis &&
+        remoteStats.remoteBatteryPercentage <= upper_bound + hysteresis) {
+      return;
+    }
   }
-  else {
-    // Determine the active element based on the percentage
-    for (int i = 0; i < 5; i++) {
-      if (remoteStats.remoteBatteryPercentage >= battery_ranges[i][0] &&
-          remoteStats.remoteBatteryPercentage <= battery_ranges[i][1] &&
-          lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
+
+  // Update visibility for battery elements
+  for (int i = 0; i < 5; i++) {
+    // Check if the remote battery percentage is within the range
+    if (remoteStats.remoteBatteryPercentage >= battery_ranges[i][0] &&
+        remoteStats.remoteBatteryPercentage <= battery_ranges[i][1]) {
+      // Show it if not already shown
+      if (lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
         lv_obj_clear_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
+
+        // Update the active range index
         last_remote_battery_range_index = i;
       }
-      else {
-        lv_obj_add_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
-      }
+    }
+    // Otherwise hide it if not already hidden
+    else if (!lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
+      lv_obj_add_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
     }
   }
 }
