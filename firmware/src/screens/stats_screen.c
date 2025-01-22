@@ -184,10 +184,11 @@ static void update_board_battery_display() {
   if (last_board_battery_value == remoteStats.batteryPercentage) {
     return;
   }
-  else {
-    last_board_battery_value = remoteStats.batteryPercentage;
-  }
 
+  // Update the last board battery percentage
+  last_board_battery_value = remoteStats.batteryPercentage;
+
+  // Update the displayed text
   char *formattedString;
 
   asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
