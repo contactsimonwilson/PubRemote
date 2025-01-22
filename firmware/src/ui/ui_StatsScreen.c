@@ -26,6 +26,17 @@ void ui_StatsScreen_screen_init(void)
 
     lv_obj_set_style_opa(ui_SpeedDial, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
 
+    ui_SpeedBar = lv_bar_create(ui_StatsScreen);
+    lv_bar_set_range(ui_SpeedBar, 0, 50);
+    lv_obj_set_width(ui_SpeedBar, 15);
+    lv_obj_set_height(ui_SpeedBar, lv_pct(100));
+    lv_obj_set_y(ui_SpeedBar, 0);
+    lv_obj_set_x(ui_SpeedBar, lv_pct(-45));
+    lv_obj_set_align(ui_SpeedBar, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_set_style_bg_color(ui_SpeedBar, lv_color_hex(0x282828), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_SpeedBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     ui_UtilizationDial = lv_arc_create(ui_StatsScreen);
     lv_obj_set_width(ui_UtilizationDial, lv_pct(100));
     lv_obj_set_height(ui_UtilizationDial, lv_pct(100));
@@ -43,6 +54,16 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_arc_width(ui_UtilizationDial, 12, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
     lv_obj_set_style_opa(ui_UtilizationDial, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
+
+    ui_UtilizationBar = lv_bar_create(ui_StatsScreen);
+    lv_obj_set_width(ui_UtilizationBar, 15);
+    lv_obj_set_height(ui_UtilizationBar, lv_pct(100));
+    lv_obj_set_y(ui_UtilizationBar, 0);
+    lv_obj_set_x(ui_UtilizationBar, lv_pct(45));
+    lv_obj_set_align(ui_UtilizationBar, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_set_style_bg_color(ui_UtilizationBar, lv_color_hex(0x282828), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_UtilizationBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LeftSensor = lv_arc_create(ui_StatsScreen);
     lv_obj_set_width(ui_LeftSensor, lv_pct(100));
@@ -124,6 +145,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_BatteryIndicatorContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_BatteryIndicatorContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_BatteryIndicatorContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+    lv_obj_add_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_BatteryOutline = lv_obj_create(ui_BatteryIndicatorContainer);

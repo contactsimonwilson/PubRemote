@@ -3,9 +3,6 @@
 #include "remote/display.h"
 #include <ui/ui.h>
 
-#define BASE_RES 240
-#define SCALE_FACTOR ((float)LV_HOR_RES / BASE_RES)
-
 static void scale_padding(lv_obj_t *obj) {
   if (obj == NULL) {
     return;
@@ -18,10 +15,10 @@ static void scale_padding(lv_obj_t *obj) {
   lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, 0);
 
   // Scale and set new padding values using SCALE_FACTOR
-  lv_obj_set_style_pad_left(obj, (lv_coord_t)(left * SCALE_FACTOR), LV_STATE_DEFAULT);
-  lv_obj_set_style_pad_right(obj, (lv_coord_t)(right * SCALE_FACTOR), LV_STATE_DEFAULT);
-  lv_obj_set_style_pad_top(obj, (lv_coord_t)(top * SCALE_FACTOR), LV_STATE_DEFAULT);
-  lv_obj_set_style_pad_bottom(obj, (lv_coord_t)(bottom * SCALE_FACTOR), LV_STATE_DEFAULT);
+  lv_obj_set_style_pad_left(obj, (lv_coord_t)(left * SCALE_FACTOR * SCALE_PADDING), LV_STATE_DEFAULT);
+  lv_obj_set_style_pad_right(obj, (lv_coord_t)(right * SCALE_FACTOR * SCALE_PADDING), LV_STATE_DEFAULT);
+  lv_obj_set_style_pad_top(obj, (lv_coord_t)(top * SCALE_FACTOR * SCALE_PADDING), LV_STATE_DEFAULT);
+  lv_obj_set_style_pad_bottom(obj, (lv_coord_t)(bottom * SCALE_FACTOR * SCALE_PADDING), LV_STATE_DEFAULT);
 }
 
 static void scale_border(lv_obj_t *obj) {
@@ -130,7 +127,7 @@ void scale_text(lv_obj_t *obj) {
       continue;
     }
 
-    int size = get_font_size(font) * SCALE_FACTOR;
+    int size = get_font_size(font) * SCALE_FACTOR * SCALE_FONT;
     bool is_bold = is_bold_font(font);
 
     lv_font_t *new_font = font;
@@ -236,7 +233,7 @@ static void scale_element(lv_obj_t *element) {
 }
 
 void apply_ui_scale(lv_obj_t *element) {
-  if (SCALE_FACTOR == 1.0) {
+  if (SCALE_FACTOR == 1.0 && SCALE_FONT == 1.0) {
     return;
   }
 
