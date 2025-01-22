@@ -160,54 +160,14 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_border_opa(ui_BatteryOutline, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_BatteryOutline, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_BatteryFillFull = lv_obj_create(ui_BatteryOutline);
-    lv_obj_remove_style_all(ui_BatteryFillFull);
-    lv_obj_set_width(ui_BatteryFillFull, lv_pct(100));
-    lv_obj_set_height(ui_BatteryFillFull, lv_pct(100));
-    lv_obj_set_align(ui_BatteryFillFull, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_BatteryFillFull, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_BatteryFillFull, lv_color_hex(0x1DB200), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_BatteryFillFull, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_BatteryFill75 = lv_obj_create(ui_BatteryOutline);
-    lv_obj_remove_style_all(ui_BatteryFill75);
-    lv_obj_set_width(ui_BatteryFill75, lv_pct(75));
-    lv_obj_set_height(ui_BatteryFill75, lv_pct(100));
-    lv_obj_set_align(ui_BatteryFill75, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_BatteryFill75, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_BatteryFill75, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_BatteryFill75, lv_color_hex(0x1DB200), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_BatteryFill75, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_BatteryFill50 = lv_obj_create(ui_BatteryOutline);
-    lv_obj_remove_style_all(ui_BatteryFill50);
-    lv_obj_set_width(ui_BatteryFill50, lv_pct(50));
-    lv_obj_set_height(ui_BatteryFill50, lv_pct(100));
-    lv_obj_set_align(ui_BatteryFill50, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_BatteryFill50, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_BatteryFill50, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_BatteryFill50, lv_color_hex(0x1DB200), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_BatteryFill50, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_BatteryFill25 = lv_obj_create(ui_BatteryOutline);
-    lv_obj_remove_style_all(ui_BatteryFill25);
-    lv_obj_set_width(ui_BatteryFill25, lv_pct(25));
-    lv_obj_set_height(ui_BatteryFill25, lv_pct(100));
-    lv_obj_set_align(ui_BatteryFill25, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_BatteryFill25, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_BatteryFill25, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_BatteryFill25, lv_color_hex(0x1DB200), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_BatteryFill25, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_BatteryFillEmpty = lv_obj_create(ui_BatteryOutline);
-    lv_obj_remove_style_all(ui_BatteryFillEmpty);
-    lv_obj_set_width(ui_BatteryFillEmpty, lv_pct(25));
-    lv_obj_set_height(ui_BatteryFillEmpty, lv_pct(100));
-    lv_obj_set_align(ui_BatteryFillEmpty, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_BatteryFillEmpty, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_BatteryFillEmpty, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_BatteryFillEmpty, lv_color_hex(0xB20000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_BatteryFillEmpty, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_BatteryFill = lv_obj_create(ui_BatteryOutline);
+    lv_obj_remove_style_all(ui_BatteryFill);
+    lv_obj_set_width(ui_BatteryFill, lv_pct(100));
+    lv_obj_set_height(ui_BatteryFill, lv_pct(100));
+    lv_obj_set_align(ui_BatteryFill, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_BatteryFill, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0x1DB200), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_BatteryFill, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BatteryTip = lv_obj_create(ui_BatteryIndicatorContainer);
     lv_obj_remove_style_all(ui_BatteryTip);
