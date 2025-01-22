@@ -145,7 +145,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_BatteryIndicatorContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_BatteryIndicatorContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_BatteryIndicatorContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
-    lv_obj_add_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_BatteryOutline = lv_obj_create(ui_BatteryIndicatorContainer);

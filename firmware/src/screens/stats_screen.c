@@ -180,8 +180,12 @@ static void update_board_battery_display() {
     remoteStats.batteryPercentage = 0.0;
   }
 
+  // See if the board battery percentage has changed
   if (last_board_battery_value == remoteStats.batteryPercentage) {
     return;
+  }
+  else {
+    last_board_battery_value = remoteStats.batteryPercentage;
   }
 
   char *formattedString;
@@ -190,15 +194,18 @@ static void update_board_battery_display() {
   lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
 
   free(formattedString);
-
-  last_board_battery_value = remoteStats.batteryPercentage;
 }
 
 static void update_remote_battery_display() {
   static uint8_t last_remote_battery_value = 0;
+  static uint8_t last_remote_battery_range_index = 10;
 
+  // See if the remote battery percentage has changed
   if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
     return;
+  }
+  else {
+    last_remote_battery_value = remoteStats.remoteBatteryPercentage;
   }
 
   // Array of LVGL objects representing the battery levels
@@ -214,19 +221,26 @@ static void update_remote_battery_display() {
       {75, 100} // ui_BatteryFillFull
   };
 
-  // Determine the active element based on the percentage
-  for (int i = 0; i < 5; i++) {
-    if (remoteStats.remoteBatteryPercentage >= battery_ranges[i][0] &&
-        remoteStats.remoteBatteryPercentage <= battery_ranges[i][1] &&
-        lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
-      lv_obj_clear_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
-    }
-    else {
-      lv_obj_add_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
+  // See if the battery range has changed
+  if (last_remote_battery_range_index != 10 &&
+      remoteStats.remoteBatteryPercentage >= battery_ranges[last_remote_battery_range_index][0] &&
+      remoteStats.remoteBatteryPercentage <= battery_ranges[last_remote_battery_range_index][1]) {
+    return;
+  }
+  else {
+    // Determine the active element based on the percentage
+    for (int i = 0; i < 5; i++) {
+      if (remoteStats.remoteBatteryPercentage >= battery_ranges[i][0] &&
+          remoteStats.remoteBatteryPercentage <= battery_ranges[i][1] &&
+          lv_obj_has_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN)) {
+        lv_obj_clear_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
+        last_remote_battery_range_index = i;
+      }
+      else {
+        lv_obj_add_flag(battery_elements[i], LV_OBJ_FLAG_HIDDEN);
+      }
     }
   }
-
-  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
 }
 
 void update_stats_screen_display() {
