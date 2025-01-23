@@ -206,7 +206,7 @@ static void update_remote_battery_display() {
   }
 
   // Set background to red below 20%
-  if (remoteStats.remoteBatteryPercentage < 20) {
+  if (remoteStats.remoteBatteryPercentage < 20 && remoteStats.remoteBatteryPercentage != 0) {
     lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0xb20000), LV_PART_MAIN | LV_STATE_DEFAULT);
   }
   else {
