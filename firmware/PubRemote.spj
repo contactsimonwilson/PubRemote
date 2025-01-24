@@ -1589,7 +1589,7 @@
                             "deepid": -123068554,
                             "children": [
                               {
-                                "guid": "GUID28888008-988009S1703302",
+                                "guid": "GUID63596240-119625S47915416",
                                 "deepid": -111427268,
                                 "dont_export": false,
                                 "locked": false,
@@ -1638,7 +1638,7 @@
                                     "flags": 34,
                                     "strtype": "OBJECT/Size",
                                     "intarray": [
-                                      25,
+                                      100,
                                       100
                                     ],
                                     "InheritedType": 7
@@ -1697,8 +1697,8 @@
                                             "nid": -741953240,
                                             "strtype": "_style/Bg_Color",
                                             "intarray": [
+                                              29,
                                               178,
-                                              0,
                                               0,
                                               255
                                             ],
@@ -1868,8 +1868,7 @@
                                 "InheritedType": 11
                               }
                             ],
-                            "saved_objtypeKey": "CONTAINER",
-                            "tree_closed": true
+                            "saved_objtypeKey": "CONTAINER"
                           },
                           {
                             "guid": "GUID41516794-986855S5483302",
@@ -2074,12 +2073,6 @@
                             "InheritedType": 1
                           },
                           {
-                            "nid": 100,
-                            "strtype": "OBJECT/Hidden",
-                            "strval": "True",
-                            "InheritedType": 2
-                          },
-                          {
                             "nid": -1212803918,
                             "strtype": "OBJECT/Clickable",
                             "strval": "False",
@@ -2126,8 +2119,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       },
                       {
                         "guid": "GUID80567878-979931S6903302",
@@ -3856,8 +3848,7 @@
                     "InheritedType": 4
                   }
                 ],
-                "saved_objtypeKey": "CONTAINER",
-                "tree_closed": true
+                "saved_objtypeKey": "CONTAINER"
               },
               {
                 "guid": "GUID68226417-225986S119341",
@@ -21049,7 +21040,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1181,
+    "backup_cnt": 1186,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",

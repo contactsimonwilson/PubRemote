@@ -173,17 +173,19 @@ static void update_footpad_display() {
 }
 
 static void update_board_battery_display() {
-  static uint8_t last_value = 0;
+  static uint8_t last_board_battery_value = 0;
 
   // Reset display to show 0% battery if disconnected
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
     remoteStats.batteryPercentage = 0.0;
   }
 
-  if (last_value == remoteStats.batteryPercentage) {
+  // See if the board battery percentage has changed
+  if (last_board_battery_value == remoteStats.batteryPercentage) {
     return;
   }
 
+  // Update the displayed text
   char *formattedString;
 
   asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
@@ -191,28 +193,31 @@ static void update_board_battery_display() {
 
   free(formattedString);
 
-  last_value = remoteStats.batteryPercentage;
+  // Update the last board battery percentage
+  last_board_battery_value = remoteStats.batteryPercentage;
 }
 
 static void update_remote_battery_display() {
-  static uint8_t last_value = 0;
+  static uint8_t last_remote_battery_value = 0;
 
-  if (last_value == remoteStats.remoteBatteryPercentage) {
+  // See if the remote battery percentage has changed
+  if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
     return;
   }
 
-  // Show low battery indicator
-  if (remoteStats.remoteBatteryPercentage < 20 && lv_obj_has_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN)) {
-    lv_obj_clear_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+  // Set background to red below 20%
+  if (remoteStats.remoteBatteryPercentage < 20 && remoteStats.remoteBatteryPercentage != 0) {
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0xb20000), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+  else {
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0x1db200), LV_PART_MAIN | LV_STATE_DEFAULT);
   }
 
-  // Hide low battery indicator
-  else if (remoteStats.remoteBatteryPercentage > 21 &&
-           !lv_obj_has_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN)) {
-    lv_obj_add_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
-  }
+  // Set width of battery object
+  lv_obj_set_width(ui_BatteryFill, lv_pct(remoteStats.remoteBatteryPercentage));
 
-  last_value = remoteStats.remoteBatteryPercentage;
+  // Update the last remote battery percentage
+  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
 }
 
 void update_stats_screen_display() {

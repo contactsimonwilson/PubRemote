@@ -145,7 +145,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_BatteryIndicatorContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_BatteryIndicatorContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_BatteryIndicatorContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
-    lv_obj_add_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_BatteryIndicatorContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_BatteryOutline = lv_obj_create(ui_BatteryIndicatorContainer);
@@ -163,11 +162,11 @@ void ui_StatsScreen_screen_init(void)
 
     ui_BatteryFill = lv_obj_create(ui_BatteryOutline);
     lv_obj_remove_style_all(ui_BatteryFill);
-    lv_obj_set_width(ui_BatteryFill, lv_pct(25));
+    lv_obj_set_width(ui_BatteryFill, lv_pct(100));
     lv_obj_set_height(ui_BatteryFill, lv_pct(100));
     lv_obj_set_align(ui_BatteryFill, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_BatteryFill, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0xB20000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0x1DB200), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BatteryFill, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BatteryTip = lv_obj_create(ui_BatteryIndicatorContainer);
