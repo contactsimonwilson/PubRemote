@@ -1,4 +1,4 @@
-import { Tag } from 'lucide-react'
+import { Info } from 'lucide-react'
 import { Dropdown } from './ui/Dropdown'
 
 export function HeaderLinksSelector() {
@@ -47,7 +47,7 @@ export function HeaderLinksSelector() {
         ]}
         value=""
         onChange={(value) => handleLinkSelect(value as string)}
-        icon={<Tag className="h-4 w-4" />}
+        icon={<Info className="h-4 w-4" />}
         label="Useful Links"
         width="fixed"
         dropdownWidth={400}
