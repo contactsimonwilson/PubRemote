@@ -2656,8 +2656,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       }
                     ],
                     "dont_export": false,
@@ -2794,8 +2793,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID3791822-224470S867341",
@@ -3077,8 +3075,7 @@
                     "InheritedType": 11
                   }
                 ],
-                "saved_objtypeKey": "CONTAINER",
-                "tree_closed": true
+                "saved_objtypeKey": "CONTAINER"
               },
               {
                 "guid": "GUID8263425-220892S780341",
@@ -3906,8 +3903,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       },
                       {
                         "guid": "GUID62168481-31424S9076434",
@@ -4227,8 +4223,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       },
                       {
                         "guid": "GUID78922771-31427S9078434",
@@ -4548,8 +4543,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       },
                       {
                         "guid": "GUID61422834-31430S9079434",
@@ -4869,8 +4863,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       }
                     ],
                     "dont_export": false,
@@ -22297,7 +22290,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1205,
+    "backup_cnt": 1220,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",

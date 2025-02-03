@@ -112,6 +112,43 @@ static void update_remote_battery_display() {
   last_remote_battery_value = remoteStats.remoteBatteryPercentage;
 }
 
+static void update_rssi_display() {
+  static uint8_t last_signal_strength_value = 0;
+
+  // Ensure the value has changed
+  if (last_signal_strength_value == remoteStats.signalStrength) {
+    return;
+  }
+
+  // Show RSSI container if it hasn't been previously shown
+  if (remoteStats.signalStrength == 0) {
+    lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+  else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+
+  // Update signal strength indicator background colors
+  if (remoteStats.signalStrength < 150) {
+    lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+  else if (remoteStats.signalStrength < 165) {
+    lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+  else {
+    lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+
+  // Update the last remote signal strength
+  last_signal_strength_value = remoteStats.signalStrength;
+}
+
 static void update_primary_stat_display() {
   static float last_value = 0;
 
@@ -336,6 +373,7 @@ void update_stats_screen_display() {
     update_speed_dial_display();
     update_utilization_dial_display();
     update_remote_battery_display();
+    update_rssi_display();
     update_primary_stat_display();
     update_secondary_stat_display();
     update_board_battery_display();
