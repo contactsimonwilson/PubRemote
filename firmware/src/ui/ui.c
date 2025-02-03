@@ -47,6 +47,7 @@ lv_obj_t * ui_SecondaryStat;
 void ui_event_StatsFooter(lv_event_t * e);
 lv_obj_t * ui_StatsFooter;
 lv_obj_t * ui_BoardBatteryDisplay;
+lv_obj_t * ui_TripDistanceDisplay;
 // CUSTOM VARIABLES
 
 

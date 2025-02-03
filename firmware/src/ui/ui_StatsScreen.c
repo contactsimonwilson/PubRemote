@@ -268,11 +268,13 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_y(ui_SecondaryStat, 33);
     lv_obj_set_align(ui_SecondaryStat, LV_ALIGN_CENTER);
     lv_label_set_long_mode(ui_SecondaryStat, LV_LABEL_LONG_DOT);
-    lv_label_set_text(ui_SecondaryStat, "Disconnected");
+    lv_label_set_text(ui_SecondaryStat, "0%");
     lv_obj_add_flag(ui_SecondaryStat, LV_OBJ_FLAG_SCROLL_ONE);     /// Flags
     lv_obj_clear_flag(ui_SecondaryStat, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
                       LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
     lv_obj_set_scrollbar_mode(ui_SecondaryStat, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_style_text_align(ui_SecondaryStat, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_SecondaryStat, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_StatsFooter = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsFooter);
@@ -289,7 +291,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_top(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_StatsFooter, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_row(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_StatsFooter, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_StatsFooter, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BoardBatteryDisplay = lv_label_create(ui_StatsFooter);
     lv_obj_set_width(ui_BoardBatteryDisplay, LV_SIZE_CONTENT);   /// 1
@@ -302,6 +304,18 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_right(ui_BoardBatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui_BoardBatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_BoardBatteryDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_TripDistanceDisplay = lv_label_create(ui_StatsFooter);
+    lv_obj_set_width(ui_TripDistanceDisplay, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_TripDistanceDisplay, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_TripDistanceDisplay, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_TripDistanceDisplay, LV_LABEL_LONG_CLIP);
+    lv_label_set_text(ui_TripDistanceDisplay, "0km");
+    lv_obj_set_style_text_font(ui_TripDistanceDisplay, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_TripDistanceDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_TripDistanceDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_TripDistanceDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_TripDistanceDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_StatsBody, ui_event_StatsBody, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsFooter, ui_event_StatsFooter, LV_EVENT_ALL, NULL);

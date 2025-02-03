@@ -14,6 +14,11 @@ typedef enum {
 } TempUnit;
 
 typedef enum {
+  TRIP_DISTANCE_UNIT_KM,
+  TRIP_DISTANCE_UNIT_MI
+} TripDistanceUnit;
+
+typedef enum {
   SWITCH_STATE_OFF,
   SWITCH_STATE_LEFT,
   SWITCH_STATE_RIGHT,
@@ -23,17 +28,30 @@ typedef enum {
 typedef struct {
   int64_t lastUpdated;
   // Stats
-  float speed;       // kph
-  float maxSpeed;    // kph
-  uint8_t dutyCycle; // 0 to 100
+  // kph
+  float speed;
+  // kph
+  float maxSpeed;
+  // 0 to 100
+  uint8_t dutyCycle;
+  // Unit of speed measure
   SpeedUnit speedUnit;
+  // Unit of temperature measure
   TempUnit tempUnit;
+  // Board battery voltage
   float batteryVoltage;
-  uint8_t batteryPercentage; // 0 to 100
-  uint8_t signalStrength;    // RSSI
-  SwitchState switchState;
+  // 0 to 100
+  uint8_t batteryPercentage;
+  // Remote battery voltage
   float remoteBatteryVoltage;
-  uint8_t remoteBatteryPercentage; // 0 to 100
+  // 0 to 100
+  uint8_t remoteBatteryPercentage;
+  float tripDistance;
+  TripDistanceUnit tripDistanceUnit;
+  // RSSI
+  uint8_t signalStrength;
+  // Footpad switch state
+  SwitchState switchState;
 } RemoteStats;
 
 extern RemoteStats remoteStats;

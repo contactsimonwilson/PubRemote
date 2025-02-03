@@ -53,6 +53,7 @@ extern lv_obj_t * ui_SecondaryStat;
 void ui_event_StatsFooter(lv_event_t * e);
 extern lv_obj_t * ui_StatsFooter;
 extern lv_obj_t * ui_BoardBatteryDisplay;
+extern lv_obj_t * ui_TripDistanceDisplay;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_MenuScreen

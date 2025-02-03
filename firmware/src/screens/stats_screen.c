@@ -87,6 +87,29 @@ static void update_utilization_dial_display() {
   last_value = remoteStats.dutyCycle;
 }
 
+static void update_remote_battery_display() {
+  static uint8_t last_remote_battery_value = 0;
+
+  // See if the remote battery percentage has changed
+  if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
+    return;
+  }
+
+  // Set background to red below 20%
+  if (remoteStats.remoteBatteryPercentage < 20 && remoteStats.remoteBatteryPercentage != 0) {
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0xb20000), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+  else {
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0x1db200), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+
+  // Set width of battery object
+  lv_obj_set_width(ui_BatteryFill, lv_pct(remoteStats.remoteBatteryPercentage));
+
+  // Update the last remote battery percentage
+  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
+}
+
 static void update_primary_stat_display() {
   static float last_value = 0;
 
@@ -115,30 +138,24 @@ static void update_primary_stat_display() {
 }
 
 static void update_secondary_stat_display() {
-  static ConnectionState last_value = CONNECTION_STATE_DISCONNECTED;
+  static float last_value = 0;
 
-  if (last_value == connection_state) {
+  if (last_value == remoteStats.dutyCycle) {
     return;
   }
 
-  switch (connection_state) {
-  case CONNECTION_STATE_DISCONNECTED:
-    lv_label_set_text(ui_SecondaryStat, "Disconnected");
-    break;
-  case CONNECTION_STATE_RECONNECTING:
-    lv_label_set_text(ui_SecondaryStat, "Reconnecting");
-    break;
-  case CONNECTION_STATE_CONNECTING:
-    lv_label_set_text(ui_SecondaryStat, "Connecting");
-    break;
-  case CONNECTION_STATE_CONNECTED:
-    lv_label_set_text(ui_SecondaryStat, "Connected"); // TODO - apply based on secondary stat display option
-    break;
-  default:
-    break;
+  char *formattedString;
+
+  if (remoteStats.dutyCycle >= 10) {
+    asprintf(&formattedString, "%0f%%", remoteStats.dutyCycle);
+  }
+  else {
+    asprintf(&formattedString, "%.1f%%", remoteStats.dutyCycle);
   }
 
-  last_value = connection_state;
+  lv_label_set_text(ui_SecondaryStat, formattedString);
+  free(formattedString);
+  last_value = remoteStats.dutyCycle;
 }
 
 static void update_footpad_display() {
@@ -197,27 +214,29 @@ static void update_board_battery_display() {
   last_board_battery_value = remoteStats.batteryPercentage;
 }
 
-static void update_remote_battery_display() {
-  static uint8_t last_remote_battery_value = 0;
+static void update_trip_distance_display() {
+  float last_trip_distance_value = 0.0;
 
-  // See if the remote battery percentage has changed
-  if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
+  // Reset display to show 0.0 distance traveled if disconnected
+  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
+    remoteStats.tripDistance = 0.0;
+  }
+
+  // See if the trip distance value has changed
+  if (last_trip_distance_value == remoteStats.tripDistance) {
     return;
   }
 
-  // Set background to red below 20%
-  if (remoteStats.remoteBatteryPercentage < 20 && remoteStats.remoteBatteryPercentage != 0) {
-    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0xb20000), LV_PART_MAIN | LV_STATE_DEFAULT);
-  }
-  else {
-    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0x1db200), LV_PART_MAIN | LV_STATE_DEFAULT);
-  }
+  // Update the displayed text
+  char *formattedString;
 
-  // Set width of battery object
-  lv_obj_set_width(ui_BatteryFill, lv_pct(remoteStats.remoteBatteryPercentage));
+  asprintf(&formattedString, "%d%%", remoteStats.tripDistance);
+  lv_label_set_text(ui_TripDistanceDisplay, formattedString);
 
-  // Update the last remote battery percentage
-  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
+  free(formattedString);
+
+  // Update the last trip distance value
+  last_trip_distance_value = remoteStats.tripDistance;
 }
 
 void update_stats_screen_display() {
@@ -235,6 +254,7 @@ void update_stats_screen_display() {
     update_secondary_stat_display();
     update_footpad_display();
     update_board_battery_display();
+    update_trip_distance_display();
     update_remote_battery_display();
     LVGL_unlock();
   }
