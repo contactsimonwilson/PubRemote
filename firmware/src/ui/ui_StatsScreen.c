@@ -185,7 +185,8 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_height(ui_RSSIContainer, 12);
     lv_obj_set_align(ui_RSSIContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_RSSIContainer, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_RSSIContainer, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_START);
+    lv_obj_set_flex_align(ui_RSSIContainer, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END);
+    lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_RSSI1 = lv_obj_create(ui_RSSIContainer);
@@ -323,7 +324,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_x(ui_DutyCycleLabel, 19);
     lv_obj_set_y(ui_DutyCycleLabel, 38);
     lv_obj_set_align(ui_DutyCycleLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_DutyCycleLabel, "Duty cycle: 0%");
+    lv_label_set_text(ui_DutyCycleLabel, "Duty Cycle: 0%");
 
     ui_TempsBody = lv_obj_create(ui_SecondaryStatContainer);
     lv_obj_remove_style_all(ui_TempsBody);
@@ -349,11 +350,11 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_x(ui_TempsLabel, 19);
     lv_obj_set_y(ui_TempsLabel, 38);
     lv_obj_set_align(ui_TempsLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_TempsLabel, "Mot: 0C | Con: 0C");
+    lv_label_set_text(ui_TempsLabel, "M: 0C | C: 0C");
 
     ui_TripBody = lv_obj_create(ui_SecondaryStatContainer);
     lv_obj_remove_style_all(ui_TripBody);
-    lv_obj_set_width(ui_TripBody, lv_pct(100));
+    lv_obj_set_width(ui_TripBody, lv_pct(75));
     lv_obj_set_height(ui_TripBody, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_TripBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_TripBody, LV_FLEX_FLOW_COLUMN);
@@ -375,7 +376,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_x(ui_TripLabel, 19);
     lv_obj_set_y(ui_TripLabel, 38);
     lv_obj_set_align(ui_TripLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_TripLabel, "Trip: 0.0KM");
+    lv_label_set_text(ui_TripLabel, "Trip: -");
 
     ui_StatsFooter = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsFooter);

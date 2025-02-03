@@ -36,6 +36,7 @@ static uint8_t max_speed = 0;
 static void update_speed_dial_display() {
   static float last_value = 0;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.speed) {
     return;
   }
@@ -61,6 +62,7 @@ static void update_speed_dial_display() {
 static void update_utilization_dial_display() {
   static uint8_t last_value = 0;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.dutyCycle) {
     return;
   }
@@ -90,7 +92,7 @@ static void update_utilization_dial_display() {
 static void update_remote_battery_display() {
   static uint8_t last_remote_battery_value = 0;
 
-  // See if the remote battery percentage has changed
+  // Ensure the value has changed
   if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
     return;
   }
@@ -113,6 +115,7 @@ static void update_remote_battery_display() {
 static void update_primary_stat_display() {
   static float last_value = 0;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.speed) {
     return;
   }
@@ -140,73 +143,25 @@ static void update_primary_stat_display() {
 static void update_duty_cycle_display() {
   static float last_value = 0;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.dutyCycle) {
-    return;
-  }
-
-  char *formattedString;
-
-  asprintf(&formattedString, "Duty cycle: %d%%", remoteStats.dutyCycle);
-  lv_label_set_text(ui_DutyCycleLabel, formattedString);
-  free(formattedString);
-  last_value = remoteStats.dutyCycle;
-}
-
-static void update_footpad_display() {
-  static SwitchState last_value = SWITCH_STATE_OFF;
-
-  if (last_value == remoteStats.switchState) {
-    return;
-  }
-
-  switch (remoteStats.switchState) {
-  case SWITCH_STATE_OFF:
-    lv_arc_set_value(ui_LeftSensor, 0);
-    lv_arc_set_value(ui_RightSensor, 0);
-    break;
-  case SWITCH_STATE_LEFT:
-    lv_arc_set_value(ui_LeftSensor, 1);
-    lv_arc_set_value(ui_RightSensor, 0);
-    break;
-  case SWITCH_STATE_RIGHT:
-    lv_arc_set_value(ui_LeftSensor, 0);
-    lv_arc_set_value(ui_RightSensor, 1);
-    break;
-  case SWITCH_STATE_BOTH:
-    lv_arc_set_value(ui_LeftSensor, 1);
-    lv_arc_set_value(ui_RightSensor, 1);
-    break;
-  default:
-    break;
-  }
-
-  last_value = remoteStats.switchState;
-}
-
-static void update_board_battery_display() {
-  static uint8_t last_board_battery_value = 0;
-
-  // See if the board battery percentage has changed
-  if (last_board_battery_value == remoteStats.batteryPercentage) {
     return;
   }
 
   // Update the displayed text
   char *formattedString;
-
-  asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
-  lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
-
+  asprintf(&formattedString, "Duty Cycle: %d%%", remoteStats.dutyCycle);
+  lv_label_set_text(ui_DutyCycleLabel, formattedString);
   free(formattedString);
 
-  // Update the last board battery percentage
-  last_board_battery_value = remoteStats.batteryPercentage;
+  last_value = remoteStats.dutyCycle;
 }
 
 static void update_temps_display() {
   static float last_motor_temp_value = 0.0;
   static float last_controller_temp_value = 0.0;
 
+  // Ensure the value has changed
   if (last_motor_temp_value == remoteStats.motorTemp && last_controller_temp_value == remoteStats.controllerTemp) {
     return;
   }
@@ -224,7 +179,7 @@ static void update_temps_display() {
 
   // Update the displayed text
   char *formattedString;
-  asprintf(&formattedString, "Mot: %.0f%s | Con: %.0f%s", converted_mot_val, temp_unit_label, converted_cont_val,
+  asprintf(&formattedString, "M: %.0f%s | C: %.0f%s", converted_mot_val, temp_unit_label, converted_cont_val,
            temp_unit_label);
   lv_label_set_text(ui_TempsLabel, formattedString);
   free(formattedString);
@@ -235,10 +190,9 @@ static void update_temps_display() {
 }
 
 static void update_trip_distance_display() {
-
   static float last_trip_distance_value = 0.0;
 
-  // See if the trip distance value has changed
+  // Ensure the value has changed
   if (last_trip_distance_value == remoteStats.tripDistance) {
     return;
   }
@@ -285,8 +239,11 @@ static void update_secondary_stat_display() {
   static lv_coord_t connected_scroll_position = 0;
   ConnectionState new_connection_state = connection_state;
 
+  // See if the current connection state has changed
+  // Update shown fields accordingly
   if (last_connection_state != new_connection_state) {
     bool is_connected = new_connection_state == CONNECTION_STATE_CONNECTED;
+
     // Update available options based on connection state
     if (is_connected) {
       lv_obj_add_flag(ui_ConnectionStateBody, LV_OBJ_FLAG_HIDDEN);
@@ -303,14 +260,68 @@ static void update_secondary_stat_display() {
       lv_obj_add_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);
       lv_obj_scroll_to(ui_SecondaryStatContainer, 0, 0, LV_ANIM_OFF);
     }
+
     lv_label_set_text(ui_ConnectionStateLabel, get_connection_state_label());
   }
 
-  update_duty_cycle_display();
-  update_temps_display();
-  update_trip_distance_display();
+  // Update secondary stat displays if currently connected
+  if (connection_state == CONNECTION_STATE_CONNECTED) {
+    update_duty_cycle_display();
+    update_temps_display();
+    update_trip_distance_display();
+  }
 
   last_connection_state = new_connection_state;
+}
+
+static void update_board_battery_display() {
+  static uint8_t last_board_battery_value = 0;
+
+  // Ensure the value has changed
+  if (last_board_battery_value == remoteStats.batteryPercentage) {
+    return;
+  }
+
+  // Update the displayed text
+  char *formattedString;
+  asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
+  lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+  free(formattedString);
+
+  // Update the last board battery percentage
+  last_board_battery_value = remoteStats.batteryPercentage;
+}
+
+static void update_footpad_display() {
+  static SwitchState last_value = SWITCH_STATE_OFF;
+
+  // Ensure the value has changed
+  if (last_value == remoteStats.switchState) {
+    return;
+  }
+
+  switch (remoteStats.switchState) {
+  case SWITCH_STATE_OFF:
+    lv_arc_set_value(ui_LeftSensor, 0);
+    lv_arc_set_value(ui_RightSensor, 0);
+    break;
+  case SWITCH_STATE_LEFT:
+    lv_arc_set_value(ui_LeftSensor, 1);
+    lv_arc_set_value(ui_RightSensor, 0);
+    break;
+  case SWITCH_STATE_RIGHT:
+    lv_arc_set_value(ui_LeftSensor, 0);
+    lv_arc_set_value(ui_RightSensor, 1);
+    break;
+  case SWITCH_STATE_BOTH:
+    lv_arc_set_value(ui_LeftSensor, 1);
+    lv_arc_set_value(ui_RightSensor, 1);
+    break;
+  default:
+    break;
+  }
+
+  last_value = remoteStats.switchState;
 }
 
 void update_stats_screen_display() {
@@ -324,11 +335,11 @@ void update_stats_screen_display() {
 
     update_speed_dial_display();
     update_utilization_dial_display();
+    update_remote_battery_display();
     update_primary_stat_display();
     update_secondary_stat_display();
-    update_footpad_display();
     update_board_battery_display();
-    update_remote_battery_display();
+    update_footpad_display();
     LVGL_unlock();
   }
 }

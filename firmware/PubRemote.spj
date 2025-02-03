@@ -2559,7 +2559,7 @@
                             "Reversed": false,
                             "MainAlignment": 3,
                             "CrossAlignment": 2,
-                            "TrackAlignment": 0,
+                            "TrackAlignment": 2,
                             "LayoutType": 1,
                             "nid": 114705661,
                             "strtype": "OBJECT/Layout_type",
@@ -2602,6 +2602,12 @@
                             "flags": 1048576,
                             "strtype": "OBJECT/Flags",
                             "InheritedType": 1
+                          },
+                          {
+                            "nid": 100,
+                            "strtype": "OBJECT/Hidden",
+                            "strval": "True",
+                            "InheritedType": 2
                           },
                           {
                             "nid": 1609590697,
@@ -4018,7 +4024,7 @@
                               {
                                 "nid": -186312778,
                                 "strtype": "LABEL/Text",
-                                "strval": "Duty cycle: 0%",
+                                "strval": "Duty Cycle: 0%",
                                 "InheritedType": 10
                               },
                               {
@@ -4339,7 +4345,7 @@
                               {
                                 "nid": -186312778,
                                 "strtype": "LABEL/Text",
-                                "strval": "Mot: 0C | Con: 0C",
+                                "strval": "M: 0C | C: 0C",
                                 "InheritedType": 10
                               },
                               {
@@ -4660,7 +4666,7 @@
                               {
                                 "nid": -186312778,
                                 "strtype": "LABEL/Text",
-                                "strval": "Trip: 0.0KM",
+                                "strval": "Trip: -",
                                 "InheritedType": 10
                               },
                               {
@@ -4729,7 +4735,7 @@
                             "flags": 50,
                             "strtype": "OBJECT/Size",
                             "intarray": [
-                              100,
+                              75,
                               1
                             ],
                             "InheritedType": 7
