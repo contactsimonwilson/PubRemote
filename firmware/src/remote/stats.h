@@ -27,10 +27,10 @@ typedef enum {
 
 typedef struct {
   int64_t lastUpdated;
-  // Stats
-  // kph
+  /* Stats */
+  // Speed, stored in KPH
   float speed;
-  // kph
+  // Max speed, stored in KPH
   float maxSpeed;
   // 0 to 100
   uint8_t dutyCycle;
@@ -46,10 +46,14 @@ typedef struct {
   float remoteBatteryVoltage;
   // 0 to 100
   uint8_t remoteBatteryPercentage;
+  // Board trip distance
   float tripDistance;
-  float motorTemp;
-  float controllerTemp;
+  // Unit of board trip distance measure
   TripDistanceUnit tripDistanceUnit;
+  // Board motor temperature
+  float motorTemp;
+  // Board controller temperature
+  float controllerTemp;
   // RSSI
   uint8_t signalStrength;
   // Footpad switch state
