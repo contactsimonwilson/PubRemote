@@ -21,6 +21,8 @@ static void reset_stats() {
   remoteStats.remoteBatteryPercentage = 0;
   remoteStats.tripDistance = 0.0;
   remoteStats.tripDistanceUnit = TRIP_DISTANCE_UNIT_KM;
+  remoteStats.motorTemp = 0;
+  remoteStats.controllerTemp = 0;
   remoteStats.signalStrength = 0;
   remoteStats.switchState = SWITCH_STATE_OFF;
 }

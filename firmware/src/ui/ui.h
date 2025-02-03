@@ -45,15 +45,22 @@ extern lv_obj_t * ui_RSSI1;
 extern lv_obj_t * ui_RSSI2;
 extern lv_obj_t * ui_RSSI3;
 extern lv_obj_t * ui_MessageText;
-void ui_event_StatsBody(lv_event_t * e);
 extern lv_obj_t * ui_StatsBody;
+void ui_event_PrimaryStat(lv_event_t * e);
 extern lv_obj_t * ui_PrimaryStat;
 extern lv_obj_t * ui_PrimaryStatUnit;
-extern lv_obj_t * ui_SecondaryStat;
+extern lv_obj_t * ui_SecondaryStatContainer;
+extern lv_obj_t * ui_ConnectionStateBody;
+extern lv_obj_t * ui_ConnectionStateLabel;
+extern lv_obj_t * ui_DutyCycleBody;
+extern lv_obj_t * ui_DutyCycleLabel;
+extern lv_obj_t * ui_TempsBody;
+extern lv_obj_t * ui_TempsLabel;
+extern lv_obj_t * ui_TripBody;
+extern lv_obj_t * ui_TripLabel;
 void ui_event_StatsFooter(lv_event_t * e);
 extern lv_obj_t * ui_StatsFooter;
 extern lv_obj_t * ui_BoardBatteryDisplay;
-extern lv_obj_t * ui_TripDistanceDisplay;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_MenuScreen

@@ -47,6 +47,8 @@ typedef struct {
   // 0 to 100
   uint8_t remoteBatteryPercentage;
   float tripDistance;
+  float motorTemp;
+  float controllerTemp;
   TripDistanceUnit tripDistanceUnit;
   // RSSI
   uint8_t signalStrength;

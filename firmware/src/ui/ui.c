@@ -39,15 +39,22 @@ lv_obj_t * ui_RSSI1;
 lv_obj_t * ui_RSSI2;
 lv_obj_t * ui_RSSI3;
 lv_obj_t * ui_MessageText;
-void ui_event_StatsBody(lv_event_t * e);
 lv_obj_t * ui_StatsBody;
+void ui_event_PrimaryStat(lv_event_t * e);
 lv_obj_t * ui_PrimaryStat;
 lv_obj_t * ui_PrimaryStatUnit;
-lv_obj_t * ui_SecondaryStat;
+lv_obj_t * ui_SecondaryStatContainer;
+lv_obj_t * ui_ConnectionStateBody;
+lv_obj_t * ui_ConnectionStateLabel;
+lv_obj_t * ui_DutyCycleBody;
+lv_obj_t * ui_DutyCycleLabel;
+lv_obj_t * ui_TempsBody;
+lv_obj_t * ui_TempsLabel;
+lv_obj_t * ui_TripBody;
+lv_obj_t * ui_TripLabel;
 void ui_event_StatsFooter(lv_event_t * e);
 lv_obj_t * ui_StatsFooter;
 lv_obj_t * ui_BoardBatteryDisplay;
-lv_obj_t * ui_TripDistanceDisplay;
 // CUSTOM VARIABLES
 
 
@@ -243,7 +250,7 @@ void ui_event_StatsScreen(lv_event_t * e)
     }
 }
 
-void ui_event_StatsBody(lv_event_t * e)
+void ui_event_PrimaryStat(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -254,7 +261,7 @@ void ui_event_StatsBody(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         stat_swipe_left(e);
     }
-    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
         stat_swipe_right(e);
     }

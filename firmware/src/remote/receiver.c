@@ -179,7 +179,9 @@ static void process_data(esp_now_event_t evt) {
     float distance_abs;
     memcpy(&distance_abs, &data[17], sizeof(float));
     float fet_temp_filtered = (float)data[21] / 2.0;
+    remoteStats.controllerTemp = fet_temp_filtered;
     float motor_temp_filtered = (float)data[22] / 2.0;
+    remoteStats.motorTemp = motor_temp_filtered;
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
     float battery_level = (float)data[27] / 2.0;
     remoteStats.batteryPercentage = battery_level;

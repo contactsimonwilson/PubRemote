@@ -137,7 +137,7 @@ static void update_primary_stat_display() {
   last_value = remoteStats.speed;
 }
 
-static void update_secondary_stat_display() {
+static void update_duty_cycle_display() {
   static float last_value = 0;
 
   if (last_value == remoteStats.dutyCycle) {
@@ -146,14 +146,8 @@ static void update_secondary_stat_display() {
 
   char *formattedString;
 
-  if (remoteStats.dutyCycle >= 10) {
-    asprintf(&formattedString, "%0f%%", remoteStats.dutyCycle);
-  }
-  else {
-    asprintf(&formattedString, "%.1f%%", remoteStats.dutyCycle);
-  }
-
-  lv_label_set_text(ui_SecondaryStat, formattedString);
+  asprintf(&formattedString, "Duty cycle: %d%%", remoteStats.dutyCycle);
+  lv_label_set_text(ui_DutyCycleLabel, formattedString);
   free(formattedString);
   last_value = remoteStats.dutyCycle;
 }
@@ -192,11 +186,6 @@ static void update_footpad_display() {
 static void update_board_battery_display() {
   static uint8_t last_board_battery_value = 0;
 
-  // Reset display to show 0% battery if disconnected
-  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
-    remoteStats.batteryPercentage = 0.0;
-  }
-
   // See if the board battery percentage has changed
   if (last_board_battery_value == remoteStats.batteryPercentage) {
     return;
@@ -214,38 +203,123 @@ static void update_board_battery_display() {
   last_board_battery_value = remoteStats.batteryPercentage;
 }
 
-static void update_trip_distance_display() {
-  float last_trip_distance_value = 0.0;
+static void update_temps_display() {
+  static float last_motor_temp_value = 0.0;
+  static float last_controller_temp_value = 0.0;
 
-  // Reset display to show 0.0 distance traveled if disconnected
-  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
-    remoteStats.tripDistance = 0.0;
+  if (last_motor_temp_value == remoteStats.motorTemp && last_controller_temp_value == remoteStats.controllerTemp) {
+    return;
   }
+
+  bool should_convert = device_settings.temp_units == TEMP_UNITS_FAHRENHEIT;
+  float converted_mot_val = remoteStats.motorTemp;
+  float converted_cont_val = remoteStats.controllerTemp;
+  char temp_unit_label[] = CELSIUS_LABEL;
+
+  if (should_convert) {
+    converted_mot_val = convert_c_to_f(remoteStats.motorTemp);
+    converted_cont_val = convert_c_to_f(remoteStats.controllerTemp);
+    strncpy(temp_unit_label, FAHRENHEIT_LABEL, sizeof(temp_unit_label) - 1);
+  }
+
+  // Update the displayed text
+  char *formattedString;
+  asprintf(&formattedString, "Mot: %.0f%s | Con: %.0f%s", converted_mot_val, temp_unit_label, converted_cont_val,
+           temp_unit_label);
+  lv_label_set_text(ui_TempsLabel, formattedString);
+  free(formattedString);
+
+  // Update last temp values
+  last_motor_temp_value = remoteStats.motorTemp;
+  last_controller_temp_value = remoteStats.controllerTemp;
+}
+
+static void update_trip_distance_display() {
+
+  static float last_trip_distance_value = 0.0;
 
   // See if the trip distance value has changed
   if (last_trip_distance_value == remoteStats.tripDistance) {
     return;
   }
 
+  float converted_val = remoteStats.tripDistance;
+
+  if (device_settings.distance_units == DISTANCE_UNITS_IMPERIAL) {
+    converted_val = convert_kph_to_mph(remoteStats.tripDistance);
+  }
+
+  char distance_label[] = KILOMETERS_LABEL;
+
+  if (device_settings.distance_units == DISTANCE_UNITS_IMPERIAL) {
+    strncpy(distance_label, MILES_LABEL, sizeof(distance_label) - 1);
+  }
+
   // Update the displayed text
   char *formattedString;
-
-  asprintf(&formattedString, "%d%%", remoteStats.tripDistance);
-  lv_label_set_text(ui_TripDistanceDisplay, formattedString);
-
+  asprintf(&formattedString, "Trip: %.1f%s", converted_val, distance_label);
+  lv_label_set_text(ui_TripLabel, formattedString);
   free(formattedString);
 
   // Update the last trip distance value
   last_trip_distance_value = remoteStats.tripDistance;
 }
 
+static char *get_connection_state_label() {
+  switch (connection_state) {
+  case CONNECTION_STATE_CONNECTED:
+    return "Connected";
+  case CONNECTION_STATE_CONNECTING:
+    return "Connecting";
+  case CONNECTION_STATE_RECONNECTING:
+    return "Reconnecting";
+  case CONNECTION_STATE_DISCONNECTED:
+    return "Disconnected";
+  default:
+    return "Disconnected";
+  }
+}
+
+static void update_secondary_stat_display() {
+  static ConnectionState last_connection_state = CONNECTION_STATE_DISCONNECTED;
+  static lv_coord_t connected_scroll_position = 0;
+  ConnectionState new_connection_state = connection_state;
+
+  if (last_connection_state != new_connection_state) {
+    bool is_connected = new_connection_state == CONNECTION_STATE_CONNECTED;
+    // Update available options based on connection state
+    if (is_connected) {
+      lv_obj_add_flag(ui_ConnectionStateBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_DutyCycleBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_TempsBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_scroll_to(ui_SecondaryStatContainer, connected_scroll_position, 0, LV_ANIM_OFF);
+    }
+    else {
+      connected_scroll_position = lv_obj_get_scroll_x(ui_SecondaryStatContainer);
+      lv_obj_clear_flag(ui_ConnectionStateBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_DutyCycleBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_TempsBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_scroll_to(ui_SecondaryStatContainer, 0, 0, LV_ANIM_OFF);
+    }
+    lv_label_set_text(ui_ConnectionStateLabel, get_connection_state_label());
+  }
+
+  update_duty_cycle_display();
+  update_temps_display();
+  update_trip_distance_display();
+
+  last_connection_state = new_connection_state;
+}
+
 void update_stats_screen_display() {
   if (LVGL_lock(-1)) {
     if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
-      lv_label_set_text(ui_PrimaryStatUnit, "kph");
+      lv_label_set_text(ui_PrimaryStatUnit, KILOMETERS_PER_HOUR_LABEL);
     }
     else {
-      lv_label_set_text(ui_PrimaryStatUnit, "mph");
+      lv_label_set_text(ui_PrimaryStatUnit, MILES_PER_HOUR_LABEL);
     }
 
     update_speed_dial_display();
@@ -254,7 +328,6 @@ void update_stats_screen_display() {
     update_secondary_stat_display();
     update_footpad_display();
     update_board_battery_display();
-    update_trip_distance_display();
     update_remote_battery_display();
     LVGL_unlock();
   }
@@ -284,6 +357,11 @@ void stats_screen_load_start(lv_event_t *e) {
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
   update_stats_screen_display();
+
+  if (LVGL_lock(-1)) {
+    lv_obj_set_scroll_snap_x(ui_SecondaryStatContainer, LV_SCROLL_SNAP_CENTER);
+    LVGL_unlock();
+  }
 }
 
 void stats_screen_unloaded(lv_event_t *e) {

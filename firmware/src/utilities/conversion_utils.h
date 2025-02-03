@@ -2,6 +2,13 @@
 #ifndef __CONVERSION_UTILS_H
 #define __CONVERSION_UTILS_H
 
+#define MILES_LABEL "MI"
+#define KILOMETERS_LABEL "KM"
+#define MILES_PER_HOUR_LABEL "MPH"
+#define KILOMETERS_PER_HOUR_LABEL "KPH"
+#define FAHRENHEIT_LABEL "F"
+#define CELSIUS_LABEL "C"
+
 float convert_ms_to_kph(float ms);
 float convert_kph_to_mph(float kph);
 
