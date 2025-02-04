@@ -117,7 +117,7 @@ static void update_remote_battery_display() {
 
 static void update_rssi_display() {
   // Use derived values to avoid unnecessary updates
-  static uint8_t last_signal_strength_rating_value = SIGNAL_STRENGTH_NONE;
+  static uint8_t last_signal_strength_rating_value = -1;
   SignalStrength signal_strength_rating = SIGNAL_STRENGTH_NONE;
 
   if (remoteStats.signalStrength > RSSI_GOOD) {
@@ -133,17 +133,18 @@ static void update_rssi_display() {
     signal_strength_rating = SIGNAL_STRENGTH_NONE;
   }
 
-  // Ensure the value has changed
-  if (last_signal_strength_rating_value == signal_strength_rating) {
-    return;
-  }
-
-  // Show RSSI container if it hasn't been previously shown
-  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
+  // Hide RSSI container on disconnect if not already hidden
+  // Otherwise, show the container if not already shown
+  if (connection_state == CONNECTION_STATE_DISCONNECTED && !lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
     lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
   else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
     lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+
+  // Ensure the value has changed
+  if (last_signal_strength_rating_value == signal_strength_rating) {
+    return;
   }
 
   int bar_color[] = {RSSI_BAR_OFF, RSSI_BAR_OFF, RSSI_BAR_OFF};
