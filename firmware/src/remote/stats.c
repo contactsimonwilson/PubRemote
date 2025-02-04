@@ -23,7 +23,7 @@ static void reset_stats() {
   remoteStats.tripDistanceUnit = TRIP_DISTANCE_UNIT_KM;
   remoteStats.motorTemp = 0;
   remoteStats.controllerTemp = 0;
-  remoteStats.signalStrength = 0;
+  remoteStats.signalStrength = -255;
   remoteStats.switchState = SWITCH_STATE_OFF;
 }
 

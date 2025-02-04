@@ -40,6 +40,7 @@ static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *da
   memcpy(evt.data, data, len);
   evt.len = len;
   evt.chan = recv_info->rx_ctrl->channel;
+  remoteStats.signalStrength = recv_info->rx_ctrl->rssi;
 
 #if RX_QUEUE_SIZE > 1
   // Send to queue for processing in application task

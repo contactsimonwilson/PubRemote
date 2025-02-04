@@ -113,40 +113,52 @@ static void update_remote_battery_display() {
 }
 
 static void update_rssi_display() {
-  static uint8_t last_signal_strength_value = 0;
+  // Use derived values to avoid unnecessary updates
+  static uint8_t last_signal_strength_rating_value = SIGNAL_STRINGTH_NONE;
+  SignalStrength signal_strength_rating = SIGNAL_STRINGTH_NONE;
+
+  if (remoteStats.signalStrength > RSSI_GOOD) {
+    signal_strength_rating = SIGNAL_STRENGTH_GOOD;
+  }
+  else if (remoteStats.signalStrength > RSSI_FAIR) {
+    signal_strength_rating = SIGNAL_STRENGTH_FAIR;
+  }
+  else if (remoteStats.signalStrength > RSSI_POOR) {
+    signal_strength_rating = SIGNAL_STRENGTH_POOR;
+  }
+  else {
+    signal_strength_rating = SIGNAL_STRINGTH_NONE;
+  }
 
   // Ensure the value has changed
-  if (last_signal_strength_value == remoteStats.signalStrength) {
+  if (last_signal_strength_rating_value == signal_strength_rating) {
     return;
   }
 
   // Show RSSI container if it hasn't been previously shown
-  if (remoteStats.signalStrength == 0) {
+  if (signal_strength_rating == SIGNAL_STRINGTH_NONE) {
     lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
   else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
     lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
 
-  // Update signal strength indicator background colors
-  if (remoteStats.signalStrength < 150) {
-    lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
-  }
-  else if (remoteStats.signalStrength < 165) {
-    lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
-  }
-  else {
-    lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+  int bar_color[] = {RSSI_BAR_OFF, RSSI_BAR_OFF, RSSI_BAR_OFF};
+  for (int i = 0; i < 3; i++) {
+    if (signal_strength_rating >= i) {
+      bar_color[i] = RSSI_BAR_ON;
+    }
+    else {
+      bar_color[i] = RSSI_BAR_OFF;
+    }
   }
 
+  lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(bar_color[0]), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(bar_color[1]), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(bar_color[2]), LV_PART_MAIN | LV_STATE_DEFAULT);
+
   // Update the last remote signal strength
-  last_signal_strength_value = remoteStats.signalStrength;
+  last_signal_strength_rating_value = signal_strength_rating;
 }
 
 static void update_primary_stat_display() {
@@ -227,7 +239,7 @@ static void update_temps_display() {
 }
 
 static void update_trip_distance_display() {
-  static float last_trip_distance_value = 0.0;
+  static float last_trip_distance_value = -1; // Set to -1 to force initial update
 
   // Ensure the value has changed
   if (last_trip_distance_value == remoteStats.tripDistance) {

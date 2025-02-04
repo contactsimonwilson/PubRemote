@@ -55,7 +55,7 @@ typedef struct {
   // Board controller temperature
   float controllerTemp;
   // RSSI
-  uint8_t signalStrength;
+  int signalStrength;
   // Footpad switch state
   SwitchState switchState;
 } RemoteStats;
