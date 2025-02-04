@@ -33,5 +33,5 @@ if "GITHUB_ACTION" in os.environ:
     # Will only run if the build was not cached
     env.AddPostAction("buildprog", post_program_action)
 
-    # # Alternative that will always run
-    # env.AddPostAction("checkprogsize", post_program_action)
+# Alternative that will always run
+# env.AddPostAction("checkprogsize", post_program_action)

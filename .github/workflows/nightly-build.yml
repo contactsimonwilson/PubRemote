@@ -81,7 +81,7 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: pio run
+        run: pio run -e avaspark_esp32s3_touch_128_nightly -e cowmote_esp32s3_tdisplay_143_nightly
 
       - name: Get Current Date
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV

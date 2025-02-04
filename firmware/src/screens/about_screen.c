@@ -3,6 +3,7 @@
 #include "utilities/screen_utils.h"
 #include <remote/stats.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-ABOUT_SCREEN";
@@ -21,8 +22,13 @@ void about_screen_load_start(lv_event_t *e) {
     // set the version number
     char *formattedString;
 
+#ifdef NIGHTLY_BUILD
+    asprintf(&formattedString, "Version: %d.%d.%d.nightly\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR,
+             VERSION_PATCH, BUILD_TYPE, BUILD_ID);
+#else
     asprintf(&formattedString, "Version: %d.%d.%d\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
              BUILD_TYPE, BUILD_ID);
+#endif
 
     lv_label_set_text(ui_VersionInfoLabel, formattedString);
 
