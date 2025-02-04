@@ -36,6 +36,7 @@ static uint8_t max_speed = 0;
 static void update_speed_dial_display() {
   static float last_value = 0;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.speed) {
     return;
   }
@@ -61,6 +62,7 @@ static void update_speed_dial_display() {
 static void update_utilization_dial_display() {
   static uint8_t last_value = 0;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.dutyCycle) {
     return;
   }
@@ -87,9 +89,82 @@ static void update_utilization_dial_display() {
   last_value = remoteStats.dutyCycle;
 }
 
+static void update_remote_battery_display() {
+  static uint8_t last_remote_battery_value = 0;
+
+  // Ensure the value has changed
+  if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
+    return;
+  }
+
+  // Set background to red below 20%
+  if (remoteStats.remoteBatteryPercentage < 20 && remoteStats.remoteBatteryPercentage != 0) {
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0xb20000), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+  else {
+    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0x1db200), LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+
+  // Set width of battery object
+  lv_obj_set_width(ui_BatteryFill, lv_pct(remoteStats.remoteBatteryPercentage));
+
+  // Update the last remote battery percentage
+  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
+}
+
+static void update_rssi_display() {
+  // Use derived values to avoid unnecessary updates
+  static uint8_t last_signal_strength_rating_value = SIGNAL_STRINGTH_NONE;
+  SignalStrength signal_strength_rating = SIGNAL_STRINGTH_NONE;
+
+  if (remoteStats.signalStrength > RSSI_GOOD) {
+    signal_strength_rating = SIGNAL_STRENGTH_GOOD;
+  }
+  else if (remoteStats.signalStrength > RSSI_FAIR) {
+    signal_strength_rating = SIGNAL_STRENGTH_FAIR;
+  }
+  else if (remoteStats.signalStrength > RSSI_POOR) {
+    signal_strength_rating = SIGNAL_STRENGTH_POOR;
+  }
+  else {
+    signal_strength_rating = SIGNAL_STRINGTH_NONE;
+  }
+
+  // Ensure the value has changed
+  if (last_signal_strength_rating_value == signal_strength_rating) {
+    return;
+  }
+
+  // Show RSSI container if it hasn't been previously shown
+  if (signal_strength_rating == SIGNAL_STRINGTH_NONE) {
+    lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+  else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+
+  int bar_color[] = {RSSI_BAR_OFF, RSSI_BAR_OFF, RSSI_BAR_OFF};
+  for (int i = 0; i < 3; i++) {
+    if (signal_strength_rating >= i) {
+      bar_color[i] = RSSI_BAR_ON;
+    }
+    else {
+      bar_color[i] = RSSI_BAR_OFF;
+    }
+  }
+
+  lv_obj_set_style_bg_color(ui_RSSI1, lv_color_hex(bar_color[0]), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(bar_color[1]), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(bar_color[2]), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+  // Update the last remote signal strength
+  last_signal_strength_rating_value = signal_strength_rating;
+}
+
 static void update_primary_stat_display() {
   static float last_value = 0;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.speed) {
     return;
   }
@@ -114,36 +189,162 @@ static void update_primary_stat_display() {
   last_value = remoteStats.speed;
 }
 
-static void update_secondary_stat_display() {
-  static ConnectionState last_value = CONNECTION_STATE_DISCONNECTED;
+static void update_duty_cycle_display() {
+  static float last_value = 0;
 
-  if (last_value == connection_state) {
+  // Ensure the value has changed
+  if (last_value == remoteStats.dutyCycle) {
     return;
   }
 
-  switch (connection_state) {
-  case CONNECTION_STATE_DISCONNECTED:
-    lv_label_set_text(ui_SecondaryStat, "Disconnected");
-    break;
-  case CONNECTION_STATE_RECONNECTING:
-    lv_label_set_text(ui_SecondaryStat, "Reconnecting");
-    break;
-  case CONNECTION_STATE_CONNECTING:
-    lv_label_set_text(ui_SecondaryStat, "Connecting");
-    break;
-  case CONNECTION_STATE_CONNECTED:
-    lv_label_set_text(ui_SecondaryStat, "Connected"); // TODO - apply based on secondary stat display option
-    break;
-  default:
-    break;
+  // Update the displayed text
+  char *formattedString;
+  asprintf(&formattedString, "Duty Cycle: %d%%", remoteStats.dutyCycle);
+  lv_label_set_text(ui_DutyCycleLabel, formattedString);
+  free(formattedString);
+
+  last_value = remoteStats.dutyCycle;
+}
+
+static void update_temps_display() {
+  static float last_motor_temp_value = 0.0;
+  static float last_controller_temp_value = 0.0;
+
+  // Ensure the value has changed
+  if (last_motor_temp_value == remoteStats.motorTemp && last_controller_temp_value == remoteStats.controllerTemp) {
+    return;
   }
 
-  last_value = connection_state;
+  bool should_convert = device_settings.temp_units == TEMP_UNITS_FAHRENHEIT;
+  float converted_mot_val = remoteStats.motorTemp;
+  float converted_cont_val = remoteStats.controllerTemp;
+  char temp_unit_label[] = CELSIUS_LABEL;
+
+  if (should_convert) {
+    converted_mot_val = convert_c_to_f(remoteStats.motorTemp);
+    converted_cont_val = convert_c_to_f(remoteStats.controllerTemp);
+    strncpy(temp_unit_label, FAHRENHEIT_LABEL, sizeof(temp_unit_label) - 1);
+  }
+
+  // Update the displayed text
+  char *formattedString;
+  asprintf(&formattedString, "M: %.0f%s | C: %.0f%s", converted_mot_val, temp_unit_label, converted_cont_val,
+           temp_unit_label);
+  lv_label_set_text(ui_TempsLabel, formattedString);
+  free(formattedString);
+
+  // Update last temp values
+  last_motor_temp_value = remoteStats.motorTemp;
+  last_controller_temp_value = remoteStats.controllerTemp;
+}
+
+static void update_trip_distance_display() {
+  static float last_trip_distance_value = -1; // Set to -1 to force initial update
+
+  // Ensure the value has changed
+  if (last_trip_distance_value == remoteStats.tripDistance) {
+    return;
+  }
+
+  float converted_val = remoteStats.tripDistance;
+
+  if (device_settings.distance_units == DISTANCE_UNITS_IMPERIAL) {
+    converted_val = convert_kph_to_mph(remoteStats.tripDistance);
+  }
+
+  char distance_label[] = KILOMETERS_LABEL;
+
+  if (device_settings.distance_units == DISTANCE_UNITS_IMPERIAL) {
+    strncpy(distance_label, MILES_LABEL, sizeof(distance_label) - 1);
+  }
+
+  // Update the displayed text
+  char *formattedString;
+  asprintf(&formattedString, "Trip: %.1f%s", converted_val, distance_label);
+  lv_label_set_text(ui_TripLabel, formattedString);
+  free(formattedString);
+
+  // Update the last trip distance value
+  last_trip_distance_value = remoteStats.tripDistance;
+}
+
+static char *get_connection_state_label() {
+  switch (connection_state) {
+  case CONNECTION_STATE_CONNECTED:
+    return "Connected";
+  case CONNECTION_STATE_CONNECTING:
+    return "Connecting";
+  case CONNECTION_STATE_RECONNECTING:
+    return "Reconnecting";
+  case CONNECTION_STATE_DISCONNECTED:
+    return "Disconnected";
+  default:
+    return "Disconnected";
+  }
+}
+
+static void update_secondary_stat_display() {
+  static ConnectionState last_connection_state = CONNECTION_STATE_DISCONNECTED;
+  static lv_coord_t connected_scroll_position = 0;
+  ConnectionState new_connection_state = connection_state;
+
+  // See if the current connection state has changed
+  // Update shown fields accordingly
+  if (last_connection_state != new_connection_state) {
+    bool is_connected = new_connection_state == CONNECTION_STATE_CONNECTED;
+
+    // Update available options based on connection state
+    if (is_connected) {
+      lv_obj_add_flag(ui_ConnectionStateBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_DutyCycleBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_TempsBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_scroll_to(ui_SecondaryStatContainer, connected_scroll_position, 0, LV_ANIM_OFF);
+    }
+    else {
+      connected_scroll_position = lv_obj_get_scroll_x(ui_SecondaryStatContainer);
+      lv_obj_clear_flag(ui_ConnectionStateBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_DutyCycleBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_TempsBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_scroll_to(ui_SecondaryStatContainer, 0, 0, LV_ANIM_OFF);
+    }
+
+    lv_label_set_text(ui_ConnectionStateLabel, get_connection_state_label());
+  }
+
+  // Update secondary stat displays if currently connected
+  if (connection_state == CONNECTION_STATE_CONNECTED) {
+    update_duty_cycle_display();
+    update_temps_display();
+    update_trip_distance_display();
+  }
+
+  last_connection_state = new_connection_state;
+}
+
+static void update_board_battery_display() {
+  static uint8_t last_board_battery_value = 0;
+
+  // Ensure the value has changed
+  if (last_board_battery_value == remoteStats.batteryPercentage) {
+    return;
+  }
+
+  // Update the displayed text
+  char *formattedString;
+  asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
+  lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+  free(formattedString);
+
+  // Update the last board battery percentage
+  last_board_battery_value = remoteStats.batteryPercentage;
 }
 
 static void update_footpad_display() {
   static SwitchState last_value = SWITCH_STATE_OFF;
 
+  // Ensure the value has changed
   if (last_value == remoteStats.switchState) {
     return;
   }
@@ -172,70 +373,23 @@ static void update_footpad_display() {
   last_value = remoteStats.switchState;
 }
 
-static void update_board_battery_display() {
-  static uint8_t last_board_battery_value = 0;
-
-  // Reset display to show 0% battery if disconnected
-  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
-    remoteStats.batteryPercentage = 0.0;
-  }
-
-  // See if the board battery percentage has changed
-  if (last_board_battery_value == remoteStats.batteryPercentage) {
-    return;
-  }
-
-  // Update the displayed text
-  char *formattedString;
-
-  asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
-  lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
-
-  free(formattedString);
-
-  // Update the last board battery percentage
-  last_board_battery_value = remoteStats.batteryPercentage;
-}
-
-static void update_remote_battery_display() {
-  static uint8_t last_remote_battery_value = 0;
-
-  // See if the remote battery percentage has changed
-  if (last_remote_battery_value == remoteStats.remoteBatteryPercentage) {
-    return;
-  }
-
-  // Set background to red below 20%
-  if (remoteStats.remoteBatteryPercentage < 20 && remoteStats.remoteBatteryPercentage != 0) {
-    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0xb20000), LV_PART_MAIN | LV_STATE_DEFAULT);
-  }
-  else {
-    lv_obj_set_style_bg_color(ui_BatteryFill, lv_color_hex(0x1db200), LV_PART_MAIN | LV_STATE_DEFAULT);
-  }
-
-  // Set width of battery object
-  lv_obj_set_width(ui_BatteryFill, lv_pct(remoteStats.remoteBatteryPercentage));
-
-  // Update the last remote battery percentage
-  last_remote_battery_value = remoteStats.remoteBatteryPercentage;
-}
-
 void update_stats_screen_display() {
   if (LVGL_lock(-1)) {
     if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
-      lv_label_set_text(ui_PrimaryStatUnit, "kph");
+      lv_label_set_text(ui_PrimaryStatUnit, KILOMETERS_PER_HOUR_LABEL);
     }
     else {
-      lv_label_set_text(ui_PrimaryStatUnit, "mph");
+      lv_label_set_text(ui_PrimaryStatUnit, MILES_PER_HOUR_LABEL);
     }
 
     update_speed_dial_display();
     update_utilization_dial_display();
+    update_remote_battery_display();
+    update_rssi_display();
     update_primary_stat_display();
     update_secondary_stat_display();
-    update_footpad_display();
     update_board_battery_display();
-    update_remote_battery_display();
+    update_footpad_display();
     LVGL_unlock();
   }
 }
@@ -264,6 +418,11 @@ void stats_screen_load_start(lv_event_t *e) {
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
   update_stats_screen_display();
+
+  if (LVGL_lock(-1)) {
+    lv_obj_set_scroll_snap_x(ui_SecondaryStatContainer, LV_SCROLL_SNAP_CENTER);
+    LVGL_unlock();
+  }
 }
 
 void stats_screen_unloaded(lv_event_t *e) {

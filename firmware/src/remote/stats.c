@@ -19,7 +19,10 @@ static void reset_stats() {
   remoteStats.batteryPercentage = 0.0;
   remoteStats.remoteBatteryVoltage = 0.0;
   remoteStats.remoteBatteryPercentage = 0;
-  remoteStats.signalStrength = 0;
+  remoteStats.tripDistance = 0.0;
+  remoteStats.motorTemp = 0;
+  remoteStats.controllerTemp = 0;
+  remoteStats.signalStrength = -255;
   remoteStats.switchState = SWITCH_STATE_OFF;
 }
 

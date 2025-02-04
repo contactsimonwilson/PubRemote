@@ -22,18 +22,35 @@ typedef enum {
 
 typedef struct {
   int64_t lastUpdated;
-  // Stats
-  float speed;       // kph
-  float maxSpeed;    // kph
-  uint8_t dutyCycle; // 0 to 100
+  /* Stats */
+  // Speed, stored in KPH
+  float speed;
+  // Max speed, stored in KPH
+  float maxSpeed;
+  // 0 to 100
+  uint8_t dutyCycle;
+  // Unit of speed measure
   SpeedUnit speedUnit;
+  // Unit of temperature measure
   TempUnit tempUnit;
+  // Board battery voltage
   float batteryVoltage;
-  uint8_t batteryPercentage; // 0 to 100
-  uint8_t signalStrength;    // RSSI
-  SwitchState switchState;
+  // 0 to 100
+  uint8_t batteryPercentage;
+  // Remote battery voltage
   float remoteBatteryVoltage;
-  uint8_t remoteBatteryPercentage; // 0 to 100
+  // 0 to 100
+  uint8_t remoteBatteryPercentage;
+  // Board trip distance
+  float tripDistance;
+  // Board motor temperature
+  float motorTemp;
+  // Board controller temperature
+  float controllerTemp;
+  // RSSI
+  int signalStrength;
+  // Footpad switch state
+  SwitchState switchState;
 } RemoteStats;
 
 extern RemoteStats remoteStats;

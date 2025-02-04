@@ -1,3 +1,4 @@
+#include "connection.h"
 #include "esp_now.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
@@ -5,6 +6,7 @@
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
 #include <nvs.h>
+#include <remote/stats.h>
 
 static const char *TAG = "PUBREMOTE-ESPNOW";
 

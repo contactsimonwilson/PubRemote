@@ -40,6 +40,7 @@ static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *da
   memcpy(evt.data, data, len);
   evt.len = len;
   evt.chan = recv_info->rx_ctrl->channel;
+  remoteStats.signalStrength = recv_info->rx_ctrl->rssi;
 
 #if RX_QUEUE_SIZE > 1
   // Send to queue for processing in application task
@@ -161,31 +162,42 @@ static void process_data(esp_now_event_t evt) {
             connection_state == CONNECTION_STATE_CONNECTING) &&
            len == 32) {
     reset_sleep_timer();
+    remoteStats.lastUpdated = get_current_time_ms();
 
     uint8_t mode = data[0];
     uint8_t fault_code = data[1];
     float pitch_angle = (int16_t)((data[2] << 8) | data[3]) / 10.0;
     float roll_angle = (int16_t)((data[4] << 8) | data[5]) / 10.0;
+    float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
+    int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
+    float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
+
+    // Get RemoteStats
+    float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
+    remoteStats.speed = convert_ms_to_kph(fabs(speed));
+
+    float battery_level = (float)data[27] / 2.0;
+
+    remoteStats.batteryPercentage = battery_level;
+    float duty_cycle_now = (float)data[16] / 100.0 - 0.5;
+    remoteStats.dutyCycle = (uint8_t)(fabs(duty_cycle_now) * 100);
+
+    float motor_temp_filtered = (float)data[22] / 2.0;
+    remoteStats.motorTemp = motor_temp_filtered;
+
+    float fet_temp_filtered = (float)data[21] / 2.0;
+    remoteStats.controllerTemp = fet_temp_filtered;
+
     uint8_t state = data[6];
     uint8_t switch_state = data[7];
     remoteStats.switchState = switch_state;
-    float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
-    int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
-    float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
-    remoteStats.speed = convert_ms_to_kph(fabs(speed)); // Store in kph
-    float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
-    float duty_cycle_now = (float)data[16] / 100.0 - 0.5;
-    remoteStats.dutyCycle = (uint8_t)(fabs(duty_cycle_now) * 100);
+
     float distance_abs;
     memcpy(&distance_abs, &data[17], sizeof(float));
-    float fet_temp_filtered = (float)data[21] / 2.0;
-    float motor_temp_filtered = (float)data[22] / 2.0;
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
-    float battery_level = (float)data[27] / 2.0;
-    remoteStats.batteryPercentage = battery_level;
+
     int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
 
-    remoteStats.lastUpdated = get_current_time_ms();
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
     // ESP_LOGI(TAG, "Fault Code: %d", fault_code);
@@ -203,6 +215,7 @@ static void process_data(esp_now_event_t evt) {
     // ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
     // ESP_LOGI(TAG, "Odometer: %lu", odometer);
     // ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
+
     update_stats_display(); // TODO - use callbacks to update the UI instead of direct calls
   }
   else if (connection_state == CONNECTION_STATE_DISCONNECTED) {
@@ -230,6 +243,7 @@ void channel_unlock() {
   if (channel_mutex == NULL) {
     channel_mutex = xSemaphoreCreateMutex();
   }
+
   xSemaphoreGive(channel_mutex);
 }
 
@@ -243,15 +257,18 @@ static void change_channel(uint8_t chan, bool is_pairing) {
   if (!is_pairing) {
     // Add peer so we can send if we're already paired
     uint8_t *mac_addr = pairing_settings.remote_addr;
+
     if (esp_now_is_peer_exist(mac_addr)) {
       esp_now_del_peer(mac_addr);
     }
+
     esp_now_peer_info_t peerInfo = {};
     peerInfo.channel = chan;
     peerInfo.encrypt = false;
     memcpy(peerInfo.peer_addr, mac_addr, ESP_NOW_ETH_ALEN);
     esp_now_add_peer(&peerInfo);
   }
+
   channel_unlock();
 }
 
@@ -278,6 +295,7 @@ static void receiver_task(void *pvParameters) {
         if (channel_switch_time_ms > CHANNEL_HOP_INTERVAL_MS) {
 // Hop to next channel
 #define NUM_AVAIL_WIFI_CHANNELS 14
+
           uint8_t next_channel = (pairing_settings.channel % NUM_AVAIL_WIFI_CHANNELS) + 1;
           change_channel(next_channel, is_pairing);
           channel_switch_time_ms = 0;

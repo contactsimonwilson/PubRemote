@@ -10,6 +10,7 @@
 #include "stats.h"
 #include "time.h"
 #include "transmitter.h"
+#include "ui/ui.h"
 #include <esp_err.h>
 #include <esp_timer.h>
 #include <remote/settings.h>
@@ -29,6 +30,11 @@ static int64_t last_connection_state_change = 0;
 void update_connection_state(ConnectionState state) {
   connection_state = state;
   last_connection_state_change = get_current_time_ms();
+
+  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
+    init_stats(); // Reset all stats when moving to disconnected state
+  }
+
   update_stats_display();
 }
 
@@ -115,5 +121,6 @@ void init_connection() {
   if (pairing_state == PAIRING_STATE_PAIRED) {
     connect_to_default_peer();
   }
+
   xTaskCreatePinnedToCore(connection_task, "connection_task", 4096, NULL, 20, NULL, 0);
 }

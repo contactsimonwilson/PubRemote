@@ -21,6 +21,13 @@ typedef struct {
   BoardBatteryDisplayOption battery_display;
 } StatsScreenDisplayOptions;
 
+typedef enum {
+  SIGNAL_STRINGTH_NONE,
+  SIGNAL_STRENGTH_POOR,
+  SIGNAL_STRENGTH_FAIR,
+  SIGNAL_STRENGTH_GOOD,
+} SignalStrength;
+
 extern StatsScreenDisplayOptions stat_display_options;
 bool is_stats_screen_active();
 void update_stats_screen_display();
