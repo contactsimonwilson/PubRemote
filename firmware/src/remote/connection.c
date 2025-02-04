@@ -33,7 +33,6 @@ void update_connection_state(ConnectionState state) {
 
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
     init_stats(); // Reset all stats when moving to disconnected state
-    lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
 
   update_stats_display();
