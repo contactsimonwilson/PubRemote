@@ -17,8 +17,6 @@ static void reset_stats() {
   remoteStats.tempUnit = TEMP_UNIT_CELSIUS;
   remoteStats.batteryVoltage = 0.0;
   remoteStats.batteryPercentage = 0.0;
-  remoteStats.remoteBatteryVoltage = 0.0;
-  remoteStats.remoteBatteryPercentage = 0;
   remoteStats.tripDistance = 0.0;
   remoteStats.motorTemp = 0;
   remoteStats.controllerTemp = 0;

@@ -2373,9 +2373,9 @@
                                         "nid": 413611707,
                                         "strtype": "_style/Bg_Color",
                                         "intarray": [
-                                          255,
-                                          255,
-                                          255,
+                                          113,
+                                          113,
+                                          113,
                                           255
                                         ],
                                         "InheritedType": 7
@@ -2510,9 +2510,9 @@
                                         "nid": -297299927,
                                         "strtype": "_style/Bg_Color",
                                         "intarray": [
-                                          255,
-                                          255,
-                                          255,
+                                          113,
+                                          113,
+                                          113,
                                           255
                                         ],
                                         "InheritedType": 7
@@ -4340,7 +4340,7 @@
                               {
                                 "nid": -186312778,
                                 "strtype": "LABEL/Text",
-                                "strval": "M: 0C | C: 0C",
+                                "strval": "M: 0°C | C: 0°C",
                                 "InheritedType": 10
                               },
                               {

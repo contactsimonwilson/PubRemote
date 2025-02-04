@@ -56,6 +56,8 @@ static void update_speed_dial_display() {
 
   lv_arc_set_value(ui_SpeedDial, remoteStats.speed);
   lv_bar_set_value(ui_SpeedBar, remoteStats.speed, LV_ANIM_OFF);
+
+  // Update the last value
   last_value = remoteStats.speed;
 }
 
@@ -86,6 +88,7 @@ static void update_utilization_dial_display() {
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_UtilizationBar, lv_color_hex(0x282828), LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
+  // Update the last value
   last_value = remoteStats.dutyCycle;
 }
 
@@ -108,14 +111,14 @@ static void update_remote_battery_display() {
   // Set width of battery object
   lv_obj_set_width(ui_BatteryFill, lv_pct(remoteStats.remoteBatteryPercentage));
 
-  // Update the last remote battery percentage
+  // Update the last value
   last_remote_battery_value = remoteStats.remoteBatteryPercentage;
 }
 
 static void update_rssi_display() {
   // Use derived values to avoid unnecessary updates
-  static uint8_t last_signal_strength_rating_value = SIGNAL_STRINGTH_NONE;
-  SignalStrength signal_strength_rating = SIGNAL_STRINGTH_NONE;
+  static uint8_t last_signal_strength_rating_value = SIGNAL_STRENGTH_NONE;
+  SignalStrength signal_strength_rating = SIGNAL_STRENGTH_NONE;
 
   if (remoteStats.signalStrength > RSSI_GOOD) {
     signal_strength_rating = SIGNAL_STRENGTH_GOOD;
@@ -127,7 +130,16 @@ static void update_rssi_display() {
     signal_strength_rating = SIGNAL_STRENGTH_POOR;
   }
   else {
-    signal_strength_rating = SIGNAL_STRINGTH_NONE;
+    signal_strength_rating = SIGNAL_STRENGTH_NONE;
+  }
+
+  // Hide RSSI container on disconnect if not already hidden
+  // Otherwise, show the container if not already shown
+  if (connection_state == CONNECTION_STATE_DISCONNECTED && !lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+  else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
 
   // Ensure the value has changed
@@ -135,15 +147,8 @@ static void update_rssi_display() {
     return;
   }
 
-  // Show RSSI container if it hasn't been previously shown
-  if (signal_strength_rating == SIGNAL_STRINGTH_NONE) {
-    lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
-  }
-  else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
-    lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
-  }
-
   int bar_color[] = {RSSI_BAR_OFF, RSSI_BAR_OFF, RSSI_BAR_OFF};
+
   for (int i = 0; i < 3; i++) {
     if (signal_strength_rating >= i) {
       bar_color[i] = RSSI_BAR_ON;
@@ -157,7 +162,7 @@ static void update_rssi_display() {
   lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(bar_color[1]), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(bar_color[2]), LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  // Update the last remote signal strength
+  // Update the last value
   last_signal_strength_rating_value = signal_strength_rating;
 }
 
@@ -186,6 +191,8 @@ static void update_primary_stat_display() {
 
   lv_label_set_text(ui_PrimaryStat, formattedString);
   free(formattedString);
+
+  // Update the last value
   last_value = remoteStats.speed;
 }
 
@@ -203,6 +210,7 @@ static void update_duty_cycle_display() {
   lv_label_set_text(ui_DutyCycleLabel, formattedString);
   free(formattedString);
 
+  // Update the last value
   last_value = remoteStats.dutyCycle;
 }
 
@@ -228,12 +236,12 @@ static void update_temps_display() {
 
   // Update the displayed text
   char *formattedString;
-  asprintf(&formattedString, "M: %.0f%s | C: %.0f%s", converted_mot_val, temp_unit_label, converted_cont_val,
+  asprintf(&formattedString, "M: %.0f°%s | C: %.0f°%s", converted_mot_val, temp_unit_label, converted_cont_val,
            temp_unit_label);
   lv_label_set_text(ui_TempsLabel, formattedString);
   free(formattedString);
 
-  // Update last temp values
+  // Update the last value
   last_motor_temp_value = remoteStats.motorTemp;
   last_controller_temp_value = remoteStats.controllerTemp;
 }
@@ -264,7 +272,7 @@ static void update_trip_distance_display() {
   lv_label_set_text(ui_TripLabel, formattedString);
   free(formattedString);
 
-  // Update the last trip distance value
+  // Update the last value
   last_trip_distance_value = remoteStats.tripDistance;
 }
 
@@ -320,6 +328,7 @@ static void update_secondary_stat_display() {
     update_trip_distance_display();
   }
 
+  // Update the last value
   last_connection_state = new_connection_state;
 }
 
@@ -337,7 +346,7 @@ static void update_board_battery_display() {
   lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
   free(formattedString);
 
-  // Update the last board battery percentage
+  // Update the last value
   last_board_battery_value = remoteStats.batteryPercentage;
 }
 

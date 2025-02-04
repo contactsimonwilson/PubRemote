@@ -22,7 +22,7 @@ typedef struct {
 } StatsScreenDisplayOptions;
 
 typedef enum {
-  SIGNAL_STRINGTH_NONE,
+  SIGNAL_STRENGTH_NONE,
   SIGNAL_STRENGTH_POOR,
   SIGNAL_STRENGTH_FAIR,
   SIGNAL_STRENGTH_GOOD,
