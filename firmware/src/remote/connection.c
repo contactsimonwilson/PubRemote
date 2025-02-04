@@ -32,7 +32,8 @@ void update_connection_state(ConnectionState state) {
   last_connection_state_change = get_current_time_ms();
 
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
-    init_stats(); // Reset all stats when moving to disconnected state
+    // Reset all stats when moving to disconnected state
+    init_stats();
   }
   else if (connection_state == CONNECTION_STATE_RECONNECTING) {
     remoteStats.signalStrength = -255;
