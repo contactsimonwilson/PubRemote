@@ -138,7 +138,7 @@ static void update_rssi_display() {
   if (connection_state == CONNECTION_STATE_DISCONNECTED && !lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
     lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
-  else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
+  else if (connection_state != CONNECTION_STATE_DISCONNECTED && lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
     lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
 
