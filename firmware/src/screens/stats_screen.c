@@ -117,7 +117,7 @@ static void update_remote_battery_display() {
 
 static void update_rssi_display() {
   // Use derived values to avoid unnecessary updates
-  static uint8_t last_signal_strength_rating_value = -1;
+  static uint8_t last_signal_strength_rating_value = SIGNAL_STRENGTH_NONE;
   SignalStrength signal_strength_rating = SIGNAL_STRENGTH_NONE;
 
   if (remoteStats.signalStrength > RSSI_GOOD) {

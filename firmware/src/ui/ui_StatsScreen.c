@@ -204,7 +204,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_height(ui_RSSI2, 8);
     lv_obj_set_align(ui_RSSI2, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_RSSI2, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI2, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_RSSI2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_RSSI3 = lv_obj_create(ui_RSSIContainer);
@@ -213,7 +213,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_height(ui_RSSI3, 12);
     lv_obj_set_align(ui_RSSI3, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_RSSI3, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_RSSI3, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_MessageText = lv_label_create(ui_StatsHeader);
