@@ -114,8 +114,8 @@ static void update_remote_battery_display() {
 
 static void update_rssi_display() {
   // Use derived values to avoid unnecessary updates
-  static uint8_t last_signal_strength_rating_value = SIGNAL_STRINGTH_NONE;
-  SignalStrength signal_strength_rating = SIGNAL_STRINGTH_NONE;
+  static uint8_t last_signal_strength_rating_value = SIGNAL_STRENGTH_NONE;
+  SignalStrength signal_strength_rating = SIGNAL_STRENGTH_NONE;
 
   if (remoteStats.signalStrength > RSSI_GOOD) {
     signal_strength_rating = SIGNAL_STRENGTH_GOOD;
@@ -127,7 +127,7 @@ static void update_rssi_display() {
     signal_strength_rating = SIGNAL_STRENGTH_POOR;
   }
   else {
-    signal_strength_rating = SIGNAL_STRINGTH_NONE;
+    signal_strength_rating = SIGNAL_STRENGTH_NONE;
   }
 
   // Ensure the value has changed
@@ -136,7 +136,7 @@ static void update_rssi_display() {
   }
 
   // Show RSSI container if it hasn't been previously shown
-  if (signal_strength_rating == SIGNAL_STRINGTH_NONE) {
+  if (connection_state == CONNECTION_STATE_DISCONNECTED) {
     lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);
   }
   else if (lv_obj_has_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN)) {
@@ -228,7 +228,7 @@ static void update_temps_display() {
 
   // Update the displayed text
   char *formattedString;
-  asprintf(&formattedString, "M: %.0f%s | C: %.0f%s", converted_mot_val, temp_unit_label, converted_cont_val,
+  asprintf(&formattedString, "M: %.0f°%s | C: %.0f°%s", converted_mot_val, temp_unit_label, converted_cont_val,
            temp_unit_label);
   lv_label_set_text(ui_TempsLabel, formattedString);
   free(formattedString);

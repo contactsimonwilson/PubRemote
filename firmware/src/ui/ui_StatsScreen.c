@@ -350,7 +350,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_x(ui_TempsLabel, 19);
     lv_obj_set_y(ui_TempsLabel, 38);
     lv_obj_set_align(ui_TempsLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_TempsLabel, "M: 0C | C: 0C");
+    lv_label_set_text(ui_TempsLabel, "M: 0°C | C: 0°C");
 
     ui_TripBody = lv_obj_create(ui_SecondaryStatContainer);
     lv_obj_remove_style_all(ui_TripBody);
