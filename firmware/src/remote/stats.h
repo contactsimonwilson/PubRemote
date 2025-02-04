@@ -14,11 +14,6 @@ typedef enum {
 } TempUnit;
 
 typedef enum {
-  TRIP_DISTANCE_UNIT_KM,
-  TRIP_DISTANCE_UNIT_MI
-} TripDistanceUnit;
-
-typedef enum {
   SWITCH_STATE_OFF,
   SWITCH_STATE_LEFT,
   SWITCH_STATE_RIGHT,
@@ -48,8 +43,6 @@ typedef struct {
   uint8_t remoteBatteryPercentage;
   // Board trip distance
   float tripDistance;
-  // Unit of board trip distance measure
-  TripDistanceUnit tripDistanceUnit;
   // Board motor temperature
   float motorTemp;
   // Board controller temperature
