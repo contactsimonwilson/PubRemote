@@ -196,6 +196,68 @@ static void update_primary_stat_display() {
   last_value = remoteStats.speed;
 }
 
+static char *get_board_state_string(BoardState state) {
+  switch (state) {
+  case BOARD_STATE_RUNNING_FLYWHEEL:
+    return "FLYWHEEL";
+  case BOARD_STATE_RUNNING_TILTBACK:
+    return "TILTBACK";
+  case BOARD_STATE_RUNNING_WHEELSLIP:
+    return "WHEELSLIP";
+  case BOARD_STATE_RUNNING_UPSIDEDOWN:
+    return "UPSIDEDOWN";
+  default:
+    return "";
+  }
+}
+
+static void update_board_state_text() {
+  static char *last_board_state_string = "";
+
+  char *formattedString;
+  asprintf(&formattedString, "%s", get_board_state_string(remoteStats.state));
+
+  if (!strcmp(last_board_state_string, formattedString)) {
+    free(formattedString);
+    return;
+  }
+
+  lv_label_set_text(ui_MessageText, formattedString);
+  memccpy(last_board_state_string, formattedString, 0, sizeof(formattedString));
+  free(formattedString);
+}
+
+static void update_header_display() {
+  static bool last_should_show_board_state = false;
+  bool should_show_board_state =
+      connection_state == CONNECTION_STATE_CONNECTED &&
+      (remoteStats.state == BOARD_STATE_RUNNING_FLYWHEEL || remoteStats.state == BOARD_STATE_RUNNING_TILTBACK ||
+       remoteStats.state == BOARD_STATE_RUNNING_UPSIDEDOWN || remoteStats.state == BOARD_STATE_RUNNING_WHEELSLIP);
+
+  if (should_show_board_state != last_should_show_board_state) {
+    if (should_show_board_state) {
+      // Show board state tex
+      lv_obj_add_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_MessageText, LV_OBJ_FLAG_HIDDEN);
+    }
+    else {
+      // Hide board state text
+      lv_obj_add_flag(ui_MessageText, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_RemoteIndicatorContainer, LV_OBJ_FLAG_HIDDEN);
+    }
+  }
+
+  if (should_show_board_state) {
+    update_board_state_text();
+  }
+  else {
+    update_remote_battery_display();
+    update_rssi_display();
+  }
+
+  last_should_show_board_state = should_show_board_state;
+}
+
 static void update_duty_cycle_display() {
   static float last_value = 0;
 
@@ -394,8 +456,7 @@ void update_stats_screen_display() {
 
     update_speed_dial_display();
     update_utilization_dial_display();
-    update_remote_battery_display();
-    update_rssi_display();
+    update_header_display();
     update_primary_stat_display();
     update_secondary_stat_display();
     update_board_battery_display();

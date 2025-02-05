@@ -1,6 +1,7 @@
 
 #ifndef __STATS_H
 #define __STATS_H
+#include "receiver.h"
 #include <stdio.h>
 
 typedef enum {
@@ -49,6 +50,8 @@ typedef struct {
   float controllerTemp;
   // RSSI
   int signalStrength;
+  // Main board state
+  BoardState state;
   // Footpad switch state
   SwitchState switchState;
 } RemoteStats;
