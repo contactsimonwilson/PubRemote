@@ -1,4 +1,5 @@
 #include "stats.h"
+#include "receiver.h"
 #include <screens/stats_screen.h>
 
 RemoteStats remoteStats;
@@ -21,6 +22,7 @@ static void reset_stats() {
   remoteStats.motorTemp = 0;
   remoteStats.controllerTemp = 0;
   remoteStats.signalStrength = -255;
+  remoteStats.state = BOARD_STATE_STARTUP;
   remoteStats.switchState = SWITCH_STATE_OFF;
 }
 

@@ -189,6 +189,7 @@ static void process_data(esp_now_event_t evt) {
     remoteStats.controllerTemp = fet_temp_filtered;
 
     uint8_t state = data[6];
+    remoteStats.state = state;
     uint8_t switch_state = data[7];
     remoteStats.switchState = switch_state;
 
