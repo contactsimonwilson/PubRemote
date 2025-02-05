@@ -248,16 +248,17 @@ static void update_temps_display() {
 
 static void update_trip_distance_display() {
   static float last_trip_distance_value = -1; // Set to -1 to force initial update
+  float new_trip_distance = remoteStats.tripDistance / 1000.0;
 
   // Ensure the value has changed
-  if (last_trip_distance_value == remoteStats.tripDistance) {
+  if (last_trip_distance_value == new_trip_distance) {
     return;
   }
 
-  float converted_val = remoteStats.tripDistance;
+  float converted_val = new_trip_distance;
 
   if (device_settings.distance_units == DISTANCE_UNITS_IMPERIAL) {
-    converted_val = convert_kph_to_mph(remoteStats.tripDistance);
+    converted_val = convert_kph_to_mph(new_trip_distance);
   }
 
   char distance_label[] = KILOMETERS_LABEL;
@@ -273,7 +274,7 @@ static void update_trip_distance_display() {
   free(formattedString);
 
   // Update the last value
-  last_trip_distance_value = remoteStats.tripDistance;
+  last_trip_distance_value = new_trip_distance;
 }
 
 static char *get_connection_state_label() {

@@ -194,6 +194,7 @@ static void process_data(esp_now_event_t evt) {
 
     float distance_abs;
     memcpy(&distance_abs, &data[17], sizeof(float));
+    remoteStats.tripDistance = distance_abs;
     uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
 
     int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
