@@ -129,6 +129,8 @@ function App() {
             </div>
           </div>
 
+          <hr/>
+
           <div className="rounded-lg bg-gray-900 p-6">
             <FloatAccessoriesSelector />
           </div>

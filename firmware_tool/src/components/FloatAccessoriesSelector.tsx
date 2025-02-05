@@ -16,6 +16,18 @@ export function FloatAccessoriesSelector() {
         }
       ],
       releaseType: ReleaseType.Release
+    },
+    {
+      version: "v2.5.0-preview3",
+      date: "2/5/2025",
+      variants: [
+        {
+          zipUrl: "/float_accessories/float_accessories-2.5-preview-3.vescpkg.zip",
+          date: "2/5/2025",
+          variant: "float_accessories-2.5-preview-3.vescpkg"
+        }
+      ],
+      releaseType: ReleaseType.Prerelease
     }
   ] as FirmwareVersion[];
 
@@ -70,6 +82,31 @@ export function FloatAccessoriesSelector() {
             width="fixed"
             dropdownWidth={400}
           />
+      </div>
+      <div className="space-y-4">
+        <div className="space-y-4 rounded-lg bg-gray-800/50 p-4">
+          <p>
+            A VESC Express package for controlling LEDs, BMS and Pubmote. To install:
+          </p>
+
+          <ul className="p-4" style={{listStyleType: "decimal"}}>
+            <li>
+              Select a build to download from the dropdown above
+            </li>
+            <li>
+              In VESC Tool, connect to your VESC Express and navigate to "VESC Packages"
+            </li>
+            <li>
+              Select "Load Custom"
+            </li>
+            <li>
+              Select the downloaded Float Accessories package
+            </li>
+            <li>
+              Install
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );
