@@ -49,6 +49,7 @@ extern lv_obj_t * ui_StatsBody;
 void ui_event_PrimaryStat(lv_event_t * e);
 extern lv_obj_t * ui_PrimaryStat;
 extern lv_obj_t * ui_PrimaryStatUnit;
+extern lv_obj_t * ui_SecondaryStatPaddingContainer;
 extern lv_obj_t * ui_SecondaryStatContainer;
 extern lv_obj_t * ui_ConnectionStateBody;
 extern lv_obj_t * ui_ConnectionStateLabel;

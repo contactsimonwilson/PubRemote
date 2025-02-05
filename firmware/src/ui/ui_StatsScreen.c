@@ -262,7 +262,19 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_add_flag(ui_PrimaryStatUnit, LV_OBJ_FLAG_FLOATING);     /// Flags
     lv_obj_set_style_text_font(ui_PrimaryStatUnit, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_SecondaryStatContainer = lv_obj_create(ui_StatsBody);
+    ui_SecondaryStatPaddingContainer = lv_obj_create(ui_StatsBody);
+    lv_obj_remove_style_all(ui_SecondaryStatPaddingContainer);
+    lv_obj_set_width(ui_SecondaryStatPaddingContainer, lv_pct(100));
+    lv_obj_set_height(ui_SecondaryStatPaddingContainer, LV_SIZE_CONTENT);    /// 50
+    lv_obj_set_align(ui_SecondaryStatPaddingContainer, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SecondaryStatPaddingContainer, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_clear_flag(ui_SecondaryStatPaddingContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_pad_left(ui_SecondaryStatPaddingContainer, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_SecondaryStatPaddingContainer, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_SecondaryStatPaddingContainer, -10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_SecondaryStatPaddingContainer, -20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_SecondaryStatContainer = lv_obj_create(ui_SecondaryStatPaddingContainer);
     lv_obj_remove_style_all(ui_SecondaryStatContainer);
     lv_obj_set_width(ui_SecondaryStatContainer, lv_pct(100));
     lv_obj_set_height(ui_SecondaryStatContainer, LV_SIZE_CONTENT);    /// 50
@@ -273,6 +285,10 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_clear_flag(ui_SecondaryStatContainer, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SCROLL_MOMENTUM);      /// Flags
     lv_obj_set_scrollbar_mode(ui_SecondaryStatContainer, LV_SCROLLBAR_MODE_ACTIVE);
     lv_obj_set_scroll_dir(ui_SecondaryStatContainer, LV_DIR_HOR);
+    lv_obj_set_style_pad_left(ui_SecondaryStatContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_SecondaryStatContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_SecondaryStatContainer, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_SecondaryStatContainer, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ConnectionStateBody = lv_obj_create(ui_SecondaryStatContainer);
     lv_obj_remove_style_all(ui_ConnectionStateBody);
@@ -354,7 +370,7 @@ void ui_StatsScreen_screen_init(void)
 
     ui_TripBody = lv_obj_create(ui_SecondaryStatContainer);
     lv_obj_remove_style_all(ui_TripBody);
-    lv_obj_set_width(ui_TripBody, lv_pct(75));
+    lv_obj_set_width(ui_TripBody, lv_pct(100));
     lv_obj_set_height(ui_TripBody, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_TripBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_TripBody, LV_FLEX_FLOW_COLUMN);
