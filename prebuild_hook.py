@@ -6,7 +6,7 @@ build_type = env["PIOENV"]
 
 major_version = 0
 minor_version = 0
-patch_version = 8
+patch_version = 9
 
 def generate_build_id():
     # Get current timestamp
