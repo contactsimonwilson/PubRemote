@@ -49,7 +49,7 @@
 void init_thumbstick();
 void init_buttons();
 void reset_button_state();
-void enable_power_button(bool enable); // TODO - disable while active
+void enable_power_button(bool enable);
 
 float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo, bool invert);
 
