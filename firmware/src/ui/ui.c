@@ -209,6 +209,7 @@ lv_obj_t * ui_UpdateButtonLabel;
 
 // SCREEN: ui_BMSScreen
 void ui_BMSScreen_screen_init(void);
+void ui_event_BMSScreen(lv_event_t * e);
 lv_obj_t * ui_BMSScreen;
 lv_obj_t * ui_BMSContent;
 lv_obj_t * ui_BMSHeader;
@@ -566,6 +567,18 @@ void ui_event_UpdateButton(lv_event_t * e)
 
     if(event_code == LV_EVENT_CLICKED) {
         update_button_press(e);
+    }
+}
+
+void ui_event_BMSScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        bms_screen_load_start(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        bms_screen_loaded(e);
     }
 }
 

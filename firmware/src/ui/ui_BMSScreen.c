@@ -133,5 +133,6 @@ void ui_BMSScreen_screen_init(void)
     lv_label_set_text(ui_BMSMainActionButtonLabel, "Back");
 
     lv_obj_add_event_cb(ui_BMSMainActionButton, ui_event_BMSMainActionButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_BMSScreen, ui_event_BMSScreen, LV_EVENT_ALL, NULL);
 
 }

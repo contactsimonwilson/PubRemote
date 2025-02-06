@@ -209,6 +209,7 @@ extern lv_obj_t * ui_UpdateButtonLabel;
 
 // SCREEN: ui_BMSScreen
 void ui_BMSScreen_screen_init(void);
+void ui_event_BMSScreen(lv_event_t * e);
 extern lv_obj_t * ui_BMSScreen;
 extern lv_obj_t * ui_BMSContent;
 extern lv_obj_t * ui_BMSHeader;
