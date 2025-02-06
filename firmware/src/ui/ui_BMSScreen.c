@@ -25,7 +25,7 @@ void ui_BMSScreen_screen_init(void)
     ui_BMSHeader = lv_obj_create(ui_BMSContent);
     lv_obj_remove_style_all(ui_BMSHeader);
     lv_obj_set_width(ui_BMSHeader, lv_pct(100));
-    lv_obj_set_height(ui_BMSHeader, lv_pct(25));
+    lv_obj_set_height(ui_BMSHeader, lv_pct(20));
     lv_obj_set_align(ui_BMSHeader, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_BMSHeader, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
@@ -34,12 +34,13 @@ void ui_BMSScreen_screen_init(void)
     lv_obj_set_height(ui_BMSHeaderLabel, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_BMSHeaderLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_BMSHeaderLabel, "BMS Info");
+    lv_obj_set_style_text_decor(ui_BMSHeaderLabel, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_BMSHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BMSBody = lv_obj_create(ui_BMSContent);
     lv_obj_remove_style_all(ui_BMSBody);
     lv_obj_set_width(ui_BMSBody, lv_pct(100));
-    lv_obj_set_height(ui_BMSBody, lv_pct(50));
+    lv_obj_set_height(ui_BMSBody, lv_pct(55));
     lv_obj_set_align(ui_BMSBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_BMSBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_BMSBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
