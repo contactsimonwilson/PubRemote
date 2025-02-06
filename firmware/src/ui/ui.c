@@ -206,6 +206,26 @@ lv_obj_t * ui_UpdateButton;
 lv_obj_t * ui_UpdateButtonLabel;
 // CUSTOM VARIABLES
 
+
+// SCREEN: ui_BMSScreen
+void ui_BMSScreen_screen_init(void);
+lv_obj_t * ui_BMSScreen;
+lv_obj_t * ui_BMSContent;
+lv_obj_t * ui_BMSHeader;
+lv_obj_t * ui_BMSHeaderLabel;
+lv_obj_t * ui_BMSBody;
+lv_obj_t * ui_BMSGroupHeadingLabel;
+lv_obj_t * ui_BMSDataLine;
+lv_obj_t * ui_BMSDataLabel;
+lv_obj_t * ui_BMSDataBar;
+lv_obj_t * ui_BMSDataValueBar;
+lv_obj_t * ui_BMSDataValueLabel;
+lv_obj_t * ui_BMSFooter;
+void ui_event_BMSMainActionButton(lv_event_t * e);
+lv_obj_t * ui_BMSMainActionButton;
+lv_obj_t * ui_BMSMainActionButtonLabel;
+// CUSTOM VARIABLES
+
 // EVENTS
 lv_obj_t * ui____initial_actions0;
 
@@ -546,6 +566,16 @@ void ui_event_UpdateButton(lv_event_t * e)
 
     if(event_code == LV_EVENT_CLICKED) {
         update_button_press(e);
+    }
+}
+
+void ui_event_BMSMainActionButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MenuScreen_screen_init);
+        bms_back(e);
     }
 }
 
