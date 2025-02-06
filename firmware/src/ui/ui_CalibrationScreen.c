@@ -237,6 +237,10 @@ void ui_CalibrationScreen_screen_init(void)
     lv_obj_set_align(ui_CalibrationStepLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_CalibrationStepLabel, "Press start to begin calibration");
     lv_obj_set_style_text_font(ui_CalibrationStepLabel, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_CalibrationStepLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_CalibrationStepLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_CalibrationStepLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_CalibrationStepLabel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_CalibrationFooter = lv_obj_create(ui_CalibrationContent);
     lv_obj_remove_style_all(ui_CalibrationFooter);
