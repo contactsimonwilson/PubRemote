@@ -218,10 +218,10 @@ void update_calibration_screen() {
       lv_obj_clear_flag(ui_StickFlags, LV_OBJ_FLAG_HIDDEN);
 
       if (calibration_data.invert_y) {
-        lv_obj_add_state(ui_InvertY, LV_STATE_CHECKED);
+        lv_obj_add_state(ui_InvertYSwitch, LV_STATE_CHECKED);
       }
       else {
-        lv_obj_clear_state(ui_InvertY, LV_STATE_CHECKED);
+        lv_obj_clear_state(ui_InvertYSwitch, LV_STATE_CHECKED);
       }
 
       break;
@@ -243,7 +243,9 @@ static void reset_calibration_data() {
   calibration_data.y_max = STICK_MAX_VAL;
   calibration_data.deadband = STICK_DEADBAND;
   calibration_data.expo = STICK_EXPO;
+  // calibration_data.invert_x = INVERT_X_AXIS;
   calibration_data.invert_y = INVERT_Y_AXIS;
+  // calibration_data.invert_xy = INVERT_XY_AXIS;
 }
 
 static void load_current_calibration_data() {
@@ -308,7 +310,7 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
     calibration_data.expo = expo;
   }
   else if (calibration_step == CALIBRATION_STEP_STICK_FLAGS) {
-    calibration_data.invert_y = lv_obj_has_state(ui_InvertY, LV_STATE_CHECKED);
+    calibration_data.invert_y = lv_obj_has_state(ui_InvertYSwitch, LV_STATE_CHECKED);
   }
   else if (calibration_step >= CALIBRATION_STEP_DONE) {
     calibration_settings = calibration_data;

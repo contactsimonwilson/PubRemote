@@ -5,8 +5,8 @@ import hashlib
 build_type = env["PIOENV"]
 
 major_version = 0
-minor_version = 0
-patch_version = 9
+minor_version = 1
+patch_version = 0
 
 def generate_build_id():
     # Get current timestamp

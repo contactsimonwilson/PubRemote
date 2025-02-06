@@ -51,9 +51,11 @@ void ui_CalibrationScreen_screen_init(void)
 
     ui_CalibrationStepContent = lv_obj_create(ui_CalibrationBody);
     lv_obj_remove_style_all(ui_CalibrationStepContent);
-    lv_obj_set_height(ui_CalibrationStepContent, 80);
     lv_obj_set_width(ui_CalibrationStepContent, lv_pct(100));
+    lv_obj_set_height(ui_CalibrationStepContent, lv_pct(90));
     lv_obj_set_align(ui_CalibrationStepContent, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_CalibrationStepContent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_CalibrationStepContent, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_add_flag(ui_CalibrationStepContent, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
     lv_obj_clear_flag(ui_CalibrationStepContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
@@ -62,43 +64,105 @@ void ui_CalibrationScreen_screen_init(void)
     lv_slider_set_value(ui_ExpoSlider, 10, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ExpoSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ui_ExpoSlider, 0, LV_ANIM_OFF);
     lv_obj_set_height(ui_ExpoSlider, 15);
-    lv_obj_set_width(ui_ExpoSlider, lv_pct(100));
+    lv_obj_set_width(ui_ExpoSlider, lv_pct(75));
     lv_obj_set_align(ui_ExpoSlider, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);     /// Flags
 
 
     ui_StickFlags = lv_obj_create(ui_CalibrationStepContent);
     lv_obj_remove_style_all(ui_StickFlags);
-    lv_obj_set_width(ui_StickFlags, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_StickFlags, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_width(ui_StickFlags, lv_pct(100));
+    lv_obj_set_height(ui_StickFlags, lv_pct(100));
     lv_obj_set_align(ui_StickFlags, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_StickFlags, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_StickFlags, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_flex_align(ui_StickFlags, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_add_flag(ui_StickFlags, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_StickFlags, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_pad_row(ui_StickFlags, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(ui_StickFlags, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_InvertX = lv_checkbox_create(ui_StickFlags);
-    lv_checkbox_set_text(ui_InvertX, "Invert X");
-    lv_obj_set_width(ui_InvertX, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_InvertX, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_InvertX, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_InvertX, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    ui_InvertXContainer = lv_obj_create(ui_StickFlags);
+    lv_obj_remove_style_all(ui_InvertXContainer);
+    lv_obj_set_width(ui_InvertXContainer, lv_pct(50));
+    lv_obj_set_height(ui_InvertXContainer, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_InvertXContainer, 9);
+    lv_obj_set_y(ui_InvertXContainer, -74);
+    lv_obj_set_align(ui_InvertXContainer, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_InvertXContainer, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_InvertXContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_InvertXContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_InvertXContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_InvertY = lv_checkbox_create(ui_StickFlags);
-    lv_checkbox_set_text(ui_InvertY, "Invert Y");
-    lv_obj_set_width(ui_InvertY, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_InvertY, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_InvertY, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_InvertY, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    ui_InvertXSwitch = lv_switch_create(ui_InvertXContainer);
+    lv_obj_set_height(ui_InvertXSwitch, 25);
+    lv_obj_set_width(ui_InvertXSwitch, lv_pct(50));
+    lv_obj_set_x(ui_InvertXSwitch, 12);
+    lv_obj_set_y(ui_InvertXSwitch, -10);
+    lv_obj_set_align(ui_InvertXSwitch, LV_ALIGN_CENTER);
 
-    ui_Swap_XY = lv_checkbox_create(ui_StickFlags);
-    lv_checkbox_set_text(ui_Swap_XY, "Swap XY");
-    lv_obj_set_width(ui_Swap_XY, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Swap_XY, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_Swap_XY, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Swap_XY, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+
+    ui_InvertXLabel = lv_label_create(ui_InvertXContainer);
+    lv_obj_set_width(ui_InvertXLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_InvertXLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_InvertXLabel, 6);
+    lv_obj_set_y(ui_InvertXLabel, -17);
+    lv_obj_set_align(ui_InvertXLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_InvertXLabel, "Invert X");
+
+    ui_InvertYContainer = lv_obj_create(ui_StickFlags);
+    lv_obj_remove_style_all(ui_InvertYContainer);
+    lv_obj_set_width(ui_InvertYContainer, lv_pct(50));
+    lv_obj_set_height(ui_InvertYContainer, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_InvertYContainer, 9);
+    lv_obj_set_y(ui_InvertYContainer, -74);
+    lv_obj_set_align(ui_InvertYContainer, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_InvertYContainer, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_InvertYContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_InvertYContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_InvertYSwitch = lv_switch_create(ui_InvertYContainer);
+    lv_obj_set_height(ui_InvertYSwitch, 25);
+    lv_obj_set_width(ui_InvertYSwitch, lv_pct(50));
+    lv_obj_set_x(ui_InvertYSwitch, 12);
+    lv_obj_set_y(ui_InvertYSwitch, -10);
+    lv_obj_set_align(ui_InvertYSwitch, LV_ALIGN_CENTER);
+
+
+    ui_InvertYLabel = lv_label_create(ui_InvertYContainer);
+    lv_obj_set_width(ui_InvertYLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_InvertYLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_InvertYLabel, 6);
+    lv_obj_set_y(ui_InvertYLabel, -17);
+    lv_obj_set_align(ui_InvertYLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_InvertYLabel, "Invert Y");
+
+    ui_InvertXYContainer = lv_obj_create(ui_StickFlags);
+    lv_obj_remove_style_all(ui_InvertXYContainer);
+    lv_obj_set_width(ui_InvertXYContainer, lv_pct(50));
+    lv_obj_set_height(ui_InvertXYContainer, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_InvertXYContainer, 9);
+    lv_obj_set_y(ui_InvertXYContainer, -74);
+    lv_obj_set_align(ui_InvertXYContainer, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_InvertXYContainer, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_InvertXYContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_InvertXYContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_InvertXYContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_InvertXYSwitch = lv_switch_create(ui_InvertXYContainer);
+    lv_obj_set_height(ui_InvertXYSwitch, 25);
+    lv_obj_set_width(ui_InvertXYSwitch, lv_pct(50));
+    lv_obj_set_x(ui_InvertXYSwitch, 12);
+    lv_obj_set_y(ui_InvertXYSwitch, -10);
+    lv_obj_set_align(ui_InvertXYSwitch, LV_ALIGN_CENTER);
+
+
+    ui_InvertXYLabel = lv_label_create(ui_InvertXYContainer);
+    lv_obj_set_width(ui_InvertXYLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_InvertXYLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_InvertXYLabel, 6);
+    lv_obj_set_y(ui_InvertXYLabel, -17);
+    lv_obj_set_align(ui_InvertXYLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_InvertXYLabel, "Invert XY");
 
     ui_CalibrationIndicatorContainer = lv_obj_create(ui_CalibrationStepContent);
     lv_obj_remove_style_all(ui_CalibrationIndicatorContainer);
@@ -175,6 +239,10 @@ void ui_CalibrationScreen_screen_init(void)
     lv_obj_set_align(ui_CalibrationStepLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_CalibrationStepLabel, "Press start to begin calibration");
     lv_obj_set_style_text_font(ui_CalibrationStepLabel, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_CalibrationStepLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_CalibrationStepLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_CalibrationStepLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_CalibrationStepLabel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_CalibrationFooter = lv_obj_create(ui_CalibrationContent);
     lv_obj_remove_style_all(ui_CalibrationFooter);

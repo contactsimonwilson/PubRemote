@@ -110,7 +110,6 @@ static void thumbstick_task(void *pvParameters) {
     int16_t x_min = calibration_settings.x_min;
     float expo = calibration_settings.expo;
     bool invert_y = calibration_settings.invert_y;
-
     esp_err_t read_err;
 #if JOYSTICK_X_ENABLED
     int x_value;
@@ -118,7 +117,7 @@ static void thumbstick_task(void *pvParameters) {
 
     if (read_err == ESP_OK) {
       joystick_data.x = x_value;
-      float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, invert_y);
+      float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, false);
       float curr_x = remote_data.data.js_x;
 
       if (new_x != curr_x) {
@@ -139,7 +138,7 @@ static void thumbstick_task(void *pvParameters) {
     if (read_err == ESP_OK) {
 
       joystick_data.y = y_value;
-      float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, false);
+      float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, invert_y);
       float curr_y = remote_data.data.js_y;
 
       if (new_y != curr_y) {

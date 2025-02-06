@@ -39,7 +39,9 @@ CalibrationSettings calibration_settings = {
     .y_center = STICK_MID_VAL,
     .deadband = STICK_DEADBAND,
     .expo = STICK_EXPO,
+    // .invert_x = INVERT_X_AXIS,
     .invert_y = INVERT_Y_AXIS,
+    // .invert_xy = INVERT_XY_AXIS,
 };
 
 PairingSettings pairing_settings = {
