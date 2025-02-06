@@ -250,6 +250,8 @@ void apply_ui_scale(lv_obj_t *element) {
 
 void reload_screens() {
   if (LVGL_lock(-1)) {
+    lv_obj_clean(ui_MenuScreen);
+    lv_obj_clean(ui_StatsScreen);
     ui_MenuScreen_screen_init();
     ui_StatsScreen_screen_init();
     apply_ui_scale(ui_StatsScreen);
