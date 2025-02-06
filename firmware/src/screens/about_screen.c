@@ -7,6 +7,12 @@
 
 static const char *TAG = "PUBREMOTE-ABOUT_SCREEN";
 
+// Set in env
+// Powershell: $env:PLATFORMIO_BUILD_FLAGS='-D RELEASE_VARIANT=\"release\"'
+#ifndef RELEASE_VARIANT
+  #define RELEASE_VARIANT "dev"
+#endif
+
 bool is_about_screen_active() {
   lv_obj_t *active_screen = lv_scr_act();
   return active_screen == ui_AboutScreen;
@@ -21,8 +27,8 @@ void about_screen_load_start(lv_event_t *e) {
     // set the version number
     char *formattedString;
 
-    asprintf(&formattedString, "Version: %d.%d.%d\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
-             BUILD_TYPE, BUILD_ID);
+    asprintf(&formattedString, "Version: %d.%d.%d.%s\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
+             RELEASE_VARIANT, BUILD_TYPE, BUILD_ID);
 
     lv_label_set_text(ui_VersionInfoLabel, formattedString);
 
