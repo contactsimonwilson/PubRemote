@@ -48,6 +48,9 @@ void about_screen_loaded(lv_event_t * e);
 void about_screen_unloaded(lv_event_t * e);
 void about_screen_load_start(lv_event_t * e);
 void update_button_press(lv_event_t * e);
+void bms_screen_load_start(lv_event_t * e);
+void bms_screen_loaded(lv_event_t * e);
+void bms_back(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/
