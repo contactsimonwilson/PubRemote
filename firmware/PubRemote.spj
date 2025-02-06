@@ -17144,7 +17144,7 @@
                             "flags": 18,
                             "strtype": "OBJECT/Size",
                             "intarray": [
-                              100,
+                              75,
                               15
                             ],
                             "InheritedType": 7
@@ -19480,13 +19480,13 @@
                         "InheritedType": 1
                       },
                       {
-                        "Flow": 0,
+                        "Flow": 1,
                         "Wrap": false,
                         "Reversed": false,
-                        "MainAlignment": 0,
-                        "CrossAlignment": 0,
-                        "TrackAlignment": 0,
-                        "LayoutType": 0,
+                        "MainAlignment": 1,
+                        "CrossAlignment": 1,
+                        "TrackAlignment": 1,
+                        "LayoutType": 1,
                         "nid": -498247392,
                         "strtype": "OBJECT/Layout_type",
                         "strval": "No_layout",
@@ -25314,7 +25314,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1257,
+    "backup_cnt": 1261,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",

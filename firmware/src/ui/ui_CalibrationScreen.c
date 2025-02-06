@@ -54,6 +54,8 @@ void ui_CalibrationScreen_screen_init(void)
     lv_obj_set_width(ui_CalibrationStepContent, lv_pct(100));
     lv_obj_set_height(ui_CalibrationStepContent, lv_pct(90));
     lv_obj_set_align(ui_CalibrationStepContent, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_CalibrationStepContent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_CalibrationStepContent, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_add_flag(ui_CalibrationStepContent, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
     lv_obj_clear_flag(ui_CalibrationStepContent, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
@@ -62,7 +64,7 @@ void ui_CalibrationScreen_screen_init(void)
     lv_slider_set_value(ui_ExpoSlider, 10, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ExpoSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ui_ExpoSlider, 0, LV_ANIM_OFF);
     lv_obj_set_height(ui_ExpoSlider, 15);
-    lv_obj_set_width(ui_ExpoSlider, lv_pct(100));
+    lv_obj_set_width(ui_ExpoSlider, lv_pct(75));
     lv_obj_set_align(ui_ExpoSlider, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ExpoSlider, LV_OBJ_FLAG_HIDDEN);     /// Flags
 
