@@ -202,3 +202,7 @@ def bms_back(event_struct):
 def bms_screen_load_start(event_struct):
     return
 
+
+def bms_screen_loaded(event_struct):
+    return
+
