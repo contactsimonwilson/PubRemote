@@ -6,28 +6,16 @@ import { Dropdown } from './ui/Dropdown';
 export function FloatAccessoriesSelector() {
   const versions = [
     {
-      version: "v2.4.0",
-      date: "1/20/2025",
+      version: "v2.5.0",
+      date: "2/6/2025",
       variants: [
         {
-          zipUrl: "/float_accessories/float_accessories-2.4.vescpkg.zip",
-          date: "1/20/2025",
-          variant: "float_accessories-2.4.vescpkg"
+          zipUrl: "/float_accessories/float_accessories-2.5.vescpkg.zip",
+          date: "2/6/2025",
+          variant: "float_accessories-2.5.vescpkg"
         }
       ],
       releaseType: ReleaseType.Release
-    },
-    {
-      version: "v2.5.0-preview3",
-      date: "2/5/2025",
-      variants: [
-        {
-          zipUrl: "/float_accessories/float_accessories-2.5-preview-3.vescpkg.zip",
-          date: "2/5/2025",
-          variant: "float_accessories-2.5-preview-3.vescpkg"
-        }
-      ],
-      releaseType: ReleaseType.Prerelease
     }
   ] as FirmwareVersion[];
 
