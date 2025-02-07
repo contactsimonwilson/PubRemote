@@ -67,7 +67,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: master
+          ref: feature/about-updates
+          # ref: master
 
       - uses: actions/cache@v4
         with:
@@ -94,7 +95,7 @@ jobs:
       - name: Attach ZIPs and Publish
         uses: softprops/action-gh-release@v2
         with: 
-          files: "*.zip"
+          files: "*.nightly.zip"
           name: "${{ env.TODAY }} Nightly Build"
           prerelease: true
           tag_name: "nightly"
