@@ -8,6 +8,12 @@
 #include <stdlib.h>
 #include <ui/ui.h>
 
+// Set in env
+// Powershell: $env:PLATFORMIO_BUILD_FLAGS='-D RELEASE_VARIANT=\"release\"'
+#ifndef RELEASE_VARIANT
+  #define RELEASE_VARIANT "dev"
+#endif
+
 static const char *TAG = "PUBREMOTE-ABOUT_SCREEN";
 
 bool is_about_screen_active() {
@@ -18,20 +24,14 @@ bool is_about_screen_active() {
 // Set version label string
 void update_version_info_label() {
   char *formattedString;
-#ifdef NIGHTLY_BUILD
-  asprintf(&formattedString, "Version: %d.%d.%d.nightly\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR,
-           VERSION_PATCH, truncate_string(BUILD_TYPE, 20, true), BUILD_ID);
-#else
-  asprintf(&formattedString, "Version: %d.%d.%d\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
-           truncate_string(BUILD_TYPE, 20, true), BUILD_ID);
-#endif
+  asprintf(&formattedString, "Version: %d.%d.%d.%s\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
+           RELEASE_VARIANT, truncate_string(BUILD_TYPE, 20, true), BUILD_ID);
   lv_label_set_text(ui_VersionInfoLabel, formattedString);
   free(formattedString);
 }
 
 void update_battery_percentage_label() {
   char *formattedString;
-  // Set the battery level
   asprintf(&formattedString, "Battery: %.2fV | %d%%", remoteStats.remoteBatteryVoltage,
            remoteStats.remoteBatteryPercentage);
   lv_label_set_text(ui_DebugInfoLabel, formattedString);

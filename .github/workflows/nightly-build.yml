@@ -2,8 +2,11 @@ name: Nightly Builds
 
 # Run every night at 11:30 PM
 on:
-  schedule:
-    - cron: "30 23 * * *" 
+  # schedule:
+  #   - cron: "30 23 * * *" 
+  push:
+    branches:
+      - feature/about-updates
 
 concurrency:
   group: ${{ github.workflow }}
@@ -17,7 +20,7 @@ permissions:
 # https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
   delete_old_release:
-    if: github.repository == 'contactsimonwilson/PubRemote'
+    # if: github.repository == 'contactsimonwilson/PubRemote'
     
     permissions:
       # Write permission is required to create a github release
@@ -52,7 +55,7 @@ jobs:
         run: sleep 2
          
   build_and_release:
-    if: github.repository == 'contactsimonwilson/PubRemote'
+    # if: github.repository == 'contactsimonwilson/PubRemote'
     needs: "delete_old_release"
     
     permissions:
@@ -81,7 +84,9 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: pio run -e avaspark_esp32s3_touch_128_nightly -e cowmote_esp32s3_tdisplay_143_nightly
+        run: pio run
+        env:
+          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"nightly\"'
 
       - name: Get Current Date
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV

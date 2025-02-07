@@ -28,7 +28,7 @@ def post_program_action(source, target, env):
     ZipFile.close()
 
 # Build if github is in the environment
-# TODO | Trigger on local environment flag as well
+# TODO | Optionally trigger on local environment flag as well
 if "GITHUB_ACTION" in os.environ:
     # Will only run if the build was not cached
     env.AddPostAction("buildprog", post_program_action)
