@@ -2120,8 +2120,7 @@
                             "InheritedType": 11
                           }
                         ],
-                        "saved_objtypeKey": "CONTAINER",
-                        "tree_closed": true
+                        "saved_objtypeKey": "CONTAINER"
                       },
                       {
                         "guid": "GUID80567878-979931S6903302",
@@ -15436,12 +15435,6 @@
                             "strval": "DEFAULT",
                             "childs": [
                               {
-                                "nid": 10440,
-                                "strtype": "_style/Text_Decor",
-                                "strval": "UNDERLINE",
-                                "InheritedType": 3
-                              },
-                              {
                                 "nid": 10450,
                                 "strtype": "_style/Text_Font",
                                 "strval": "Inter_Bold_14",
@@ -21468,12 +21461,6 @@
                             "strval": "DEFAULT",
                             "childs": [
                               {
-                                "nid": 10440,
-                                "strtype": "_style/Text_Decor",
-                                "strval": "UNDERLINE",
-                                "InheritedType": 3
-                              },
-                              {
                                 "nid": 10450,
                                 "strtype": "_style/Text_Font",
                                 "strval": "Inter_Bold_14",
@@ -23444,12 +23431,6 @@
                             "strtype": "_style/StyleState",
                             "strval": "DEFAULT",
                             "childs": [
-                              {
-                                "nid": 10440,
-                                "strtype": "_style/Text_Decor",
-                                "strval": "UNDERLINE",
-                                "InheritedType": 3
-                              },
                               {
                                 "nid": 1559699501,
                                 "strtype": "_style/Text_Font",
@@ -25498,7 +25479,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1269,
+    "backup_cnt": 1272,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "C_FILE",
