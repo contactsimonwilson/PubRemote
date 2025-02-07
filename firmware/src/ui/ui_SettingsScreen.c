@@ -26,7 +26,7 @@ void ui_SettingsScreen_screen_init(void)
     ui_SettingsHeader = lv_obj_create(ui_SettingsContent);
     lv_obj_remove_style_all(ui_SettingsHeader);
     lv_obj_set_width(ui_SettingsHeader, lv_pct(100));
-    lv_obj_set_height(ui_SettingsHeader, lv_pct(25));
+    lv_obj_set_height(ui_SettingsHeader, lv_pct(20));
     lv_obj_set_align(ui_SettingsHeader, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_SettingsHeader, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_SettingsHeader, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -111,7 +111,7 @@ void ui_SettingsScreen_screen_init(void)
     ui_SettingsBody = lv_obj_create(ui_SettingsContent);
     lv_obj_remove_style_all(ui_SettingsBody);
     lv_obj_set_width(ui_SettingsBody, lv_pct(100));
-    lv_obj_set_height(ui_SettingsBody, lv_pct(50));
+    lv_obj_set_height(ui_SettingsBody, lv_pct(55));
     lv_obj_set_align(ui_SettingsBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_SettingsBody, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_SettingsBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);

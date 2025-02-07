@@ -170,6 +170,7 @@ void calibration_task(void *pvParameters) {
 
       LVGL_unlock();
     }
+
     vTaskDelay(pdMS_TO_TICKS(LV_DISP_DEF_REFR_PERIOD));
   }
 
@@ -263,29 +264,33 @@ static void load_current_calibration_data() {
 // Event handlers
 void calibration_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Calibration screen load start");
+
   if (LVGL_lock(0)) {
     apply_ui_scale(NULL);
+
     LVGL_unlock();
   }
 }
 
 void calibration_screen_loaded(lv_event_t *e) {
+  ESP_LOGI(TAG, "Calibration screen loaded");
+
   calibration_step = 0;
   load_current_calibration_data();
   reset_min_max_data();
   deadband = STICK_DEADBAND;
   expo = STICK_EXPO;
   update_calibration_screen();
-  ESP_LOGI(TAG, "Calibration screen loaded");
 
-  // start task to update UI
+  // Start task to update UI
   xTaskCreate(calibration_task, "calibration_task", 4096, NULL, 2, NULL);
 }
 
 void calibration_screen_unloaded(lv_event_t *e) {
+  ESP_LOGI(TAG, "Calibration screen unloaded");
+
   calibration_step = 0;
   update_calibration_screen();
-  ESP_LOGI(TAG, "Calibration screen unloaded");
 }
 
 // Event handlers

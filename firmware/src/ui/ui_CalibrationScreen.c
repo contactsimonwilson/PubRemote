@@ -26,8 +26,10 @@ void ui_CalibrationScreen_screen_init(void)
     ui_CalibrationHeader = lv_obj_create(ui_CalibrationContent);
     lv_obj_remove_style_all(ui_CalibrationHeader);
     lv_obj_set_width(ui_CalibrationHeader, lv_pct(100));
-    lv_obj_set_height(ui_CalibrationHeader, lv_pct(25));
+    lv_obj_set_height(ui_CalibrationHeader, lv_pct(20));
     lv_obj_set_align(ui_CalibrationHeader, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_CalibrationHeader, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_CalibrationHeader, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_CalibrationHeader, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_CalibrationHeaderLabel = lv_label_create(ui_CalibrationHeader);
@@ -40,7 +42,7 @@ void ui_CalibrationScreen_screen_init(void)
     ui_CalibrationBody = lv_obj_create(ui_CalibrationContent);
     lv_obj_remove_style_all(ui_CalibrationBody);
     lv_obj_set_width(ui_CalibrationBody, lv_pct(100));
-    lv_obj_set_height(ui_CalibrationBody, lv_pct(50));
+    lv_obj_set_height(ui_CalibrationBody, lv_pct(55));
     lv_obj_set_align(ui_CalibrationBody, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_CalibrationBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_CalibrationBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
