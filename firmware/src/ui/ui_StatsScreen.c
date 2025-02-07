@@ -119,7 +119,7 @@ void ui_StatsScreen_screen_init(void)
     ui_StatsHeader = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsHeader);
     lv_obj_set_width(ui_StatsHeader, lv_pct(100));
-    lv_obj_set_height(ui_StatsHeader, lv_pct(25));
+    lv_obj_set_height(ui_StatsHeader, lv_pct(20));
     lv_obj_set_x(ui_StatsHeader, 69);
     lv_obj_set_y(ui_StatsHeader, -16);
     lv_obj_set_align(ui_StatsHeader, LV_ALIGN_CENTER);
@@ -233,7 +233,7 @@ void ui_StatsScreen_screen_init(void)
     ui_StatsBody = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsBody);
     lv_obj_set_width(ui_StatsBody, lv_pct(100));
-    lv_obj_set_height(ui_StatsBody, lv_pct(50));
+    lv_obj_set_height(ui_StatsBody, lv_pct(55));
     lv_obj_set_x(ui_StatsBody, 69);
     lv_obj_set_y(ui_StatsBody, -16);
     lv_obj_set_align(ui_StatsBody, LV_ALIGN_CENTER);

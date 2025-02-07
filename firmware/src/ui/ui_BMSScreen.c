@@ -34,7 +34,6 @@ void ui_BMSScreen_screen_init(void)
     lv_obj_set_height(ui_BMSHeaderLabel, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_BMSHeaderLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_BMSHeaderLabel, "BMS Info");
-    lv_obj_set_style_text_decor(ui_BMSHeaderLabel, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_BMSHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BMSBody = lv_obj_create(ui_BMSContent);

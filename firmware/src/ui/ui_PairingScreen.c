@@ -43,7 +43,6 @@ void ui_PairingScreen_screen_init(void)
     lv_obj_set_y(ui_PairingHeaderLabel, -102);
     lv_obj_set_align(ui_PairingHeaderLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_PairingHeaderLabel, "Pairing");
-    lv_obj_set_style_text_decor(ui_PairingHeaderLabel, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_PairingHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PairingBody = lv_obj_create(ui_PairingContent);
