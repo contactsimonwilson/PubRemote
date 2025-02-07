@@ -25,12 +25,6 @@ def post_program_action(source, target, env):
             release_variant = flag.split("=", 1)[1].strip('\\"')
             break
     
-    # * Debugging
-    if release_variant != "dev":
-        print(f"RELEASE_VARIANT: {release_variant}")
-    else:
-        print("RELEASE_VARIANT not found in build flags")
-
     # Build debugging
     print("Creating ZIP for release of " + env["PIOENV"] + ": " + env["PIOENV"] + "." + release_variant + ".zip")
     
@@ -51,4 +45,4 @@ if "GITHUB_ACTION" in os.environ:
     env.AddPostAction("buildprog", post_program_action)
 
 # Alternative that will always run
-env.AddPostAction("checkprogsize", post_program_action)
+# env.AddPostAction("checkprogsize", post_program_action)
