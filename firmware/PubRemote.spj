@@ -3013,7 +3013,7 @@
                     "strtype": "OBJECT/Size",
                     "intarray": [
                       100,
-                      20
+                      25
                     ],
                     "InheritedType": 7
                   },
@@ -5203,7 +5203,7 @@
                     "strtype": "OBJECT/Size",
                     "intarray": [
                       100,
-                      55
+                      50
                     ],
                     "InheritedType": 7
                   },
