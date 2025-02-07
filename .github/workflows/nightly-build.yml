@@ -2,11 +2,8 @@ name: Nightly Builds
 
 # Run every night at 11:30 PM
 on:
-  # schedule:
-  #   - cron: "30 23 * * *" 
-  push:
-    branches:
-      - feature/about-updates
+  schedule:
+    - cron: "30 23 * * *" 
 
 concurrency:
   group: ${{ github.workflow }}
@@ -20,7 +17,7 @@ permissions:
 # https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
   delete_old_release:
-    # if: github.repository == 'contactsimonwilson/PubRemote'
+    if: github.repository == 'contactsimonwilson/PubRemote'
     
     permissions:
       # Write permission is required to create a github release
@@ -55,7 +52,7 @@ jobs:
         run: sleep 2
          
   build_and_release:
-    # if: github.repository == 'contactsimonwilson/PubRemote'
+    if: github.repository == 'contactsimonwilson/PubRemote'
     needs: "delete_old_release"
     
     permissions:
@@ -67,8 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature/about-updates
-          # ref: master
+          ref: master
 
       - uses: actions/cache@v4
         with:
@@ -85,7 +81,7 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: pio run -e cowmote_esp32s3_tdisplay_143
+        run: pio run
         env:
           PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"nightly\"'
 
