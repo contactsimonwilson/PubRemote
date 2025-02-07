@@ -87,7 +87,7 @@ jobs:
       - name: Build PlatformIO Project
         run: pio run -e cowmote_esp32s3_tdisplay_143
         env:
-          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"nightly\"'
+          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT="nightly"'
 
       - name: Get Current Date
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV

@@ -14,16 +14,28 @@ def post_program_action(source, target, env):
         "bootloader.bin"
     ]
 
-    # Get release variant from env
-    RELEASE_VARIANT = "dev"
-    if "RELEASE_VARIANT" in os.environ:
-        RELEASE_VARIANT = os.environ.get("RELEASE_VARIANT")
+    # Get build flags for parsing
+    build_flags = env.get('BUILD_FLAGS', [])
+
+    # Retrieve current variant
+    release_variant = "dev"
+    for flag in build_flags:
+        if flag.startswith('-D RELEASE_VARIANT='):
+            # Extract the value after the equals sign
+            release_variant = flag.split('=', 1)[1].strip('"')
+            break
+    
+    # * Debugging
+    if release_variant != "dev":
+        print(f"RELEASE_VARIANT: {release_variant}")
+    else:
+        print("RELEASE_VARIANT not found in build flags")
 
     # Build debugging
-    print("Creating ZIP for release of " + env["PIOENV"] + ": " + env["PIOENV"] + "." + RELEASE_VARIANT + ".zip")
+    print("Creating ZIP for release of " + env["PIOENV"] + ": " + env["PIOENV"] + "." + release_variant + ".zip")
     
     # Create zip in the root of the directory
-    ZipFile = zipfile.ZipFile(project_dir + os.sep + env["PIOENV"] + "." + RELEASE_VARIANT + ".zip", "w" )
+    ZipFile = zipfile.ZipFile(project_dir + os.sep + env["PIOENV"] + "." + release_variant + ".zip", "w" )
         
     #  Zip relevant files
     for file in files_to_zip: 
@@ -39,4 +51,4 @@ if "GITHUB_ACTION" in os.environ:
     env.AddPostAction("buildprog", post_program_action)
 
 # Alternative that will always run
-# env.AddPostAction("checkprogsize", post_program_action)
+env.AddPostAction("checkprogsize", post_program_action)
