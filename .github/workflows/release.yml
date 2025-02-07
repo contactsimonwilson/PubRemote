@@ -46,7 +46,7 @@ jobs:
       - name: Build PlatformIO Project
         run: pio run
         env:
-          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"release\"'
+          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT="release"'
 
       - name: Attach ZIPs and Publish
         uses: softprops/action-gh-release@v2

@@ -17,8 +17,13 @@ def post_program_action(source, target, env):
     # Build debugging
     print("Creating ZIP for release of " + env["PIOENV"])
     
+    # Get release variant from env
+    RELEASE_VARIANT = "dev"
+    if "RELEASE_VARIANT" in os.environ:
+        RELEASE_VARIANT = os.environ.get("RELEASE_VARIANT")
+
     # Create zip in the root of the directory
-    ZipFile = zipfile.ZipFile(project_dir + os.sep + env["PIOENV"] + ".zip", "w" )
+    ZipFile = zipfile.ZipFile(project_dir + os.sep + env["PIOENV"] + "." + RELEASE_VARIANT + ".zip", "w" )
         
     #  Zip relevant files
     for file in files_to_zip: 
