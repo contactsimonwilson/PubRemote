@@ -2,8 +2,6 @@ Import("env")
 from datetime import datetime
 import hashlib
 
-build_type = env["PIOENV"]
-
 major_version = 0
 minor_version = 1
 patch_version = 1
@@ -29,6 +27,7 @@ def generate_build_id():
     return build_id
 
 # Add build ID to environment
+build_type = env["PIOENV"]
 build_id = generate_build_id()
 
 env.Append(BUILD_FLAGS=[f'-D BUILD_TYPE=\\"{build_type}\\"'])

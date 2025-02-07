@@ -1,48 +1,57 @@
 Import("env")
 import os
+import time
 import zipfile
 
-def post_program_action(source, target, env):
+def zip_build_files(source, target, env):
     # Define relevant paths
     project_dir = os.getcwd()
-    build_dir = os.path.join(project_dir, ".pio" + os.sep + "build")
+    build_dir = os.path.join(project_dir, f".pio{os.sep}build")
 
     # Define list of files to zip
     files_to_zip = [
-        "firmware.bin",
+        "bootloader.bin",
         "partitions.bin",
-        "bootloader.bin"
+        "firmware.bin"
     ]
 
     # Get build flags for parsing
     build_flags = env.get('BUILD_FLAGS', [])
 
-    # Retrieve current variant
+    # Retrieve build information
     release_variant = "dev"
+    version_major = 0
+    version_minor = 0
+    version_patch = 0
+
     for flag in build_flags:
         if "RELEASE_VARIANT=" in flag:
             # Extract the value after the equals sign
             release_variant = flag.split("=", 1)[1].strip('\\"')
-            break
+        elif "VERSION_MAJOR=" in flag:
+            # Extract the value after the equals sign
+            version_major = flag.split("=", 1)[1]
+        elif "VERSION_MINOR=" in flag:
+            # Extract the value after the equals sign
+            version_minor = flag.split("=", 1)[1]
+        elif "VERSION_PATCH=" in flag:
+            # Extract the value after the equals sign
+            version_patch = flag.split("=", 1)[1]
+
+    version_string = f"v{version_major}.{version_minor}.{version_patch}.{release_variant}"
     
     # Build debugging
-    print("Creating ZIP for release of " + env["PIOENV"] + ": " + env["PIOENV"] + "." + release_variant + ".zip")
+    print(f"Creating ZIP for release of {env['PIOENV']}: {env['PIOENV']}-{version_string}.zip")
     
     # Create zip in the root of the directory
-    ZipFile = zipfile.ZipFile(project_dir + os.sep + env["PIOENV"] + "." + release_variant + ".zip", "w" )
+    ZipFile = zipfile.ZipFile(f"{project_dir}{os.sep}{env['PIOENV']}-{version_string}.zip", "w" )
         
     #  Zip relevant files
     for file in files_to_zip: 
-        ZipFile.write(os.path.join(build_dir, env["PIOENV"], file), arcname=os.path.basename(file), compress_type=zipfile.ZIP_DEFLATED)
+        ZipFile.write(os.path.join(build_dir, env['PIOENV'], file), arcname=os.path.basename(file), compress_type=zipfile.ZIP_DEFLATED)
 
     # Close stream
     ZipFile.close()
 
-# Build if github is in the environment
-# TODO | Optionally trigger on local environment flag as well
-if "GITHUB_ACTION" in os.environ:
-    # Will only run if the build was not cached
-    env.AddPostAction("buildprog", post_program_action)
-
-# Alternative that will always run
-# env.AddPostAction("checkprogsize", post_program_action)
+# Add postbuild call
+env.AddPostAction("$BUILD_DIR/firmware.bin", zip_build_files)

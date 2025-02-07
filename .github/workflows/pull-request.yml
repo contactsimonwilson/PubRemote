@@ -37,3 +37,5 @@ jobs:
 
       - name: Build PlatformIO Project
         run: pio run -e waveshare_esp32s3_touch_128
+        env:
+          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"release\"'

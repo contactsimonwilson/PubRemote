@@ -51,7 +51,7 @@ jobs:
       - name: Attach ZIPs and Publish
         uses: softprops/action-gh-release@v2
         with: 
-          files: "*.release.zip"
+          files: "*.zip"
           prerelease: true
           fail_on_unmatched_files: true
           generate_release_notes: true
