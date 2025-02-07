@@ -91,7 +91,7 @@ jobs:
       - name: Attach ZIPs and Publish
         uses: softprops/action-gh-release@v2
         with: 
-          files: "*.nightly.zip"
+          files: "*.zip"
           name: "${{ env.TODAY }} Nightly Build"
           prerelease: true
           tag_name: "nightly"
