@@ -20,9 +20,9 @@ def post_program_action(source, target, env):
     # Retrieve current variant
     release_variant = "dev"
     for flag in build_flags:
-        if flag.startswith('-D RELEASE_VARIANT='):
+        if "RELEASE_VARIANT=" in flag:
             # Extract the value after the equals sign
-            release_variant = flag.split('=', 1)[1].strip('"')
+            release_variant = flag.split("=", 1)[1].strip('\\"')
             break
     
     # * Debugging
