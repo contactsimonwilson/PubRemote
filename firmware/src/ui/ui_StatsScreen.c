@@ -394,6 +394,32 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_align(ui_TripLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_TripLabel, "Trip: -");
 
+    ui_RemoteInputBody = lv_obj_create(ui_SecondaryStatContainer);
+    lv_obj_remove_style_all(ui_RemoteInputBody);
+    lv_obj_set_width(ui_RemoteInputBody, lv_pct(100));
+    lv_obj_set_height(ui_RemoteInputBody, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_RemoteInputBody, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_RemoteInputBody, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_RemoteInputBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_RemoteInputBody, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_RemoteInputBody,
+                      LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE |
+                      LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    lv_obj_set_style_pad_left(ui_RemoteInputBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_RemoteInputBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_RemoteInputBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_RemoteInputBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_RemoteInputBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_RemoteInputBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_RemoteInputLabel = lv_label_create(ui_RemoteInputBody);
+    lv_obj_set_width(ui_RemoteInputLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_RemoteInputLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_RemoteInputLabel, 19);
+    lv_obj_set_y(ui_RemoteInputLabel, 38);
+    lv_obj_set_align(ui_RemoteInputLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_RemoteInputLabel, "Input: -");
+
     ui_StatsFooter = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsFooter);
     lv_obj_set_width(ui_StatsFooter, lv_pct(100));

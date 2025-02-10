@@ -1,6 +1,8 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
 #include "remote/display.h"
+#include "remote/remoteinputs.h"
+#include "remote/settings.h"
 #include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>
@@ -309,7 +311,8 @@ static void update_temps_display() {
 }
 
 static void update_trip_distance_display() {
-  static float last_trip_distance_value = -1; // Set to -1 to force initial update
+  // Set to -1 to force initial update
+  static float last_trip_distance_value = -1;
   float new_trip_distance = remoteStats.tripDistance / 1000.0;
 
   // Ensure the value has changed
@@ -337,6 +340,35 @@ static void update_trip_distance_display() {
 
   // Update the last value
   last_trip_distance_value = new_trip_distance;
+}
+
+static void update_remote_inputs_display() {
+  // Set to -1 to force initial update
+  static float last_remote_input_value = -1;
+
+#if JOYSTICK_Y_ENABLED
+  float curr_y_val = convert_adc_to_axis(joystick_data.y, calibration_settings.y_min, calibration_settings.y_center,
+                                         calibration_settings.y_max, calibration_settings.deadband,
+                                         calibration_settings.expo, calibration_settings.invert_y);
+#else
+  float curr_y_val = 0;
+#endif
+
+  // Ensure the value has changed
+  if (last_remote_input_value == curr_y_val) {
+    return;
+  }
+
+  float converted_val = curr_y_val * 100;
+
+  // Update the displayed text
+  char *formattedString;
+  asprintf(&formattedString, "Input: %.0f%%", converted_val);
+  lv_label_set_text(ui_RemoteInputLabel, formattedString);
+  free(formattedString);
+
+  // Update the last value
+  last_remote_input_value = curr_y_val;
 }
 
 static char *get_connection_state_label() {
@@ -370,6 +402,7 @@ static void update_secondary_stat_display() {
       lv_obj_clear_flag(ui_DutyCycleBody, LV_OBJ_FLAG_HIDDEN);
       lv_obj_clear_flag(ui_TempsBody, LV_OBJ_FLAG_HIDDEN);
       lv_obj_clear_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_RemoteInputBody, LV_OBJ_FLAG_HIDDEN);
       lv_obj_scroll_to(ui_SecondaryStatContainer, connected_scroll_position, 0, LV_ANIM_OFF);
     }
     else {
@@ -378,6 +411,7 @@ static void update_secondary_stat_display() {
       lv_obj_add_flag(ui_DutyCycleBody, LV_OBJ_FLAG_HIDDEN);
       lv_obj_add_flag(ui_TempsBody, LV_OBJ_FLAG_HIDDEN);
       lv_obj_add_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_RemoteInputBody, LV_OBJ_FLAG_HIDDEN);
       lv_obj_scroll_to(ui_SecondaryStatContainer, 0, 0, LV_ANIM_OFF);
     }
 
@@ -389,6 +423,7 @@ static void update_secondary_stat_display() {
     update_duty_cycle_display();
     update_temps_display();
     update_trip_distance_display();
+    update_remote_inputs_display();
   }
 
   // Update the last value

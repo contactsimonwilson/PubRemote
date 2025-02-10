@@ -59,6 +59,8 @@ extern lv_obj_t * ui_TempsBody;
 extern lv_obj_t * ui_TempsLabel;
 extern lv_obj_t * ui_TripBody;
 extern lv_obj_t * ui_TripLabel;
+extern lv_obj_t * ui_RemoteInputBody;
+extern lv_obj_t * ui_RemoteInputLabel;
 void ui_event_StatsFooter(lv_event_t * e);
 extern lv_obj_t * ui_StatsFooter;
 extern lv_obj_t * ui_BoardBatteryDisplay;

@@ -111,6 +111,7 @@ static void thumbstick_task(void *pvParameters) {
     float expo = calibration_settings.expo;
     bool invert_y = calibration_settings.invert_y;
     esp_err_t read_err;
+
 #if JOYSTICK_X_ENABLED
     int x_value;
     read_err = adc_oneshot_read(x_adc_handle, JOYSTICK_X_ADC, &x_value);
@@ -128,7 +129,6 @@ static void thumbstick_task(void *pvParameters) {
     else {
       ESP_LOGE(TAG, "Error reading X axis: %d", read_err);
     }
-
 #endif
 
 #if JOYSTICK_Y_ENABLED
@@ -136,7 +136,6 @@ static void thumbstick_task(void *pvParameters) {
     read_err = adc_oneshot_read(y_adc_handle, JOYSTICK_Y_ADC, &y_value);
 
     if (read_err == ESP_OK) {
-
       joystick_data.y = y_value;
       float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, invert_y);
       float curr_y = remote_data.data.js_y;
@@ -149,7 +148,6 @@ static void thumbstick_task(void *pvParameters) {
     else {
       ESP_LOGE(TAG, "Error reading Y axis: %d", read_err);
     }
-
 #endif
 
     if (trigger_sleep_disrupt) {

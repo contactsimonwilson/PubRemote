@@ -53,6 +53,8 @@ lv_obj_t * ui_TempsBody;
 lv_obj_t * ui_TempsLabel;
 lv_obj_t * ui_TripBody;
 lv_obj_t * ui_TripLabel;
+lv_obj_t * ui_RemoteInputBody;
+lv_obj_t * ui_RemoteInputLabel;
 void ui_event_StatsFooter(lv_event_t * e);
 lv_obj_t * ui_StatsFooter;
 lv_obj_t * ui_BoardBatteryDisplay;
