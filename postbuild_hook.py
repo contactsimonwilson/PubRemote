@@ -1,6 +1,5 @@
 Import("env")
 import os
-import time
 import zipfile
 
 def zip_build_files(source, target, env):
