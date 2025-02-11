@@ -79,16 +79,19 @@ export function FloatAccessoriesSelector() {
 
           <ul className="p-4" style={{listStyleType: "decimal"}}>
             <li>
-              Select a build to download from the dropdown above
+              Select a build to download from the dropdown above and unzip it
             </li>
             <li>
-              In VESC Tool, connect to your VESC Express and navigate to "VESC Packages"
+              In VESC Tool, connect to your VESC Express
             </li>
             <li>
-              Select "Load Custom"
+              Navigate to "VESC Packages" on desktop, or "Package Store" on mobile
             </li>
             <li>
-              Select the downloaded Float Accessories package
+              Select "Load Custom" on desktop, or "..." &gt; "Install from file..." on mobile
+            </li>
+            <li>
+              Select the unzipped Float Accessories package (.vescpkg file)
             </li>
             <li>
               Install
