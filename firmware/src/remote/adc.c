@@ -40,7 +40,7 @@ static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_ha
     adc_cali_curve_fitting_config_t cali_config = {
         .unit_id = unit,
         .atten = atten,
-        .bitwidth = ADC_BITWIDTH_DEFAULT,
+        .bitwidth = ADC_BITWIDTH_12,
     };
     ret = adc_cali_create_scheme_curve_fitting(&cali_config, &handle);
     if (ret == ESP_OK) {
@@ -55,7 +55,7 @@ static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_ha
     adc_cali_line_fitting_config_t cali_config = {
         .unit_id = unit,
         .atten = atten,
-        .bitwidth = ADC_BITWIDTH_DEFAULT,
+        .bitwidth = ADC_BITWIDTH_12,
     };
     ret = adc_cali_create_scheme_line_fitting(&cali_config, &handle);
     if (ret == ESP_OK) {
