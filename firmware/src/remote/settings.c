@@ -142,68 +142,61 @@ esp_err_t init_settings() {
   }
 
   // Reading device settings
+  uint32_t temp_setting_value;
   device_settings.bl_level =
-      nvs_read_int("bl_level", &device_settings.bl_level) == ESP_OK ? device_settings.bl_level : BL_LEVEL_DEFAULT;
-  device_settings.auto_off_time = nvs_read_int("auto_off_time", &device_settings.auto_off_time) == ESP_OK
-                                      ? device_settings.auto_off_time
-                                      : DEFAULT_AUTO_OFF_TIME;
+      nvs_read_int("bl_level", &temp_setting_value) == ESP_OK ? (uint8_t)temp_setting_value : BL_LEVEL_DEFAULT;
+  device_settings.auto_off_time =
+      nvs_read_int("auto_off_time", &temp_setting_value) ? (AutoOffOptions)temp_setting_value : DEFAULT_AUTO_OFF_TIME;
 
-  device_settings.temp_units = nvs_read_int("temp_units", &device_settings.temp_units) == ESP_OK
-                                   ? device_settings.temp_units
-                                   : TEMP_UNITS_CELSIUS;
+  device_settings.temp_units =
+      nvs_read_int("temp_units", &temp_setting_value) == ESP_OK ? (TempUnits)temp_setting_value : TEMP_UNITS_CELSIUS;
 
-  device_settings.distance_units = nvs_read_int("distance_units", &device_settings.distance_units) == ESP_OK
-                                       ? device_settings.distance_units
+  device_settings.distance_units = nvs_read_int("distance_units", &temp_setting_value) == ESP_OK
+                                       ? (DistanceUnits)temp_setting_value
                                        : DISTANCE_UNITS_METRIC;
 
-  device_settings.startup_sound = nvs_read_int("startup_sound", &device_settings.startup_sound) == ESP_OK
-                                      ? device_settings.startup_sound
+  device_settings.startup_sound = nvs_read_int("startup_sound", &temp_setting_value) == ESP_OK
+                                      ? (StartupSoundOptions)temp_setting_value
                                       : STARTUP_SOUND_BEEP;
 
   device_settings.theme_color =
       nvs_read_int("theme_color", &device_settings.theme_color) == ESP_OK ? device_settings.theme_color : COLOR_PRIMARY;
 
   device_settings.dark_text =
-      nvs_read_int("dark_text", &device_settings.dark_text) == ESP_OK ? device_settings.dark_text : DARK_TEXT_DISABLED;
+      nvs_read_int("dark_text", &temp_setting_value) == ESP_OK ? (bool)temp_setting_value : DARK_TEXT_DISABLED;
 
   // Reading calibration settings
   calibration_settings.x_min =
-      nvs_read_int("x_min", &calibration_settings.x_min) == ESP_OK ? calibration_settings.x_min : STICK_MIN_VAL;
+      nvs_read_int("x_min", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_MIN_VAL;
   calibration_settings.x_max =
-      nvs_read_int("x_max", &calibration_settings.x_max) == ESP_OK ? calibration_settings.x_max : STICK_MAX_VAL;
+      nvs_read_int("x_max", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_MAX_VAL;
 
   calibration_settings.y_min =
-      nvs_read_int("y_min", &calibration_settings.y_min) == ESP_OK ? calibration_settings.y_min : STICK_MIN_VAL;
+      nvs_read_int("y_min", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_MIN_VAL;
 
   calibration_settings.y_max =
-      nvs_read_int("y_max", &calibration_settings.y_max) == ESP_OK ? calibration_settings.y_max : STICK_MAX_VAL;
+      nvs_read_int("y_max", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_MAX_VAL;
 
-  calibration_settings.x_center = nvs_read_int("x_center", &calibration_settings.x_center) == ESP_OK
-                                      ? calibration_settings.x_center
-                                      : STICK_MID_VAL;
+  calibration_settings.x_center =
+      nvs_read_int("x_center", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_MID_VAL;
 
-  calibration_settings.y_center = nvs_read_int("y_center", &calibration_settings.y_center) == ESP_OK
-                                      ? calibration_settings.y_center
-                                      : STICK_MID_VAL;
+  calibration_settings.y_center =
+      nvs_read_int("y_center", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_MID_VAL;
 
-  calibration_settings.deadband = nvs_read_int("deadband", &calibration_settings.deadband) == ESP_OK
-                                      ? calibration_settings.deadband
-                                      : STICK_DEADBAND;
+  calibration_settings.deadband =
+      nvs_read_int("deadband", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_DEADBAND;
 
-  int16_t expo = STICK_EXPO;
+  calibration_settings.expo = nvs_read_int("expo", &temp_setting_value) == ESP_OK
+                                  ? (float)(temp_setting_value / EXPO_ADJUST_FACTOR)
+                                  : STICK_EXPO;
 
-  calibration_settings.expo = nvs_read_int("expo", &expo) == ESP_OK ? (float)(expo / EXPO_ADJUST_FACTOR) : STICK_EXPO;
-
-  calibration_settings.invert_y = nvs_read_int("invert_y", &calibration_settings.invert_y) == ESP_OK
-                                      ? calibration_settings.invert_y
-                                      : INVERT_Y_AXIS;
+  calibration_settings.invert_y =
+      nvs_read_int("invert_y", &temp_setting_value) == ESP_OK ? (bool)temp_setting_value : INVERT_Y_AXIS;
 
   // Reading pairing settings
-  pairing_settings.secret_code =
-      nvs_read_int("secret_code", &pairing_settings.secret_code) == ESP_OK ? pairing_settings.secret_code : -1;
+  pairing_settings.secret_code = nvs_read_int("secret_code", &temp_setting_value) == ESP_OK ? temp_setting_value : -1;
 
-  pairing_settings.channel =
-      nvs_read_int("channel", &pairing_settings.channel) == ESP_OK ? pairing_settings.channel : 1;
+  pairing_settings.channel = nvs_read_int("channel", &temp_setting_value) == ESP_OK ? (uint8_t)temp_setting_value : 1;
 
   uint8_t remote_addr[ESP_NOW_ETH_ALEN];
   err = nvs_read_blob("remote_addr", &remote_addr, sizeof(remote_addr));

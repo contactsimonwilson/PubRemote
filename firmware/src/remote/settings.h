@@ -85,11 +85,11 @@ typedef struct {
 typedef struct {
   uint8_t bl_level;
   AutoOffOptions auto_off_time;
-  uint8_t temp_units;
-  uint8_t distance_units;
-  uint8_t startup_sound;
+  TempUnits temp_units;
+  DistanceUnits distance_units;
+  StartupSoundOptions startup_sound;
   uint32_t theme_color;
-  uint8_t dark_text;
+  bool dark_text;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();
