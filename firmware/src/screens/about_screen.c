@@ -25,7 +25,7 @@ bool is_about_screen_active() {
 void update_version_info_label() {
   char *formattedString;
   asprintf(&formattedString, "Version: %d.%d.%d.%s\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
-           RELEASE_VARIANT, truncate_string(BUILD_TYPE, 20, true), BUILD_ID);
+           RELEASE_VARIANT, BUILD_TYPE, BUILD_ID);
   lv_label_set_text(ui_VersionInfoLabel, formattedString);
   free(formattedString);
 }

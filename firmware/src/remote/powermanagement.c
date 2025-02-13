@@ -26,10 +26,25 @@ static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
   #define BAT_ADC_F 3
 #endif
 
-float convert_adc_to_battery_volts(int adc_value) {
-  // 0 - 4095 -> 0 - 255
-  float val = 3.3 / (1 << 12) * BAT_ADC_F * adc_value;
-  return roundf(val * 100) / 100;
+static esp_err_t init_battery_read() {
+  return adc_oneshot_config_channel(adc1_handle, BAT_ADC, &adc_channel_config);
+}
+
+static float get_battery_voltage() {
+#define NUM_SAMPLES 5
+  int32_t accumulated = 0;
+
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    int sample = 0;
+    int voltage_mv = 0;
+    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BAT_ADC, &sample));
+    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, sample, &voltage_mv));
+    accumulated += voltage_mv;
+    vTaskDelay(pdMS_TO_TICKS(1));
+  }
+
+  int battery_value = accumulated / NUM_SAMPLES;
+  return roundf(battery_value = 0.001f * battery_value * ((float)BAT_ADC_F) * 100.0f) / 100.0f;
 }
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
@@ -173,14 +188,15 @@ void reset_sleep_timer() {
 }
 
 void power_management_task(void *pvParameters) {
-  ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, BAT_ADC, &adc_channel_config));
+  ESP_ERROR_CHECK(init_battery_read());
   vTaskDelay(pdMS_TO_TICKS(1000));
+#define MIN_BATTERY_VOLTAGE 3.0
+#define MAX_BATTERY_VOLTAGE 4.2
 
   while (1) {
-    int battery_value = 0;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BAT_ADC, &battery_value));
-    remoteStats.remoteBatteryVoltage = convert_adc_to_battery_volts(battery_value);
-    float battery_percentage = (remoteStats.remoteBatteryVoltage - 3.0) / (4.2 - 3.0);
+    remoteStats.remoteBatteryVoltage = get_battery_voltage();
+    float battery_percentage =
+        (remoteStats.remoteBatteryVoltage - MIN_BATTERY_VOLTAGE) / (MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE);
     remoteStats.remoteBatteryPercentage = clampu8((uint8_t)(battery_percentage * 100), 0, 100);
     ESP_LOGD(TAG, "Battery volts: %.1f %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
     vTaskDelay(pdMS_TO_TICKS(1000));
