@@ -141,12 +141,13 @@ esp_err_t init_settings() {
     return err;
   }
 
-  // Reading device settings
+  // Temporary value to store read settings
   uint32_t temp_setting_value;
   device_settings.bl_level =
       nvs_read_int("bl_level", &temp_setting_value) == ESP_OK ? (uint8_t)temp_setting_value : BL_LEVEL_DEFAULT;
-  device_settings.auto_off_time =
-      nvs_read_int("auto_off_time", &temp_setting_value) ? (AutoOffOptions)temp_setting_value : DEFAULT_AUTO_OFF_TIME;
+  device_settings.auto_off_time = nvs_read_int("auto_off_time", &temp_setting_value) == ESP_OK
+                                      ? (AutoOffOptions)temp_setting_value
+                                      : DEFAULT_AUTO_OFF_TIME;
 
   device_settings.temp_units =
       nvs_read_int("temp_units", &temp_setting_value) == ESP_OK ? (TempUnits)temp_setting_value : TEMP_UNITS_CELSIUS;

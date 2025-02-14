@@ -88,22 +88,22 @@ void brightness_slider_change(lv_event_t *e) {
 
 void auto_off_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_AutoOffTime);
-  device_settings.auto_off_time = (uint8_t)(val & 0xFF);
+  device_settings.auto_off_time = (AutoOffOptions)(val & 0xFF);
 }
 
 void temp_units_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_TempUnits);
-  device_settings.temp_units = (uint8_t)(val & 0xFF);
+  device_settings.temp_units = (TempUnits)(val & 0xFF);
 }
 
 void distance_units_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_DistanceUnits);
-  device_settings.distance_units = (uint8_t)(val & 0xFF);
+  device_settings.distance_units = (DistanceUnits)(val & 0xFF);
 }
 
 void startup_sound_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_StartupSound);
-  device_settings.startup_sound = (uint8_t)(val & 0xFF);
+  device_settings.startup_sound = (StartupSoundOptions)(val & 0xFF);
 }
 
 void theme_color_picker_change(lv_event_t *e) {
