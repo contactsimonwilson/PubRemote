@@ -95,18 +95,15 @@ void ui_event_SettingsScreen(lv_event_t * e);
 lv_obj_t * ui_SettingsScreen;
 lv_obj_t * ui_SettingsContent;
 lv_obj_t * ui_SettingsHeader;
-lv_obj_t * ui_Selection1;
-lv_obj_t * ui_Selection2;
-lv_obj_t * ui_Selection3;
-lv_obj_t * ui_Selection4;
-lv_obj_t * ui_Selection5;
-lv_obj_t * ui_Selection6;
-lv_obj_t * ui_Selection7;
 lv_obj_t * ui_SettingsBody;
 lv_obj_t * ui_BrightnessBody;
 void ui_event_BrightnessSlider(lv_event_t * e);
 lv_obj_t * ui_BrightnessSlider;
 lv_obj_t * ui_BrightnessLabel;
+lv_obj_t * ui_RotationBody;
+void ui_event_Rotation(lv_event_t * e);
+lv_obj_t * ui_Rotation;
+lv_obj_t * ui_RotationLabel;
 lv_obj_t * ui_PowerBody;
 void ui_event_AutoOffTime(lv_event_t * e);
 lv_obj_t * ui_AutoOffTime;
@@ -223,8 +220,6 @@ lv_obj_t * ui_BMSHeader;
 lv_obj_t * ui_BMSHeaderLabel;
 lv_obj_t * ui_BMSBody;
 lv_obj_t * ui_BMSGroupHeadingLabel;
-lv_obj_t * ui_BMSDataLine;
-lv_obj_t * ui_BMSDataLabel;
 lv_obj_t * ui_BMSDataBar;
 lv_obj_t * ui_BMSDataValueBar;
 lv_obj_t * ui_BMSDataValueLabel;
@@ -410,6 +405,15 @@ void ui_event_BrightnessSlider(lv_event_t * e)
 
     if(event_code == LV_EVENT_VALUE_CHANGED) {
         brightness_slider_change(e);
+    }
+}
+
+void ui_event_Rotation(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        screen_rotation_change(e);
     }
 }
 

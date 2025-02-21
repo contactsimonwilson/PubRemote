@@ -206,3 +206,7 @@ def bms_screen_load_start(event_struct):
 def bms_screen_loaded(event_struct):
     return
 
+
+def screen_rotation_change(event_struct):
+    return
+

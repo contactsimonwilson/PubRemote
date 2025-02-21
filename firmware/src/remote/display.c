@@ -55,10 +55,7 @@
   #include "esp_lcd_touch_ft3168.h"
   #define TOUCH_ENABLED 1
 #endif
-
-#ifndef DISP_ROTATE
-  #define DISP_ROTATE 0
-#endif
+#include "display.h"
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
@@ -303,6 +300,10 @@ static void lv_touch_cb(lv_event_t *e) {
 
 #endif // TOUCH_ENABLED
 
+void set_rotation(ScreenRotation rot) {
+  lv_disp_set_rotation(lvgl_disp, (lv_disp_rot_t)rot);
+}
+
 static esp_err_t app_lvgl_init(void) {
   ESP_LOGI(TAG, "Initialize LVGL library");
 
@@ -367,7 +368,7 @@ static esp_err_t app_lvgl_init(void) {
   lvgl_disp->driver->rounder_cb = LVGL_port_rounder_callback;
 #endif
 
-  lv_disp_set_rotation(lvgl_disp, DISP_ROTATE);
+  set_rotation(device_settings.screen_rotation);
 
 #if TOUCH_ENABLED
   const lvgl_port_touch_cfg_t touch_cfg = {

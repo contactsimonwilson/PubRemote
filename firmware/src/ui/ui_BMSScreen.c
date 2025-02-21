@@ -10,6 +10,8 @@ void ui_BMSScreen_screen_init(void)
     ui_BMSScreen = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_BMSScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_add_event_cb(ui_BMSScreen, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_BMSScreen);
+    lv_obj_set_style_bg_color(ui_BMSScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_BMSScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_BMSScreen, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BMSContent = lv_obj_create(ui_BMSScreen);
@@ -53,31 +55,15 @@ void ui_BMSScreen_screen_init(void)
     lv_obj_set_style_pad_column(ui_BMSBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BMSGroupHeadingLabel = lv_label_create(ui_BMSBody);
-    lv_obj_set_width(ui_BMSGroupHeadingLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_width(ui_BMSGroupHeadingLabel, lv_pct(100));
     lv_obj_set_height(ui_BMSGroupHeadingLabel, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_BMSGroupHeadingLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_BMSGroupHeadingLabel, "Voltages");
 
-    ui_BMSDataLine = lv_obj_create(ui_BMSBody);
-    lv_obj_remove_style_all(ui_BMSDataLine);
-    lv_obj_set_width(ui_BMSDataLine, lv_pct(100));
-    lv_obj_set_height(ui_BMSDataLine, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_BMSDataLine, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_BMSDataLine, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_BMSDataLine, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
-    lv_obj_clear_flag(ui_BMSDataLine, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_BMSDataLabel = lv_label_create(ui_BMSDataLine);
-    lv_obj_set_width(ui_BMSDataLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_BMSDataLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_BMSDataLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_BMSDataLabel, "1");
-    lv_obj_set_style_text_font(ui_BMSDataLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_BMSDataBar = lv_obj_create(ui_BMSDataLine);
+    ui_BMSDataBar = lv_obj_create(ui_BMSBody);
     lv_obj_remove_style_all(ui_BMSDataBar);
     lv_obj_set_height(ui_BMSDataBar, 20);
-    lv_obj_set_width(ui_BMSDataBar, lv_pct(85));
+    lv_obj_set_width(ui_BMSDataBar, lv_pct(100));
     lv_obj_set_align(ui_BMSDataBar, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_BMSDataBar, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_BMSDataBar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
@@ -94,13 +80,13 @@ void ui_BMSScreen_screen_init(void)
     lv_obj_set_style_bg_color(ui_BMSDataValueBar, lv_color_hex(0x9F3A3A), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BMSDataValueBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_BMSDataValueLabel = lv_label_create(ui_BMSDataValueBar);
+    ui_BMSDataValueLabel = lv_label_create(ui_BMSDataBar);
     lv_obj_set_width(ui_BMSDataValueLabel, lv_pct(100));
     lv_obj_set_height(ui_BMSDataValueLabel, lv_pct(100));
     lv_obj_set_align(ui_BMSDataValueLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_BMSDataValueLabel, "1.0V");
+    lv_label_set_text(ui_BMSDataValueLabel, "C1: 1.0V");
     lv_obj_add_flag(ui_BMSDataValueLabel, LV_OBJ_FLAG_FLOATING);     /// Flags
-    lv_obj_set_style_text_align(ui_BMSDataValueLabel, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_BMSDataValueLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_BMSDataValueLabel, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui_BMSDataValueLabel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_BMSDataValueLabel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
