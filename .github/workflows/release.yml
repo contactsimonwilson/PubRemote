@@ -1,57 +1,129 @@
 name: Publish Release
 
-# Run on every semantic version tag
+# Runs on every update to the master branch with a change to the prebuild_hook.py
 on:
   push:
-    tags:
-      - "v*.*.*"
-
+    branches:
+      - master
+    paths:
+      - prebuild_hook.py
+        
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
-
+        
+# Required to create a GitHub release and tag
 permissions:
-  contents: read
-
+  contents: write
+        
 # References: 
 # https://github.com/softprops/action-gh-release
 # https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
-  build_and_release:
+  check_version_update:
     if: github.repository == 'contactsimonwilson/PubRemote'
-    
-    permissions:
-      # Write permission is required to create a github release
-      contents: write
+    runs-on: ubuntu-latest
+
+    outputs:
+      should_continue: ${{ steps.check_changes.outputs.should_continue }}
+      version_tag: ${{ steps.extract_version.outputs.version_tag }}
+              
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Identify Changed Version
+        id: check_changes
+        run: |
+          FILE="prebuild_hook.py"
+          LINES_TO_CHECK="5 6 7"
+
+          # Get the previous commit for comparison
+          PREV_COMMIT=$(git log --format="%H" -n 2 "$FILE" | tail -1)
+
+          echo "Comparing commits: $PREV_COMMIT -> HEAD"
+
+          if [ -z "$PREV_COMMIT" ]; then
+            echo "No previous commit found for comparison."
+            echo "should_continue=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check if lines 5, 6, or 7 changed
+          CHANGED=false
+          for LINE_NUMBER in $LINES_TO_CHECK; do
+            OLD_LINE=$(git show "$PREV_COMMIT":"$FILE" | sed -n "${LINE_NUMBER}p")
+            NEW_LINE=$(sed -n "${LINE_NUMBER}p" "$FILE")
+
+            if [ "$OLD_LINE" != "$NEW_LINE" ]; then
+              echo "Line $LINE_NUMBER changed: '$OLD_LINE' -> '$NEW_LINE'"
+              CHANGED=true
+            fi
+          done
+
+          if $CHANGED; then
+            echo "should_continue=true" >> $GITHUB_OUTPUT
+          else
+            echo "No relevant line changes detected. Exiting workflow."
+            echo "should_continue=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+      - name: Extract Version
+        id: extract_version
+        run: |
+          MAJOR=$(grep '^major_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
+          MINOR=$(grep '^minor_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
+          PATCH=$(grep '^patch_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
+          VERSION_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+
+          echo "Extracted Version: $VERSION_TAG"
+          echo "version_tag=$VERSION_TAG" >> $GITHUB_OUTPUT
+
+  build_and_release:
+    needs: check_version_update
+    if: needs.check_version_update.outputs.should_continue == 'true' && github.repository == 'contactsimonwilson/PubRemote'
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-            ~/.platformio/.cache
-          key: ${{ runner.os }}-pio
-          
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
+    - uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.platformio/.cache
+        key: ${{ runner.os }}-pio
 
-      - name: Install PlatformIO Core
-        run: pip install --upgrade platformio
+    - uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
 
-      - name: Build PlatformIO Project
-        run: pio run
-        env:
-          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"release\"'
+    - name: Install PlatformIO Core
+      run: pip install --upgrade platformio
 
-      - name: Attach ZIPs and Publish
-        uses: softprops/action-gh-release@v2
-        with: 
-          files: "*.zip"
-          prerelease: true
-          fail_on_unmatched_files: true
-          generate_release_notes: true
+    - name: Build PlatformIO Project
+      run: pio run
+      env:
+        PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"release\"'
+
+    - name: Create Git Tag
+      run: |
+        VERSION_TAG="${{ needs.check_version_update.outputs.version_tag }}"
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git tag "$VERSION_TAG"
+        git push origin "$VERSION_TAG"
+
+    - name: Attach ZIPs and Publish
+      uses: softprops/action-gh-release@v2
+      with: 
+        tag_name: ${{ needs.check_version_update.outputs.version_tag }}
+        files: "*.zip"
+        prerelease: true
+        fail_on_unmatched_files: true
+        generate_release_notes: true
+                              
