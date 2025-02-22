@@ -1,5 +1,6 @@
 #ifndef __SETTINGS_H
 #define __SETTINGS_H
+#include "display.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include <core/lv_obj.h>
@@ -84,6 +85,7 @@ typedef struct {
 
 typedef struct {
   uint8_t bl_level;
+  ScreenRotation screen_rotation;
   AutoOffOptions auto_off_time;
   TempUnits temp_units;
   DistanceUnits distance_units;

@@ -1,5 +1,6 @@
 #ifndef __DISPLAY_H
 #define __DISPLAY_H
+#include "esp_err.h"
 #include "lvgl.h"
 
 #define BASE_RES 240
@@ -20,6 +21,13 @@
   #define SCALE_PADDING 1
 #endif
 
+typedef enum {
+  SCREEN_ROTATION_0,
+  SCREEN_ROTATION_90,
+  SCREEN_ROTATION_180,
+  SCREEN_ROTATION_270,
+} ScreenRotation;
+
 void display_task(void *pvParameters);
 
 bool LVGL_lock(int timeout_ms);
@@ -27,4 +35,5 @@ void LVGL_unlock();
 void init_display();
 void deinit_display();
 void set_bl_level(uint8_t level);
+void set_rotation(ScreenRotation rot);
 #endif

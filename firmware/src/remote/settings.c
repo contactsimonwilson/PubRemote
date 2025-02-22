@@ -1,4 +1,5 @@
 #include "settings.h"
+#include "display.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
@@ -13,6 +14,7 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 #define STORAGE_NAMESPACE "nvs"
 #define BL_LEVEL_KEY "bl_level"
 #define BL_LEVEL_DEFAULT 200
+#define SCREEN_ROTATION_KEY "screen_rotation"
 #define AUTO_OFF_TIME_KEY "auto_off_time"
 #define EXPO_ADJUST_FACTOR 100 // Stored as 2dp int
 
@@ -22,6 +24,7 @@ static const DarkTextOptions DEFAULT_DARK_TEXT = DARK_TEXT_DISABLED;
 
 DeviceSettings device_settings = {
     .bl_level = BL_LEVEL_DEFAULT,
+    .screen_rotation = SCREEN_ROTATION_0,
     .auto_off_time = DEFAULT_AUTO_OFF_TIME,
     .temp_units = TEMP_UNITS_CELSIUS,
     .distance_units = DISTANCE_UNITS_METRIC,
@@ -75,6 +78,7 @@ uint64_t get_auto_off_ms() {
 
 void save_device_settings() {
   nvs_write_int(BL_LEVEL_KEY, device_settings.bl_level);
+  nvs_write_int(SCREEN_ROTATION_KEY, device_settings.screen_rotation);
   nvs_write_int(AUTO_OFF_TIME_KEY, device_settings.auto_off_time);
   nvs_write_int("temp_units", device_settings.temp_units);
   nvs_write_int("distance_units", device_settings.distance_units);
@@ -144,7 +148,12 @@ esp_err_t init_settings() {
   // Temporary value to store read settings
   uint32_t temp_setting_value;
   device_settings.bl_level =
-      nvs_read_int("bl_level", &temp_setting_value) == ESP_OK ? (uint8_t)temp_setting_value : BL_LEVEL_DEFAULT;
+      nvs_read_int(BL_LEVEL_KEY, &temp_setting_value) == ESP_OK ? (uint8_t)temp_setting_value : BL_LEVEL_DEFAULT;
+
+  device_settings.screen_rotation = nvs_read_int(SCREEN_ROTATION_KEY, &temp_setting_value) == ESP_OK
+                                        ? (uint8_t)temp_setting_value
+                                        : SCREEN_ROTATION_0;
+
   device_settings.auto_off_time = nvs_read_int("auto_off_time", &temp_setting_value) == ESP_OK
                                       ? (AutoOffOptions)temp_setting_value
                                       : DEFAULT_AUTO_OFF_TIME;

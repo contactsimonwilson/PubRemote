@@ -47,6 +47,9 @@ void settings_screen_load_start(lv_event_t *e) {
     // Brightness
     lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
 
+    // Screen rotation
+    lv_dropdown_set_selected(ui_Rotation, device_settings.screen_rotation);
+
     // Auto off time
     lv_dropdown_set_selected(ui_AutoOffTime, device_settings.auto_off_time);
 
@@ -65,6 +68,21 @@ void settings_screen_load_start(lv_event_t *e) {
     // Dark text
     if (device_settings.dark_text == DARK_TEXT_ENABLED) {
       lv_obj_add_state(ui_DarkText, LV_STATE_CHECKED);
+    }
+
+    uint32_t total_items = lv_obj_get_child_cnt(ui_SettingsBody);
+
+    for (uint32_t i = 0; i < total_items; i++) {
+      uint8_t bg_opacity = i == 0 ? 255 : 100;
+      lv_obj_t *item = lv_obj_create(ui_SettingsHeader);
+      lv_obj_remove_style_all(item);
+      lv_obj_set_width(item, 10 * SCALE_FACTOR);
+      lv_obj_set_height(item, 10 * SCALE_FACTOR);
+      lv_obj_set_align(item, LV_ALIGN_CENTER);
+      lv_obj_clear_flag(item, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
+      lv_obj_set_style_radius(item, 5 * SCALE_FACTOR, LV_PART_MAIN | LV_STATE_DEFAULT);
+      lv_obj_set_style_bg_color(item, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+      lv_obj_set_style_bg_opa(item, bg_opacity, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
 
     LVGL_unlock();
@@ -129,6 +147,13 @@ void dark_text_switch_change(lv_event_t *e) {
   lv_scr_load(ui_SettingsScreen);
   settings_screen_load_start(NULL);
   lv_obj_scroll_to(ui_SettingsBody, scroll_x, 0, LV_ANIM_OFF); // No animation
+}
+
+void screen_rotation_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_Rotation);
+  uint8_t new_val = (val % 4);
+  device_settings.screen_rotation = (ScreenRotation)new_val;
+  set_rotation(device_settings.screen_rotation);
 }
 
 void settings_save(lv_event_t *e) {
