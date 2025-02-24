@@ -212,18 +212,26 @@ static char *get_board_state_string(BoardState state) {
 }
 
 static void update_board_state_text() {
-  static char *last_board_state_string = "";
+  static char *last_board_state_string = NULL;
 
   char *formattedString;
   asprintf(&formattedString, "%s", get_board_state_string(remoteStats.state));
 
-  if (!strcmp(last_board_state_string, formattedString)) {
+  // First time initialization
+  if (last_board_state_string == NULL) {
+    last_board_state_string = strdup(formattedString);
+    lv_label_set_text(ui_MessageText, formattedString);
     free(formattedString);
     return;
   }
 
-  lv_label_set_text(ui_MessageText, formattedString);
-  memccpy(last_board_state_string, formattedString, 0, sizeof(formattedString));
+  // Compare and update if different
+  if (strcmp(last_board_state_string, formattedString) != 0) {
+    free(last_board_state_string);
+    last_board_state_string = strdup(formattedString);
+    lv_label_set_text(ui_MessageText, formattedString);
+  }
+
   free(formattedString);
 }
 
