@@ -30,7 +30,7 @@ jobs:
         with:
           ref: master
 
-      - name: Check for Tag
+      - name: Check for Tag 
         id: check_for_tag
         run: |
           TAG_NAME="nightly"
