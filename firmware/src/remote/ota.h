@@ -24,5 +24,8 @@ typedef struct {
 } ota_state_t;
 
 void init_ota();
+void teardown_ota();
+int ota_get_progress(void);
+bool ota_is_updating(void);
 
 #endif

@@ -423,8 +423,82 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_top(ui_BoardBatteryDisplay, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_BoardBatteryDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_StatsPanel = lv_obj_create(ui_StatsScreen);
+    lv_obj_set_width(ui_StatsPanel, lv_pct(100));
+    lv_obj_set_height(ui_StatsPanel, lv_pct(100));
+    lv_obj_set_align(ui_StatsPanel, LV_ALIGN_BOTTOM_MID);
+    lv_obj_add_flag(ui_StatsPanel, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_StatsPanel, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_StatsTabView = lv_tabview_create(ui_StatsPanel, LV_DIR_TOP, 30);
+    lv_obj_set_width(ui_StatsTabView, lv_pct(100));
+    lv_obj_set_height(ui_StatsTabView, lv_pct(100));
+    lv_obj_set_align(ui_StatsTabView, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_StatsTabView, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+
+    ui_StatsTab = lv_tabview_add_tab(ui_StatsTabView, "Stats");
+
+    ui_BMSTab = lv_tabview_add_tab(ui_StatsTabView, "BMS");
+
+    ui_BMSBody = lv_obj_create(ui_BMSTab);
+    lv_obj_remove_style_all(ui_BMSBody);
+    lv_obj_set_width(ui_BMSBody, lv_pct(100));
+    lv_obj_set_height(ui_BMSBody, lv_pct(55));
+    lv_obj_set_align(ui_BMSBody, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_BMSBody, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_BMSBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_BMSBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_clear_flag(ui_BMSBody, LV_OBJ_FLAG_CLICKABLE);      /// Flags
+    lv_obj_set_style_pad_left(ui_BMSBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_BMSBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_BMSBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_BMSBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_BMSBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_BMSBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_BMSGroupHeadingLabel = lv_label_create(ui_BMSBody);
+    lv_obj_set_width(ui_BMSGroupHeadingLabel, lv_pct(100));
+    lv_obj_set_height(ui_BMSGroupHeadingLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_BMSGroupHeadingLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_BMSGroupHeadingLabel, "Voltages");
+
+    ui_BMSDataBar = lv_obj_create(ui_BMSBody);
+    lv_obj_remove_style_all(ui_BMSDataBar);
+    lv_obj_set_height(ui_BMSDataBar, 20);
+    lv_obj_set_width(ui_BMSDataBar, lv_pct(100));
+    lv_obj_set_align(ui_BMSDataBar, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_BMSDataBar, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_BMSDataBar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+    lv_obj_clear_flag(ui_BMSDataBar, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_BMSDataBar, lv_color_hex(0x373737), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_BMSDataBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_BMSDataValueBar = lv_obj_create(ui_BMSDataBar);
+    lv_obj_remove_style_all(ui_BMSDataValueBar);
+    lv_obj_set_width(ui_BMSDataValueBar, lv_pct(50));
+    lv_obj_set_height(ui_BMSDataValueBar, lv_pct(100));
+    lv_obj_set_align(ui_BMSDataValueBar, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_BMSDataValueBar, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_BMSDataValueBar, lv_color_hex(0x9F3A3A), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_BMSDataValueBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_BMSDataValueLabel = lv_label_create(ui_BMSDataBar);
+    lv_obj_set_width(ui_BMSDataValueLabel, lv_pct(100));
+    lv_obj_set_height(ui_BMSDataValueLabel, lv_pct(100));
+    lv_obj_set_align(ui_BMSDataValueLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_BMSDataValueLabel, "C1: 1.0V");
+    lv_obj_add_flag(ui_BMSDataValueLabel, LV_OBJ_FLAG_FLOATING);     /// Flags
+    lv_obj_set_style_text_align(ui_BMSDataValueLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_BMSDataValueLabel, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_BMSDataValueLabel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_BMSDataValueLabel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_BMSDataValueLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_BMSDataValueLabel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_add_event_cb(ui_PrimaryStat, ui_event_PrimaryStat, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsFooter, ui_event_StatsFooter, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_StatsPanel, ui_event_StatsPanel, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsScreen, ui_event_StatsScreen, LV_EVENT_ALL, NULL);
 
 }

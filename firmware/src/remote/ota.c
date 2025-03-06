@@ -1,8 +1,9 @@
 #include "ota.h"
+#include "esp_netif.h"
 #include "ota_http.h"
-#include "ota_wifi.h"
+#include <esp_netif_types.h>
 
-static const char *TAG = "PUBREMOTE-OTA";
+static const char *TAG = "PUBMOTE-OTA";
 
 static ota_state_t ota_state = {.in_progress = false,
                                 .total_size = 0,
@@ -352,7 +353,7 @@ static esp_err_t ota_update_handler(httpd_req_t *req) {
 }
 
 // Register HTTP server handlers for OTA
-void ota_register_handlers(httpd_handle_t server) {
+static void ota_register_handlers(httpd_handle_t server) {
   // Handler for OTA UI webpage
   httpd_uri_t ota_get = {.uri = "/update", .method = HTTP_GET, .handler = ota_get_handler, .user_ctx = NULL};
   httpd_register_uri_handler(server, &ota_get);
@@ -374,17 +375,47 @@ bool ota_is_updating(void) {
   return ota_state.in_progress;
 }
 
-void init_ota() {
-  wifi_init_sta();
+static void print_ip_info(void) {
+  esp_netif_t *netif = NULL;
+  esp_netif_ip_info_t ip_info;
 
+  // For Station mode
+  netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+  if (netif) {
+    ESP_ERROR_CHECK(esp_netif_get_ip_info(netif, &ip_info));
+    ESP_LOGI("WIFI", "STA IP: " IPSTR, IP2STR(&ip_info.ip));
+    ESP_LOGI("WIFI", "STA MASK: " IPSTR, IP2STR(&ip_info.netmask));
+    ESP_LOGI("WIFI", "STA GW: " IPSTR, IP2STR(&ip_info.gw));
+  }
+
+  // For AP mode
+  netif = esp_netif_get_handle_from_ifkey("WIFI_AP_DEF");
+  if (netif) {
+    ESP_ERROR_CHECK(esp_netif_get_ip_info(netif, &ip_info));
+    ESP_LOGI("WIFI", "AP IP: " IPSTR, IP2STR(&ip_info.ip));
+    ESP_LOGI("WIFI", "AP MASK: " IPSTR, IP2STR(&ip_info.netmask));
+    ESP_LOGI("WIFI", "AP GW: " IPSTR, IP2STR(&ip_info.gw));
+  }
+}
+
+static httpd_handle_t server;
+
+void init_ota() {
   // Start the web server
-  httpd_handle_t server = start_webserver();
+  server = start_webserver();
   if (server) {
     ota_register_handlers(server);
     // Get current firmware version (optional)
     const esp_app_desc_t *app_desc = esp_app_get_description();
     ESP_LOGI(TAG, "Running firmware version: %s", app_desc->version);
-
     ESP_LOGI(TAG, "OTA ready! Open http://[device-ip]/update in your browser");
+    // print_ip_info();
+  }
+}
+
+void teardown_ota() {
+  if (server) {
+    stop_webserver(server);
+    server = NULL;
   }
 }

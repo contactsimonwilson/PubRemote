@@ -1,7 +1,7 @@
 #include "ota_http.h"
 #include "esp_log.h"
 
-static const char *TAG = "PUBREMOTE-OTA_HTTP";
+static const char *TAG = "PUBMOTE-OTA_HTTP";
 
 /* Simple HTTP server handler for root path */
 static esp_err_t root_get_handler(httpd_req_t *req) {
@@ -35,4 +35,10 @@ httpd_handle_t start_webserver() {
 
   ESP_LOGI(TAG, "Error starting server!");
   return NULL;
+}
+
+void stop_webserver(httpd_handle_t server) {
+  // Stop the HTTP server
+  httpd_stop(server);
+  ESP_LOGI(TAG, "Server stopped");
 }

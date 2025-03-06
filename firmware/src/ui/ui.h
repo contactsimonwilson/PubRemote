@@ -62,6 +62,16 @@ extern lv_obj_t * ui_TripLabel;
 void ui_event_StatsFooter(lv_event_t * e);
 extern lv_obj_t * ui_StatsFooter;
 extern lv_obj_t * ui_BoardBatteryDisplay;
+void ui_event_StatsPanel(lv_event_t * e);
+extern lv_obj_t * ui_StatsPanel;
+extern lv_obj_t * ui_StatsTabView;
+extern lv_obj_t * ui_StatsTab;
+extern lv_obj_t * ui_BMSTab;
+extern lv_obj_t * ui_BMSBody;
+extern lv_obj_t * ui_BMSGroupHeadingLabel;
+extern lv_obj_t * ui_BMSDataBar;
+extern lv_obj_t * ui_BMSDataValueBar;
+extern lv_obj_t * ui_BMSDataValueLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_MenuScreen
@@ -209,24 +219,6 @@ extern lv_obj_t * ui_AboutMainActionButtonLabel;
 void ui_event_UpdateButton(lv_event_t * e);
 extern lv_obj_t * ui_UpdateButton;
 extern lv_obj_t * ui_UpdateButtonLabel;
-// CUSTOM VARIABLES
-
-// SCREEN: ui_BMSScreen
-void ui_BMSScreen_screen_init(void);
-void ui_event_BMSScreen(lv_event_t * e);
-extern lv_obj_t * ui_BMSScreen;
-extern lv_obj_t * ui_BMSContent;
-extern lv_obj_t * ui_BMSHeader;
-extern lv_obj_t * ui_BMSHeaderLabel;
-extern lv_obj_t * ui_BMSBody;
-extern lv_obj_t * ui_BMSGroupHeadingLabel;
-extern lv_obj_t * ui_BMSDataBar;
-extern lv_obj_t * ui_BMSDataValueBar;
-extern lv_obj_t * ui_BMSDataValueLabel;
-extern lv_obj_t * ui_BMSFooter;
-void ui_event_BMSMainActionButton(lv_event_t * e);
-extern lv_obj_t * ui_BMSMainActionButton;
-extern lv_obj_t * ui_BMSMainActionButtonLabel;
 // CUSTOM VARIABLES
 
 // EVENTS
