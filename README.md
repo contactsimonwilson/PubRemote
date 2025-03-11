@@ -57,7 +57,7 @@ To ensure you can get your PubRemote paired and running, follow these simple ste
     - Ensure this is checked
     - Save and restart as necessary
 4. Launch Pubmote pairing
-    - On the Pubmote, navigate to the settings menu
+    - On the Pubmote, navigate to the settings menu by swiping down from the top of the main screen
     - Select "Pairing" and start the pairing on the Pubmote
 5. Launch VESC Express Pubmote pairing
     - Navigate to App UI > Config > Pair Pubmote
