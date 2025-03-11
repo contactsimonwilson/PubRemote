@@ -51,7 +51,7 @@ To ensure you can get your PubRemote paired and running, follow these simple ste
     - Download a relatively recent build from [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz) and install using the VESC Tool custom package installer
 2. Configure your VESC Express wifi settings
     - Navigate to VESC Express > WiFi > WiFi Mode
-    - Set this to "Station"
+    - Set this to "Access Point"
 3. Configure your VESC Express Float Accessories settings
     - Navigate to App UI > Settings > Pubmote Enabled
     - Ensure this is checked
