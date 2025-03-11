@@ -64,3 +64,13 @@ To ensure you can get your PubRemote paired and running, follow these simple ste
 6. Confirm the pairing code on both the Pubmote and VESC Express
 
 You should now be connected!
+
+## Package-Side Setup
+
+On Refloat:
+1. Navigate to Refloat Cfg > Remote
+2. Ensure Remote Type is set to "UART"
+3. Ensure Tiltback Angle Limit is above 0 degrees
+4. Ensure Tiltback Speed is above 0 degrees/second
+5. Ensure Input Deadband is below 100%, but at least 1%.
+6. Set Throttle Current Maximum to 0, unless you intend to use remote throttle for fun
