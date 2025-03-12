@@ -97,29 +97,25 @@ jobs:
           cp .pio/build/${{ needs.check-comment.outputs.build_value }}/firmware.bin .
           zip BUILD.zip bootloader.bin partitions.bin firmware.bin
 
-      # Upload the ZIP file as a reply to the PR comment
-      - name: Attach ZIPs and reply with comment
+      # Upload the ZIP file as an artifact
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: BUILD.zip
+
+      # Reply to the PR comment with a link to the artifacts
+      - name: Reply to PR comment
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
             const { issue: { number: issue_number }, repository: { owner: { login: owner }, name: repo } } = context.payload;
             const comment_id = context.payload.comment.id;
-            const zipPath = 'BUILD.zip';
 
-            // Upload the ZIP file as an artifact
-            const { data: upload } = await github.rest.actions.uploadArtifact({
-              owner,
-              repo,
-              artifact_id: issue_number,
-              name: 'build-artifacts',
-              file: fs.createReadStream(zipPath),
-            });
-
-            // Reply to the PR comment with the ZIP file link
+            // Reply to the PR comment with a link to the artifacts
             await github.rest.issues.createComment({
               owner,
               repo,
               issue_number,
-              body: `Build completed successfully! 🎉\n\nDownload the build artifacts: [BUILD.zip](https://github.com/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${upload.id})`,
+              body: `Build completed successfully! 🎉\n\nDownload the build artifacts: [BUILD.zip](https://github.com/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.GITHUB_RUN_ID})`,
             });
