@@ -7,6 +7,11 @@ on:
       - created
       - edited
 
+# Concurrency limit: Only one workflow run per user every 10 minutes
+concurrency:
+  group: pr-build-${{ github.event.comment.user.login }}
+  cancel-in-progress: true
+
 jobs:
   check-comment:
     runs-on: ubuntu-latest
@@ -49,6 +54,7 @@ jobs:
     if: needs.check-comment.outputs.comment_valid == 'true'
 
     steps:
+      # Check out the PR branch
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
