@@ -72,23 +72,17 @@ jobs:
       # Create a folder named according to the build and copy the build files into it
       - name: Create build folder and copy files
         run: |
-          build_folder="${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa"
+          build_folder="${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.name }}-qa"
           mkdir -p "$build_folder"
           cp README.md "$build_folder/"
-
-      # Create a ZIP file of the build folder
-      - name: Create ZIP of build folder
-        run: |
-          build_folder="${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa"
-          zip -r "$build_folder.zip" "$build_folder"
 
       # Upload the ZIP file as an artifact
       - name: Upload build artifacts
         id: upload-artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa
-          path: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa.zip
+          name: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.name }}-qa
+          path: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.name }}-qa
 
       # Reply to the PR comment with a direct download link and tag the user
       - name: Reply to PR comment
@@ -108,5 +102,5 @@ jobs:
               owner,
               repo,
               issue_number,
-              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.event.pull_request.head.ref }}-qa.zip](${artifactUrl})`,
+              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.event.pull_request.head.name }}-qa.zip](${artifactUrl})`,
             });
