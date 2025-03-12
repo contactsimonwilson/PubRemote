@@ -69,20 +69,42 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      # Build the project using the extracted build_value
+      - name: Build PlatformIO Project
+        run: pio run -e ${{ needs.check_comment.outputs.build_value }}
+        env:
+          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"qa\"'
+  
       # Create a folder named according to the build and copy the build files into it
       - name: Create build folder and copy files
         run: |
-          build_folder="${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.name }}-qa"
+          build_folder="${{ needs.check_comment.outputs.build_value }}-${GITHUB_SHA}-qa"
           mkdir -p "$build_folder"
-          cp README.md "$build_folder/"
+          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/bootloader.bin "$build_folder/"
+          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/partitions.bin "$build_folder/"
+          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/firmware.bin "$build_folder/"
 
       # Upload the ZIP file as an artifact
       - name: Upload build artifacts
         id: upload-artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.name }}-qa
-          path: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.name }}-qa
+          name: ${{ needs.check_comment.outputs.build_value }}-${{ github.sha }}-qa
+          path: ${{ needs.check_comment.outputs.build_value }}-${{ github.sha }}-qa
 
       # Reply to the PR comment with a direct download link and tag the user
       - name: Reply to PR comment
@@ -102,5 +124,5 @@ jobs:
               owner,
               repo,
               issue_number,
-              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.event.pull_request.head.name }}-qa.zip](${artifactUrl})`,
+              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.sha }}-qa.zip](${artifactUrl})`,
             });
