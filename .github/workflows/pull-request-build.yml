@@ -56,6 +56,24 @@ jobs:
           else
             echo "comment_valid=false" >> $GITHUB_OUTPUT
           fi
+      
+      # Step 3: React to the comment with a thumbs-up or "x" based on comment_valid
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { issue: { number: issue_number }, repository: { owner: { login: owner }, name: repo } } = context.payload;
+            const comment_id = context.payload.comment.id;
+            const comment_valid = "${{ steps.validate-build-value.outputs.comment_valid }}";
+
+            // React with a thumbs-up if comment_valid is true, otherwise react with an "x"
+            const reaction = comment_valid === "true" ? "+1" : "-1";
+            await github.rest.reactions.createForIssueComment({
+              owner,
+              repo,
+              comment_id,
+              content: reaction,
+            });
 
   build_and_reply: 
     runs-on: ubuntu-latest
