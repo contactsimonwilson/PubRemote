@@ -16,7 +16,7 @@ jobs:
   check-comment:
     runs-on: ubuntu-latest
     outputs:
-      comment_valid: ${{ steps.check-comment.outputs.comment_valid }}
+      comment_valid: ${{ steps.validate-build-value.outputs.comment_valid }}
       build_value: ${{ steps.check-comment.outputs.build_value }}
 
     steps:
@@ -48,10 +48,13 @@ jobs:
             # Check if the build_value exists in platformio.ini
             if grep -q "\[env:${{ steps.check-comment.outputs.build_value }}\]" platformio.ini; then
               echo "Build value is valid."
+              echo "comment_valid=true" >> $GITHUB_OUTPUT
             else
               echo "Build value is invalid."
               echo "comment_valid=false" >> $GITHUB_OUTPUT
             fi
+          else
+            echo "comment_valid=false" >> $GITHUB_OUTPUT
           fi
 
   build_and_reply:
