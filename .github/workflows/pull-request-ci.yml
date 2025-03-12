@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Check out the PR branch
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
