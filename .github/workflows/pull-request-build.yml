@@ -112,10 +112,10 @@ jobs:
             const { issue: { number: issue_number }, repository: { owner: { login: owner }, name: repo } } = context.payload;
             const comment_id = context.payload.comment.id;
 
-            // Reply to the PR comment with a link to the artifacts
+            // Reply to the PR comment with a link to the artifacts page
             await github.rest.issues.createComment({
               owner,
               repo,
               issue_number,
-              body: `Build completed successfully! 🎉\n\nDownload the build artifacts: [${{ needs.check-comment.outputs.build_value }}.zip](https://github.com/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.GITHUB_RUN_ID})`,
+              body: `Build completed successfully! 🎉\n\nDownload the build artifacts: [Artifacts Page](https://github.com/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID})`,
             });
