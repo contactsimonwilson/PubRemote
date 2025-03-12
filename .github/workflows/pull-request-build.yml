@@ -69,34 +69,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-            ~/.platformio/.cache
-          key: ${{ runner.os }}-pio
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-
-      - name: Install PlatformIO Core
-        run: pip install --upgrade platformio
-
-      # Build the project using the extracted build_value
-      - name: Build PlatformIO Project
-        run: pio run -e ${{ needs.check_comment.outputs.build_value }}
-        env:
-          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"qa\"'
-
       # Create a folder named according to the build and copy the build files into it
       - name: Create build folder and copy files
         run: |
           build_folder="${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa"
           mkdir -p "$build_folder"
-          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/bootloader.bin "$build_folder/"
-          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/partitions.bin "$build_folder/"
-          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/firmware.bin "$build_folder/"
+          cp README.md "$build_folder/"
 
       # Create a ZIP file of the build folder
       - name: Create ZIP of build folder
