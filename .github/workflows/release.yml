@@ -16,9 +16,6 @@ concurrency:
 permissions:
   contents: write
         
-# References: 
-# https://github.com/softprops/action-gh-release
-# https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
   # Ensure a version update has happened
   # Extract a version tag for the deployment

@@ -11,8 +11,6 @@ on:
     branches:
       - master
 
-# References: 
-# https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
   build:
     if: github.repository == 'contactsimonwilson/PubRemote' && github.event.pull_request.draft == false
