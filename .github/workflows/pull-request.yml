@@ -1,6 +1,6 @@
 name: PlatformIO CI
 
-# Run on every opened, reopened, or updated PR
+# Runs on every opened, reopened, or updated PR
 on:
   pull_request:
     types: 

@@ -20,6 +20,8 @@ permissions:
 # https://github.com/softprops/action-gh-release
 # https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
+  # Ensure a version update has happened
+  # Extract a version tag for the deployment
   check_version_update:
     if: github.repository == 'contactsimonwilson/PubRemote'
     runs-on: ubuntu-latest
@@ -38,6 +40,9 @@ jobs:
         id: check_changes
         run: |
           FILE="prebuild_hook.py"
+
+          # These are the lines of the file to check
+          # If they change in the future, be sure to updated them here
           LINES_TO_CHECK="5 6 7"
 
           # Get the previous commit for comparison
@@ -51,7 +56,7 @@ jobs:
             exit 0
           fi
 
-          # Check if lines 5, 6, or 7 changed
+          # Check if the relevant lines changed
           CHANGED=false
           for LINE_NUMBER in $LINES_TO_CHECK; do
             OLD_LINE=$(git show "$PREV_COMMIT":"$FILE" | sed -n "${LINE_NUMBER}p")

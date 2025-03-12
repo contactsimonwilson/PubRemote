@@ -1,6 +1,6 @@
 name: Nightly Builds
 
-# Run every night at 11:30 PM
+# Runs every night at 11:30 PM
 on:
   schedule:
     - cron: "30 23 * * *" 
