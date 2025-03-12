@@ -20,6 +20,12 @@ jobs:
       build_value: ${{ steps.check-comment.outputs.build_value }}
 
     steps:
+      # Check out the PR branch
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
       # Step 1: Check if the comment is on a PR, contains "/build", and extract the value after it
       - name: Check comment conditions and extract value
         id: check-comment
