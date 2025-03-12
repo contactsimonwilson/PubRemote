@@ -9,26 +9,35 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 ## Getting started
 
 ### Hardware Prerequisites
-- VESC Express receiver. Options include:
-  - Building your own
-  - [Trampa VESC Express Module](https://trampaboards.com/vesc-express--p-34857.html)
-  - [AvaSpark RGB Mini](https://avaspark.com/products/avaspark-rgb-mini)
-  - [CustomWheel VESC Express Module](https://customwheel.shop/accesories/vesc-express-module-wifi-bt)
-  - And many others...
-- [ESP32S3 development board](https://www.waveshare.com/esp32-s3-touch-lcd-1.28.htm)
-  - The ["Cowmote"](https://cowpowersystems.com/product/1) from ExcessRacoon uses the [LilyGo T-Display S3 Amoled (1.43in)](https://lilygo.cc/products/t-display-s3-amoled-1-64?variant=44507650556085)
-  - Or for an easy assembly process, consider buying a kit from [Avaspark](https://avaspark.com/products/pubmote-dev-kit)
-- A Joystick; One of either:
-  - [Nintendo Switch joystick](https://vi.aliexpress.com/item/1005006746686389.html)
-  - [PS5 hall joystick](https://vi.aliexpress.com/item/1005005916919152.html)
+
+#### VESC Express receiver. Options:
+- Building your own
+- [Trampa VESC Express Module](https://trampaboards.com/vesc-express--p-34857.html)
+- [AvaSpark RGB Mini](https://avaspark.com/products/avaspark-rgb-mini)
+- [CustomWheel VESC Express Module](https://customwheel.shop/accesories/vesc-express-module-wifi-bt)
+- And many others...
+
+#### ESP32S3-based controller with a display, and a case. Options:
+- [WaveShare 1.43in Amoled display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm?sku=30106) (recommended)
+  - [Leaf Blaster case by Markoblaster](https://www.printables.com/model/1191785-leaf-blaster-pubmote-waveshare-14)
+  - Leaf Blaster remix case by ZiNc (TBD)
+- [WaveShare 1.28in LCD display](https://www.waveshare.com/esp32-s3-touch-lcd-1.28.htm)
+  - [Case by ThePoro](https://www.printables.com/model/835158-pubmote)
+  - Full development kit from [Avaspark](https://avaspark.com/products/pubmote-dev-kit) including a case, display, joystick, and other parts
+- The ["Cowmote"](https://cowpowersystems.com/product/1) from ExcessRacoon uses the [LilyGo T-Display S3 Amoled (1.43in)](https://lilygo.cc/products/t-display-s3-amoled-1-64?variant=44507650556085)
+  - [SnowMote](https://www.printables.com/model/1143449-snowmote-case-for-pubmote-project) by ZiNc
+
+#### A Joystick. Options:
+- [Nintendo Switch joystick](https://vi.aliexpress.com/item/1005006746686389.html)
+- [PS5 hall joystick](https://vi.aliexpress.com/item/1005005916919152.html)
 
 ### Software Prerequisites
 
-**Simple Deployment, No Development**
+#### Simple Deployment, No Development
 
 Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz)
 
-**Advanced Deployment**
+#### Advanced Deployment
 - IDE or other code editor
   - SquareLine Studio
   - VS Code
@@ -40,7 +49,7 @@ Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](ht
 
 ## Issues
 
-Create an issue on GitHub or in the PubRemote channel within the PubWheel Discord server
+[Create an issue](https://github.com/contactsimonwilson/PubRemote/issues) on GitHub or post in the PubRemote channel within the PubWheel Discord server
 
 ## Pairing Instructions
 
