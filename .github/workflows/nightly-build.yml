@@ -12,12 +12,56 @@ concurrency:
 permissions:
   contents: read
 
-# References: 
-# https://github.com/softprops/action-gh-release
-# https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
-  delete_old_release:
+  check_tag_up_to_date:
     if: github.repository == 'contactsimonwilson/PubRemote'
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0  # Fetch all history for tags
+
+      - name: Get latest commit hash from master
+        id: get-master-hash
+        run: |
+          MASTER_HASH=$(git rev-parse master)
+          echo "MASTER_HASH=$MASTER_HASH" >> $GITHUB_ENV
+
+      - name: Check if nightly tag exists
+        id: check_for_tag
+        run: |
+          TAG_NAME="nightly"
+          git fetch --tags
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "TAG_FOUND=YES" >> $GITHUB_ENV
+            TAG_HASH=$(git rev-parse "$TAG_NAME")
+            echo "TAG_HASH=$TAG_HASH" >> $GITHUB_ENV
+          else
+            echo "TAG_FOUND=NO" >> $GITHUB_ENV
+          fi
+
+      - name: Compare master hash with nightly tag hash
+        id: compare_hashes
+        run: |
+          if [[ "${{ env.TAG_FOUND }}" == "YES" && "${{ env.MASTER_HASH }}" == "${{ env.TAG_HASH }}" ]]; then
+            echo "TAG_UP_TO_DATE=YES" >> $GITHUB_ENV
+          else
+            echo "TAG_UP_TO_DATE=NO" >> $GITHUB_ENV
+          fi
+
+      - name: Exit if nightly tag is up to date
+        if: ${{ env.TAG_UP_TO_DATE == 'YES' }}
+        run: |
+          echo "Nightly tag is already up to date with master. Skipping build."
+          exit 0
+
+  delete_old_release:
+    if: ${{ github.repository == 'contactsimonwilson/PubRemote' && env.TAG_UP_TO_DATE == 'NO' }}
+    needs: check_tag_up_to_date
     
     permissions:
       # Write permission is required to create a github release
@@ -52,8 +96,8 @@ jobs:
         run: sleep 2
          
   build_and_release:
-    if: github.repository == 'contactsimonwilson/PubRemote'
-    needs: "delete_old_release"
+    if: ${{ github.repository == 'contactsimonwilson/PubRemote' && env.TAG_UP_TO_DATE == 'NO' }}
+    needs: delete_old_release
     
     permissions:
       # Write permission is required to create a github release
