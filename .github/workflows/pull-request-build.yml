@@ -92,7 +92,7 @@ jobs:
       # Create a ZIP file of the build artifacts (files in the root of the archive)
       - name: Create ZIP of build artifacts
         run: |
-          zip ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa.zip \
+          zip -j ${{ needs.check_comment.outputs.build_value }}-${{ github.ref_name }}-qa.zip \
             .pio/build/${{ needs.check_comment.outputs.build_value }}/bootloader.bin \
             .pio/build/${{ needs.check_comment.outputs.build_value }}/partitions.bin \
             .pio/build/${{ needs.check_comment.outputs.build_value }}/firmware.bin
@@ -102,8 +102,8 @@ jobs:
         id: upload-artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa
-          path: ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa.zip
+          name: ${{ needs.check_comment.outputs.build_value }}-${{ github.ref_name }}-qa
+          path: ${{ needs.check_comment.outputs.build_value }}-${{ github.ref_name }}-qa.zip
 
       # Reply to the PR comment with a direct download link and tag the user
       - name: Reply to PR comment
@@ -123,5 +123,5 @@ jobs:
               owner,
               repo,
               issue_number,
-              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.event.pull_request.head.ref }}-qa.zip](${artifactUrl})`,
+              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.ref_name }}-qa.zip](${artifactUrl})`,
             });
