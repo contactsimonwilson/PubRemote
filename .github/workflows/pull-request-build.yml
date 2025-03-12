@@ -56,9 +56,10 @@ jobs:
           else
             echo "comment_valid=false" >> $GITHUB_OUTPUT
           fi
-      
-      # Step 3: React to the comment with a thumbs-up or "x" based on comment_valid
+
+      # Step 3: React to the comment with a thumbs-up or "x" if it contains "/build"
       - name: React to comment
+        if: steps.check_comment.outputs.build_value != ''
         uses: actions/github-script@v7
         with:
           script: |
