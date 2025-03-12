@@ -57,7 +57,7 @@ jobs:
             echo "comment_valid=false" >> $GITHUB_OUTPUT
           fi
 
-  build_and_reply:
+  build_and_reply: 
     runs-on: ubuntu-latest
     needs: check_comment
     if: needs.check_comment.outputs.comment_valid == 'true'
@@ -92,10 +92,10 @@ jobs:
       # Create a ZIP file of the build artifacts (files in the root of the archive)
       - name: Create ZIP of build artifacts
         run: |
-          zip ${{ needs.check-comment.outputs.build_value }}-qa.zip \
-            .pio/build/${{ needs.check-comment.outputs.build_value }}/bootloader.bin \
-            .pio/build/${{ needs.check-comment.outputs.build_value }}/partitions.bin \
-            .pio/build/${{ needs.check-comment.outputs.build_value }}/firmware.bin
+          zip ${{ needs.check_comment.outputs.build_value }}-${{ github.event.pull_request.head.ref }}-qa.zip \
+            .pio/build/${{ needs.check_comment.outputs.build_value }}/bootloader.bin \
+            .pio/build/${{ needs.check_comment.outputs.build_value }}/partitions.bin \
+            .pio/build/${{ needs.check_comment.outputs.build_value }}/firmware.bin
 
       # Upload the ZIP file as an artifact
       - name: Upload build artifacts
@@ -123,5 +123,5 @@ jobs:
               owner,
               repo,
               issue_number,
-              body: `@${commenter} Build completed successfully! 🎉 [${ buildValue }-${{ github.event.pull_request.head.ref }}-qa.zip](${artifactUrl})`,
+              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.event.pull_request.head.ref }}-qa.zip](${artifactUrl})`,
             });
