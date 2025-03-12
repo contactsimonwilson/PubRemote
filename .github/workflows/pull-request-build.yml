@@ -1,0 +1,110 @@
+name: PR Build Request
+
+# Runs when a comment is added or edited on a PR
+on:
+  issue_comment:
+    types: 
+      - created
+      - edited
+
+jobs:
+  check-comment:
+    runs-on: ubuntu-latest
+    outputs:
+      comment_valid: ${{ steps.check-comment.outputs.comment_valid }}
+      build_value: ${{ steps.check-comment.outputs.build_value }}
+
+    steps:
+      # Step 1: Check if the comment is on a PR, contains "/build", and extract the value after it
+      - name: Check comment conditions and extract value
+        id: check-comment
+        run: |
+          if [[ "${{ github.event.issue.pull_request }}" && "${{ github.event.comment.body }}" == */build* ]]; then
+            # Extract the value after "/build"
+            build_value=$(echo "${{ github.event.comment.body }}" | sed -n 's|.*/build \(.*\)|\1|p')
+            echo "comment_valid=true" >> $GITHUB_OUTPUT
+            echo "build_value=$build_value" >> $GITHUB_OUTPUT
+          else
+            echo "comment_valid=false" >> $GITHUB_OUTPUT
+            echo "build_value=" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 2: Validate the extracted build_value against the platformio.ini file
+      - name: Validate build_value
+        id: validate-build-value
+        run: |
+          if [[ "${{ steps.check-comment.outputs.comment_valid }}" == "true" ]]; then
+            # Check if the build_value exists in platformio.ini
+            if grep -q "\[env:${{ steps.check-comment.outputs.build_value }}\]" platformio.ini; then
+              echo "Build value is valid."
+            else
+              echo "Build value is invalid."
+              echo "comment_valid=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  build_and_reply:
+    runs-on: ubuntu-latest
+    needs: check-comment
+    if: needs.check-comment.outputs.comment_valid == 'true'
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      # Build the project using the extracted build_value
+      - name: Build PlatformIO Project
+        run: pio run -e ${{ needs.check-comment.outputs.build_value }}
+        env:
+          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"qa\"'
+
+      # Create a ZIP file of the build artifacts (files in the root of the archive)
+      - name: Create ZIP of build artifacts
+        run: |
+          cp .pio/build/${{ needs.check-comment.outputs.build_value }}/bootloader.bin .
+          cp .pio/build/${{ needs.check-comment.outputs.build_value }}/partitions.bin .
+          cp .pio/build/${{ needs.check-comment.outputs.build_value }}/firmware.bin .
+          zip BUILD.zip bootloader.bin partitions.bin firmware.bin
+
+      # Upload the ZIP file as a reply to the PR comment
+      - name: Attach ZIPs and reply with comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { issue: { number: issue_number }, repository: { owner: { login: owner }, name: repo } } = context.payload;
+            const comment_id = context.payload.comment.id;
+            const zipPath = 'BUILD.zip';
+
+            // Upload the ZIP file as an artifact
+            const { data: upload } = await github.rest.actions.uploadArtifact({
+              owner,
+              repo,
+              artifact_id: issue_number,
+              name: 'build-artifacts',
+              file: fs.createReadStream(zipPath),
+            });
+
+            // Reply to the PR comment with the ZIP file link
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `Build completed successfully! 🎉\n\nDownload the build artifacts: [BUILD.zip](https://github.com/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${upload.id})`,
+            });
