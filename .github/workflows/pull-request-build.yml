@@ -95,14 +95,14 @@ jobs:
           cp .pio/build/${{ needs.check-comment.outputs.build_value }}/bootloader.bin .
           cp .pio/build/${{ needs.check-comment.outputs.build_value }}/partitions.bin .
           cp .pio/build/${{ needs.check-comment.outputs.build_value }}/firmware.bin .
-          zip BUILD.zip bootloader.bin partitions.bin firmware.bin
+          zip ${{ needs.check-comment.outputs.build_value }}.zip bootloader.bin partitions.bin firmware.bin
 
       # Upload the ZIP file as an artifact
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: BUILD.zip
+          name: ${{ needs.check-comment.outputs.build_value }}.zip
+          path: ${{ needs.check-comment.outputs.build_value }}.zip
 
       # Reply to the PR comment with a link to the artifacts
       - name: Reply to PR comment
@@ -117,5 +117,5 @@ jobs:
               owner,
               repo,
               issue_number,
-              body: `Build completed successfully! 🎉\n\nDownload the build artifacts: [BUILD.zip](https://github.com/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.GITHUB_RUN_ID})`,
+              body: `Build completed successfully! 🎉\n\nDownload the build artifacts: [${{ needs.check-comment.outputs.build_value }}.zip](https://github.com/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.GITHUB_RUN_ID})`,
             });
