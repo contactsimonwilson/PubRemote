@@ -7,7 +7,7 @@ on:
       - created
       - edited
 
-# Concurrency limit: Only one workflow run per user every 10 minutes
+# Concurrency limit: Only one workflow run per user at a time
 concurrency:
   group: pr-build-${{ github.event.comment.user.login }}
   cancel-in-progress: true
