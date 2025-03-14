@@ -28,8 +28,8 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
   - [SnowMote](https://www.printables.com/model/1143449-snowmote-case-for-pubmote-project) by ZiNc
 
 #### A Joystick. Options:
+- [PS5 hall joystick](https://www.aliexpress.us/item/3256806823053436.html)
 - [Nintendo Switch joystick](https://vi.aliexpress.com/item/1005006746686389.html)
-- [PS5 hall joystick](https://vi.aliexpress.com/item/1005005916919152.html)
 
 ### Software Prerequisites
 
