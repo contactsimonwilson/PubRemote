@@ -131,15 +131,15 @@ export class ESPService {
       const macAddress = await loader.chip.readMac(loader);
       this.log(`MAC address: ${macAddress.toUpperCase()}`, "success");
 
-      this.log("Reading getChipDescription...");
+      this.log("Reading Chip Description...");
       const chipDescription = await loader.chip.getChipDescription(loader);
       this.log(`Chip Description: ${chipDescription}`, "success");
 
-      this.log("Reading getChipFeatures...");
+      this.log("Reading Chip Features...");
       const chipFeatures = await loader.chip.getChipFeatures(loader);
       this.log(`Chip Features: ${chipFeatures}`, "success");
 
-      this.log("Reading getCrystalFreq...");
+      this.log("Reading Crystal Frequency...");
       const crystalFreq = await loader.chip.getCrystalFreq(loader);
       this.log(`Crystal Frequency: ${crystalFreq}`, "success");
 
