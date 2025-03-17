@@ -1,5 +1,7 @@
 #include "esp_log.h"
 #include "remote/display.h"
+#include "remote/ota.h"
+#include "remote/wifi.h"
 #include "utilities/screen_utils.h"
 #include "utilities/string_utils.h"
 #include <remote/remoteinputs.h>
@@ -80,4 +82,8 @@ void about_screen_unloaded(lv_event_t *e) {
 
 void update_button_press(lv_event_t *e) {
   ESP_LOGI(TAG, "Update button pressed");
+  ESP_LOGI(TAG, "Connecting to WiFi...");
+  // change_wifi_mode(WIFI_MODE_OTA_AP);
+  change_wifi_mode(WIFI_MODE_OTA_STA);
+  init_ota();
 }
