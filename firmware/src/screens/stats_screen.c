@@ -84,6 +84,9 @@ static void update_utilization_dial_display() {
   else if (remoteStats.dutyCycle > 70) {
     color = lv_color_hex(COLOR_WARNING);
   }
+  else if (remoteStats.dutyCycle > 20) {
+    color = lv_color_hex(COLOR_ACTIVE);
+  }
 
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(ui_UtilizationBar, lv_color_hex(0x282828), LV_PART_INDICATOR | LV_STATE_DEFAULT);
