@@ -131,6 +131,18 @@ export class ESPService {
       const macAddress = await loader.chip.readMac(loader);
       this.log(`MAC address: ${macAddress.toUpperCase()}`, "success");
 
+      this.log("Reading Chip Description...");
+      const chipDescription = await loader.chip.getChipDescription(loader);
+      this.log(`Chip Description: ${chipDescription}`, "success");
+
+      this.log("Reading Chip Features...");
+      const chipFeatures = await loader.chip.getChipFeatures(loader);
+      this.log(`Chip Features: ${chipFeatures}`, "success");
+
+      this.log("Reading Crystal Frequency...");
+      const crystalFreq = await loader.chip.getCrystalFreq(loader);
+      this.log(`Crystal Frequency: ${crystalFreq}`, "success");
+
       this.log("Rebooting into normal mode...");
       await loader.hardReset();
       await loader.transport.disconnect();
@@ -141,22 +153,15 @@ export class ESPService {
       this.espLoader = loader;
 
       // Request firmware info
-      // this.log("Fetching firmware information...");
-      // await this.sendCommand("version");
-      // await delay(100);
-      // const versionResponse = await this.readResponse();
+      this.log("Fetching firmware information...");
+      await delay(100);
+      const firmwareInformationResponse = await this.readResponse(750);
 
-      // await this.sendCommand("variant");
-      // await delay(100);
-      // const variantResponse = await this.readResponse();
-
-      // const version =
-      //   this.parseFirmwareResponse(versionResponse, "version") || "Unknown";
-      // const variant =
-      //   this.parseFirmwareResponse(variantResponse, "variant") || "Unknown";
-
-      const version = "Unknown";
-      const variant = "Unknown";
+      // Parse firmware info from log
+      const version =
+        this.parseFirmwareResponse(firmwareInformationResponse, "version") || "Unknown";
+      const variant =
+        this.parseFirmwareResponse(firmwareInformationResponse, "variant") || "Unknown";
 
       this.addSerialMonitor();
 
@@ -187,17 +192,29 @@ export class ESPService {
     }
   }
 
+  private asciiCodesToText(asciiCodes: string): string {
+    // Split the string into an array of individual code strings
+    const codeArray = asciiCodes.split(',');
+    
+    // Convert each code to its corresponding ASCII character
+    const text = codeArray
+        .map(code => String.fromCharCode(parseInt(code, 10)))
+        .join('');
+    
+    return text;
+  }
+
   private parseFirmwareResponse(
     response: string,
     type: "version" | "variant"
   ): string | null {
     const regex =
       type === "version"
-        ? /firmware_version:\s*([^\s\n]+)/i
-        : /firmware_variant:\s*([^\s\n]+)/i;
+        ? /(?<=86,101,114,115,105,111,110,32,40,)([0-9]{1,3}|,){1,20}(?=,41)/i
+        : /(?<=86,97,114,105,97,110,116,32,40,)([0-9]{1,3}|,){1,110}(?=,41)/i;
 
     const match = response.match(regex);
-    return match ? match[1] : null;
+    return match ? this.asciiCodesToText(match[0]) : null;
   }
 
   private async readResponse(timeout = 1000): Promise<string> {

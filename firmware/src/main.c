@@ -8,6 +8,7 @@
 #include "remote/adc.h"
 #include "remote/buzzer.h"
 #include "remote/connection.h"
+#include "remote/console.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
 #include "remote/led.h"
@@ -46,4 +47,5 @@ void app_main(void) {
   init_connection();
   init_receiver();
   init_transmitter();
+  init_console();
 }
