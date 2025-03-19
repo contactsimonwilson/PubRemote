@@ -68,7 +68,10 @@ static float get_battery_voltage() {
 }
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
-#define FORCE_LIGHT_SLEEP 0         // DEBUG: Force light sleep mode
+
+#ifndef FORCE_LIGHT_SLEEP
+  #define FORCE_LIGHT_SLEEP 0
+#endif
 
 static bool check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
