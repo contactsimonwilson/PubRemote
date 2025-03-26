@@ -187,7 +187,7 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_style_pad_column(ui_TempUnitsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_TempUnits = lv_dropdown_create(ui_TempUnitsBody);
-    lv_dropdown_set_options(ui_TempUnits, "Celcius\nFarenheit");
+    lv_dropdown_set_options(ui_TempUnits, "Celsius\nFahrenheit");
     lv_obj_set_width(ui_TempUnits, lv_pct(100));
     lv_obj_set_height(ui_TempUnits, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_TempUnits, LV_ALIGN_CENTER);
