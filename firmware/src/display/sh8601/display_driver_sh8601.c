@@ -26,7 +26,7 @@ const sh8601_lcd_init_cmd_t sh8601_lcd_init_cmds[] = {
 };
 
 size_t sh8601_get_lcd_init_cmds_size(void) {
-  return sizeof(sh8601_lcd_init_cmds) / sizeof(sh8601_lcd_init_cmd_t);
+  return sizeof(sh8601_lcd_init_cmds) / sizeof(sh8601_lcd_init_cmds[0]);
 }
 
 // CO5300 is very similar to SH8601 - lets just put them here

@@ -155,7 +155,7 @@ export class ESPService {
       // Request firmware info
       this.log("Fetching firmware information...");
       await delay(100);
-      const firmwareInformationResponse = await this.readResponse();
+      const firmwareInformationResponse = await this.readResponse(2000);
 
       // Parse firmware info from log
       const version =
