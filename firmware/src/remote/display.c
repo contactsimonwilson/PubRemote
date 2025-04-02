@@ -148,6 +148,7 @@ static esp_err_t app_lcd_init(void) {
 #elif DISP_ST7789
   #error "ST7789 not supported"
 #endif
+
   // Attach the LCD to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &lcd_io));
 
@@ -160,21 +161,25 @@ static esp_err_t app_lcd_init(void) {
 
   static uint8_t READ_LCD_ID = 0x00;
   READ_LCD_ID = read_lcd_id();
+  vTaskDelay(pdMS_TO_TICKS(200));
 
-  if (READ_LCD_ID == SH8601_ID) {
-    ESP_LOGI(TAG, "SH8601 display detected");
-  }
-  else {
+  if (READ_LCD_ID == CO5300_ID) {
     ESP_LOGI(TAG, "CO5300 display detected");
 
   #ifndef PANEL_X_GAP
     #define PANEL_X_GAP 6
   #endif
   }
+  else if (READ_LCD_ID == SH8601_ID) {
+    ESP_LOGI(TAG, "SH8601 display detected");
+  }
+  else {
+    ESP_LOGI(TAG, "Error reading display from ID");
+  }
 
   sh8601_vendor_config_t vendor_config = {
-      .init_cmds = (READ_LCD_ID == SH8601_ID) ? sh8601_lcd_init_cmds : co5300_lcd_init_cmds,
-      .init_cmds_size = (READ_LCD_ID == SH8601_ID) ? sh8601_get_lcd_init_cmds_size() : co5300_get_lcd_init_cmds_size(),
+      .init_cmds = (READ_LCD_ID == CO5300_ID) ? co5300_lcd_init_cmds : sh8601_lcd_init_cmds,
+      .init_cmds_size = (READ_LCD_ID == CO5300_ID) ? co5300_get_lcd_init_cmds_size() : sh8601_get_lcd_init_cmds_size(),
       .flags =
           {
               .use_qspi_interface = 1,
@@ -234,7 +239,9 @@ static esp_err_t app_lcd_init(void) {
   #define PANEL_Y_GAP 0
 #endif
 
-  esp_lcd_panel_set_gap(lcd_panel, PANEL_X_GAP, PANEL_Y_GAP);
+  if (PANEL_X_GAP > 0 || PANEL_Y_GAP > 0) {
+    esp_lcd_panel_set_gap(lcd_panel, PANEL_X_GAP, PANEL_Y_GAP);
+  }
 
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(lcd_panel, invert_color));
   ESP_ERROR_CHECK(esp_lcd_panel_mirror(lcd_panel, true, false));

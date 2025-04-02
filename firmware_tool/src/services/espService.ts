@@ -146,7 +146,7 @@ export class ESPService {
       this.log("Rebooting into normal mode...");
       await loader.hardReset();
       await loader.transport.disconnect();
-      await delay(2000); // Give device time to boot
+      await delay(1000); // Give device time to boot
 
       // Reconnect in normal mode to get firmware info
       await transport.connect(115200);
@@ -154,7 +154,7 @@ export class ESPService {
 
       // Request firmware info
       this.log("Fetching firmware information...");
-      await delay(100);
+      await delay(1000);
       const firmwareInformationResponse = await this.readResponse(2000);
 
       // Parse firmware info from log
