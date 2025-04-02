@@ -154,7 +154,7 @@ static esp_err_t app_lcd_init(void) {
 #elif DISP_SH8601
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
 #elif DISP_CO5300
-  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, DISP_DC, NULL);
+  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
 #elif DISP_ST7789
   #error "ST7789 not supported"
 #endif
