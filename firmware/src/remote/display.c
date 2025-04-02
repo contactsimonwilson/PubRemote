@@ -227,7 +227,7 @@ static esp_err_t app_lcd_init(void) {
   invert_color = false;
 #elif DISP_CO5300
   invert_color = false;
-  esp_lcd_panel_set_gap(lcd_panel, 20, 0);
+  esp_lcd_panel_set_gap(lcd_panel, 7, 0);
 #elif DISP_ST7789
   #error "ST7789 not supported"
 #endif
