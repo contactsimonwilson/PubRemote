@@ -31,18 +31,20 @@ size_t sh8601_get_lcd_init_cmds_size(void) {
 
 // CO5300 is very similar to SH8601 - lets just put them here
 const sh8601_lcd_init_cmd_t co5300_lcd_init_cmds[] = {
-    //  {cmd, { data }, data_size, delay_ms}
-    {SH8601_C_SLPOUT, (uint8_t[]){0x00}, 0, SH8601_SLPOUT_DELAY},
-    {SH8601_W_SPIMODECTL, (uint8_t[]){0x80}, 1, 0},
-    {SH8601_W_PIXFMT, (uint8_t[]){0x05}, 1, 0}, // Interface Pixel Format 16bit/pixel
-    {SH8601_C_DISPON, (uint8_t[]){0x00}, 0, 0},
-    {SH8601_W_WCTRLD1, (uint8_t[]){0x28}, 1, 0},            // Brightness Control On and Display Dimming On
-    {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0x00}, 1, 0}, // Brightness adjustment
-    {SH8601_W_WCE, (uint8_t[]){0x00}, 1, 10},               // High contrast mode (Sunlight Readability Enhancement)
+    {SH8601_C_SLPOUT, (uint8_t[]){0x00}, 0, 80},
+    {0xC4, (uint8_t[]){0x80}, 1, 0},
+    //{0x44, (uint8_t []){0x01, 0xD1}, 2, 0},
+    //{0x35, (uint8_t []){0x00}, 1, 0},//TE ON
+    {SH8601_W_WCTRLD1, (uint8_t[]){0x20}, 1, 1},
+    {0x63, (uint8_t[]){0xFF}, 1, 1},
+    {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0x00}, 1, 1},
+    {SH8601_C_DISPON, (uint8_t[]){0x00}, 0, 10},
+    {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0xFF}, 1, 0},
+    //{0x36, (uint8_t []){0x60}, 1, 0},
 };
 
 size_t co5300_get_lcd_init_cmds_size(void) {
-  return sizeof(co5300_lcd_init_cmds) / sizeof(sh8601_lcd_init_cmd_t);
+  return sizeof(co5300_lcd_init_cmds) / sizeof(co5300_lcd_init_cmds[0]);
 }
 
 static esp_err_t tx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, const void *param, size_t param_size) {
