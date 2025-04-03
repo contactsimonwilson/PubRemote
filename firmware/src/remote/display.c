@@ -127,8 +127,34 @@ void set_bl_level(uint8_t level) {
 
 static esp_err_t app_lcd_init(void) {
   esp_err_t ret = ESP_OK;
+
+  /* Display IDs for SH8601 vs CO5300 display */
+#if DISP_SH8601_CO5300
+  #define SH8601_ID 0x86
+  #define CO5300_ID 0xff
+
+  static uint8_t READ_LCD_ID = 0x00;
+  READ_LCD_ID = read_lcd_id();
+  vTaskDelay(pdMS_TO_TICKS(200));
+
+  if (READ_LCD_ID == CO5300_ID) {
+    ESP_LOGI(TAG, "CO5300 display detected");
+
+  #ifndef PANEL_X_GAP
+    #define PANEL_X_GAP 6
+  #endif
+  }
+  else if (READ_LCD_ID == SH8601_ID) {
+    ESP_LOGI(TAG, "SH8601 display detected");
+  }
+  else {
+    ESP_LOGI(TAG, "Error reading display from ID");
+  }
+#endif
+
   display_driver_preinit();
   ESP_LOGI(TAG, "Initialize SPI bus");
+
 #if DISP_GC9A01
   const spi_bus_config_t buscfg = GC9A01_PANEL_BUS_SPI_CONFIG(DISP_CLK, DISP_MOSI, MAX_TRAN_SIZE);
 #elif DISP_SH8601_CO5300
@@ -155,28 +181,6 @@ static esp_err_t app_lcd_init(void) {
 #if DISP_GC9A01
   gc9a01_vendor_config_t vendor_config = {};
 #elif DISP_SH8601_CO5300
-  /* Display IDs for SH8601 vs CO5300 display */
-  #define SH8601_ID 0x86
-  #define CO5300_ID 0xff
-
-  static uint8_t READ_LCD_ID = 0x00;
-  READ_LCD_ID = read_lcd_id();
-  vTaskDelay(pdMS_TO_TICKS(200));
-
-  if (READ_LCD_ID == CO5300_ID) {
-    ESP_LOGI(TAG, "CO5300 display detected");
-
-  #ifndef PANEL_X_GAP
-    #define PANEL_X_GAP 6
-  #endif
-  }
-  else if (READ_LCD_ID == SH8601_ID) {
-    ESP_LOGI(TAG, "SH8601 display detected");
-  }
-  else {
-    ESP_LOGI(TAG, "Error reading display from ID");
-  }
-
   sh8601_vendor_config_t vendor_config = {
       .init_cmds = (READ_LCD_ID == CO5300_ID) ? co5300_lcd_init_cmds : sh8601_lcd_init_cmds,
       .init_cmds_size = (READ_LCD_ID == CO5300_ID) ? co5300_get_lcd_init_cmds_size() : sh8601_get_lcd_init_cmds_size(),
