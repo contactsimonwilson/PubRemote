@@ -86,6 +86,18 @@ static lv_display_t *lvgl_disp = NULL;
 static lv_indev_t *lvgl_touch_indev = NULL;
 #endif
 
+/* LCD panel gap */
+static uint8_t panel_x_gap = 0;
+static uint8_t panel_y_gap = 0;
+
+#ifdef PANEL_X_GAP
+panel_x_gap = PANEL_X_GAP;
+#endif
+
+#ifdef PANEL_Y_GAP
+panel_y_gap = PANEL_Y_GAP;
+#endif
+
 static bool has_installed_drivers = false;
 
 #if ROUNDER_CALLBACK
@@ -135,14 +147,10 @@ static esp_err_t app_lcd_init(void) {
 
   static uint8_t READ_LCD_ID = 0x00;
   READ_LCD_ID = read_lcd_id();
-  vTaskDelay(pdMS_TO_TICKS(200));
 
   if (READ_LCD_ID == CO5300_ID) {
     ESP_LOGI(TAG, "CO5300 display detected");
-
-  #ifndef PANEL_X_GAP
-    #define PANEL_X_GAP 6
-  #endif
+    panel_x_gap = 6;
   }
   else if (READ_LCD_ID == SH8601_ID) {
     ESP_LOGI(TAG, "SH8601 display detected");
@@ -212,12 +220,15 @@ static esp_err_t app_lcd_init(void) {
 
   if (init_err != ESP_OK) {
     ESP_LOGE(TAG, "Failed to install LCD driver");
+
     if (lcd_panel) {
       esp_lcd_panel_del(lcd_panel);
     }
+
     if (lcd_io) {
       esp_lcd_panel_io_del(lcd_io);
     }
+
     spi_bus_free(LCD_HOST);
     return ret;
   }
@@ -235,16 +246,11 @@ static esp_err_t app_lcd_init(void) {
 #endif
 
   // Set lcd panel gap
-#ifndef PANEL_X_GAP
-  #define PANEL_X_GAP 0
-#endif
+  ESP_LOGI(TAG, "panel_x_gap: %d", panel_x_gap);
+  ESP_LOGI(TAG, "panel_y_gap: %d", panel_y_gap);
 
-#ifndef PANEL_Y_GAP
-  #define PANEL_Y_GAP 0
-#endif
-
-  if (PANEL_X_GAP > 0 || PANEL_Y_GAP > 0) {
-    esp_lcd_panel_set_gap(lcd_panel, PANEL_X_GAP, PANEL_Y_GAP);
+  if (panel_x_gap > 0 || panel_y_gap > 0) {
+    esp_lcd_panel_set_gap(lcd_panel, panel_x_gap, panel_y_gap);
   }
 
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(lcd_panel, invert_color));
