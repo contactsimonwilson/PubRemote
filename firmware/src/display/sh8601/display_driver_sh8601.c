@@ -29,7 +29,8 @@ size_t sh8601_get_lcd_init_cmds_size(void) {
   return sizeof(sh8601_lcd_init_cmds) / sizeof(sh8601_lcd_init_cmds[0]);
 }
 
-// CO5300 is very similar to SH8601 - lets just put them here
+// Reference:
+// https://files.waveshare.com/wiki/ESP32-S3-Touch-AMOLED-1.43/ESP32-S3-AMOLED-1.43-Demo-V3.zip
 const sh8601_lcd_init_cmd_t co5300_lcd_init_cmds[] = {
     {SH8601_C_SLPOUT, (uint8_t[]){0x00}, 0, 80},
     {0xC4, (uint8_t[]){0x80}, 1, 0},
