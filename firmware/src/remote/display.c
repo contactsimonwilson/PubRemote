@@ -33,7 +33,7 @@
 #if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
   #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_BGR
-#elif DISP_SH8601_CO5300
+#elif DISP_SH8601_CO5300 || DISP_SH8601
   #define SW_ROTATE 1
   #define ROUNDER_CALLBACK 1
   #include "display/sh8601/display_driver_sh8601.h"
@@ -140,12 +140,12 @@ void set_bl_level(uint8_t level) {
 static esp_err_t app_lcd_init(void) {
   esp_err_t ret = ESP_OK;
 
-  /* Display IDs for SH8601 vs CO5300 display */
-#if DISP_SH8601_CO5300
-  #define SH8601_ID 0x86
-  #define CO5300_ID 0xff
-
+/* Display IDs for SH8601 vs CO5300 display */
+#define SH8601_ID 0x86
+#define CO5300_ID 0xff
   static uint8_t READ_LCD_ID = 0x00;
+
+#if DISP_SH8601_CO5300
   READ_LCD_ID = read_lcd_id();
 
   if (READ_LCD_ID == CO5300_ID) {
@@ -165,7 +165,7 @@ static esp_err_t app_lcd_init(void) {
 
 #if DISP_GC9A01
   const spi_bus_config_t buscfg = GC9A01_PANEL_BUS_SPI_CONFIG(DISP_CLK, DISP_MOSI, MAX_TRAN_SIZE);
-#elif DISP_SH8601_CO5300
+#elif DISP_SH8601_CO5300 || DISP_SH8601
   const spi_bus_config_t buscfg =
       SH8601_PANEL_BUS_QSPI_CONFIG(DISP_CLK, DISP_SDIO0, DISP_SDIO1, DISP_SDIO2, DISP_SDIO3, MAX_TRAN_SIZE);
 #elif DISP_ST7789
@@ -177,7 +177,7 @@ static esp_err_t app_lcd_init(void) {
 
 #if DISP_GC9A01
   const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
-#elif DISP_SH8601_CO5300
+#elif DISP_SH8601_CO5300 || DISP_SH8601
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
 #elif DISP_ST7789
   #error "ST7789 not supported"
@@ -188,7 +188,7 @@ static esp_err_t app_lcd_init(void) {
 
 #if DISP_GC9A01
   gc9a01_vendor_config_t vendor_config = {};
-#elif DISP_SH8601_CO5300
+#elif DISP_SH8601_CO5300 || DISP_SH8601
   sh8601_vendor_config_t vendor_config = {
       .init_cmds = (READ_LCD_ID == CO5300_ID) ? co5300_lcd_init_cmds : sh8601_lcd_init_cmds,
       .init_cmds_size = (READ_LCD_ID == CO5300_ID) ? co5300_get_lcd_init_cmds_size() : sh8601_get_lcd_init_cmds_size(),
@@ -211,7 +211,7 @@ static esp_err_t app_lcd_init(void) {
 #if DISP_GC9A01
   ESP_LOGI(TAG, "Install GC9A01 panel driver");
   esp_err_t init_err = esp_lcd_new_panel_gc9a01(lcd_io, &panel_config, &lcd_panel);
-#elif DISP_SH8601_CO5300
+#elif DISP_SH8601_CO5300 || DISP_SH8601
   ESP_LOGI(TAG, "Install SH8601/CO5300 panel driver");
   esp_err_t init_err = esp_lcd_new_panel_sh8601(lcd_io, &panel_config, &lcd_panel);
 #elif DISP_ST7789
@@ -239,7 +239,7 @@ static esp_err_t app_lcd_init(void) {
 
 #if DISP_GC9A01
   invert_color = true;
-#elif DISP_SH8601_CO5300
+#elif DISP_SH8601_CO5300 || DISP_SH8601
   invert_color = false;
 #elif DISP_ST7789
   #error "ST7789 not supported"
@@ -361,7 +361,7 @@ static esp_err_t app_lvgl_init(void) {
 #if DISP_GC9A01
                                                     .mirror_x = true,
                                                     .mirror_y = false,
-#elif DISP_SH8601_CO5300
+#elif DISP_SH8601_CO5300 || DISP_SH8601
                                                     .mirror_x = false,
                                                     .mirror_y = false,
 #elif DISP_ST7789
