@@ -222,7 +222,7 @@ export class ESPService {
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeout) {
-      const data = await this.espLoader?.transport.rawRead();
+      const data = await this.espLoader?.transport.rawRead(timeout);
       if (data) {
         response += data;
         if (response.includes("\n")) {
