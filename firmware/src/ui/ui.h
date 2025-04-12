@@ -216,9 +216,6 @@ extern lv_obj_t * ui_AboutFooter;
 void ui_event_AboutMainActionButton(lv_event_t * e);
 extern lv_obj_t * ui_AboutMainActionButton;
 extern lv_obj_t * ui_AboutMainActionButtonLabel;
-void ui_event_UpdateButton(lv_event_t * e);
-extern lv_obj_t * ui_UpdateButton;
-extern lv_obj_t * ui_UpdateButtonLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_BMSScreen

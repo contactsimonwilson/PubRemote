@@ -79,11 +79,3 @@ void about_screen_loaded(lv_event_t *e) {
 void about_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen unloaded");
 }
-
-void update_button_press(lv_event_t *e) {
-  ESP_LOGI(TAG, "Update button pressed");
-  ESP_LOGI(TAG, "Connecting to WiFi...");
-  // change_wifi_mode(WIFI_MODE_OTA_AP);
-  change_wifi_mode(WIFI_MODE_OTA_STA);
-  init_ota();
-}

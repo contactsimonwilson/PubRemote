@@ -94,7 +94,7 @@ void ui_AboutScreen_screen_init(void)
     lv_obj_set_style_pad_column(ui_AboutFooter, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_AboutMainActionButton = lv_btn_create(ui_AboutFooter);
-    lv_obj_set_width(ui_AboutMainActionButton, 60);
+    lv_obj_set_width(ui_AboutMainActionButton, 80);
     lv_obj_set_height(ui_AboutMainActionButton, 42);
     lv_obj_set_align(ui_AboutMainActionButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_AboutMainActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
@@ -107,22 +107,7 @@ void ui_AboutScreen_screen_init(void)
     lv_obj_set_align(ui_AboutMainActionButtonLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_AboutMainActionButtonLabel, "Back");
 
-    ui_UpdateButton = lv_btn_create(ui_AboutFooter);
-    lv_obj_set_width(ui_UpdateButton, 60);
-    lv_obj_set_height(ui_UpdateButton, 42);
-    lv_obj_set_align(ui_UpdateButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_UpdateButton, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_text_font(ui_UpdateButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_UpdateButtonLabel = lv_label_create(ui_UpdateButton);
-    lv_obj_set_width(ui_UpdateButtonLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_UpdateButtonLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_UpdateButtonLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_UpdateButtonLabel, "Update");
-
     lv_obj_add_event_cb(ui_AboutMainActionButton, ui_event_AboutMainActionButton, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_UpdateButton, ui_event_UpdateButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_AboutScreen, ui_event_AboutScreen, LV_EVENT_ALL, NULL);
 
 }
