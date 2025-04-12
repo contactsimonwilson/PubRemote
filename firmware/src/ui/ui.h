@@ -218,24 +218,6 @@ extern lv_obj_t * ui_AboutMainActionButton;
 extern lv_obj_t * ui_AboutMainActionButtonLabel;
 // CUSTOM VARIABLES
 
-// SCREEN: ui_BMSScreen
-void ui_BMSScreen_screen_init(void);
-void ui_event_BMSScreen(lv_event_t * e);
-extern lv_obj_t * ui_BMSScreen;
-extern lv_obj_t * ui_BMSContent;
-extern lv_obj_t * ui_BMSHeader;
-extern lv_obj_t * ui_BMSHeaderLabel;
-extern lv_obj_t * ui_BMSBody;
-extern lv_obj_t * ui_BMSGroupHeadingLabel;
-extern lv_obj_t * ui_BMSDataBar;
-extern lv_obj_t * ui_BMSDataValueBar;
-extern lv_obj_t * ui_BMSDataValueLabel;
-extern lv_obj_t * ui_BMSFooter;
-void ui_event_BMSMainActionButton(lv_event_t * e);
-extern lv_obj_t * ui_BMSMainActionButton;
-extern lv_obj_t * ui_BMSMainActionButtonLabel;
-// CUSTOM VARIABLES
-
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
