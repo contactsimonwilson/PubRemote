@@ -39,6 +39,7 @@ void settings_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen load start");
   if (LVGL_lock(-1)) {
     apply_ui_scale(NULL);
+
     // Set the scroll snap
     lv_obj_set_scroll_snap_x(ui_SettingsBody, LV_SCROLL_SNAP_CENTER);
     lv_obj_add_event_cb(ui_SettingsBody, scroll_event_cb, LV_EVENT_SCROLL, NULL);
@@ -70,11 +71,17 @@ void settings_screen_load_start(lv_event_t *e) {
       lv_obj_add_state(ui_DarkText, LV_STATE_CHECKED);
     }
 
-    uint32_t total_items = lv_obj_get_child_cnt(ui_SettingsBody);
+    // How many scroll icons already exist
+    uint32_t total_scroll_icons = lv_obj_get_child_cnt(ui_SettingsHeader);
+    uint32_t total_settings = lv_obj_get_child_cnt(ui_SettingsBody);
 
-    for (uint32_t i = 0; i < total_items; i++) {
+    for (uint32_t i = 0; i < total_settings; i++) {
       uint8_t bg_opacity = i == 0 ? 255 : 100;
-      lv_obj_t *item = lv_obj_create(ui_SettingsHeader);
+
+      // Either get existing settings header icons or create them if needed
+      lv_obj_t *item =
+          total_scroll_icons == 0 ? lv_obj_create(ui_SettingsHeader) : lv_obj_get_child(ui_SettingsHeader, i);
+
       lv_obj_remove_style_all(item);
       lv_obj_set_width(item, 10 * SCALE_FACTOR);
       lv_obj_set_height(item, 10 * SCALE_FACTOR);
@@ -139,13 +146,18 @@ void dark_text_switch_change(lv_event_t *e) {
   lv_coord_t scroll_x = lv_obj_get_scroll_x(ui_SettingsBody);
 
   lv_obj_t *new_scr = lv_obj_create(NULL);
-  lv_scr_load(new_scr); // This automatically deletes the old screen
+
+  // This automatically deletes the old screen
+  lv_scr_load(new_scr);
 
   reload_screens();
 
+  // Re-initialize the screen manually
   ui_SettingsScreen_screen_init();
   lv_scr_load(ui_SettingsScreen);
   settings_screen_load_start(NULL);
+
+  // Scroll to the current setting
   lv_obj_scroll_to(ui_SettingsBody, scroll_x, 0, LV_ANIM_OFF); // No animation
 }
 

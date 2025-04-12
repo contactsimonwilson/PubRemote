@@ -32,23 +32,46 @@ static esp_err_t init_battery_read() {
 
 static float get_battery_voltage() {
 #define NUM_SAMPLES 5
+  uint8_t num_successful_samples = 0;
   int32_t accumulated = 0;
 
   for (int i = 0; i < NUM_SAMPLES; i++) {
     int sample = 0;
     int voltage_mv = 0;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, BAT_ADC, &sample));
-    ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_handle, sample, &voltage_mv));
+    esp_err_t res = ESP_OK;
+    res = adc_oneshot_read(adc1_handle, BAT_ADC, &sample);
+
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to read battery voltage.");
+      continue;
+    }
+
+    res = adc_cali_raw_to_voltage(adc1_cali_handle, sample, &voltage_mv);
+
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to convert raw value to voltage.");
+      continue;
+    }
+
     accumulated += voltage_mv;
+    num_successful_samples++;
     vTaskDelay(pdMS_TO_TICKS(1));
   }
 
-  int battery_value = accumulated / NUM_SAMPLES;
+  if (num_successful_samples == 0) {
+    ESP_LOGE(TAG, "Failed to read battery voltage.");
+    return 0.0f;
+  }
+
+  int battery_value = accumulated / num_successful_samples;
   return roundf(battery_value = 0.001f * battery_value * ((float)BAT_ADC_F) * 100.0f) / 100.0f;
 }
 
 #define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
-#define FORCE_LIGHT_SLEEP 0         // DEBUG: Force light sleep mode
+
+#ifndef FORCE_LIGHT_SLEEP
+  #define FORCE_LIGHT_SLEEP 0
+#endif
 
 static bool check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
@@ -195,8 +218,8 @@ void power_management_task(void *pvParameters) {
 
   while (1) {
     remoteStats.remoteBatteryVoltage = get_battery_voltage();
-    float battery_percentage =
-        (remoteStats.remoteBatteryVoltage - MIN_BATTERY_VOLTAGE) / (MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE);
+    float battery_percentage = fmaxf(0, (remoteStats.remoteBatteryVoltage - MIN_BATTERY_VOLTAGE)) /
+                               (MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE);
     remoteStats.remoteBatteryPercentage = clampu8((uint8_t)(battery_percentage * 100), 0, 100);
     ESP_LOGD(TAG, "Battery volts: %.1f %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
     vTaskDelay(pdMS_TO_TICKS(1000));

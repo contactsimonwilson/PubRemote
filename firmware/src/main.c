@@ -8,7 +8,9 @@
 #include "remote/adc.h"
 #include "remote/buzzer.h"
 #include "remote/connection.h"
+#include "remote/console.h"
 #include "remote/display.h"
+#include "remote/espnow.h"
 #include "remote/led.h"
 #include "remote/peers.h"
 #include "remote/powermanagement.h"
@@ -20,7 +22,6 @@
 #include "remote/stats.h"
 #include "remote/time.h"
 #include "remote/transmitter.h"
-#include "remote/wifi.h"
 #include "ui/ui.h"
 #include <stdio.h>
 #include <string.h>
@@ -29,7 +30,7 @@ static const char *TAG = "PUBREMOTE-MAIN";
 int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
-  // // Core setup
+  // Core setup
   init_settings();
   init_adcs();
   init_power_management();
@@ -42,8 +43,9 @@ void app_main(void) {
   init_display();
 
   // Comms
-  init_wifi();
+  init_espnow();
   init_connection();
   init_receiver();
   init_transmitter();
+  init_console();
 }
