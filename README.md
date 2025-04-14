@@ -19,13 +19,13 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 
 #### ESP32S3-based controller with a display, and a case. Options:
 - [WaveShare 1.43in Amoled display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm?sku=30106) (recommended)
-  - [Leaf Blaster case by Markoblaster](https://www.printables.com/model/1191785-leaf-blaster-pubmote-waveshare-14)
+  - [Leaf Blaster case by Markoblaster](https://www.printables.com/model/1191785)
   - Leaf Blaster remix case by ZiNc (TBD)
 - [WaveShare 1.28in LCD display](https://www.waveshare.com/esp32-s3-touch-lcd-1.28.htm)
   - [Case by ThePoro](https://www.printables.com/model/835158-pubmote)
   - Full development kit from [Avaspark](https://avaspark.com/products/pubmote-dev-kit) including a case, display, joystick, and other parts
 - The ["Cowmote"](https://cowpowersystems.com/product/1) from ExcessRacoon uses the [LilyGo T-Display S3 Amoled (1.43in)](https://lilygo.cc/products/t-display-s3-amoled-1-64?variant=44507650556085)
-  - [SnowMote](https://www.printables.com/model/1143449-snowmote-case-for-pubmote-project) by ZiNc
+  - [SnowMote](https://www.printables.com/model/1143449) by ZiNc
 
 #### A Joystick. Options:
 - [PS5 hall joystick](https://www.aliexpress.us/item/3256806823053436.html)
@@ -35,7 +35,7 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 
 #### Simple Deployment, No Development
 
-Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz)
+Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz/)
 
 #### Advanced Deployment
 - IDE or other code editor
@@ -49,8 +49,8 @@ Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](ht
 
 ## Issues
 
-[Create an issue](https://github.com/contactsimonwilson/PubRemote/issues) on GitHub or post in the Pubmote channel within the PubWheel Discord server
+[Create an issue](https://github.com/contactsimonwilson/PubRemote/) on GitHub or post in the Pubmote channel within the PubWheel Discord server
 
 ## Get Started Using PubMote
 
-For instructions on first-time setup, pairing, and usage, see the quick start guide.
+For instructions on first-time setup, pairing, and usage, see the [quick start guide](/quick-start.md).
