@@ -7,7 +7,18 @@
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Settings" and swipe through the options to set your preferences
     - Select "Save" to apply your settings
-3. Pair the remote to your VESC Express by following the [Pairing Instructions](#pairing-instructions)
+3. Calibrate your Pubmote
+    - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
+    - Select "Calibration"
+    - Select "Start" and move through the steps, selecting "Next" to continue each step, and "Save" to store your calibration.
+        - For "Move stick to center", allow the joystick to sit steady.
+        - For "Move stick to min/max", move the joystick smoothly to its limits of motion in all directions.
+        - For "Move stick within deadband", move the joystick just slightly off-center. This will set the inner radius the Pubmote treats as no input.
+        - For "Set expo factor", you may leave this at 1.00 or adjust for more or less input to tilt ratio.
+        - For "Invert Y", you may check or uncheck this to flip the direction of the Y axis input.
+        - View the graph for testing and save your calibration.
+4. Pair the remote to your VESC Express by following the [Pairing Instructions](#pairing-instructions)
+5. Go ride!
 
 ## Pairing Instructions
 
@@ -41,3 +52,8 @@ On Refloat:
 4. Ensure Tiltback Speed is above 0 degrees/second
 5. Ensure Input Deadband is below 100%, but at least 1%.
 6. Set Throttle Current Maximum to 0, unless you intend to use remote throttle for fun
+
+## Usage
+
+1. While the homescreen is active, tilting the joystick will apply remote input to your VESC 
+2. If the direction of tilt is backwards, re-run calibration and check "Invert Y"
