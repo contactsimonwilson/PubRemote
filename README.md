@@ -49,37 +49,8 @@ Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](ht
 
 ## Issues
 
-[Create an issue](https://github.com/contactsimonwilson/PubRemote/issues) on GitHub or post in the PubRemote channel within the PubWheel Discord server
+[Create an issue](https://github.com/contactsimonwilson/PubRemote/issues) on GitHub or post in the Pubmote channel within the PubWheel Discord server
 
-## Pairing Instructions
+## Get Started Using PubMote
 
-To ensure you can get your PubRemote paired and running, follow these simple steps after you have your Pubmote hardware assembled and have flashed the latest Pubmote software to your ESP32:
-
-1. Install Float Accessories on your VESC Express. Available from [Syler's vesc_pkg repository](https://github.com/Relys/vesc_pkg). To install this, either:
-    - Clone the repository and build the float_accessories package yourself
-    - Download a relatively recent build from [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz) and install using the VESC Tool custom package installer
-2. Configure your VESC Express wifi settings
-    - Navigate to VESC Express > WiFi > WiFi Mode
-    - Set this to "Access Point"
-3. Configure your VESC Express Float Accessories settings
-    - Navigate to App UI > Settings > Pubmote Enabled
-    - Ensure this is checked
-    - Save and restart as necessary
-4. Launch Pubmote pairing
-    - On the Pubmote, navigate to the settings menu by swiping down from the top of the main screen
-    - Select "Pairing" and start the pairing on the Pubmote
-5. Launch VESC Express Pubmote pairing
-    - Navigate to App UI > Config > Pair Pubmote
-6. Confirm the pairing code on both the Pubmote and VESC Express
-
-You should now be connected!
-
-## Package-Side Setup
-
-On Refloat:
-1. Navigate to Refloat Cfg > Remote
-2. Ensure Remote Type is set to "UART"
-3. Ensure Tiltback Angle Limit is above 0 degrees
-4. Ensure Tiltback Speed is above 0 degrees/second
-5. Ensure Input Deadband is below 100%, but at least 1%.
-6. Set Throttle Current Maximum to 0, unless you intend to use remote throttle for fun
+For instructions on first-time setup, pairing, and usage, see the quick start guide.
