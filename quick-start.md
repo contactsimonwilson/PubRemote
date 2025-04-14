@@ -2,7 +2,7 @@
 
 ## First-Time Setup
 
-1. Ensure you have completed the Hardware Prerequisites and Software Prerequisites for a deployment from the README.
+1. Ensure you have completed the [Hardware Prerequisites](/README.md#hardware-prerequisites) and [Software Prerequisites](/README.md#software-prerequisites) for a deployment, from the README.
 2. Configure Pubmote settings
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Settings" and swipe through the options to set your preferences
