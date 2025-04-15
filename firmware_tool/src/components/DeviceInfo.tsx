@@ -64,7 +64,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand,
         </div>
       )}
 
-      {deviceInfo.connected && (
+      {deviceInfo.connected ? (
         <div className="grid gap-4 md:grid-cols-2 mb-4">
           {deviceInfo.chipId && (
             <div className="flex items-center gap-3 rounded-lg bg-gray-800/50 p-4">
@@ -109,6 +109,10 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand,
               </div>
             </div>
           </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between mb-6">
+          <p>Start here by connecting your ESP32-S3 display</p>
         </div>
       )}
 
