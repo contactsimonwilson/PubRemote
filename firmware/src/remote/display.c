@@ -87,15 +87,17 @@ static lv_indev_t *lvgl_touch_indev = NULL;
 #endif
 
 /* LCD panel gap */
-static uint8_t panel_x_gap = 0;
-static uint8_t panel_y_gap = 0;
 
 #ifdef PANEL_X_GAP
-panel_x_gap = PANEL_X_GAP;
+static uint8_t panel_x_gap = PANEL_X_GAP;
+#else
+static uint8_t panel_x_gap = 0;
 #endif
 
 #ifdef PANEL_Y_GAP
-panel_y_gap = PANEL_Y_GAP;
+static uint8_t panel_y_gap = PANEL_Y_GAP;
+#else
+static uint8_t panel_y_gap = 0;
 #endif
 
 static bool has_installed_drivers = false;
