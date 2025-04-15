@@ -106,6 +106,11 @@ function App() {
 
           <div className="rounded-lg bg-gray-900 p-6">
             <h2 className="mb-6 text-xl font-semibold">Flash Firmware</h2>
+
+            <div className="flex items-center justify-between mb-6">
+              <p>Finally, flash your selected firmware to the connected device</p>
+            </div>
+
             <div className="space-y-4">
               <FlashProgress
                 progress={flashProgress}

@@ -3,6 +3,7 @@
 ## First-Time Setup
 
 1. Ensure you have completed the [Hardware Prerequisites](/README.md#hardware-prerequisites) and [Software Prerequisites](/README.md#software-prerequisites) for a deployment, from the README.
+    - Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz/)
 2. Configure Pubmote settings
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Settings" and swipe through the options to set your preferences
@@ -21,6 +22,10 @@
 5. Go ride!
 
 ## Pairing Instructions
+
+> [!CAUTION]
+> VESC Express -> Bluetooth -> Bluetooth Mode: "Enabled and Encrypted" will cause connection failures with Pubmote! It must be set to "Enabled" or "Enabled with Scripting"
+> ![alt text](bt_encrypted.png)
 
 To ensure you can get your PubRemote paired and running, follow these simple steps after you have your Pubmote hardware assembled and have flashed the latest Pubmote software to your ESP32:
 
