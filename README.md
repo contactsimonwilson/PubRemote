@@ -54,4 +54,5 @@ Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](ht
 
 ## Get Started Using PubMote
 
-For instructions on first-time setup, pairing, and usage, see the [quick start guide](/docs/quick-start.md).
+- Not sure where to get started with a Pubmote build? Check out an example build like the [Leaf Blaster](/docs/builds/leaf-blaster.md)!
+- For instructions on first-time setup, pairing, and usage, see the [quick start guide](/docs/quick-start.md).
