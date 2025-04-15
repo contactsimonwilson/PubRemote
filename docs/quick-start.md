@@ -22,6 +22,10 @@
 
 ## Pairing Instructions
 
+> [!CAUTION]
+> VESC Express -> Bluetooth -> Bluetooth Mode: "Enabled and Encrypted" will cause connection failures with Pubmote! It must be set to "Enabled" or "Enabled with Scripting"
+> ![alt text](bt_encrypted.png)
+
 To ensure you can get your PubRemote paired and running, follow these simple steps after you have your Pubmote hardware assembled and have flashed the latest Pubmote software to your ESP32:
 
 1. Install Float Accessories on your VESC Express. Available from [Syler's vesc_pkg repository](https://github.com/Relys/vesc_pkg). To install this, either:
