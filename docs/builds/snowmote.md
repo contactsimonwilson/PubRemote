@@ -13,6 +13,8 @@ By ZiNc
   - [SnowMote case](https://www.printables.com/model/1143449) by ZiNc
   - 5 x M1.7x3 screws
 
+## Instructions
+
 1. Print all require case parts!
 2. Place battery into its case (if desired) and zip tie this to the Floor piece
 ![Snowmote backing](snowmote-1.png)
