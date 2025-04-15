@@ -3,20 +3,21 @@
 ## First-Time Setup
 
 1. Ensure you have completed the [Hardware Prerequisites](/README.md#hardware-prerequisites) and [Software Prerequisites](/README.md#software-prerequisites) for a deployment, from the README.
+  - Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz/)
 2. Configure Pubmote settings
-    - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
-    - Select "Settings" and swipe through the options to set your preferences
-    - Select "Save" to apply your settings
+  - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
+  - Select "Settings" and swipe through the options to set your preferences
+  - Select "Save" to apply your settings
 3. Calibrate your Pubmote
-    - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
-    - Select "Calibration"
-    - Select "Start" and move through the steps, selecting "Next" to continue each step, and "Save" to store your calibration.
-        - For "Move stick to center", allow the joystick to sit steady.
-        - For "Move stick to min/max", move the joystick smoothly to its limits of motion in all directions.
-        - For "Move stick within deadband", move the joystick just slightly off-center. This will set the inner radius the Pubmote treats as no input.
-        - For "Set expo factor", you may leave this at 1.00 or adjust for more or less input to tilt ratio.
-        - For "Invert Y", you may check or uncheck this to flip the direction of the Y axis input.
-        - View the graph for testing and save your calibration.
+  - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
+  - Select "Calibration"
+  - Select "Start" and move through the steps, selecting "Next" to continue each step, and "Save" to store your calibration.
+    - For "Move stick to center", allow the joystick to sit steady.
+    - For "Move stick to min/max", move the joystick smoothly to its limits of motion in all directions.
+    - For "Move stick within deadband", move the joystick just slightly off-center. This will set the inner radius the Pubmote treats as no input.
+    - For "Set expo factor", you may leave this at 1.00 or adjust for more or less input to tilt ratio.
+    - For "Invert Y", you may check or uncheck this to flip the direction of the Y axis input.
+    - View the graph for testing and save your calibration.
 4. Pair the remote to your VESC Express by following the [Pairing Instructions](#pairing-instructions)
 5. Go ride!
 
