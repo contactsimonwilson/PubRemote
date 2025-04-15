@@ -12,14 +12,14 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 
 #### ESP32S3-based controller with a display, and a case. Options:
 - **Recommended:** [WaveShare 1.43in Amoled display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm?sku=30106) (see: [example build](/docs/builds/leaf-blaster.md))
-  - [ZiNc Leaf Blaster remix case](https://www.printables.com/model/1265591) by ZiNc
-  - [Leaf Blaster case](https://www.printables.com/model/1191785) by Markoblaster
+    - [ZiNc Leaf Blaster remix case](https://www.printables.com/model/1265591) by ZiNc
+    - [Leaf Blaster case](https://www.printables.com/model/1191785) by Markoblaster
 - [WaveShare 1.28in LCD display](https://www.waveshare.com/esp32-s3-touch-lcd-1.28.htm)
-  - [VX4 Case](https://www.printables.com/model/835158-pubmote) by ThePoro
-  - Full development kit from [Avaspark](https://avaspark.com/products/pubmote-dev-kit) including a case, display, joystick, and other parts
+    - [VX4 Case](https://www.printables.com/model/835158-pubmote) by ThePoro
+    - Full development kit from [Avaspark](https://avaspark.com/products/pubmote-dev-kit) including a case, display, joystick, and other parts
 - The ["Cowmote"](https://cowpowersystems.com/product/1) from ExcessRaccoon uses the [LilyGo T-Display S3 Amoled (1.43in)](https://lilygo.cc/products/t-display-s3-amoled-1-64?variant=44507650556085) (see: [example build](/docs/builds/snowmote.md))
-  - [SnowMote case](https://www.printables.com/model/1143449) by ZiNc
-  - [Finger Blaster case](https://www.printables.com/model/1159060) by Markoblaster
+    - [SnowMote case](https://www.printables.com/model/1143449) by ZiNc
+    - [Finger Blaster case](https://www.printables.com/model/1159060) by Markoblaster
 
 #### A Joystick. Options:
 - [PS5 hall joystick](https://www.aliexpress.us/item/3256806823053436.html)
@@ -40,9 +40,9 @@ Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](ht
 
 #### Advanced Deployment
 - IDE or other code editor
-  - SquareLine Studio
-  - VS Code
-  - Something else...
+    - SquareLine Studio
+    - VS Code
+    - Something else...
 - PlatformIO
 
 > [!TIP]
