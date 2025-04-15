@@ -4,7 +4,7 @@ By ZiNc
 
 ## Parts
 
-- The ["Cowmote"](https://cowpowersystems.com/product/1) from ExcessRacoon uses the [LilyGo T-Display S3 Amoled (1.43in)](https://lilygo.cc/products/t-display-s3-amoled-1-64?variant=44507650556085)
+- The ["Cowmote"](https://cowpowersystems.com/product/1) from ExcessRaccoon uses the [LilyGo T-Display S3 Amoled (1.43in)](https://lilygo.cc/products/t-display-s3-amoled-1-64?variant=44507650556085)
 - [PS5 hall joystick](https://www.aliexpress.us/item/3256806823053436.html)
 - Battery
   - [1500mAh Lipo battery](https://www.amazon.com/dp/B09DPNCLQZ)
