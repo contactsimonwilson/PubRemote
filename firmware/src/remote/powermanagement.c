@@ -3,8 +3,10 @@
 #include "buzzer.h"
 #include "display.h"
 #include "driver/gpio.h"
+#include "driver/rtc_io.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_log.h"
+#include "esp_sleep.h"
 #include "esp_timer.h"
 #include "remoteinputs.h"
 #include "settings.h"
@@ -78,26 +80,20 @@ static bool check_button_press() {
   while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL) { // Check if button is still pressed
     if ((esp_timer_get_time() - pressStartTime) >= (REQUIRED_PRESS_TIME_MS * 1000)) {
       ESP_LOGI(TAG, "Button has been pressed for 2 seconds.");
-      break;
+      return true;
     }
     vTaskDelay(pdMS_TO_TICKS(10)); // Delay to allow for time checking without busy waiting
   }
-  while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL) {
-    // wait for button release
-  }
-  if ((esp_timer_get_time() - pressStartTime) < (REQUIRED_PRESS_TIME_MS * 1000)) {
-    ESP_LOGI(TAG, "Button press time was less than 2 seconds. Ignoring.");
-    return false;
-  }
-
-  return true;
+  return false;
 }
+
+#define BUTTON_PIN_BITMASK(GPIO) (1ULL << GPIO) // 2 ^ GPIO_NUMBER in hex
 
 static esp_err_t enable_wake() {
   esp_err_t res = ESP_OK;
 
   if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !FORCE_LIGHT_SLEEP) {
-    res = esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL);
+    res = esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK(JOYSTICK_BUTTON_PIN), JOYSTICK_BUTTON_LEVEL);
     if (res != ESP_OK) {
       ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
     }
@@ -118,8 +114,10 @@ static esp_err_t enable_wake() {
 }
 
 void enter_sleep() {
+  vTaskDelay(50); // Delay for button debouncing
   if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !FORCE_LIGHT_SLEEP) {
     ESP_LOGI(TAG, "Entering deep sleep mode");
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
     esp_deep_sleep_start();
   }
   else {
@@ -237,15 +235,15 @@ void init_power_management() {
   wakeup_reason = esp_sleep_get_wakeup_cause();
   ESP_LOGI(TAG, "Wake-up reason: %d", wakeup_reason);
   switch (wakeup_reason) {
-  case ESP_SLEEP_WAKEUP_EXT0: { // Wake-up caused by external signal using RTC_IO
-    ESP_LOGI(TAG, "Woken up by external signal on EXT0.");
+  case ESP_SLEEP_WAKEUP_EXT0:
+    break;
+  case ESP_SLEEP_WAKEUP_EXT1:
+    ESP_LOGI(TAG, "Woken up by external signal on EXT1.");
     // Proceed to check if the button is still pressed
     if (!check_button_press()) {
       enter_sleep();
     }
     break;
-  }
-  case ESP_SLEEP_WAKEUP_EXT1:
   case ESP_SLEEP_WAKEUP_TIMER:
   case ESP_SLEEP_WAKEUP_TOUCHPAD:
   case ESP_SLEEP_WAKEUP_ULP:
