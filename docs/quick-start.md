@@ -77,15 +77,17 @@ Some common scenarios where a tilt remote may be useful:
 ### The Pubmote won't connect
 
 1. If VESC Express -> WiFi -> WiFi Mode is set to "Station Mode", it will cause connection failures with Pubmote.
+
 The fix: It must be set to "Access Point"
 
-2. If VESC Controller -> Refloat Cfg -> Remote ->
-  - Remote Type is not set to UART
-  - Tiltback Angle Limit is set to 0 °
-  - Tiltback Speed is set to 0 °/s
-  - Input Deadband is set to a very high %
+3. If VESC Controller -> Refloat Cfg -> Remote ->
+      - Remote Type is not set to UART
+      - Tiltback Angle Limit is set to 0 °
+      - Tiltback Speed is set to 0 °/s
+      - Input Deadband is set to a very high %
 
 The fix: Ensure Remote Type of  UART, Tiltback Angle Limit of >0 °, Tiltback Speed of >0 °/s, and a relatively low Input Deadband,
 
 ### The direction of the tilt is backwards
+
 The fix: Re-run calibration and check "Invert Y"
