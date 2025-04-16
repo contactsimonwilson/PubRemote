@@ -1,6 +1,6 @@
 name: PlatformIO CI
 
-# Run on every opened, reopened, or updated PR
+# Runs on every opened, reopened, or updated PR
 on:
   pull_request:
     types: 
@@ -11,16 +11,18 @@ on:
     branches:
       - master
 
-# References: 
-# https://docs.platformio.org/en/stable/integration/ci/github-actions.html
 jobs:
   build:
-    if: github.repository == 'contactsimonwilson/PubRemote' && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Check out the PR branch
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - uses: actions/cache@v4
         with:
