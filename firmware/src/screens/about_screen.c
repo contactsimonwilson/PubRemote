@@ -1,7 +1,6 @@
 #include "esp_log.h"
 #include "remote/display.h"
 #include "remote/ota.h"
-#include "remote/wifi.h"
 #include "utilities/screen_utils.h"
 #include "utilities/string_utils.h"
 #include <remote/remoteinputs.h>
