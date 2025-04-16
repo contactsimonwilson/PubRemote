@@ -12,7 +12,7 @@ By ZiNc
 - Case
   - [ZiNc Leaf Blaster remix case](https://www.printables.com/model/1265591) by ZiNc
   - [Leaf Blaster case](https://www.printables.com/model/1191785) by Markoblaster
-  - 5 x [M3 heat set inserts](https://www.amazon.com/dp/B0CS6VZYL8)
+  - 5 x [M3 x D5 x L4 heat set inserts](https://www.amazon.com/dp/B0CS6VZYL8)
   - 3 x M3x12 countersunk screws
 
 ## Instructions
