@@ -272,6 +272,10 @@ export function FirmwareSelector({ onSelectFirmware }: Props) {
           />
       </div>
 
+      <div className="flex items-center justify-between mb-6">
+        <p>Once connected to your device, upload your desired firmware build ZIP here</p>
+      </div>
+
       {fetchError && (
         <div className="p-3 rounded-lg bg-red-900/50 text-red-200">{fetchError}</div>
       )}

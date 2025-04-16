@@ -1,0 +1,147 @@
+name: PR Build Request
+
+# Runs when a comment is added or edited on a PR
+on:
+  issue_comment:
+    types: 
+      - created
+      - edited
+
+# Concurrency limit: Only one workflow run per user at a time
+concurrency:
+  group: pr-build-${{ github.event.comment.user.login }}
+  cancel-in-progress: true
+
+jobs:
+  check_comment:
+    runs-on: ubuntu-latest
+    outputs:
+      comment_valid: ${{ steps.validate-build-value.outputs.comment_valid }}
+      build_value: ${{ steps.check_comment.outputs.build_value }}
+
+    steps:
+      # Check out the PR branch
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      # Step 1: Check if the comment is on a PR, contains "/build", and extract the value after it
+      - name: Check comment conditions and extract value
+        id: check_comment
+        run: |
+          if [[ "${{ github.event.issue.pull_request }}" && "${{ github.event.comment.body }}" == */build* ]]; then
+            # Extract the value after "/build"
+            build_value=$(echo "${{ github.event.comment.body }}" | sed -n 's|.*/build \(.*\)|\1|p')
+            echo "comment_valid=true" >> $GITHUB_OUTPUT
+            echo "build_value=$build_value" >> $GITHUB_OUTPUT
+          else
+            echo "comment_valid=false" >> $GITHUB_OUTPUT
+            echo "build_value=" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 2: Validate the extracted build_value against the platformio.ini file
+      - name: Validate build_value
+        id: validate-build-value
+        run: |
+          if [[ "${{ steps.check_comment.outputs.comment_valid }}" == "true" ]]; then
+            # Check if the build_value exists in platformio.ini
+            if grep -q "\[env:${{ steps.check_comment.outputs.build_value }}\]" platformio.ini; then
+              echo "Build value is valid."
+              echo "comment_valid=true" >> $GITHUB_OUTPUT
+            else
+              echo "Build value is invalid."
+              echo "comment_valid=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "comment_valid=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 3: React to the comment with a thumbs-up or "x" if it contains "/build"
+      - name: React to comment
+        if: steps.check_comment.outputs.build_value != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { issue: { number: issue_number }, repository: { owner: { login: owner }, name: repo } } = context.payload;
+            const comment_id = context.payload.comment.id;
+            const comment_valid = "${{ steps.validate-build-value.outputs.comment_valid }}";
+
+            // React with a thumbs-up if comment_valid is true, otherwise react with an "x"
+            const reaction = comment_valid === "true" ? "+1" : "-1";
+            await github.rest.reactions.createForIssueComment({
+              owner,
+              repo,
+              comment_id,
+              content: reaction,
+            });
+
+  build_and_reply: 
+    runs-on: ubuntu-latest
+    needs: check_comment
+    if: needs.check_comment.outputs.comment_valid == 'true'
+
+    steps:
+      # Check out the PR branch
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      # Build the project using the extracted build_value
+      - name: Build PlatformIO Project
+        run: pio run -e ${{ needs.check_comment.outputs.build_value }}
+        env:
+          PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"qa\"'
+  
+      # Create a folder named according to the build and copy the build files into it
+      - name: Create build folder and copy files
+        run: |
+          build_folder="${{ needs.check_comment.outputs.build_value }}-${GITHUB_SHA}-qa"
+          mkdir -p "$build_folder"
+          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/bootloader.bin "$build_folder/"
+          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/partitions.bin "$build_folder/"
+          cp .pio/build/${{ needs.check_comment.outputs.build_value }}/firmware.bin "$build_folder/"
+
+      # Upload the ZIP file as an artifact
+      - name: Upload build artifacts
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ needs.check_comment.outputs.build_value }}-${{ github.sha }}-qa
+          path: ${{ needs.check_comment.outputs.build_value }}-${{ github.sha }}-qa
+
+      # Reply to the PR comment with a direct download link and tag the user
+      - name: Reply to PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { issue: { number: issue_number }, repository: { owner: { login: owner }, name: repo } } = context.payload;
+            const comment_id = context.payload.comment.id;
+            const commenter = context.payload.comment.user.login;
+
+            // Get the artifact URL from the upload-artifact step
+            const buildValue = "${{ needs.check_comment.outputs.build_value }}";
+            const artifactUrl = "${{ steps.upload-artifact.outputs.artifact-url }}";
+
+            // Reply to the PR comment with a direct download link and tag the user
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `@${commenter} Build completed successfully! 🎉 [${buildValue}-${{ github.sha }}-qa.zip](${artifactUrl})`,
+            });
