@@ -17,15 +17,25 @@ By ZiNc
 
 1. Print all require case parts!
 2. Place battery into its case (if desired) and zip tie this to the Floor piece
+
 ![Snowmote backing](snowmote-1.png)
 ![Snowmote battery](snowmote-2.png)
-3. Install data wire between main PCB and joystick breakout board
+
+4. Install data wire between main PCB and joystick breakout board
+
 ![Snowmote PCB](snowmote-3.png)
-4. Install main PCB and joystick breakout board on Floor piece
+
+5. Install main PCB and joystick breakout board on Floor piece
+
 ![Snowmote breakout](snowmote-4.png)
-5. Connect power to LilyGo display and install onto main PCB with the UCB-C port on the display facing away from the joystick
+
+6. Connect power to LilyGo display and install onto main PCB with the UCB-C port on the display facing away from the joystick
+
 ![Snowmote power](snowmote-5.webp)
-6. Close lid over top of assembled board and snap to fit together
+
+7. Close lid over top of assembled board and snap to fit together
+
 ![Snowmote assembly](snowmote-6.webp)
-7. Install a lanyard if you like!
-8. You're ready to start [setting up your Pubmote software](/README.md#software-prerequisites)!
+
+8. Install a lanyard if you like!
+9. You're ready to start [setting up your Pubmote software](/README.md#software-prerequisites)!
