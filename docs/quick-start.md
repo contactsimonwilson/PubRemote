@@ -23,10 +23,6 @@
 
 ## Pairing Instructions
 
-> [!CAUTION]
-> VESC Express -> Bluetooth -> Bluetooth Mode: "Enabled and Encrypted" will cause connection failures with Pubmote! It must be set to "Enabled" or "Enabled with Scripting"
-> ![alt text](bt_encrypted.png)
-
 To ensure you can get your PubRemote paired and running, follow these simple steps after you have your Pubmote hardware assembled and have flashed the latest Pubmote software to your ESP32:
 
 1. Install Float Accessories on your VESC Express. Available from [Syler's vesc_pkg repository](https://github.com/Relys/vesc_pkg). To install this, either:
@@ -60,5 +56,38 @@ On Refloat:
 
 ## Usage
 
-1. While the homescreen is active, tilting the joystick will apply remote input to your VESC 
-2. If the direction of tilt is backwards, re-run calibration and check "Invert Y"
+While the homescreen is active, tilting the joystick will apply remote input to your VESC.
+
+Some common scenarios where a tilt remote may be useful:
+- Going up a hill, raising the nose angle
+- Going down a hill, lowering the nose angle
+- Accelerating quickly, raising the nose angle
+- Decelerating quickly, lowering the nose angle
+- Riding into headwind, lowering the nose angle to require less leaning into the wind
+- Landing drops more level, lowering the nose
+- Bonks or climbs over large objects, to gain clearance on the approach and exit
+- Putting your friends through a Bucking Bronco mini game on your board
+- Nose slides
+- Tail drags
+- Balance recovery
+- And whatever else you might come up with!
+
+## Common Issues and Mistakes
+
+### The Pubmote won't connect
+
+1. If VESC Express -> WiFi -> WiFi Mode is set to "Station Mode", it will cause connection failures with Pubmote.
+
+The fix: It must be set to "Access Point"
+
+3. If VESC Controller -> Refloat Cfg -> Remote ->
+      - Remote Type is not set to UART
+      - Tiltback Angle Limit is set to 0 °
+      - Tiltback Speed is set to 0 °/s
+      - Input Deadband is set to a very high %
+
+The fix: Ensure Remote Type of  UART, Tiltback Angle Limit of >0 °, Tiltback Speed of >0 °/s, and a relatively low Input Deadband,
+
+### The direction of the tilt is backwards
+
+The fix: Re-run calibration and check "Invert Y"
