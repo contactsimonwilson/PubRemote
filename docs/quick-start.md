@@ -23,10 +23,6 @@
 
 ## Pairing Instructions
 
-> [!CAUTION]
-> VESC Express -> Bluetooth -> Bluetooth Mode: "Enabled and Encrypted" will cause connection failures with Pubmote! It must be set to "Enabled" or "Enabled with Scripting"
-> ![alt text](bt_encrypted.png)
-
 To ensure you can get your PubRemote paired and running, follow these simple steps after you have your Pubmote hardware assembled and have flashed the latest Pubmote software to your ESP32:
 
 1. Install Float Accessories on your VESC Express. Available from [Syler's vesc_pkg repository](https://github.com/Relys/vesc_pkg). To install this, either:
@@ -79,15 +75,11 @@ Some common scenarios where a tilt remote may be useful:
 ## Common Issues and Mistakes
 
 ### The Pubmote won't connect
-1. If VESC Express -> Bluetooth -> Bluetooth Mode is set to "Enabled and Encrypted", it will cause connection failures with Pubmote!
 
-The fix: It must be set to "Enabled" or "Enabled with Scripting".
-
-2. If VESC Express -> WiFi -> WiFi Mode is set to "Station Mode", it will cause connection failures with Pubmote.
-
+1. If VESC Express -> WiFi -> WiFi Mode is set to "Station Mode", it will cause connection failures with Pubmote.
 The fix: It must be set to "Access Point"
 
-3. If VESC Controller -> Refloat Cfg -> Remote ->
+2. If VESC Controller -> Refloat Cfg -> Remote ->
   - Remote Type is not set to UART
   - Tiltback Angle Limit is set to 0 °
   - Tiltback Speed is set to 0 °/s
