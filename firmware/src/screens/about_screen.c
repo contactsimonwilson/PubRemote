@@ -1,5 +1,6 @@
 #include "esp_log.h"
 #include "remote/display.h"
+#include "remote/ota.h"
 #include "utilities/screen_utils.h"
 #include "utilities/string_utils.h"
 #include <remote/remoteinputs.h>
@@ -76,8 +77,4 @@ void about_screen_loaded(lv_event_t *e) {
 
 void about_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen unloaded");
-}
-
-void update_button_press(lv_event_t *e) {
-  ESP_LOGI(TAG, "Update button pressed");
 }

@@ -155,10 +155,6 @@ def reset_button_press(event_struct):
     return
 
 
-def update_button_press(event_struct):
-    return
-
-
 def shutdown_button_press(event_struct):
     return
 
