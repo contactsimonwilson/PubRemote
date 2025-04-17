@@ -9,6 +9,8 @@
 void reset_sleep_timer();
 void init_power_management();
 void enter_sleep();
+void bind_power_button();
+void unbind_power_button();
 
 typedef enum {
   CHARGING,

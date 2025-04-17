@@ -33,12 +33,12 @@ void app_main(void) {
   // Core setup
   init_settings();
   init_adcs();
+  init_buttons(); // Required before power management for boot button detection
   init_power_management();
 
   // Peripherals
   init_led();
   init_buzzer();
-  init_buttons();
   init_thumbstick();
   init_display();
 
