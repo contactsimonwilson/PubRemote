@@ -154,11 +154,11 @@ static esp_err_t app_lcd_init(void) {
   READ_LCD_ID = read_lcd_id();
 
   if (READ_LCD_ID == CO5300_ID) {
-    ESP_LOGI(TAG, "CO5300 display detected");
+    ESP_LOGI(TAG, "CO5300 display detected. read_lcd_id() result: %d", READ_LCD_ID);
     panel_x_gap = 6;
   }
   else if (READ_LCD_ID == SH8601_ID) {
-    ESP_LOGI(TAG, "SH8601 display detected");
+    ESP_LOGI(TAG, "SH8601 display detected. read_lcd_id() result: %d", READ_LCD_ID);
   }
   else {
     ESP_LOGI(TAG, "Error reading display from ID");

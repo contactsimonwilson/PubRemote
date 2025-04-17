@@ -31,17 +31,18 @@ size_t sh8601_get_lcd_init_cmds_size(void) {
 
 // Reference:
 // https://files.waveshare.com/wiki/ESP32-S3-Touch-AMOLED-1.43/ESP32-S3-AMOLED-1.43-Demo-V3.zip
+// https://files.waveshare.com/wiki/common/CO5300(ICNA3311)_Datasheet_V0.01_20230724.pdf
 const sh8601_lcd_init_cmd_t co5300_lcd_init_cmds[] = {
     {SH8601_C_SLPOUT, (uint8_t[]){0x00}, 0, 80},
-    {0xC4, (uint8_t[]){0x80}, 1, 0},
-    //{0x44, (uint8_t []){0x01, 0xD1}, 2, 0},
-    //{0x35, (uint8_t []){0x00}, 1, 0},//TE ON
+    {SH8601_W_SPIMODECTL, (uint8_t[]){0x80}, 1, 0},
+    //{SH8601_W_SETTSL, (uint8_t []){0x01, 0xD1}, 2, 0},
+    //{SH8601_WC_TEARON, (uint8_t []){0x00}, 1, 0},//TE ON
     {SH8601_W_WCTRLD1, (uint8_t[]){0x20}, 1, 1},
-    {0x63, (uint8_t[]){0xFF}, 1, 1},
+    {SH8601_W_WDBRIGHTNESSVALHBM, (uint8_t[]){0xFF}, 1, 1},
     {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0x00}, 1, 1},
     {SH8601_C_DISPON, (uint8_t[]){0x00}, 0, 10},
     {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0xFF}, 1, 0},
-    //{0x36, (uint8_t []){0x60}, 1, 0},
+    //{SH8601_W_MADCTL, (uint8_t []){0x60}, 1, 0},
 };
 
 size_t co5300_get_lcd_init_cmds_size(void) {
