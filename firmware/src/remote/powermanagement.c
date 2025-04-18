@@ -131,7 +131,6 @@ static void power_button_long_press_hold(void *arg, void *usr_data) {
   }
 
   // Immediately turn off screen but wait for release before sleep
-  uint8_t cur_level = get_bl_level();
   set_bl_level(0);
 
   while (get_button_pressed()) {
@@ -139,9 +138,6 @@ static void power_button_long_press_hold(void *arg, void *usr_data) {
   }
 
   enter_sleep();
-
-  // Restore brightness state when back from light sleep
-  set_bl_level(cur_level);
 }
 
 void bind_power_button() {
@@ -175,6 +171,8 @@ void enter_sleep() {
   unbind_power_button();
   enable_wake();
   vTaskDelay(10); // Allow gpio level to settle before going into sleep
+  // Turn off screen before sleep
+  set_bl_level(0);
 
   while (1) {
     if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
