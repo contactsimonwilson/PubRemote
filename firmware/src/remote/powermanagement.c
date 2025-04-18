@@ -124,18 +124,22 @@ static esp_err_t enable_wake() {
 
 static void power_button_long_press_hold(void *arg, void *usr_data) {
   BoardState state = remoteStats.state;
-  if (state == BOARD_STATE_RUNNING_FLYWHEEL || state == BOARD_STATE_RUNNING_TILTBACK ||
+  if (state == BOARD_STATE_RUNNING || state == BOARD_STATE_RUNNING_FLYWHEEL || state == BOARD_STATE_RUNNING_TILTBACK ||
       state == BOARD_STATE_RUNNING_UPSIDEDOWN || state == BOARD_STATE_RUNNING_WHEELSLIP) {
     ESP_LOGI(TAG, "Power button long press hold detected. Ignoring.");
     return;
   }
+
   // Immediately turn off screen but wait for release before sleep
   uint8_t cur_level = get_bl_level();
   set_bl_level(0);
+
   while (get_button_pressed()) {
     vTaskDelay(pdMS_TO_TICKS(10));
   }
+
   enter_sleep();
+
   // Restore brightness state when back from light sleep
   set_bl_level(cur_level);
 }
@@ -184,10 +188,12 @@ void enter_sleep() {
 
       // Light sleep resumes code execution after wake-up
       ESP_LOGI(TAG, "Woke up from light sleep mode");
+
       if (check_button_press()) {
         ESP_LOGI(TAG, "Button was pressed. Resuming from light sleep.");
         esp_restart(); // Restart the system so we start from the same point as deep sleep
       }
+
       // If button was not pressed, continue the loop
       ESP_LOGI(TAG, "Button was not pressed. Entering sleep mode again.");
     }
