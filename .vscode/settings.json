@@ -1,11 +1,14 @@
 {
     "C_Cpp.intelliSenseEngine": "default",
     "files.associations": {
+      "*.ejs": "ejs",
+      "*.lisp": "lisp",
       "*.h": "c",
       "*.c": "c",
       "array": "c",
       "string": "c",
-      "string_view": "c"
+      "string_view": "c",
+      "cstdint": "c"
     },
     "editor.tabSize": 2,
     "files.eol": "\n",

@@ -26,23 +26,27 @@ const sh8601_lcd_init_cmd_t sh8601_lcd_init_cmds[] = {
 };
 
 size_t sh8601_get_lcd_init_cmds_size(void) {
-  return sizeof(sh8601_lcd_init_cmds) / sizeof(sh8601_lcd_init_cmd_t);
+  return sizeof(sh8601_lcd_init_cmds) / sizeof(sh8601_lcd_init_cmds[0]);
 }
 
-// CO5300 is very similar to SH8601 - lets just put them here
+// Reference:
+// https://files.waveshare.com/wiki/ESP32-S3-Touch-AMOLED-1.43/ESP32-S3-AMOLED-1.43-Demo-V3.zip
+// https://files.waveshare.com/wiki/common/CO5300(ICNA3311)_Datasheet_V0.01_20230724.pdf
 const sh8601_lcd_init_cmd_t co5300_lcd_init_cmds[] = {
-    //  {cmd, { data }, data_size, delay_ms}
-    {SH8601_C_SLPOUT, (uint8_t[]){0x00}, 0, SH8601_SLPOUT_DELAY},
+    {SH8601_C_SLPOUT, (uint8_t[]){0x00}, 0, 80},
     {SH8601_W_SPIMODECTL, (uint8_t[]){0x80}, 1, 0},
-    {SH8601_W_PIXFMT, (uint8_t[]){0x05}, 1, 0}, // Interface Pixel Format 16bit/pixel
-    {SH8601_C_DISPON, (uint8_t[]){0x00}, 0, 0},
-    {SH8601_W_WCTRLD1, (uint8_t[]){0x28}, 1, 0},            // Brightness Control On and Display Dimming On
-    {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0x00}, 1, 0}, // Brightness adjustment
-    {SH8601_W_WCE, (uint8_t[]){0x00}, 1, 10},               // High contrast mode (Sunlight Readability Enhancement)
+    //{SH8601_W_SETTSL, (uint8_t []){0x01, 0xD1}, 2, 0},
+    //{SH8601_WC_TEARON, (uint8_t []){0x00}, 1, 0},//TE ON
+    {SH8601_W_WCTRLD1, (uint8_t[]){0x20}, 1, 1},
+    {SH8601_W_WDBRIGHTNESSVALHBM, (uint8_t[]){0xFF}, 1, 1},
+    {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0x00}, 1, 1},
+    {SH8601_C_DISPON, (uint8_t[]){0x00}, 0, 10},
+    {SH8601_W_WDBRIGHTNESSVALNOR, (uint8_t[]){0xFF}, 1, 0},
+    //{SH8601_W_MADCTL, (uint8_t []){0x60}, 1, 0},
 };
 
 size_t co5300_get_lcd_init_cmds_size(void) {
-  return sizeof(co5300_lcd_init_cmds) / sizeof(sh8601_lcd_init_cmd_t);
+  return sizeof(co5300_lcd_init_cmds) / sizeof(co5300_lcd_init_cmds[0]);
 }
 
 static esp_err_t tx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, const void *param, size_t param_size) {

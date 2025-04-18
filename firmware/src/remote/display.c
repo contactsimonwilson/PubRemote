@@ -1,4 +1,5 @@
 #include "display/display_driver.h"
+#include "display/sh8601/read_lcd_id_bsp.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/ledc.h"
@@ -32,13 +33,7 @@
 #if DISP_GC9A01
   #include "esp_lcd_gc9a01.h"
   #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_BGR
-#elif DISP_SH8601
-  #define SW_ROTATE 1
-  #define ROUNDER_CALLBACK 1
-  #include "display/sh8601/display_driver_sh8601.h"
-  #include "esp_lcd_sh8601.h"
-  #define RGB_ELE_ORDER LCD_RGB_ELEMENT_ORDER_RGB
-#elif DISP_CO5300
+#elif DISP_SH8601 || DISP_CO5300
   #define SW_ROTATE 1
   #define ROUNDER_CALLBACK 1
   #include "display/sh8601/display_driver_sh8601.h"
@@ -91,6 +86,20 @@ static lv_display_t *lvgl_disp = NULL;
 static lv_indev_t *lvgl_touch_indev = NULL;
 #endif
 
+/* LCD panel gap */
+
+#ifdef PANEL_X_GAP
+static uint8_t panel_x_gap = PANEL_X_GAP;
+#else
+static uint8_t panel_x_gap = 0;
+#endif
+
+#ifdef PANEL_Y_GAP
+static uint8_t panel_y_gap = PANEL_Y_GAP;
+#else
+static uint8_t panel_y_gap = 0;
+#endif
+
 static bool has_installed_drivers = false;
 
 #if ROUNDER_CALLBACK
@@ -139,14 +148,36 @@ void set_bl_level(uint8_t level) {
 
 static esp_err_t app_lcd_init(void) {
   esp_err_t ret = ESP_OK;
+
+/* Display IDs for SH8601 vs CO5300 display */
+#define SH8601_ID 0x86
+#define CO5300_ID 0xff
+  static uint8_t READ_LCD_ID = 0x00;
+#ifndef DISP_CO5300
+  #define DISP_CO5300 0
+#endif
+
+#if DISP_SH8601 && DISP_CO5300
+  READ_LCD_ID = read_lcd_id();
+
+  if (READ_LCD_ID == CO5300_ID) {
+    ESP_LOGI(TAG, "CO5300 display detected. read_lcd_id() result: %d", READ_LCD_ID);
+    panel_x_gap = 6;
+  }
+  else if (READ_LCD_ID == SH8601_ID) {
+    ESP_LOGI(TAG, "SH8601 display detected. read_lcd_id() result: %d", READ_LCD_ID);
+  }
+  else {
+    ESP_LOGI(TAG, "Error reading display from ID");
+  }
+#endif
+
   display_driver_preinit();
   ESP_LOGI(TAG, "Initialize SPI bus");
+
 #if DISP_GC9A01
   const spi_bus_config_t buscfg = GC9A01_PANEL_BUS_SPI_CONFIG(DISP_CLK, DISP_MOSI, MAX_TRAN_SIZE);
-#elif DISP_SH8601
-  const spi_bus_config_t buscfg =
-      SH8601_PANEL_BUS_QSPI_CONFIG(DISP_CLK, DISP_SDIO0, DISP_SDIO1, DISP_SDIO2, DISP_SDIO3, MAX_TRAN_SIZE);
-#elif DISP_CO5300
+#elif DISP_SH8601 || DISP_CO5300
   const spi_bus_config_t buscfg =
       SH8601_PANEL_BUS_QSPI_CONFIG(DISP_CLK, DISP_SDIO0, DISP_SDIO1, DISP_SDIO2, DISP_SDIO3, MAX_TRAN_SIZE);
 #elif DISP_ST7789
@@ -158,31 +189,22 @@ static esp_err_t app_lcd_init(void) {
 
 #if DISP_GC9A01
   const esp_lcd_panel_io_spi_config_t io_config = GC9A01_PANEL_IO_SPI_CONFIG(DISP_CS, DISP_DC, NULL, NULL);
-#elif DISP_SH8601
+#elif DISP_SH8601 || DISP_CO5300
   const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, NULL, NULL);
-#elif DISP_CO5300
-  const esp_lcd_panel_io_spi_config_t io_config = SH8601_PANEL_IO_QSPI_CONFIG(DISP_CS, DISP_DC, NULL);
 #elif DISP_ST7789
   #error "ST7789 not supported"
 #endif
+
   // Attach the LCD to the SPI bus
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &lcd_io));
 
 #if DISP_GC9A01
   gc9a01_vendor_config_t vendor_config = {};
-#elif DISP_SH8601
+#elif DISP_SH8601 || DISP_CO5300
   sh8601_vendor_config_t vendor_config = {
-      .init_cmds = sh8601_lcd_init_cmds,
-      .init_cmds_size = sh8601_get_lcd_init_cmds_size(),
-      .flags =
-          {
-              .use_qspi_interface = 1,
-          },
-  };
-#elif DISP_CO5300
-  sh8601_vendor_config_t vendor_config = {
-      .init_cmds = co5300_lcd_init_cmds,
-      .init_cmds_size = co5300_get_lcd_init_cmds_size(),
+      .init_cmds = (READ_LCD_ID == CO5300_ID || DISP_CO5300) ? co5300_lcd_init_cmds : sh8601_lcd_init_cmds,
+      .init_cmds_size =
+          (READ_LCD_ID == CO5300_ID || DISP_CO5300) ? co5300_get_lcd_init_cmds_size() : sh8601_get_lcd_init_cmds_size(),
       .flags =
           {
               .use_qspi_interface = 1,
@@ -202,11 +224,8 @@ static esp_err_t app_lcd_init(void) {
 #if DISP_GC9A01
   ESP_LOGI(TAG, "Install GC9A01 panel driver");
   esp_err_t init_err = esp_lcd_new_panel_gc9a01(lcd_io, &panel_config, &lcd_panel);
-#elif DISP_SH8601
-  ESP_LOGI(TAG, "Install SH8601 panel driver");
-  esp_err_t init_err = esp_lcd_new_panel_sh8601(lcd_io, &panel_config, &lcd_panel);
-#elif DISP_CO5300
-  ESP_LOGI(TAG, "Install CO5300 panel driver");
+#elif DISP_SH8601 || DISP_CO5300
+  ESP_LOGI(TAG, "Install SH8601/CO5300 panel driver");
   esp_err_t init_err = esp_lcd_new_panel_sh8601(lcd_io, &panel_config, &lcd_panel);
 #elif DISP_ST7789
   #error "ST7789 not supported"
@@ -214,12 +233,15 @@ static esp_err_t app_lcd_init(void) {
 
   if (init_err != ESP_OK) {
     ESP_LOGE(TAG, "Failed to install LCD driver");
+
     if (lcd_panel) {
       esp_lcd_panel_del(lcd_panel);
     }
+
     if (lcd_io) {
       esp_lcd_panel_io_del(lcd_io);
     }
+
     spi_bus_free(LCD_HOST);
     return ret;
   }
@@ -230,14 +252,19 @@ static esp_err_t app_lcd_init(void) {
 
 #if DISP_GC9A01
   invert_color = true;
-#elif DISP_SH8601
+#elif DISP_SH8601 || DISP_CO5300
   invert_color = false;
-#elif DISP_CO5300
-  invert_color = false;
-  esp_lcd_panel_set_gap(lcd_panel, 20, 0);
 #elif DISP_ST7789
   #error "ST7789 not supported"
 #endif
+
+  // Set lcd panel gap
+  ESP_LOGI(TAG, "panel_x_gap: %d", panel_x_gap);
+  ESP_LOGI(TAG, "panel_y_gap: %d", panel_y_gap);
+
+  if (panel_x_gap > 0 || panel_y_gap > 0) {
+    esp_lcd_panel_set_gap(lcd_panel, panel_x_gap, panel_y_gap);
+  }
 
   ESP_ERROR_CHECK(esp_lcd_panel_invert_color(lcd_panel, invert_color));
   ESP_ERROR_CHECK(esp_lcd_panel_mirror(lcd_panel, true, false));
@@ -347,11 +374,7 @@ static esp_err_t app_lvgl_init(void) {
 #if DISP_GC9A01
                                                     .mirror_x = true,
                                                     .mirror_y = false,
-#elif DISP_SH8601
-                                                    .mirror_x = false,
-                                                    .mirror_y = false,
-
-#elif DISP_CO5300
+#elif DISP_SH8601 || DISP_CO5300
                                                     .mirror_x = false,
                                                     .mirror_y = false,
 #elif DISP_ST7789
