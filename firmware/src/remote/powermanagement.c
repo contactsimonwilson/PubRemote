@@ -131,7 +131,6 @@ static void power_button_long_press_hold(void *arg, void *usr_data) {
   }
 
   // Immediately turn off screen but wait for release before sleep
-  uint8_t cur_level = get_bl_level();
   set_bl_level(0);
 
   while (get_button_pressed()) {
@@ -139,9 +138,6 @@ static void power_button_long_press_hold(void *arg, void *usr_data) {
   }
 
   enter_sleep();
-
-  // Restore brightness state when back from light sleep
-  set_bl_level(cur_level);
 }
 
 void bind_power_button() {
@@ -183,6 +179,9 @@ void enter_sleep() {
       esp_deep_sleep_start(); // No code executes after esp_deep_sleep_start()
     }
     else {
+      // Turn off screen before sleep
+      set_bl_level(0);
+
       ESP_LOGI(TAG, "Entering light sleep mode");
       esp_light_sleep_start();
 
