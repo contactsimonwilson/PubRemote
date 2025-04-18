@@ -123,6 +123,12 @@ static esp_err_t enable_wake() {
 }
 
 static void power_button_long_press_hold(void *arg, void *usr_data) {
+  BoardState state = remoteStats.state;
+  if (state == BOARD_STATE_RUNNING_FLYWHEEL || state == BOARD_STATE_RUNNING_TILTBACK ||
+      state == BOARD_STATE_RUNNING_UPSIDEDOWN || state == BOARD_STATE_RUNNING_WHEELSLIP) {
+    ESP_LOGI(TAG, "Power button long press hold detected. Ignoring.");
+    return;
+  }
   // Immediately turn off screen but wait for release before sleep
   uint8_t cur_level = get_bl_level();
   set_bl_level(0);
@@ -143,8 +149,9 @@ void unbind_power_button() {
 }
 
 static void power_button_initial_release(void *arg, void *usr_data) {
-  deinit_buttons();
+  unregister_primary_button_cb(BUTTON_PRESS_UP);
   external_pull_t resistor = detect_gpio_external_pull(JOYSTICK_BUTTON_PIN);
+  deinit_buttons();
   init_buttons(); // Reinit buttons after detect to ensure correct gpio config
 
   if (resistor == EXTERNAL_PULL_NONE || (resistor == EXTERNAL_PULL_DOWN && !JOYSTICK_BUTTON_LEVEL) ||
