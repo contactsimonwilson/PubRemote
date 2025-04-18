@@ -171,6 +171,8 @@ void enter_sleep() {
   unbind_power_button();
   enable_wake();
   vTaskDelay(10); // Allow gpio level to settle before going into sleep
+  // Turn off screen before sleep
+  set_bl_level(0);
 
   while (1) {
     if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
@@ -179,9 +181,6 @@ void enter_sleep() {
       esp_deep_sleep_start(); // No code executes after esp_deep_sleep_start()
     }
     else {
-      // Turn off screen before sleep
-      set_bl_level(0);
-
       ESP_LOGI(TAG, "Entering light sleep mode");
       esp_light_sleep_start();
 
