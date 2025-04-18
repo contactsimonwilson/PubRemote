@@ -15,6 +15,8 @@ By ZiNc
   - 5 x [M3xD5xL4 heat set inserts](https://www.amazon.com/dp/B0CS6VZYL8)
   - 3 x M3x20 countersunk screws
   - 2 x M3x8 cap head screws
+  - 6 x 1.27mm header pins
+  - 1 x 10k Ohm resistor (TBD)
 
 ## Instructions
 
