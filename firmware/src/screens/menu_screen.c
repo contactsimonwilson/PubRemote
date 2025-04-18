@@ -99,6 +99,7 @@ void shutdown_button_press(lv_event_t *e) {
     esp_restart();
   }
 }
+
 void shutdown_button_long_press(lv_event_t *e) {
   if (is_press_handled) {
     ESP_LOGI(TAG, "Shutdown button long press already handled");
