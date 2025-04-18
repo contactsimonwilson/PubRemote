@@ -126,7 +126,7 @@ static void power_button_long_press_hold(void *arg, void *usr_data) {
   // Immediately turn off screen but wait for release before sleep
   uint8_t cur_level = get_bl_level();
   set_bl_level(0);
-  while (check_button_press()) {
+  while (get_button_pressed()) {
     vTaskDelay(pdMS_TO_TICKS(10));
   }
   enter_sleep();
@@ -159,25 +159,19 @@ static void power_button_initial_release(void *arg, void *usr_data) {
 }
 
 void enter_sleep() {
-  bool is_active = true;
+  // Disable some things so they don't run during wake check
+  update_connection_state(CONNECTION_STATE_DISCONNECTED);
+  unbind_power_button();
+  enable_wake();
   vTaskDelay(10); // Allow gpio level to settle before going into sleep
-  while (1) {
-    enable_wake();
 
+  while (1) {
     if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
       ESP_LOGI(TAG, "Entering deep sleep mode");
       esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
       esp_deep_sleep_start(); // No code executes after esp_deep_sleep_start()
     }
     else {
-      if (is_active) {
-        is_active = false;
-        // Disable some things while in light sleep
-        update_connection_state(CONNECTION_STATE_DISCONNECTED);
-        unbind_power_button();
-        deinit_display();
-      }
-
       ESP_LOGI(TAG, "Entering light sleep mode");
       esp_light_sleep_start();
 
@@ -185,17 +179,10 @@ void enter_sleep() {
       ESP_LOGI(TAG, "Woke up from light sleep mode");
       if (check_button_press()) {
         ESP_LOGI(TAG, "Button was pressed. Resuming from light sleep.");
-        is_active = true;
-        // reinit everything
-        bind_power_button();
-        init_display();
-        play_melody();
-        break;
+        esp_restart(); // Restart the system so we start from the same point as deep sleep
       }
-
       // If button was not pressed, continue the loop
       ESP_LOGI(TAG, "Button was not pressed. Entering sleep mode again.");
-      // Loop will continue to the top and enter sleep again
     }
   }
 }
