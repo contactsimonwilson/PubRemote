@@ -135,8 +135,15 @@ void LVGL_unlock(void) {
   lvgl_port_unlock();
 }
 
+static uint8_t bl_level = 0;
+
+uint8_t get_bl_level() {
+  return bl_level;
+}
+
 void set_bl_level(uint8_t level) {
-  set_display_brightness(lcd_io, level);
+  bl_level = level;
+  set_display_brightness(lcd_io, bl_level);
 }
 
 static esp_err_t app_lcd_init(void) {

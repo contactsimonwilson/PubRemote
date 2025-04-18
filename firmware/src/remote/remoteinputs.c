@@ -18,7 +18,6 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
-#define SLEEP_DISRUPT_THRESHOLD 25
 
 // TODO - from SETTINGS
 #ifndef JOYSTICK_BUTTON_LEVEL
@@ -28,7 +27,6 @@ static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
 RemoteDataUnion remote_data;
 JoystickData joystick_data;
 static button_handle_t gpio_btn_handle = NULL;
-static bool power_button_enabled = true;
 
 float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo, bool invert) {
   float axis = 0;
@@ -186,15 +184,15 @@ static void button_double_click_cb(void *arg, void *usr_data) {
   reset_sleep_timer();
 }
 
-static void button_long_press_cb(void *arg, void *usr_data) {
-  ESP_LOGI(TAG, "BUTTON LONG PRESS");
-  if (power_button_enabled) {
-    enter_sleep();
-  }
-}
-
 void reset_button_state() {
   remote_data.data.bt_c = 0;
+}
+
+void deinit_buttons() {
+  if (gpio_btn_handle) {
+    iot_button_delete(gpio_btn_handle);
+    gpio_btn_handle = NULL;
+  }
 }
 
 void init_buttons() {
@@ -210,17 +208,26 @@ void init_buttons() {
               .active_level = JOYSTICK_BUTTON_LEVEL,
           },
   };
+
+  if (gpio_btn_handle != NULL) {
+    ESP_LOGW(TAG, "Initialize called with existing button config. Please deinit before calling init");
+    return;
+  }
+
   gpio_btn_handle = iot_button_create(&gpio_btn_cfg);
-  if (NULL == gpio_btn_handle) {
+  if (gpio_btn_handle == NULL) {
     ESP_LOGE(TAG, "Button create failed");
   }
 
   iot_button_register_cb(gpio_btn_handle, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
   iot_button_register_cb(gpio_btn_handle, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
-  iot_button_register_cb(gpio_btn_handle, BUTTON_LONG_PRESS_UP, button_long_press_cb, NULL);
 #endif
 }
 
-void enable_power_button(bool enable) {
-  power_button_enabled = enable;
+void register_primary_button_cb(button_event_t event, button_cb_t cb) {
+  iot_button_register_cb(gpio_btn_handle, event, cb, NULL);
+}
+
+void unregister_primary_button_cb(button_event_t event) {
+  iot_button_unregister_cb(gpio_btn_handle, event);
 }

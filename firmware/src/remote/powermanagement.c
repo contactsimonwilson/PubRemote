@@ -3,9 +3,12 @@
 #include "buzzer.h"
 #include "display.h"
 #include "driver/gpio.h"
+#include "driver/rtc_io.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_log.h"
+#include "esp_sleep.h"
 #include "esp_timer.h"
+#include "gpio_detection.h"
 #include "remoteinputs.h"
 #include "settings.h"
 #include "stats.h"
@@ -24,6 +27,10 @@ static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
 #ifndef BAT_ADC_F
   #define BAT_ADC_F 3
+#endif
+
+#ifndef FORCE_LIGHT_SLEEP
+  #define FORCE_LIGHT_SLEEP 0
 #endif
 
 static esp_err_t init_battery_read() {
@@ -67,43 +74,41 @@ static float get_battery_voltage() {
   return roundf(battery_value = 0.001f * battery_value * ((float)BAT_ADC_F) * 100.0f) / 100.0f;
 }
 
-#define REQUIRED_PRESS_TIME_MS 2000 // 2 seconds
+static bool has_pull_resistor = true;
 
-#ifndef FORCE_LIGHT_SLEEP
-  #define FORCE_LIGHT_SLEEP 0
-#endif
+static bool get_use_light_sleep() {
+  return FORCE_LIGHT_SLEEP || !has_pull_resistor || !gpio_supports_wakeup_from_deep_sleep(JOYSTICK_BUTTON_PIN);
+}
+
+static bool get_button_pressed() {
+  return gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL;
+}
 
 static bool check_button_press() {
   uint64_t pressStartTime = esp_timer_get_time();
-  while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL) { // Check if button is still pressed
-    if ((esp_timer_get_time() - pressStartTime) >= (REQUIRED_PRESS_TIME_MS * 1000)) {
+  while (get_button_pressed()) { // Check if button is still pressed
+    if ((esp_timer_get_time() - pressStartTime) >= (CONFIG_BUTTON_LONG_PRESS_TIME_MS * 1000)) {
       ESP_LOGI(TAG, "Button has been pressed for 2 seconds.");
-      break;
+      return true;
     }
     vTaskDelay(pdMS_TO_TICKS(10)); // Delay to allow for time checking without busy waiting
   }
-  while (gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL) {
-    // wait for button release
-  }
-  if ((esp_timer_get_time() - pressStartTime) < (REQUIRED_PRESS_TIME_MS * 1000)) {
-    ESP_LOGI(TAG, "Button press time was less than 2 seconds. Ignoring.");
-    return false;
-  }
-
-  return true;
+  return false;
 }
+
+#define BUTTON_PIN_BITMASK(GPIO) (1ULL << GPIO) // 2 ^ GPIO_NUMBER in hex
 
 static esp_err_t enable_wake() {
   esp_err_t res = ESP_OK;
 
-  if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !FORCE_LIGHT_SLEEP) {
-    res = esp_sleep_enable_ext0_wakeup(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL);
+  if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
+    res = esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK(JOYSTICK_BUTTON_PIN), JOYSTICK_BUTTON_LEVEL);
     if (res != ESP_OK) {
       ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
     }
   }
   else {
-    ESP_LOGI(TAG, "Button pin is not valid for wake-up. Using light sleep instead.");
+    ESP_LOGI(TAG, "Button pin is not available for wake. Using light sleep instead.");
     res = gpio_wakeup_enable(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL ? GPIO_INTR_HIGH_LEVEL : GPIO_INTR_LOW_LEVEL);
     if (res != ESP_OK) {
       ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
@@ -117,33 +122,78 @@ static esp_err_t enable_wake() {
   return res;
 }
 
-void enter_sleep() {
-  if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !FORCE_LIGHT_SLEEP) {
-    ESP_LOGI(TAG, "Entering deep sleep mode");
-    esp_deep_sleep_start();
+static void power_button_long_press_hold(void *arg, void *usr_data) {
+  BoardState state = remoteStats.state;
+  if (state == BOARD_STATE_RUNNING || state == BOARD_STATE_RUNNING_FLYWHEEL || state == BOARD_STATE_RUNNING_TILTBACK ||
+      state == BOARD_STATE_RUNNING_UPSIDEDOWN || state == BOARD_STATE_RUNNING_WHEELSLIP) {
+    ESP_LOGI(TAG, "Power button long press hold detected. Ignoring.");
+    return;
+  }
+
+  // Immediately turn off screen but wait for release before sleep
+  set_bl_level(0);
+
+  while (get_button_pressed()) {
+    vTaskDelay(pdMS_TO_TICKS(10));
+  }
+
+  enter_sleep();
+}
+
+void bind_power_button() {
+  register_primary_button_cb(BUTTON_LONG_PRESS_HOLD, power_button_long_press_hold);
+}
+
+void unbind_power_button() {
+  unregister_primary_button_cb(BUTTON_LONG_PRESS_HOLD);
+}
+
+static void power_button_initial_release(void *arg, void *usr_data) {
+  unregister_primary_button_cb(BUTTON_PRESS_UP);
+  external_pull_t resistor = detect_gpio_external_pull(JOYSTICK_BUTTON_PIN);
+  deinit_buttons();
+  init_buttons(); // Reinit buttons after detect to ensure correct gpio config
+
+  if (resistor == EXTERNAL_PULL_NONE || (resistor == EXTERNAL_PULL_DOWN && !JOYSTICK_BUTTON_LEVEL) ||
+      (resistor == EXTERNAL_PULL_UP && JOYSTICK_BUTTON_LEVEL)) {
+    has_pull_resistor = false;
   }
   else {
-    // Disable some things while in light sleep
-    update_connection_state(CONNECTION_STATE_DISCONNECTED);
-    enable_power_button(false);
-    deinit_display();
+    has_pull_resistor = true;
+  }
 
-    ESP_LOGI(TAG, "Entering light sleep mode");
-    enable_wake();
-    esp_light_sleep_start();
+  bind_power_button();
+}
 
-    // Light sleep resumes code execution after wake-up
-    ESP_LOGI(TAG, "Woke up from light sleep mode");
-    if (!check_button_press()) {
-      ESP_LOGI(TAG, "Button was not pressed. Entering sleep mode.");
-      enter_sleep();
+void enter_sleep() {
+  // Disable some things so they don't run during wake check
+  update_connection_state(CONNECTION_STATE_DISCONNECTED);
+  unbind_power_button();
+  enable_wake();
+  vTaskDelay(10); // Allow gpio level to settle before going into sleep
+  // Turn off screen before sleep
+  set_bl_level(0);
+
+  while (1) {
+    if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
+      ESP_LOGI(TAG, "Entering deep sleep mode");
+      esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+      esp_deep_sleep_start(); // No code executes after esp_deep_sleep_start()
     }
     else {
-      ESP_LOGI(TAG, "Button was pressed. Resuming from light sleep.");
-      // reinit everything
-      enable_power_button(true);
-      init_display();
-      play_melody();
+      ESP_LOGI(TAG, "Entering light sleep mode");
+      esp_light_sleep_start();
+
+      // Light sleep resumes code execution after wake-up
+      ESP_LOGI(TAG, "Woke up from light sleep mode");
+
+      if (check_button_press()) {
+        ESP_LOGI(TAG, "Button was pressed. Resuming from light sleep.");
+        esp_restart(); // Restart the system so we start from the same point as deep sleep
+      }
+
+      // If button was not pressed, continue the loop
+      ESP_LOGI(TAG, "Button was not pressed. Entering sleep mode again.");
     }
   }
 }
@@ -231,21 +281,27 @@ void power_management_task(void *pvParameters) {
 }
 
 void init_power_management() {
-  enable_wake();
   init_sleep_timer();
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
   ESP_LOGI(TAG, "Wake-up reason: %d", wakeup_reason);
   switch (wakeup_reason) {
-  case ESP_SLEEP_WAKEUP_EXT0: { // Wake-up caused by external signal using RTC_IO
+  case ESP_SLEEP_WAKEUP_EXT0:
     ESP_LOGI(TAG, "Woken up by external signal on EXT0.");
     // Proceed to check if the button is still pressed
     if (!check_button_press()) {
       enter_sleep();
+      return;
     }
     break;
-  }
   case ESP_SLEEP_WAKEUP_EXT1:
+    ESP_LOGI(TAG, "Woken up by external signal on EXT1.");
+    // Proceed to check if the button is still pressed
+    if (!check_button_press()) {
+      enter_sleep();
+      return;
+    }
+    break;
   case ESP_SLEEP_WAKEUP_TIMER:
   case ESP_SLEEP_WAKEUP_TOUCHPAD:
   case ESP_SLEEP_WAKEUP_ULP:
@@ -258,5 +314,13 @@ void init_power_management() {
     break;
   }
   reset_sleep_timer();
+  if (get_button_pressed()) {
+    // Enable the power button once released if it wasn't already
+    register_primary_button_cb(BUTTON_PRESS_UP, power_button_initial_release);
+  }
+  else {
+    power_button_initial_release(NULL, NULL);
+  }
+
   xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
 }

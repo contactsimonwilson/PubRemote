@@ -2,6 +2,7 @@
 #define __REMOTEINPUTS_H
 #include "adc.h"
 #include "driver/gpio.h"
+#include "iot_button.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
@@ -48,8 +49,10 @@
 
 void init_thumbstick();
 void init_buttons();
+void deinit_buttons();
 void reset_button_state();
-void enable_power_button(bool enable);
+void register_primary_button_cb(button_event_t event, button_cb_t cb);
+void unregister_primary_button_cb(button_event_t event);
 
 float convert_adc_to_axis(int adc_value, int min_val, int mid_val, int max_val, int deadband, float expo, bool invert);
 
