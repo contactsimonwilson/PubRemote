@@ -65,7 +65,7 @@ static esp_err_t rx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, const void 
     lcd_cmd <<= 8;
     lcd_cmd |= LCD_OPCODE_READ_CMD << 24;
   }
-  return esp_lcd_panel_io_tx_param(io, lcd_cmd, param, param_size);
+  return esp_lcd_panel_io_rx_param(io, lcd_cmd, param, param_size);
 }
 
 esp_err_t sh8601_test_display_communication(esp_lcd_panel_io_handle_t io_handle) {
