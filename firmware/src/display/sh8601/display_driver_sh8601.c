@@ -59,7 +59,7 @@ static esp_err_t tx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, const void 
   return esp_lcd_panel_io_tx_param(io, lcd_cmd, param, param_size);
 }
 
-static esp_err_t rx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, const void *param, size_t param_size) {
+static esp_err_t rx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, void *param, size_t param_size) {
   if (USE_QSPI_INTERFACE) {
     lcd_cmd &= 0xff;
     lcd_cmd <<= 8;
