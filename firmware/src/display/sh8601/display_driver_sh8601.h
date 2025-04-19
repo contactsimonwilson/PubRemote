@@ -2,6 +2,7 @@
 #ifndef __DISPLAY_DRIVER_SH8601_H
 #define __DISPLAY_DRIVER_SH8601_H
 
+#include "display_ids.h"
 #include <esp_err.h>
 #include <esp_lcd_sh8601.h>
 #include <esp_lcd_types.h>
@@ -127,5 +128,6 @@ size_t co5300_get_lcd_init_cmds_size(void);
 esp_err_t sh8601_test_display_communication(esp_lcd_panel_io_handle_t io_handle);
 esp_err_t sh8601_display_driver_preinit();
 esp_err_t sh8601_set_display_brightness(esp_lcd_panel_io_handle_t io_handle, uint8_t brightness);
+uint8_t sh8601_read_display_id();
 
 #endif

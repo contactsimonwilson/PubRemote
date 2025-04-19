@@ -1,5 +1,5 @@
-#ifndef READ_LCD_ID_H
-#define READ_LCD_ID_H
+#ifndef __READ_LCD_ID_H
+#define __READ_LCD_ID_H
 
 #include <stdio.h>
 
