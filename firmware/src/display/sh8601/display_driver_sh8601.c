@@ -1,5 +1,6 @@
 #include "display_driver_sh8601.h"
 #include "driver/ledc.h"
+#include "read_lcd_id_bsp.h"
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_sh8601.h>
 #include <esp_log.h>
@@ -92,4 +93,8 @@ esp_err_t sh8601_set_display_brightness(esp_lcd_panel_io_handle_t io_handle, uin
 
   // Send the command and brightness value over SPI
   return tx_param(io_handle, SH8601_W_WDBRIGHTNESSVALNOR, data, 1);
+}
+
+uint8_t sh8601_read_display_id() {
+  return read_lcd_id();
 }
