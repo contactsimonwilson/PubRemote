@@ -42,3 +42,13 @@ esp_err_t set_display_brightness(esp_lcd_panel_io_handle_t io_handle, uint8_t br
   return st7789_set_display_brightness(io_handle, brightness);
 #endif
 }
+
+uint8_t read_display_id() {
+  ESP_LOGI(TAG, "Getting display ID");
+#if DISP_SH8601 || DISP_CO5300
+  return sh8601_read_display_id();
+#else
+  ESP_LOGW(TAG, "Display ID not supported for this display");
+  return 0x00;
+#endif
+}

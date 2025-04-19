@@ -113,6 +113,10 @@
 #define SH8601_MADCTL_BGR 0x08                      // Blue-Green-Red pixel order
 #define SH8601_MADCTL_COLOR_ORDER SH8601_MADCTL_RGB // RGB
 
+/* Display IDs for SH8601 vs CO5300 display */
+#define SH8601_ID 0x86
+#define CO5300_ID 0xff
+
 enum {
   SH8601_ContrastOff = 0,
   SH8601_LowContrast,
@@ -127,5 +131,6 @@ size_t co5300_get_lcd_init_cmds_size(void);
 esp_err_t sh8601_test_display_communication(esp_lcd_panel_io_handle_t io_handle);
 esp_err_t sh8601_display_driver_preinit();
 esp_err_t sh8601_set_display_brightness(esp_lcd_panel_io_handle_t io_handle, uint8_t brightness);
+uint8_t sh8601_read_display_id();
 
 #endif

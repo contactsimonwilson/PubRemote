@@ -1,32 +1,36 @@
-#include "read_lcd_id_bsp.h"
-#include "driver/gpio.h"
-#include "esp_log.h"
-#include "esp_rom_sys.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include <stdio.h>
+#if DISP_CO5300 || DISP_SH8601
 
-#define bit_mask (uint64_t)0x01
+  #include "read_lcd_id_bsp.h"
+  #include "driver/gpio.h"
+  #include "esp_log.h"
+  #include "esp_rom_sys.h"
+  #include "freertos/FreeRTOS.h"
+  #include "freertos/task.h"
+  #include <stdio.h>
 
-#define lcd_cs_1 gpio_set_level(GPIO_NUM_9, 1)
-#define lcd_cs_0 gpio_set_level(GPIO_NUM_9, 0)
-#define lcd_clk_1 gpio_set_level(GPIO_NUM_10, 1)
-#define lcd_clk_0 gpio_set_level(GPIO_NUM_10, 0)
-#define lcd_d0_1 gpio_set_level(GPIO_NUM_11, 1)
-#define lcd_d0_0 gpio_set_level(GPIO_NUM_11, 0)
-#define lcd_rst_1 gpio_set_level(GPIO_NUM_21, 1)
-#define lcd_rst_0 gpio_set_level(GPIO_NUM_21, 0)
+static const char *TAG = "PUBREMOTE-SH8601";
 
-#define read_d0 gpio_get_level(GPIO_NUM_11)
+  #define bit_mask (uint64_t)0x01
+
+  #define lcd_cs_1 gpio_set_level(DISP_CS, 1)
+  #define lcd_cs_0 gpio_set_level(DISP_CS, 0)
+  #define lcd_clk_1 gpio_set_level(DISP_CLK, 1)
+  #define lcd_clk_0 gpio_set_level(DISP_CLK, 0)
+  #define lcd_d0_1 gpio_set_level(DISP_SDIO0, 1)
+  #define lcd_d0_0 gpio_set_level(DISP_SDIO0, 0)
+  #define lcd_rst_1 gpio_set_level(DISP_RST, 1)
+  #define lcd_rst_0 gpio_set_level(DISP_RST, 0)
+
+  #define read_d0 gpio_get_level(DISP_SDIO0)
 
 void lcd_gpio_init(void) {
   gpio_config_t gpio_conf = {};
 
   gpio_conf.intr_type = GPIO_INTR_DISABLE;
   gpio_conf.mode = GPIO_MODE_OUTPUT;
-  gpio_conf.pin_bit_mask = (bit_mask << GPIO_NUM_9) | (bit_mask << GPIO_NUM_10) | (bit_mask << GPIO_NUM_11) |
-                           (bit_mask << GPIO_NUM_12) | (bit_mask << GPIO_NUM_13) | (bit_mask << GPIO_NUM_14) |
-                           (bit_mask << GPIO_NUM_21);
+  gpio_conf.pin_bit_mask = (bit_mask << DISP_CS) | (bit_mask << DISP_CLK) | (bit_mask << DISP_SDIO0) |
+                           (bit_mask << DISP_SDIO1) | (bit_mask << DISP_SDIO2) | (bit_mask << DISP_SDIO3) |
+                           (bit_mask << DISP_RST);
   gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
   gpio_conf.pull_up_en = GPIO_PULLUP_ENABLE;
 
@@ -38,7 +42,7 @@ void sda_read_mode(void) {
 
   gpio_conf.intr_type = GPIO_INTR_DISABLE;
   gpio_conf.mode = GPIO_MODE_INPUT;
-  gpio_conf.pin_bit_mask = (bit_mask << GPIO_NUM_11);
+  gpio_conf.pin_bit_mask = (bit_mask << DISP_SDIO0);
   gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
   gpio_conf.pull_up_en = GPIO_PULLUP_ENABLE;
 
@@ -50,7 +54,7 @@ void sda_write_mode(void) {
 
   gpio_conf.intr_type = GPIO_INTR_DISABLE;
   gpio_conf.mode = GPIO_MODE_OUTPUT;
-  gpio_conf.pin_bit_mask = (bit_mask << GPIO_NUM_11);
+  gpio_conf.pin_bit_mask = (bit_mask << DISP_SDIO0);
   gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
   gpio_conf.pull_up_en = GPIO_PULLUP_ENABLE;
 
@@ -155,7 +159,9 @@ uint8_t read_lcd_id(void) {
   SPI_ReadComm(0xDA);
 
   uint8_t ret = SPI_ReadData_Continue();
-  ESP_LOGI("SH8601/CO5300 Check:", "0x%02x", ret);
+  ESP_LOGI(TAG, "SH8601/CO5300 Check: 0x%02x", ret);
 
   return ret;
 }
+
+#endif

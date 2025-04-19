@@ -21,6 +21,38 @@
   #define SCALE_PADDING 1
 #endif
 
+#ifndef DISP_SDIO0
+  #define DISP_SDIO0 -1
+#endif
+
+#ifndef DISP_SDIO1
+  #define DISP_SDIO1 -1
+#endif
+
+#ifndef DISP_SDIO2
+  #define DISP_SDIO2 -1
+#endif
+
+#ifndef DISP_SDIO3
+  #define DISP_SDIO3 -1
+#endif
+
+#ifndef DISP_CO5300
+  #define DISP_CO5300 0
+#endif
+
+#ifndef DISP_SH8601
+  #define DISP_SH8601 0
+#endif
+
+#ifndef DISP_ST7789
+  #define DISP_ST7789 0
+#endif
+
+#ifndef DISP_GC9A01
+  #define DISP_GC9A01 0
+#endif
+
 typedef enum {
   SCREEN_ROTATION_0,
   SCREEN_ROTATION_90,
