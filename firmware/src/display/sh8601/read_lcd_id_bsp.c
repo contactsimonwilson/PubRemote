@@ -1,6 +1,7 @@
 #if DISP_CO5300 || DISP_SH8601
 
   #include "read_lcd_id_bsp.h"
+  #include "display_ids.h"
   #include "driver/gpio.h"
   #include "esp_log.h"
   #include "esp_rom_sys.h"
@@ -149,16 +150,28 @@ uint8_t SPI_ReadData_Continue(void) {
 
 uint8_t read_lcd_id(void) {
   lcd_gpio_init();
-
+  vTaskDelay(pdMS_TO_TICKS(10));
   lcd_rst_1;
   vTaskDelay(pdMS_TO_TICKS(120));
   lcd_rst_0;
   vTaskDelay(pdMS_TO_TICKS(120));
   lcd_rst_1;
   vTaskDelay(pdMS_TO_TICKS(120));
-  SPI_ReadComm(0xDA);
 
-  uint8_t ret = SPI_ReadData_Continue();
+  uint8_t ret = 0x00;
+  for (uint8_t i = 0; i < 5; i++) {
+    SPI_ReadComm(0xDA);
+    uint8_t val = SPI_ReadData_Continue();
+    /* Display IDs for SH8601 vs CO5300 display */
+    ESP_LOGE(TAG, "Read ID: 0x%02x", val);
+
+    if (val == CO5300_ID || val == SH8601_ID) {
+      ret = val;
+      break;
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(5));
+  }
   ESP_LOGI(TAG, "SH8601/CO5300 Check: 0x%02x", ret);
 
   return ret;

@@ -2,6 +2,7 @@
 #ifndef __DISPLAY_DRIVER_SH8601_H
 #define __DISPLAY_DRIVER_SH8601_H
 
+#include "display_ids.h"
 #include <esp_err.h>
 #include <esp_lcd_sh8601.h>
 #include <esp_lcd_types.h>
@@ -112,10 +113,6 @@
 #define SH8601_MADCTL_RGB 0x00                      // Red-Green-Blue pixel order
 #define SH8601_MADCTL_BGR 0x08                      // Blue-Green-Red pixel order
 #define SH8601_MADCTL_COLOR_ORDER SH8601_MADCTL_RGB // RGB
-
-/* Display IDs for SH8601 vs CO5300 display */
-#define SH8601_ID 0x86
-#define CO5300_ID 0xff
 
 enum {
   SH8601_ContrastOff = 0,
