@@ -80,7 +80,7 @@ Some common scenarios where a tilt remote may be useful:
 
 The fix: It must be set to "Access Point"
 
-3. If VESC Controller -> Refloat Cfg -> Remote ->
+2. If VESC Controller -> Refloat Cfg -> Remote ->
       - Remote Type is not set to UART
       - Tiltback Angle Limit is set to 0 °
       - Tiltback Speed is set to 0 °/s
