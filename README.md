@@ -32,27 +32,20 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 - [CustomWheel VESC Express Module](https://customwheel.shop/accesories/vesc-express-module-wifi-bt)
 - And many others...
 
-### Software Prerequisites
+## Get Started Using PubMote
 
-#### Simple Deployment, No Development
-
-Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz/)
-
-#### Advanced Deployment
-- IDE or other code editor
-    - SquareLine Studio
-    - VS Code
-    - Something else...
-- PlatformIO
-
-> [!TIP]
-> If SL Studio repeatedly fails on startup because of a font error, try clearing the font bin files.
+- Not sure where to get started with a Pubmote build? Check out an example build like the [Leaf Blaster](/docs/builds/leaf-blaster.md)!
+- For instructions on first-time setup, pairing, and usage, see the [quick start guide](/docs/quick-start.md).
 
 ## Issues
 
 [Create an issue](https://github.com/contactsimonwilson/PubRemote/) on GitHub or post in the Pubmote channel within the PubWheel Discord server
 
-## Get Started Using PubMote
+## For Developers
 
-- Not sure where to get started with a Pubmote build? Check out an example build like the [Leaf Blaster](/docs/builds/leaf-blaster.md)!
-- For instructions on first-time setup, pairing, and usage, see the [quick start guide](/docs/quick-start.md).
+- VS Code or other code editor
+- PlatformIO
+- SquareLine Studio
+
+> [!TIP]
+> If SL Studio repeatedly fails on startup because of a font error, try clearing the font bin files.

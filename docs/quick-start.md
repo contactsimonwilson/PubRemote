@@ -2,16 +2,16 @@
 
 ## First-Time Pubmote Setup
 
-1. Ensure you have completed the [Hardware Prerequisites](/README.md#hardware-prerequisites) and [Software Prerequisites](/README.md#software-prerequisites) for a deployment, from the README
-    - Flash your ESP32-S3 display using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz/)
-2. Configure Pubmote settings:
+1. Ensure you have completed the [Hardware Prerequisites](/README.md#hardware-prerequisites)
+2. Flash your Pubmote's ESP32-S3 controller using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz/)
+3. Configure Pubmote settings:
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Settings" and swipe through the options to set your preferences
     - Select "Save" to apply your settings
 
 ![](configure_pubmote_settings.gif)
 
-3. Calibrate your Pubmote:
+4. Calibrate your Pubmote:
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Calibration"
     - Select "Start" and move through the steps, selecting "Next" to continue each step, and "Save" to store your calibration.
@@ -24,7 +24,7 @@
 
 ![](configure_mote_calibration.gif)
 
-4. Pair the remote to your VESC Express:
+5. Pair the remote to your VESC Express:
     
     1. If you haven't already, install Float Accessories on your VESC Express:
         - Instructions for this may be found at the bottom of [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz)
