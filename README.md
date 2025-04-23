@@ -26,7 +26,7 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 - [Nintendo Switch joystick](https://vi.aliexpress.com/item/1005006746686389.html)
 
 #### VESC Express receiver. Options:
-- Building your own
+- [Building your own](https://forum.esk8.news/t/usb-c-to-vesc-can-forward-adapter-cheap-and-diy/79789/17)
 - [Trampa VESC Express Module](https://trampaboards.com/vesc-express--p-34857.html)
 - [AvaSpark RGB Mini](https://avaspark.com/products/avaspark-rgb-mini)
 - [CustomWheel VESC Express Module](https://customwheel.shop/accesories/vesc-express-module-wifi-bt)
