@@ -24,22 +24,22 @@ By ZiNc
   - Install 5 x M3 heat set inserts into lid
 2. Solder PS5 hall effect joystick according to Leaf Blaster configuration (see following), having all wires terminated with 1.27mm header pins
 
-![PS5 hall pins](leaf-blaster-hall.png)
+![](leaf-blaster-hall.png)
 
 3. If buzzer is desired, terminate buzzer wires with 1.27mm header pins
 4. Connect PS5 hall effect joystick to WaveShare display GPIO headers (see image)
 5. Connect buzzer to WaveShare display GPIO headers if desired (see image)
 
-![WaveShare 1.43in AMOLED display pinout](leaf-blaster-pinout.png)
-![Leaf Blaster wiring](leaf-blaster-wiring.png)
+![](leaf-blaster-pinout.png)
+![](leaf-blaster-wiring.png)
 
 6. Connect 1.25mm JST battery to display
 
-![Leaf Blaster battery](leaf-blaster-battery.png)
+![](leaf-blaster-battery.png)
  
 8. Assemble all parts and screw case together
 9. Install a lanyard if you like!
 
-![Leaf Blaster assembly](leaf-blaster-assembly.png)
+![](leaf-blaster-assembly.png)
 
 10. You're ready to start [setting up your Pubmote software](/README.md#software-prerequisites)!

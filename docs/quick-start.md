@@ -8,6 +8,9 @@
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Settings" and swipe through the options to set your preferences
     - Select "Save" to apply your settings
+
+![](configure_pubmote_settings.gif)
+
 3. Calibrate your Pubmote
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Calibration"
@@ -18,6 +21,9 @@
         - For "Set expo factor", you may leave this at 1.00 or adjust for more or less input to tilt ratio.
         - For "Invert Y", you may check or uncheck this to flip the direction of the Y axis input.
         - View the graph for testing and save your calibration.
+
+![](configure_mote_calibration.gif)
+
 4. Pair the remote to your VESC Express by following the [Pairing Instructions](#pairing-instructions)
 5. Ensure you've completed the [Package Side Setup](#package-side-setup-refloat)
 6. Go ride!
@@ -29,18 +35,29 @@ To ensure you can get your PubRemote paired and running, follow these simple ste
 1. Install Float Accessories on your VESC Express. Available from [Syler's vesc_pkg repository](https://github.com/Relys/vesc_pkg). To install this, either:
     - Clone the repository and build the float_accessories package yourself
     - Download a relatively recent build from [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz) and install using the VESC Tool custom package installer
-2. Configure your VESC Express wifi settings
-    - Navigate to VESC Express > WiFi > WiFi Mode
-    - Set this to "Access Point"
+2. Configure your VESC Express wifi and bluetooth settings
+    - Navigate to VESC Express > WiFi > WiFi Mode: Set this to "Access Point"
+    - Navigate to VESC Express > Bluetooth > Bluetooth Mode: Set this to "Enabled" or "Enabled with Scripting" (if needed)
+
+![](configure_ve_wifi.png)
+![](configure_ve_bluetooth.png)
+
 3. Configure your VESC Express Float Accessories settings
     - Navigate to App UI > Settings > Pubmote Enabled
     - Ensure this is checked
     - Save and restart as necessary
+
+![](configure_ve_fa_settings.png)
+
 4. Launch Pubmote pairing
     - On the Pubmote, navigate to the main menu by swiping down from the top of the main screen
     - Select "Pairing" and start the pairing on the Pubmote
 5. Launch VESC Express Pubmote pairing
     - Navigate to App UI > Config > Pair Pubmote
+
+![](configure_ve_fa_pairing.png)
+![](configure_mote_pairing.gif)
+
 6. Confirm the pairing code on both the Pubmote and VESC Express
 
 You should now be connected!
@@ -54,6 +71,8 @@ On Refloat:
 4. Ensure Tiltback Speed is above 0 degrees/second
 5. Ensure Input Deadband is below 100%, but at least 1%.
 6. Set Throttle Current Maximum to 0, unless you intend to use remote throttle for fun
+
+![](configure_vesc_refloat.png)
 
 ## Usage
 
