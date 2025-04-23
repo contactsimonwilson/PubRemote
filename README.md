@@ -32,7 +32,7 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 - [CustomWheel VESC Express Module](https://customwheel.shop/accesories/vesc-express-module-wifi-bt)
 - And many others...
 
-## Get Started Using PubMote
+## Setup and Usage
 
 - Not sure where to get started with a Pubmote build? Check out an example build like the [Leaf Blaster](/docs/builds/leaf-blaster.md)!
 - For instructions on first-time setup, pairing, and usage, see the [quick start guide](/docs/quick-start.md).
