@@ -1,6 +1,6 @@
 # Pubmote Quick Start Guide
 
-## First-Time Setup
+## First-Time Pubmote Setup
 
 1. Ensure you have completed the [Hardware Prerequisites](/README.md#hardware-prerequisites) and [Software Prerequisites](/README.md#software-prerequisites) for a deployment, from the README.
     - Flash your ESP32 using the included flashing tool at [pubmote.techfoundry.nz](https://pubmote.techfoundry.nz/)
@@ -19,9 +19,10 @@
         - For "Invert Y", you may check or uncheck this to flip the direction of the Y axis input.
         - View the graph for testing and save your calibration.
 4. Pair the remote to your VESC Express by following the [Pairing Instructions](#pairing-instructions)
-5. Go ride!
+5. Ensure you've completed the [Package Side Setup](#package-side-setup-refloat)
+6. Go ride!
 
-## Pairing Instructions
+## VESC Express to Pubmote Pairing Instructions
 
 To ensure you can get your PubRemote paired and running, follow these simple steps after you have your Pubmote hardware assembled and have flashed the latest Pubmote software to your ESP32:
 
@@ -44,7 +45,7 @@ To ensure you can get your PubRemote paired and running, follow these simple ste
 
 You should now be connected!
 
-## Package-Side Setup
+## Package-Side Setup (Refloat)
 
 On Refloat:
 1. Navigate to Refloat Cfg > Remote
@@ -86,8 +87,13 @@ The fix: It must be set to "Access Point"
       - Tiltback Speed is set to 0 °/s
       - Input Deadband is set to a very high %
 
-The fix: Ensure Remote Type of  UART, Tiltback Angle Limit of >0 °, Tiltback Speed of >0 °/s, and a relatively low Input Deadband,
+The fix: Ensure Remote Type of  UART, Tiltback Angle Limit of >0 °, Tiltback Speed of >0 °/s, and a relatively low Input Deadband
 
 ### The direction of the tilt is backwards
 
 The fix: Re-run calibration and check "Invert Y"
+
+### My Float Accessories package isn't connecting to my Refloat/Float package
+
+1. If your VESC Express and VESC Controller firmware versions are different, this will prevent communication
+2. If your CAN communication between the VESC Express and VESC Controller is not functioning properly, this will prevent communication
