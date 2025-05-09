@@ -42,4 +42,4 @@ By ZiNc
 
 ![](leaf-blaster-assembly.png)
 
-10. You're ready to start [setting up your Pubmote software](/README.md#software-prerequisites)!
+10. You're ready to start [setting up your Pubmote software](/docs/quick-start.md)!
