@@ -54,6 +54,16 @@ lv_obj_t * ui_TripLabel;
 void ui_event_StatsFooter(lv_event_t * e);
 lv_obj_t * ui_StatsFooter;
 lv_obj_t * ui_BoardBatteryDisplay;
+void ui_event_StatsPanel(lv_event_t * e);
+lv_obj_t * ui_StatsPanel;
+lv_obj_t * ui_StatsTabView;
+lv_obj_t * ui_StatsTab;
+lv_obj_t * ui_BMSTab;
+lv_obj_t * ui_BMSBody;
+lv_obj_t * ui_BMSGroupHeadingLabel;
+lv_obj_t * ui_BMSDataBar;
+lv_obj_t * ui_BMSDataValueBar;
+lv_obj_t * ui_BMSDataValueLabel;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_MenuScreen
@@ -198,27 +208,6 @@ lv_obj_t * ui_AboutFooter;
 void ui_event_AboutMainActionButton(lv_event_t * e);
 lv_obj_t * ui_AboutMainActionButton;
 lv_obj_t * ui_AboutMainActionButtonLabel;
-void ui_event_UpdateButton(lv_event_t * e);
-lv_obj_t * ui_UpdateButton;
-lv_obj_t * ui_UpdateButtonLabel;
-// CUSTOM VARIABLES
-
-// SCREEN: ui_BMSScreen
-void ui_BMSScreen_screen_init(void);
-void ui_event_BMSScreen(lv_event_t * e);
-lv_obj_t * ui_BMSScreen;
-lv_obj_t * ui_BMSContent;
-lv_obj_t * ui_BMSHeader;
-lv_obj_t * ui_BMSHeaderLabel;
-lv_obj_t * ui_BMSBody;
-lv_obj_t * ui_BMSGroupHeadingLabel;
-lv_obj_t * ui_BMSDataBar;
-lv_obj_t * ui_BMSDataValueBar;
-lv_obj_t * ui_BMSDataValueLabel;
-lv_obj_t * ui_BMSFooter;
-void ui_event_BMSMainActionButton(lv_event_t * e);
-lv_obj_t * ui_BMSMainActionButton;
-lv_obj_t * ui_BMSMainActionButtonLabel;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -288,6 +277,16 @@ void ui_event_StatsFooter(lv_event_t * e)
 
     if(event_code == LV_EVENT_LONG_PRESSED) {
         stats_footer_long_press(e);
+    }
+}
+
+void ui_event_StatsPanel(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_flag_modify(ui_StatsPanel, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
     }
 }
 
@@ -560,37 +559,6 @@ void ui_event_AboutMainActionButton(lv_event_t * e)
 
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MenuScreen_screen_init);
-    }
-}
-
-void ui_event_UpdateButton(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-    if(event_code == LV_EVENT_CLICKED) {
-        update_button_press(e);
-    }
-}
-
-void ui_event_BMSScreen(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
-        bms_screen_load_start(e);
-    }
-    if(event_code == LV_EVENT_SCREEN_LOADED) {
-        bms_screen_loaded(e);
-    }
-}
-
-void ui_event_BMSMainActionButton(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-    if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MenuScreen_screen_init);
-        bms_back(e);
     }
 }
 
