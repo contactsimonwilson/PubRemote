@@ -39,4 +39,4 @@ By ZiNc
 ![](snowmote-7.png)
 
 8. Install a lanyard if you like!
-9. You're ready to start [setting up your Pubmote software](/README.md#software-prerequisites)!
+9. You're ready to start [setting up your Pubmote software](/docs/quick-start.md)!
