@@ -52,7 +52,7 @@ static void transmitter_task(void *pvParameters) {
     //   continue;
     // }
 
-    if (is_stats_screen_active() &&
+    if (is_stats_screen_active() && !is_hud_mode_enabled() &&
         (connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
          connection_state == CONNECTION_STATE_CONNECTING)) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes

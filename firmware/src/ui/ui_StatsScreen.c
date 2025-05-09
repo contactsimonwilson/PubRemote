@@ -216,11 +216,34 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_RSSI3, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_HUDContainer = lv_obj_create(ui_RemoteIndicatorContainer);
+    lv_obj_remove_style_all(ui_HUDContainer);
+    lv_obj_set_width(ui_HUDContainer, 30);
+    lv_obj_set_height(ui_HUDContainer, 14);
+    lv_obj_set_align(ui_HUDContainer, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_HUDContainer, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_HUDContainer, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END);
+    lv_obj_add_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_HUDContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_HUDText = lv_label_create(ui_HUDContainer);
+    lv_obj_set_width(ui_HUDText, lv_pct(100));
+    lv_obj_set_height(ui_HUDText, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_HUDText, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_HUDText, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_text(ui_HUDText, "HUD");
+    lv_obj_set_style_text_align(ui_HUDText, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_HUDText, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui_HUDText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_HUDText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_HUDText, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_HUDText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     ui_MessageText = lv_label_create(ui_StatsHeader);
     lv_obj_set_width(ui_MessageText, lv_pct(100));
     lv_obj_set_height(ui_MessageText, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_MessageText, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_MessageText, LV_LABEL_LONG_DOT);
+    lv_label_set_long_mode(ui_MessageText, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_label_set_text(ui_MessageText, "PUSHBACK");
     lv_obj_add_flag(ui_MessageText, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_set_style_text_align(ui_MessageText, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);

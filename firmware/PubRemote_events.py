@@ -210,3 +210,7 @@ def bms_screen_loaded(event_struct):
 def screen_rotation_change(event_struct):
     return
 
+
+def menu_hud_mode_press(event_struct):
+    return
+

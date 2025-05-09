@@ -53,6 +53,23 @@ void menu_screen_loaded(lv_event_t *e) {
     else {
       lv_obj_add_flag(ui_MenuConnectButton, LV_OBJ_FLAG_HIDDEN);
     }
+
+    // Toggle HUD mode
+    if (connection_state == CONNECTION_STATE_CONNECTED) {
+      lv_obj_clear_flag(ui_MenuHudModeButton, LV_OBJ_FLAG_HIDDEN);
+
+      if (is_hud_mode_enabled()) {
+        lv_label_set_text(ui_MenuHudModeButtonLabel, "Disable HUD Mode");
+      }
+      else {
+        lv_label_set_text(ui_MenuHudModeButtonLabel, "Enable HUD Mode");
+      }
+    }
+    // Not connected, so hide the button
+    else {
+      lv_obj_add_flag(ui_MenuHudModeButton, LV_OBJ_FLAG_HIDDEN);
+    }
+
     LVGL_unlock();
   }
 }
@@ -74,6 +91,25 @@ void menu_connect_press(lv_event_t *e) {
   else {
     update_connection_state(CONNECTION_STATE_DISCONNECTED);
   }
+
+  if (LVGL_lock(0)) {
+    _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);
+    LVGL_unlock();
+  }
+}
+
+void menu_hud_mode_press(lv_event_t *e) {
+  ESP_LOGI(TAG, "HUD mode button pressed");
+
+  // Toggle HUD mode
+  if (device_settings.hud_mode == HUD_MODE_DISABLED) {
+    device_settings.hud_mode = HUD_MODE_ENABLED;
+  }
+  else {
+    device_settings.hud_mode = HUD_MODE_DISABLED;
+  }
+
+  save_device_settings();
 
   if (LVGL_lock(0)) {
     _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);

@@ -69,6 +69,11 @@ typedef enum {
   BATTERY_DISPLAY_VOLTAGE,
 } BoardBatteryDisplayOption;
 
+typedef enum {
+  HUD_MODE_DISABLED,
+  HUD_MODE_ENABLED,
+} HudModeOptions;
+
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
@@ -99,9 +104,11 @@ typedef struct {
   uint32_t theme_color;
   bool dark_text;
   BoardBatteryDisplayOption battery_display;
+  bool hud_mode;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();
+bool is_hud_mode_enabled();
 
 extern CalibrationSettings calibration_settings;
 extern DeviceSettings device_settings;

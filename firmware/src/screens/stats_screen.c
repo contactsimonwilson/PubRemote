@@ -168,6 +168,19 @@ static void update_rssi_display() {
   last_signal_strength_rating_value = signal_strength_rating;
 }
 
+static void update_hud_mode_display() {
+  // Hide HUD mode container on disconnect if not already hidden
+  // Otherwise, show the container if not already shown
+  if (!is_hud_mode_enabled() ||
+      (connection_state == CONNECTION_STATE_DISCONNECTED && !lv_obj_has_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN))) {
+    lv_obj_add_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+  else if (is_hud_mode_enabled() && connection_state != CONNECTION_STATE_DISCONNECTED &&
+           lv_obj_has_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_clear_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN);
+  }
+}
+
 static void update_primary_stat_display() {
   static float last_value = 0;
 
@@ -263,6 +276,7 @@ static void update_header_display() {
   else {
     update_remote_battery_display();
     update_rssi_display();
+    update_hud_mode_display();
   }
 
   last_should_show_board_state = should_show_board_state;
