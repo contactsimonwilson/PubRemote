@@ -63,6 +63,11 @@ typedef enum {
   DARK_TEXT_ENABLED,
 } DarkTextOptions;
 
+typedef enum {
+  HUD_MODE_DISABLED,
+  HUD_MODE_ENABLED,
+} HudModeOptions;
+
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
@@ -92,9 +97,11 @@ typedef struct {
   StartupSoundOptions startup_sound;
   uint32_t theme_color;
   bool dark_text;
+  bool hud_mode;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();
+bool is_hud_mode_enabled();
 
 extern CalibrationSettings calibration_settings;
 extern DeviceSettings device_settings;
