@@ -9,16 +9,9 @@ typedef enum {
   STAT_DISPLAY_TEMP,
 } StatsDisplayOption;
 
-typedef enum {
-  BATTERY_DISPLAY_ALL,
-  BATTERY_DISPLAY_PERCENT,
-  BATTERY_DISPLAY_VOLTAGE,
-} BoardBatteryDisplayOption;
-
 typedef struct {
   StatsDisplayOption primary_stat;
   StatsDisplayOption secondary_stat;
-  BoardBatteryDisplayOption battery_display;
 } StatsScreenDisplayOptions;
 
 typedef enum {

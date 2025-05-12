@@ -31,7 +31,7 @@ DeviceSettings device_settings = {
     .startup_sound = STARTUP_SOUND_BEEP,
     .theme_color = COLOR_PRIMARY,
     .dark_text = DEFAULT_DARK_TEXT,
-
+    .battery_display = BATTERY_DISPLAY_PERCENT,
 };
 
 CalibrationSettings calibration_settings = {

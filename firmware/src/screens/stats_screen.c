@@ -14,24 +14,25 @@ static const char *TAG = "PUBREMOTE-STATS_SCREEN";
 StatsScreenDisplayOptions stat_display_options = {
     .primary_stat = STAT_DISPLAY_SPEED,
     .secondary_stat = STAT_DISPLAY_DUTY,
-    .battery_display = BATTERY_DISPLAY_PERCENT,
 };
 
 static void change_stat_display(int direction) {
   if (direction > 0) {
     stat_display_options.primary_stat = (stat_display_options.primary_stat + 1) % 4;
+    save_device_settings();
   }
   else {
     stat_display_options.primary_stat = (stat_display_options.primary_stat + 3) % 4;
+    save_device_settings();
   }
 }
 
 static void change_bat_display(int direction) {
   if (direction > 0) {
-    stat_display_options.battery_display = (stat_display_options.battery_display + 1) % 3;
+    device_settings.battery_display = (device_settings.battery_display + 1) % 3;
   }
   else {
-    stat_display_options.battery_display = (stat_display_options.battery_display + 2) % 3;
+    device_settings.battery_display = (device_settings.battery_display + 2) % 3;
   }
 }
 
@@ -420,7 +421,7 @@ static void update_board_battery_display() {
   static float last_board_battery_voltage = 0;
   char *formattedString;
 
-  switch (stat_display_options.battery_display) {
+  switch (device_settings.battery_display) {
   case BATTERY_DISPLAY_VOLTAGE:
     // Ensure the value has changed
     if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.1f) {
