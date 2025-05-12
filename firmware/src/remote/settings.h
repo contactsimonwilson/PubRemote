@@ -64,10 +64,15 @@ typedef enum {
 } DarkTextOptions;
 
 typedef enum {
-  BATTERY_DISPLAY_ALL,
   BATTERY_DISPLAY_PERCENT,
   BATTERY_DISPLAY_VOLTAGE,
+  BATTERY_DISPLAY_ALL,
 } BoardBatteryDisplayOption;
+
+typedef enum {
+  POCKET_MODE_DISABLED,
+  POCKET_MODE_ENABLED,
+} PocketModeOptions;
 
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
@@ -99,9 +104,11 @@ typedef struct {
   uint32_t theme_color;
   bool dark_text;
   BoardBatteryDisplayOption battery_display;
+  PocketModeOptions pocket_mode;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();
+bool is_pocket_mode_enabled();
 
 extern CalibrationSettings calibration_settings;
 extern DeviceSettings device_settings;

@@ -21,6 +21,8 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 static const DarkTextOptions DEFAULT_DARK_TEXT = DARK_TEXT_DISABLED;
+static const BoardBatteryDisplayOption DEFAULT_BATTERY_DISPLAY = BATTERY_DISPLAY_PERCENT;
+static const PocketModeOptions DEFAULT_POCKET_MODE = POCKET_MODE_DISABLED;
 
 DeviceSettings device_settings = {
     .bl_level = BL_LEVEL_DEFAULT,
@@ -31,7 +33,8 @@ DeviceSettings device_settings = {
     .startup_sound = STARTUP_SOUND_BEEP,
     .theme_color = COLOR_PRIMARY,
     .dark_text = DEFAULT_DARK_TEXT,
-    .battery_display = BATTERY_DISPLAY_PERCENT,
+    .battery_display = DEFAULT_BATTERY_DISPLAY,
+    .pocket_mode = DEFAULT_POCKET_MODE,
 };
 
 CalibrationSettings calibration_settings = {
@@ -77,6 +80,10 @@ uint64_t get_auto_off_ms() {
   return get_auto_off_time_minutes() * 60 * 1000;
 }
 
+bool is_pocket_mode_enabled() {
+  return device_settings.pocket_mode == POCKET_MODE_ENABLED;
+}
+
 void save_device_settings() {
   nvs_write_int(BL_LEVEL_KEY, device_settings.bl_level);
   nvs_write_int(SCREEN_ROTATION_KEY, device_settings.screen_rotation);
@@ -86,6 +93,8 @@ void save_device_settings() {
   nvs_write_int("startup_sound", device_settings.startup_sound);
   nvs_write_int("theme_color", device_settings.theme_color);
   nvs_write_int("dark_text", device_settings.dark_text);
+  nvs_write_int("battery_display", device_settings.battery_display);
+  nvs_write_int("pocket_mode", device_settings.pocket_mode);
 }
 
 esp_err_t save_pairing_data() {
@@ -179,6 +188,9 @@ esp_err_t init_settings() {
   device_settings.battery_display = nvs_read_int("battery_display", &temp_setting_value) == ESP_OK
                                         ? (BoardBatteryDisplayOption)temp_setting_value
                                         : BATTERY_DISPLAY_PERCENT;
+
+  device_settings.pocket_mode =
+      nvs_read_int("pocket_mode", &temp_setting_value) == ESP_OK ? (bool)temp_setting_value : POCKET_MODE_DISABLED;
 
   // Reading calibration settings
   calibration_settings.x_min =

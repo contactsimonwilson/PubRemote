@@ -53,6 +53,15 @@ void menu_screen_loaded(lv_event_t *e) {
     else {
       lv_obj_add_flag(ui_MenuConnectButton, LV_OBJ_FLAG_HIDDEN);
     }
+
+    // Update pocket mode button text
+    if (is_pocket_mode_enabled()) {
+      lv_label_set_text(ui_MenuPocketModeButtonLabel, "Disable Pocket Mode");
+    }
+    else {
+      lv_label_set_text(ui_MenuPocketModeButtonLabel, "Enable Pocket Mode");
+    }
+
     LVGL_unlock();
   }
 }
@@ -74,6 +83,25 @@ void menu_connect_press(lv_event_t *e) {
   else {
     update_connection_state(CONNECTION_STATE_DISCONNECTED);
   }
+
+  if (LVGL_lock(0)) {
+    _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);
+    LVGL_unlock();
+  }
+}
+
+void menu_pocket_mode_press(lv_event_t *e) {
+  ESP_LOGI(TAG, "Pocket mode button pressed");
+
+  // Toggle pocket mode
+  if (device_settings.pocket_mode == POCKET_MODE_DISABLED) {
+    device_settings.pocket_mode = POCKET_MODE_ENABLED;
+  }
+  else {
+    device_settings.pocket_mode = POCKET_MODE_DISABLED;
+  }
+
+  save_device_settings();
 
   if (LVGL_lock(0)) {
     _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);
