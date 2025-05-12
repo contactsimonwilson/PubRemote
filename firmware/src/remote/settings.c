@@ -176,6 +176,10 @@ esp_err_t init_settings() {
   device_settings.dark_text =
       nvs_read_int("dark_text", &temp_setting_value) == ESP_OK ? (bool)temp_setting_value : DARK_TEXT_DISABLED;
 
+  device_settings.battery_display = nvs_read_int("battery_display", &temp_setting_value) == ESP_OK
+                                        ? (BoardBatteryDisplayOption)temp_setting_value
+                                        : BATTERY_DISPLAY_PERCENT;
+
   // Reading calibration settings
   calibration_settings.x_min =
       nvs_read_int("x_min", &temp_setting_value) == ESP_OK ? (uint16_t)temp_setting_value : STICK_MIN_VAL;
