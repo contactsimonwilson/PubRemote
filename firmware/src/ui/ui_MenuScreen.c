@@ -67,18 +67,18 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_align(ui_MenuConnectButtonLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_MenuConnectButtonLabel, "Connect");
 
-    ui_MenuHudModeButton = lv_btn_create(ui_MenuBody);
-    lv_obj_set_height(ui_MenuHudModeButton, 42);
-    lv_obj_set_width(ui_MenuHudModeButton, lv_pct(100));
-    lv_obj_set_align(ui_MenuHudModeButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuHudModeButton, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_MenuHudModeButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_MenuPocketModeButton = lv_btn_create(ui_MenuBody);
+    lv_obj_set_height(ui_MenuPocketModeButton, 42);
+    lv_obj_set_width(ui_MenuPocketModeButton, lv_pct(100));
+    lv_obj_set_align(ui_MenuPocketModeButton, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_MenuHudModeButtonLabel = lv_label_create(ui_MenuHudModeButton);
-    lv_obj_set_width(ui_MenuHudModeButtonLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_MenuHudModeButtonLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_MenuHudModeButtonLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_MenuHudModeButtonLabel, "Enable HUD Mode");
+    ui_MenuPocketModeButtonLabel = lv_label_create(ui_MenuPocketModeButton);
+    lv_obj_set_width(ui_MenuPocketModeButtonLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_MenuPocketModeButtonLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_MenuPocketModeButtonLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_MenuPocketModeButtonLabel, "Enable Pocket Mode");
 
     ui_MenuSettingsButton = lv_btn_create(ui_MenuBody);
     lv_obj_set_height(ui_MenuSettingsButton, 42);
@@ -147,7 +147,7 @@ void ui_MenuScreen_screen_init(void)
 
     lv_obj_add_event_cb(ui_MenuBackButton, ui_event_MenuBackButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MenuConnectButton, ui_event_MenuConnectButton, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_MenuHudModeButton, ui_event_MenuHudModeButton, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_MenuPocketModeButton, ui_event_MenuPocketModeButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MenuSettingsButton, ui_event_MenuSettingsButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MenuCalibrateButton, ui_event_MenuCalibrateButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MenuPairButton, ui_event_MenuPairButton, LV_EVENT_ALL, NULL);

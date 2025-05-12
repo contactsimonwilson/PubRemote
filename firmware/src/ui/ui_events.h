@@ -21,7 +21,7 @@ void menu_screen_loaded(lv_event_t * e);
 void menu_screen_unloaded(lv_event_t * e);
 void menu_screen_load_start(lv_event_t * e);
 void menu_connect_press(lv_event_t * e);
-void menu_hud_mode_press(lv_event_t * e);
+void menu_pocket_mode_press(lv_event_t * e);
 void shutdown_button_press(lv_event_t * e);
 void shutdown_button_long_press(lv_event_t * e);
 void shutdown_button_down(lv_event_t * e);

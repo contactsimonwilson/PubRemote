@@ -44,8 +44,8 @@ extern lv_obj_t * ui_RSSIContainer;
 extern lv_obj_t * ui_RSSI1;
 extern lv_obj_t * ui_RSSI2;
 extern lv_obj_t * ui_RSSI3;
-extern lv_obj_t * ui_HUDContainer;
-extern lv_obj_t * ui_HUDText;
+extern lv_obj_t * ui_PocketModeContainer;
+extern lv_obj_t * ui_PocketModeImage;
 extern lv_obj_t * ui_MessageText;
 extern lv_obj_t * ui_StatsBody;
 void ui_event_PrimaryStat(lv_event_t * e);
@@ -78,9 +78,9 @@ extern lv_obj_t * ui_MenuBackButtonLabel;
 void ui_event_MenuConnectButton(lv_event_t * e);
 extern lv_obj_t * ui_MenuConnectButton;
 extern lv_obj_t * ui_MenuConnectButtonLabel;
-void ui_event_MenuHudModeButton(lv_event_t * e);
-extern lv_obj_t * ui_MenuHudModeButton;
-extern lv_obj_t * ui_MenuHudModeButtonLabel;
+void ui_event_MenuPocketModeButton(lv_event_t * e);
+extern lv_obj_t * ui_MenuPocketModeButton;
+extern lv_obj_t * ui_MenuPocketModeButtonLabel;
 void ui_event_MenuSettingsButton(lv_event_t * e);
 extern lv_obj_t * ui_MenuSettingsButton;
 extern lv_obj_t * ui_MenuSettingsButtonLabel;
@@ -240,6 +240,7 @@ extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_icon2_png);    // assets/icon2.png
+LV_IMG_DECLARE(ui_img_noinput_14x14_png);    // assets/noinput_14x14.png
 
 // FONTS
 LV_FONT_DECLARE(ui_font_Inter_14);

@@ -36,8 +36,8 @@ lv_obj_t * ui_RSSIContainer;
 lv_obj_t * ui_RSSI1;
 lv_obj_t * ui_RSSI2;
 lv_obj_t * ui_RSSI3;
-lv_obj_t * ui_HUDContainer;
-lv_obj_t * ui_HUDText;
+lv_obj_t * ui_PocketModeContainer;
+lv_obj_t * ui_PocketModeImage;
 lv_obj_t * ui_MessageText;
 lv_obj_t * ui_StatsBody;
 void ui_event_PrimaryStat(lv_event_t * e);
@@ -70,9 +70,9 @@ lv_obj_t * ui_MenuBackButtonLabel;
 void ui_event_MenuConnectButton(lv_event_t * e);
 lv_obj_t * ui_MenuConnectButton;
 lv_obj_t * ui_MenuConnectButtonLabel;
-void ui_event_MenuHudModeButton(lv_event_t * e);
-lv_obj_t * ui_MenuHudModeButton;
-lv_obj_t * ui_MenuHudModeButtonLabel;
+void ui_event_MenuPocketModeButton(lv_event_t * e);
+lv_obj_t * ui_MenuPocketModeButton;
+lv_obj_t * ui_MenuPocketModeButtonLabel;
 void ui_event_MenuSettingsButton(lv_event_t * e);
 lv_obj_t * ui_MenuSettingsButton;
 lv_obj_t * ui_MenuSettingsButtonLabel;
@@ -329,12 +329,12 @@ void ui_event_MenuConnectButton(lv_event_t * e)
     }
 }
 
-void ui_event_MenuHudModeButton(lv_event_t * e)
+void ui_event_MenuPocketModeButton(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        menu_hud_mode_press(e);
+        menu_pocket_mode_press(e);
     }
 }
 

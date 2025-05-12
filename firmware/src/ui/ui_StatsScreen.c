@@ -182,12 +182,16 @@ void ui_StatsScreen_screen_init(void)
     ui_RSSIContainer = lv_obj_create(ui_RemoteIndicatorContainer);
     lv_obj_remove_style_all(ui_RSSIContainer);
     lv_obj_set_width(ui_RSSIContainer, 18);
-    lv_obj_set_height(ui_RSSIContainer, 12);
+    lv_obj_set_height(ui_RSSIContainer, 14);
     lv_obj_set_align(ui_RSSIContainer, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_RSSIContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_RSSIContainer, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END);
     lv_obj_add_flag(ui_RSSIContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
     lv_obj_clear_flag(ui_RSSIContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_pad_left(ui_RSSIContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_RSSIContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_RSSIContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_RSSIContainer, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_RSSI1 = lv_obj_create(ui_RSSIContainer);
     lv_obj_remove_style_all(ui_RSSI1);
@@ -216,28 +220,26 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_RSSI3, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_HUDContainer = lv_obj_create(ui_RemoteIndicatorContainer);
-    lv_obj_remove_style_all(ui_HUDContainer);
-    lv_obj_set_width(ui_HUDContainer, 30);
-    lv_obj_set_height(ui_HUDContainer, 14);
-    lv_obj_set_align(ui_HUDContainer, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_HUDContainer, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_HUDContainer, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END);
-    lv_obj_add_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_HUDContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_PocketModeContainer = lv_obj_create(ui_RemoteIndicatorContainer);
+    lv_obj_remove_style_all(ui_PocketModeContainer);
+    lv_obj_set_width(ui_PocketModeContainer, 14);
+    lv_obj_set_height(ui_PocketModeContainer, 14);
+    lv_obj_set_align(ui_PocketModeContainer, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_PocketModeContainer, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_PocketModeContainer, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END);
+    lv_obj_add_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    lv_obj_clear_flag(ui_PocketModeContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_HUDText = lv_label_create(ui_HUDContainer);
-    lv_obj_set_width(ui_HUDText, lv_pct(100));
-    lv_obj_set_height(ui_HUDText, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_HUDText, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_HUDText, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_label_set_text(ui_HUDText, "HUD");
-    lv_obj_set_style_text_align(ui_HUDText, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_HUDText, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui_HUDText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_HUDText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_HUDText, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_HUDText, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_PocketModeImage = lv_img_create(ui_PocketModeContainer);
+    lv_img_set_src(ui_PocketModeImage, &ui_img_noinput_14x14_png);
+    lv_obj_set_width(ui_PocketModeImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_PocketModeImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_PocketModeImage, 5);
+    lv_obj_set_y(ui_PocketModeImage, -63);
+    lv_obj_set_align(ui_PocketModeImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_PocketModeImage, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_PocketModeImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_PocketModeImage, 210);
 
     ui_MessageText = lv_label_create(ui_StatsHeader);
     lv_obj_set_width(ui_MessageText, lv_pct(100));

@@ -168,16 +168,16 @@ static void update_rssi_display() {
   last_signal_strength_rating_value = signal_strength_rating;
 }
 
-static void update_hud_mode_display() {
-  // Hide HUD mode container on disconnect if not already hidden
+static void update_pocket_mode_display() {
+  // Hide pocket mode container on disconnect if not already hidden
   // Otherwise, show the container if not already shown
-  if (!is_hud_mode_enabled() ||
-      (connection_state == CONNECTION_STATE_DISCONNECTED && !lv_obj_has_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN))) {
-    lv_obj_add_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN);
+  if (!is_pocket_mode_enabled() || (connection_state == CONNECTION_STATE_DISCONNECTED &&
+                                    !lv_obj_has_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN))) {
+    lv_obj_add_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN);
   }
-  else if (is_hud_mode_enabled() && connection_state != CONNECTION_STATE_DISCONNECTED &&
-           lv_obj_has_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN)) {
-    lv_obj_clear_flag(ui_HUDContainer, LV_OBJ_FLAG_HIDDEN);
+  else if (is_pocket_mode_enabled() && connection_state != CONNECTION_STATE_DISCONNECTED &&
+           lv_obj_has_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN)) {
+    lv_obj_clear_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN);
   }
 }
 
@@ -276,7 +276,7 @@ static void update_header_display() {
   else {
     update_remote_battery_display();
     update_rssi_display();
-    update_hud_mode_display();
+    update_pocket_mode_display();
   }
 
   last_should_show_board_state = should_show_board_state;
@@ -431,13 +431,13 @@ static void update_board_battery_display() {
   }
 
   switch (device_settings.battery_display) {
-  case BATTERY_DISPLAY_VOLTAGE:
-    // Update the displayed text
-    asprintf(&formattedString, "%.1fV", remoteStats.batteryVoltage);
-    break;
   case BATTERY_DISPLAY_PERCENT:
     // Update the displayed text
     asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
+    break;
+  case BATTERY_DISPLAY_VOLTAGE:
+    // Update the displayed text
+    asprintf(&formattedString, "%.1fV", remoteStats.batteryVoltage);
     break;
   case BATTERY_DISPLAY_ALL:
     // Update the displayed text
@@ -453,16 +453,19 @@ static void update_board_battery_display() {
   last_units = device_settings.battery_display;
 }
 
-static void change_bat_display(int direction) {
-  if (direction > 0) {
-    device_settings.battery_display = (device_settings.battery_display + 1) % 3;
-    nvs_write_int("battery_display", device_settings.battery_display);
+static void change_board_battery_display(int direction) {
+  // Rotate battery display type
+  if (device_settings.battery_display == BATTERY_DISPLAY_ALL) {
+    device_settings.battery_display = 0;
   }
   else {
-    device_settings.battery_display = (device_settings.battery_display + 2) % 3;
-    nvs_write_int("battery_display", device_settings.battery_display);
+    device_settings.battery_display += 1;
   }
 
+  // Save settings
+  save_device_settings();
+
+  // Call an immediate update to the battery display to update things
   update_board_battery_display();
 }
 
@@ -566,5 +569,5 @@ void stat_swipe_right(lv_event_t *e) {
 }
 
 void stats_footer_long_press(lv_event_t *e) {
-  change_bat_display(1);
+  change_board_battery_display(1);
 }

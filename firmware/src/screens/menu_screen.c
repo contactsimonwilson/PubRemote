@@ -54,20 +54,20 @@ void menu_screen_loaded(lv_event_t *e) {
       lv_obj_add_flag(ui_MenuConnectButton, LV_OBJ_FLAG_HIDDEN);
     }
 
-    // Toggle HUD mode
+    // Update pocket mode button text
     if (connection_state == CONNECTION_STATE_CONNECTED) {
-      lv_obj_clear_flag(ui_MenuHudModeButton, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_clear_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_HIDDEN);
 
-      if (is_hud_mode_enabled()) {
-        lv_label_set_text(ui_MenuHudModeButtonLabel, "Disable HUD Mode");
+      if (is_pocket_mode_enabled()) {
+        lv_label_set_text(ui_MenuPocketModeButtonLabel, "Disable Pocket Mode");
       }
       else {
-        lv_label_set_text(ui_MenuHudModeButtonLabel, "Enable HUD Mode");
+        lv_label_set_text(ui_MenuPocketModeButtonLabel, "Enable Pocket Mode");
       }
     }
     // Not connected, so hide the button
     else {
-      lv_obj_add_flag(ui_MenuHudModeButton, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_add_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_HIDDEN);
     }
 
     LVGL_unlock();
@@ -98,15 +98,15 @@ void menu_connect_press(lv_event_t *e) {
   }
 }
 
-void menu_hud_mode_press(lv_event_t *e) {
-  ESP_LOGI(TAG, "HUD mode button pressed");
+void menu_pocket_mode_press(lv_event_t *e) {
+  ESP_LOGI(TAG, "Pocket mode button pressed");
 
-  // Toggle HUD mode
-  if (device_settings.hud_mode == HUD_MODE_DISABLED) {
-    device_settings.hud_mode = HUD_MODE_ENABLED;
+  // Toggle pocket mode
+  if (device_settings.pocket_mode == POCKET_MODE_DISABLED) {
+    device_settings.pocket_mode = POCKET_MODE_ENABLED;
   }
   else {
-    device_settings.hud_mode = HUD_MODE_DISABLED;
+    device_settings.pocket_mode = POCKET_MODE_DISABLED;
   }
 
   save_device_settings();
