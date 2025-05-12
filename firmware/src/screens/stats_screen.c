@@ -422,7 +422,7 @@ static void update_board_battery_display() {
   char *formattedString;
 
   if (device_settings.battery_display != last_units) {
-    last_board_battery_voltage = 0;
+    last_board_battery_voltage = 1;
   }
 
   // Ensure the value has changed
