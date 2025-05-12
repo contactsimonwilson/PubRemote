@@ -423,7 +423,7 @@ static void update_board_battery_display() {
   switch (stat_display_options.battery_display) {
   case BATTERY_DISPLAY_VOLTAGE:
     // Ensure the value has changed
-    if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.05f) {
+    if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.1f) {
       return;
     }
 
