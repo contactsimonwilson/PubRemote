@@ -457,7 +457,7 @@ static void update_board_battery_display() {
     }
 
     // Update the displayed text
-    asprintf(&formattedString, "%d%% - %.1fV", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
+    asprintf(&formattedString, "%d%% | %.1fV", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
     lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
     free(formattedString);
 
