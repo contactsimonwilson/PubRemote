@@ -16,14 +16,12 @@ StatsScreenDisplayOptions stat_display_options = {
     .secondary_stat = STAT_DISPLAY_DUTY,
 };
 
-static void change_bat_display(int direction) {
+static void change_stat_display(int direction) {
   if (direction > 0) {
-    device_settings.battery_display = (device_settings.battery_display + 1) % 3;
-    nvs_write_int("battery_display", device_settings.battery_display);
+    stat_display_options.primary_stat = (stat_display_options.primary_stat + 1) % 4;
   }
   else {
-    device_settings.battery_display = (device_settings.battery_display + 2) % 3;
-    nvs_write_int("battery_display", device_settings.battery_display);
+    stat_display_options.primary_stat = (stat_display_options.primary_stat + 3) % 4;
   }
 }
 
@@ -432,6 +430,7 @@ static void update_board_battery_display() {
     asprintf(&formattedString, "%d%% | %.1fV", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
     break;
   }
+
   lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
   free(formattedString);
 
@@ -439,6 +438,20 @@ static void update_board_battery_display() {
   last_board_battery_voltage = remoteStats.batteryVoltage;
   last_units = device_settings.battery_display;
 }
+
+static void change_bat_display(int direction) {
+  if (direction > 0) {
+    device_settings.battery_display = (device_settings.battery_display + 1) % 3;
+    nvs_write_int("battery_display", device_settings.battery_display);
+  }
+  else {
+    device_settings.battery_display = (device_settings.battery_display + 2) % 3;
+    nvs_write_int("battery_display", device_settings.battery_display);
+  }
+
+  update_board_battery_display();
+}
+
 static void update_footpad_display() {
   static SwitchState last_value = SWITCH_STATE_OFF;
 
@@ -469,16 +482,6 @@ static void update_footpad_display() {
   }
 
   last_value = remoteStats.switchState;
-}
-
-static void change_stat_display(int direction) {
-  if (direction > 0) {
-    stat_display_options.primary_stat = (stat_display_options.primary_stat + 1) % 4;
-  }
-  else {
-    stat_display_options.primary_stat = (stat_display_options.primary_stat + 3) % 4;
-  }
-  update_board_battery_display();
 }
 
 void update_stats_screen_display() {
