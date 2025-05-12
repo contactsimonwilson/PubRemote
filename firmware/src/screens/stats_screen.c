@@ -418,7 +418,7 @@ static void update_secondary_stat_display() {
 
 static void update_board_battery_display() {
   static float last_board_battery_voltage = 0;
-  static int last_units = 0;
+  static BoardBatteryDisplayOption last_units = 0;
   char *formattedString;
 
   if (device_settings.battery_display != last_units) {
