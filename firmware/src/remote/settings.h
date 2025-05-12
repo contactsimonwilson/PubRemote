@@ -63,12 +63,6 @@ typedef enum {
   DARK_TEXT_ENABLED,
 } DarkTextOptions;
 
-typedef enum {
-  BATTERY_UNITS_ALL,
-  BATTERY_UNITS_PERCENTAGE,
-  BATTERY_UNITS_VOLTAGE,
-} BatteryUnits;
-
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
@@ -98,7 +92,6 @@ typedef struct {
   StartupSoundOptions startup_sound;
   uint32_t theme_color;
   bool dark_text;
-  BatteryUnits battery_units;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();

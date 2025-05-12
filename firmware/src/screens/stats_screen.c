@@ -14,6 +14,7 @@ static const char *TAG = "PUBREMOTE-STATS_SCREEN";
 StatsScreenDisplayOptions stat_display_options = {
     .primary_stat = STAT_DISPLAY_SPEED,
     .secondary_stat = STAT_DISPLAY_DUTY,
+    .battery_display = BATTERY_DISPLAY_VOLTAGE,
 };
 
 static void change_stat_display(int direction) {
@@ -22,6 +23,15 @@ static void change_stat_display(int direction) {
   }
   else {
     stat_display_options.primary_stat = (stat_display_options.primary_stat + 3) % 4;
+  }
+}
+
+static void change_bat_display(int direction) {
+  if (direction > 0) {
+    stat_display_options.primary_stat = (stat_display_options.battery_display + 1) % 3;
+  }
+  else {
+    stat_display_options.primary_stat = (stat_display_options.battery_display + 2) % 3;
   }
 }
 
@@ -410,8 +420,8 @@ static void update_board_battery_display() {
   static float last_board_battery_voltage = 0;
   char *formattedString;
 
-  switch (device_settings.battery_units) {
-  case BATTERY_UNITS_VOLTAGE:
+  switch (stat_display_options.battery_display) {
+  case BATTERY_DISPLAY_VOLTAGE:
     // Ensure the value has changed
     if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.05f) {
       return;
@@ -425,7 +435,7 @@ static void update_board_battery_display() {
     // Update the last value
     last_board_battery_voltage = remoteStats.batteryVoltage;
     break;
-  case BATTERY_UNITS_PERCENTAGE:
+  case BATTERY_DISPLAY_PERCENT:
     // Ensure the value has changed
     if (last_board_battery_percentage == remoteStats.batteryPercentage) {
       return;
@@ -439,7 +449,7 @@ static void update_board_battery_display() {
     // Update the last value
     last_board_battery_percentage = remoteStats.batteryPercentage;
     break;
-  case BATTERY_UNITS_ALL:
+  case BATTERY_DISPLAY_ALL:
     // Ensure the value has changed
     if (last_board_battery_percentage == remoteStats.batteryPercentage) {
       return;
@@ -555,5 +565,5 @@ void stat_swipe_right(lv_event_t *e) {
 }
 
 void stats_footer_long_press(lv_event_t *e) {
-  // Your code here
+  change_bat_display(1);
 }
