@@ -211,10 +211,6 @@ def screen_rotation_change(event_struct):
     return
 
 
-def menu_hud_mode_press(event_struct):
-    return
-
-
 def menu_pocket_mode_press(event_struct):
     return
 
