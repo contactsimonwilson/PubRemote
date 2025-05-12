@@ -19,20 +19,20 @@ StatsScreenDisplayOptions stat_display_options = {
 static void change_stat_display(int direction) {
   if (direction > 0) {
     stat_display_options.primary_stat = (stat_display_options.primary_stat + 1) % 4;
-    nvs_write_int("battery_display", device_settings.battery_display);
   }
   else {
     stat_display_options.primary_stat = (stat_display_options.primary_stat + 3) % 4;
-    nvs_write_int("battery_display", device_settings.battery_display);
   }
 }
 
 static void change_bat_display(int direction) {
   if (direction > 0) {
     device_settings.battery_display = (device_settings.battery_display + 1) % 3;
+    nvs_write_int("battery_display", device_settings.battery_display);
   }
   else {
     device_settings.battery_display = (device_settings.battery_display + 2) % 3;
+    nvs_write_int("battery_display", device_settings.battery_display);
   }
 }
 
