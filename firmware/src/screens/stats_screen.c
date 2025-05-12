@@ -451,7 +451,7 @@ static void update_board_battery_display() {
   last_units = device_settings.battery_display;
 }
 
-static void change_board_battery_display(int direction) {
+static void change_board_battery_display() {
   // Rotate battery display type
   if (device_settings.battery_display == BATTERY_DISPLAY_ALL) {
     device_settings.battery_display = 0;
@@ -568,5 +568,5 @@ void stat_swipe_right(lv_event_t *e) {
 }
 
 void stats_footer_long_press(lv_event_t *e) {
-  change_board_battery_display(1);
+  change_board_battery_display();
 }
