@@ -4,17 +4,16 @@
 #include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>
+#include <math.h>
 #include <remote/connection.h>
 #include <remote/settings.h>
 #include <remote/stats.h>
 #include <utilities/conversion_utils.h>
-
 static const char *TAG = "PUBREMOTE-STATS_SCREEN";
 
 StatsScreenDisplayOptions stat_display_options = {
     .primary_stat = STAT_DISPLAY_SPEED,
     .secondary_stat = STAT_DISPLAY_DUTY,
-    .battery_display = BATTERY_DISPLAY_PERCENT,
 };
 
 static void change_stat_display(int direction) {
@@ -407,21 +406,50 @@ static void update_secondary_stat_display() {
 }
 
 static void update_board_battery_display() {
-  static uint8_t last_board_battery_value = 0;
+  static float last_board_battery_voltage = 0;
+  static BoardBatteryDisplayOption last_units = 0;
+  char *formattedString;
 
   // Ensure the value has changed
-  if (last_board_battery_value == remoteStats.batteryPercentage) {
+  if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.1f &&
+      device_settings.battery_display == last_units) {
     return;
   }
 
-  // Update the displayed text
-  char *formattedString;
-  asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
+  switch (device_settings.battery_display) {
+  case BATTERY_DISPLAY_VOLTAGE:
+    // Update the displayed text
+    asprintf(&formattedString, "%.1fV", remoteStats.batteryVoltage);
+    break;
+  case BATTERY_DISPLAY_PERCENT:
+    // Update the displayed text
+    asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
+    break;
+  case BATTERY_DISPLAY_ALL:
+    // Update the displayed text
+    asprintf(&formattedString, "%d%% | %.1fV", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
+    break;
+  }
+
   lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
   free(formattedString);
 
-  // Update the last value
-  last_board_battery_value = remoteStats.batteryPercentage;
+  // Update the last values
+  last_board_battery_voltage = remoteStats.batteryVoltage;
+  last_units = device_settings.battery_display;
+}
+
+static void change_bat_display(int direction) {
+  if (direction > 0) {
+    device_settings.battery_display = (device_settings.battery_display + 1) % 3;
+    nvs_write_int("battery_display", device_settings.battery_display);
+  }
+  else {
+    device_settings.battery_display = (device_settings.battery_display + 2) % 3;
+    nvs_write_int("battery_display", device_settings.battery_display);
+  }
+
+  update_board_battery_display();
 }
 
 static void update_footpad_display() {
@@ -524,5 +552,5 @@ void stat_swipe_right(lv_event_t *e) {
 }
 
 void stats_footer_long_press(lv_event_t *e) {
-  // Your code here
+  change_bat_display(1);
 }

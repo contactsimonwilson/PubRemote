@@ -179,6 +179,7 @@ static void process_data(esp_now_event_t evt) {
     float battery_level = (float)data[27] / 2.0;
 
     remoteStats.batteryPercentage = battery_level;
+    remoteStats.batteryVoltage = input_voltage_filtered;
     float duty_cycle_now = (float)data[16] / 100.0 - 0.5;
     remoteStats.dutyCycle = (uint8_t)(fabs(duty_cycle_now) * 100);
 
