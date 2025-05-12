@@ -28,10 +28,10 @@ static void change_stat_display(int direction) {
 
 static void change_bat_display(int direction) {
   if (direction > 0) {
-    stat_display_options.battery_display = (stat_display_options.battery_display + 1) % 3;
+    stat_display_options.battery_display = (stat_display_options.battery_display + 1) % 2;
   }
   else {
-    stat_display_options.battery_display = (stat_display_options.battery_display + 2) % 3;
+    stat_display_options.battery_display = (stat_display_options.battery_display + 2) % 2;
   }
 }
 
