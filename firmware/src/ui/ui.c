@@ -37,7 +37,7 @@ lv_obj_t * ui_RSSI1;
 lv_obj_t * ui_RSSI2;
 lv_obj_t * ui_RSSI3;
 lv_obj_t * ui_PocketModeContainer;
-lv_obj_t * ui_PocketModeImage;
+lv_obj_t * ui_PocketModeText;
 lv_obj_t * ui_MessageText;
 lv_obj_t * ui_StatsBody;
 void ui_event_PrimaryStat(lv_event_t * e);

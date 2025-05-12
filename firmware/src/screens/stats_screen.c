@@ -517,6 +517,7 @@ void update_stats_screen_display() {
     update_secondary_stat_display();
     update_board_battery_display();
     update_footpad_display();
+
     LVGL_unlock();
   }
 }
