@@ -171,12 +171,10 @@ static void update_rssi_display() {
 static void update_pocket_mode_display() {
   // Hide pocket mode container on disconnect if not already hidden
   // Otherwise, show the container if not already shown
-  if (!is_pocket_mode_enabled() || (connection_state == CONNECTION_STATE_DISCONNECTED &&
-                                    !lv_obj_has_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN))) {
+  if (!is_pocket_mode_enabled() && !lv_obj_has_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN)) {
     lv_obj_add_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN);
   }
-  else if (is_pocket_mode_enabled() && connection_state != CONNECTION_STATE_DISCONNECTED &&
-           lv_obj_has_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN)) {
+  else if (is_pocket_mode_enabled() && lv_obj_has_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN)) {
     lv_obj_clear_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN);
   }
 }

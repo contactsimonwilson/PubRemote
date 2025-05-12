@@ -55,19 +55,11 @@ void menu_screen_loaded(lv_event_t *e) {
     }
 
     // Update pocket mode button text
-    if (connection_state == CONNECTION_STATE_CONNECTED) {
-      lv_obj_clear_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_HIDDEN);
-
-      if (is_pocket_mode_enabled()) {
-        lv_label_set_text(ui_MenuPocketModeButtonLabel, "Disable Pocket Mode");
-      }
-      else {
-        lv_label_set_text(ui_MenuPocketModeButtonLabel, "Enable Pocket Mode");
-      }
+    if (is_pocket_mode_enabled()) {
+      lv_label_set_text(ui_MenuPocketModeButtonLabel, "Disable Pocket Mode");
     }
-    // Not connected, so hide the button
     else {
-      lv_obj_add_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_HIDDEN);
+      lv_label_set_text(ui_MenuPocketModeButtonLabel, "Enable Pocket Mode");
     }
 
     LVGL_unlock();

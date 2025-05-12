@@ -71,7 +71,7 @@ void ui_MenuScreen_screen_init(void)
     lv_obj_set_height(ui_MenuPocketModeButton, 42);
     lv_obj_set_width(ui_MenuPocketModeButton, lv_pct(100));
     lv_obj_set_align(ui_MenuPocketModeButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_add_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_MenuPocketModeButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_MenuPocketModeButtonLabel = lv_label_create(ui_MenuPocketModeButton);
