@@ -14,7 +14,7 @@ static const char *TAG = "PUBREMOTE-STATS_SCREEN";
 StatsScreenDisplayOptions stat_display_options = {
     .primary_stat = STAT_DISPLAY_SPEED,
     .secondary_stat = STAT_DISPLAY_DUTY,
-    .battery_display = BATTERY_DISPLAY_VOLTAGE,
+    .battery_display = BATTERY_DISPLAY_PERCENT,
 };
 
 static void change_stat_display(int direction) {
@@ -28,10 +28,10 @@ static void change_stat_display(int direction) {
 
 static void change_bat_display(int direction) {
   if (direction > 0) {
-    stat_display_options.battery_display = (stat_display_options.battery_display + 1) % 2;
+    stat_display_options.battery_display = (stat_display_options.battery_display + 1) % 3;
   }
   else {
-    stat_display_options.battery_display = (stat_display_options.battery_display + 2) % 2;
+    stat_display_options.battery_display = (stat_display_options.battery_display + 2) % 3;
   }
 }
 
