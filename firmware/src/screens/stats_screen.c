@@ -443,14 +443,13 @@ static void update_board_battery_display() {
     // Update the displayed text
     asprintf(&formattedString, "%d%% | %.1fV", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
     break;
-
-    lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
-    free(formattedString);
-
-    // Update the last values
-    last_board_battery_voltage = remoteStats.batteryVoltage;
-    last_units = device_settings.battery_display;
   }
+  lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+  free(formattedString);
+
+  // Update the last values
+  last_board_battery_voltage = remoteStats.batteryVoltage;
+  last_units = device_settings.battery_display;
 }
 static void update_footpad_display() {
   static SwitchState last_value = SWITCH_STATE_OFF;
