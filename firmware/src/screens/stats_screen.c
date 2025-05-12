@@ -16,15 +16,6 @@ StatsScreenDisplayOptions stat_display_options = {
     .secondary_stat = STAT_DISPLAY_DUTY,
 };
 
-static void change_stat_display(int direction) {
-  if (direction > 0) {
-    stat_display_options.primary_stat = (stat_display_options.primary_stat + 1) % 4;
-  }
-  else {
-    stat_display_options.primary_stat = (stat_display_options.primary_stat + 3) % 4;
-  }
-}
-
 static void change_bat_display(int direction) {
   if (direction > 0) {
     device_settings.battery_display = (device_settings.battery_display + 1) % 3;
@@ -421,12 +412,9 @@ static void update_board_battery_display() {
   static BoardBatteryDisplayOption last_units = 0;
   char *formattedString;
 
-  if (device_settings.battery_display != last_units) {
-    last_board_battery_voltage = 1;
-  }
-
   // Ensure the value has changed
-  if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.1f) {
+  if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.1f &&
+      device_settings.battery_display == last_units) {
     return;
   }
 
@@ -481,6 +469,16 @@ static void update_footpad_display() {
   }
 
   last_value = remoteStats.switchState;
+}
+
+static void change_stat_display(int direction) {
+  if (direction > 0) {
+    stat_display_options.primary_stat = (stat_display_options.primary_stat + 1) % 4;
+  }
+  else {
+    stat_display_options.primary_stat = (stat_display_options.primary_stat + 3) % 4;
+  }
+  update_board_battery_display();
 }
 
 void update_stats_screen_display() {
