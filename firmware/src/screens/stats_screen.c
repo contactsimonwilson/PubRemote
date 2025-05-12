@@ -417,53 +417,39 @@ static void update_secondary_stat_display() {
 }
 
 static void update_board_battery_display() {
-  static uint8_t last_board_battery_percentage = 0;
   static float last_board_battery_voltage = 0;
+  static int last_units = 0;
   char *formattedString;
+
+  if (device_settings.battery_display != last_units) {
+    last_board_battery_voltage = 0;
+  }
+
+  // Ensure the value has changed
+  if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.1f) {
+    return;
+  }
 
   switch (device_settings.battery_display) {
   case BATTERY_DISPLAY_VOLTAGE:
-    // Ensure the value has changed
-    if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.1f) {
-      return;
-    }
-
     // Update the displayed text
     asprintf(&formattedString, "%.1fV", remoteStats.batteryVoltage);
-    lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
-    free(formattedString);
-
-    // Update the last value
-    last_board_battery_voltage = remoteStats.batteryVoltage;
     break;
   case BATTERY_DISPLAY_PERCENT:
-    // Ensure the value has changed
-    if (last_board_battery_percentage == remoteStats.batteryPercentage) {
-      return;
-    }
-
     // Update the displayed text
     asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
-    lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
-    free(formattedString);
-
-    // Update the last value
-    last_board_battery_percentage = remoteStats.batteryPercentage;
     break;
   case BATTERY_DISPLAY_ALL:
-    // Ensure the value has changed
-    if (last_board_battery_percentage == remoteStats.batteryPercentage) {
-      return;
-    }
-
     // Update the displayed text
     asprintf(&formattedString, "%d%% | %.1fV", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
+    break;
+
     lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
     free(formattedString);
 
-    // Update the last value
-    last_board_battery_percentage = remoteStats.batteryPercentage;
-    break;
+    // Update the last values
+    last_board_battery_voltage = remoteStats.batteryVoltage;
+    last_units = device_settings.battery_display;
   }
 }
 static void update_footpad_display() {
