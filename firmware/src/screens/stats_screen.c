@@ -4,17 +4,16 @@
 #include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>
+#include <math.h>
 #include <remote/connection.h>
 #include <remote/settings.h>
 #include <remote/stats.h>
 #include <utilities/conversion_utils.h>
-
 static const char *TAG = "PUBREMOTE-STATS_SCREEN";
 
 StatsScreenDisplayOptions stat_display_options = {
     .primary_stat = STAT_DISPLAY_SPEED,
     .secondary_stat = STAT_DISPLAY_DUTY,
-    .battery_display = BATTERY_DISPLAY_PERCENT,
 };
 
 static void change_stat_display(int direction) {
@@ -407,23 +406,55 @@ static void update_secondary_stat_display() {
 }
 
 static void update_board_battery_display() {
-  static uint8_t last_board_battery_value = 0;
-
-  // Ensure the value has changed
-  if (last_board_battery_value == remoteStats.batteryPercentage) {
-    return;
-  }
-
-  // Update the displayed text
+  static uint8_t last_board_battery_percentage = 0;
+  static float last_board_battery_voltage = 0;
   char *formattedString;
-  asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
-  lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
-  free(formattedString);
 
-  // Update the last value
-  last_board_battery_value = remoteStats.batteryPercentage;
+  switch (device_settings.battery_units) {
+  case BATTERY_UNITS_VOLTAGE:
+    // Ensure the value has changed
+    if (fabsf(last_board_battery_voltage - remoteStats.batteryVoltage) < 0.05f) {
+      return;
+    }
+
+    // Update the displayed text
+    asprintf(&formattedString, "%.1fV", remoteStats.batteryVoltage);
+    lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+    free(formattedString);
+
+    // Update the last value
+    last_board_battery_voltage = remoteStats.batteryVoltage;
+    break;
+  case BATTERY_UNITS_PERCENTAGE:
+    // Ensure the value has changed
+    if (last_board_battery_percentage == remoteStats.batteryPercentage) {
+      return;
+    }
+
+    // Update the displayed text
+    asprintf(&formattedString, "%d%%", remoteStats.batteryPercentage);
+    lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+    free(formattedString);
+
+    // Update the last value
+    last_board_battery_percentage = remoteStats.batteryPercentage;
+    break;
+  case BATTERY_UNITS_ALL:
+    // Ensure the value has changed
+    if (last_board_battery_percentage == remoteStats.batteryPercentage) {
+      return;
+    }
+
+    // Update the displayed text
+    asprintf(&formattedString, "%d%% - %.1fV", remoteStats.batteryPercentage, remoteStats.batteryVoltage);
+    lv_label_set_text(ui_BoardBatteryDisplay, formattedString);
+    free(formattedString);
+
+    // Update the last value
+    last_board_battery_percentage = remoteStats.batteryPercentage;
+    break;
+  }
 }
-
 static void update_footpad_display() {
   static SwitchState last_value = SWITCH_STATE_OFF;
 
