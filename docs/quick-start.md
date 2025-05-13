@@ -108,3 +108,7 @@ The fix: Re-run calibration and check "Invert Y"
 
 1. If your VESC Express and VESC Controller firmware versions are different, this will prevent communication
 2. If your CAN communication between the VESC Express and VESC Controller is not functioning properly, this will prevent communication
+
+### My remote is showing 0% board battery all the time
+
+This is a known incompatibility with versions of Refloat package before 1.1, and all Float package versions. Update to Refloat 1.1 to resolve.
