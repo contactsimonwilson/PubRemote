@@ -1,4 +1,5 @@
 #include "transmitter.h"
+#include "commands.h"
 #include "connection.h"
 #include "esp_event.h"
 #include "esp_log.h"
@@ -41,7 +42,9 @@ static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "Registered RX callback");
 
   ESP_LOGI(TAG, "TX task started");
-  uint8_t combined_data[sizeof(int32_t) + sizeof(remote_data.bytes)];
+  uint8_t ind = 0;
+  uint8_t data[100];
+
   while (1) {
     int64_t newTime = get_current_time_ms();
 
@@ -59,14 +62,18 @@ static void transmitter_task(void *pvParameters) {
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
       // Copy secret_Code to the beginning of the buffer
-      memcpy(combined_data, &pairing_settings.secret_code, sizeof(int32_t));
+      data[0] = REC_SET_REMOTE_STATE;
+      ind++;
+
+      memcpy(data + ind, &pairing_settings.secret_code, sizeof(int32_t));
+      ind += sizeof(int32_t);
 
       // Copy remote_data.bytes after secret_Code
-      memcpy(combined_data + sizeof(int32_t), remote_data.bytes, sizeof(remote_data.bytes));
+      memcpy(data + ind, remote_data.bytes, sizeof(remote_data.bytes));
 
       uint8_t *mac_addr = pairing_settings.remote_addr;
       if (channel_lock()) {
-        esp_err_t result = esp_now_send(mac_addr, combined_data, sizeof(combined_data));
+        esp_err_t result = esp_now_send(mac_addr, data, ind);
         if (result != ESP_OK) {
           // Handle error if needed
           uint8_t chann = pairing_settings.channel;
