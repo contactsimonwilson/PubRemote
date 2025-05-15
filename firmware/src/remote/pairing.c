@@ -1,4 +1,5 @@
 #include "pairing.h"
+#include "commands.h"
 #include "connection.h"
 #include "esp_log.h"
 #include "espnow.h"
@@ -22,7 +23,7 @@ bool process_pairing_init(uint8_t *data, int len, esp_now_event_t evt) {
     ESP_LOGI(TAG, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", data[0], data[1], data[2], data[3], data[4], data[5]);
     // ESP_LOGI(TAG, "Incorrect MAC Address: %02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2],
     //          mac_addr[3], mac_addr[4], mac_addr[5]);
-    uint8_t TEST[1] = {420}; // TODO - FIX THIS
+    uint8_t PAIR_BOND_RES[2] = {REM_PAIR_BOND};
     // Do this internally as we don't want it to change connection state
     esp_now_peer_info_t peerInfo = {};
     peerInfo.channel = evt.chan; // Set the channel number (0-14)
@@ -43,7 +44,7 @@ bool process_pairing_init(uint8_t *data, int len, esp_now_event_t evt) {
 
       esp_now_add_peer(&peerInfo);
 
-      result = esp_now_send(mac_addr, (uint8_t *)&TEST, sizeof(TEST));
+      result = esp_now_send(mac_addr, (uint8_t *)&PAIR_BOND_RES, sizeof(PAIR_BOND_RES));
       channel_unlock();
     }
 
@@ -57,6 +58,9 @@ bool process_pairing_init(uint8_t *data, int len, esp_now_event_t evt) {
       pairing_state = PAIRING_STATE_PAIRING;
       return true;
     }
+  }
+  else {
+    ESP_LOGE(TAG, "Invalid pairing init packet length: %d", len);
   }
   return false;
 }
@@ -79,29 +83,37 @@ bool process_pairing_bond(uint8_t *data, int len) {
     pairing_state = PAIRING_STATE_PENDING;
     return true;
   }
+  else {
+    ESP_LOGE(TAG, "Invalid pairing bond packet length: %d", len);
+  }
   return false;
 }
 
 bool process_pairing_complete(uint8_t *data, int len) {
-  if (pairing_state == PAIRING_STATE_PENDING && len == 4) {
-    // grab secret code
+  if (pairing_state == PAIRING_STATE_PENDING && len == 1) {
     ESP_LOGI(TAG, "Grabbing response");
     ESP_LOGI(TAG, "packet Length: %d", len);
-    int response = (int32_t)(data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+    uint8_t response = data[0];
     ESP_LOGI(TAG, "Response: %i", response);
-    if (LVGL_lock(0)) {
-      if (response == -1) {
+
+    if (response == 1) {
+      if (LVGL_lock(0)) {
         pairing_state = PAIRING_STATE_PAIRED;
         save_pairing_data();
         connect_to_default_peer();
         lv_disp_load_scr(ui_StatsScreen);
+        LVGL_unlock();
       }
-      else {
-        pairing_state = PAIRING_STATE_UNPAIRED;
-      }
-      LVGL_unlock();
+      return true;
     }
-    return true;
+    else {
+      ESP_LOGI(TAG, "Pairing failed");
+      pairing_state = PAIRING_STATE_UNPAIRED;
+      return false;
+    }
+  }
+  else {
+    ESP_LOGE(TAG, "Invalid pairing complete packet length: %d", len);
   }
   return false;
 }

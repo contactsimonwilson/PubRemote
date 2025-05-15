@@ -61,7 +61,6 @@ static void process_data(esp_now_event_t evt) {
   ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
   bool is_pairing_start = pairing_state == PAIRING_STATE_UNPAIRED && is_pairing_screen_active();
-
   // Check mac for security on anything other than initial pairing
   if (!is_same_mac(evt.mac_addr, pairing_settings.remote_addr) && !is_pairing_start) {
     ESP_LOGD(TAG, "Ignoring data from unknown MAC");
@@ -77,30 +76,30 @@ static void process_data(esp_now_event_t evt) {
 
   data += 1; // Move data pointer to the actual data
 
-  ESP_LOGD(TAG, "Command: %d", command);
+  ESP_LOGI(TAG, "Command: %d", command);
 
   switch (command) {
   case REM_VERSION:
     ESP_LOGI(TAG, "Rec: Version: %d", data[1]);
     break;
-  case REM_RECEIVER_VERSION:
+  case REM_REC_VERSION:
     ESP_LOGI(TAG, "Rec: Receiver version: %d", data[1]);
     break;
   case REM_PAIR_INIT:
-    ESP_LOGI(TAG, "Rec: Pairing init");
     if (is_pairing_start) {
+      ESP_LOGI(TAG, "Process: Pairing init");
       process_pairing_init(data, len, evt);
     }
     break;
   case REM_PAIR_BOND:
-    ESP_LOGI(TAG, "Rec: Pairing bond");
-    if (is_pairing_start) {
+    if (pairing_state == PAIRING_STATE_PAIRING && is_pairing_screen_active()) {
+      ESP_LOGI(TAG, "Process: Pairing bond");
       process_pairing_bond(data, len);
     }
     break;
   case REM_PAIR_COMPLETE:
-    ESP_LOGI(TAG, "Rec: Pairing complete");
-    if (is_pairing_start) {
+    if (pairing_state == PAIRING_STATE_PENDING && is_pairing_screen_active()) {
+      ESP_LOGI(TAG, "Process: Pairing complete");
       process_pairing_complete(data, len);
     }
     break;
