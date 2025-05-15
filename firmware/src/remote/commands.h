@@ -5,18 +5,19 @@
 #include <stdio.h>
 
 typedef enum {
+  // Receiver version commands
   REM_VERSION = 0,
-  REM_RECEIVER_VERSION = 1,
+  // Receiver version commands
+  REM_REC_VERSION = 5,
+  // Pairing commands
   REM_PAIR_INIT = 10,
   REM_PAIR_BOND = 11,
   REM_PAIR_COMPLETE = 12,
+  // Remote specific commands
   REM_SET_CORE_DATA = 100,
+  // Receiver specific commands
+  REM_REC_SET_REMOTE_STATE = 150,
 } RemoteCommands;
-
-typedef enum {
-  REC_VERSION = 0,
-  REC_SET_REMOTE_STATE = 100,
-} ReceiverCommands;
 
 bool process_board_data(uint8_t *data, int len);
 

@@ -62,7 +62,7 @@ static void transmitter_task(void *pvParameters) {
       // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
       // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
       // Copy secret_Code to the beginning of the buffer
-      data[0] = REC_SET_REMOTE_STATE;
+      data[0] = REM_REC_SET_REMOTE_STATE;
       ind++;
 
       memcpy(data + ind, &pairing_settings.secret_code, sizeof(int32_t));
