@@ -16,42 +16,41 @@ bool process_board_data(uint8_t *data, int len) {
     reset_sleep_timer();
     remoteStats.lastUpdated = get_current_time_ms();
 
-    uint8_t mode = data[0];
-    uint8_t fault_code = data[1];
-    float pitch_angle = (int16_t)((data[2] << 8) | data[3]) / 10.0;
-    float roll_angle = (int16_t)((data[4] << 8) | data[5]) / 10.0;
-    float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
-    int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
-    float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
+    uint8_t fault_code = data[0];
+    float pitch_angle = (int16_t)((data[1] << 8) | data[2]) / 10.0;
+    float roll_angle = (int16_t)((data[3] << 8) | data[4]) / 10.0;
+    float input_voltage_filtered = (int16_t)((data[7] << 8) | data[8]) / 10.0;
+    int16_t rpm = (int16_t)((data[9] << 8) | data[10]);
+    float tot_current = (int16_t)((data[13] << 8) | data[14]) / 10.0;
 
     // Get RemoteStats
-    float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
+    float speed = (int16_t)((data[11] << 8) | data[12]) / 10.0;
     remoteStats.speed = convert_ms_to_kph(fabs(speed));
 
-    float battery_level = (float)data[27] / 2.0;
+    float battery_level = (float)data[26] / 2.0;
 
     remoteStats.batteryPercentage = battery_level;
     remoteStats.batteryVoltage = input_voltage_filtered;
-    float duty_cycle_now = (float)data[16] / 100.0 - 0.5;
+    float duty_cycle_now = (float)data[15] / 100.0 - 0.5;
     remoteStats.dutyCycle = (uint8_t)(fabs(duty_cycle_now) * 100);
 
-    float motor_temp_filtered = (float)data[22] / 2.0;
+    float motor_temp_filtered = (float)data[21] / 2.0;
     remoteStats.motorTemp = motor_temp_filtered;
 
-    float fet_temp_filtered = (float)data[21] / 2.0;
+    float fet_temp_filtered = (float)data[20] / 2.0;
     remoteStats.controllerTemp = fet_temp_filtered;
 
-    uint8_t state = data[6];
+    uint8_t state = data[5];
     remoteStats.state = state;
-    uint8_t switch_state = data[7];
+    uint8_t switch_state = data[6];
     remoteStats.switchState = switch_state;
 
     float distance_abs;
-    memcpy(&distance_abs, &data[17], sizeof(float));
+    memcpy(&distance_abs, &data[16], sizeof(float));
     remoteStats.tripDistance = distance_abs;
-    uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
+    uint32_t odometer = (uint32_t)((data[22] << 24) | (data[23] << 16) | (data[24] << 8) | data[25]);
 
-    int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
+    int32_t super_secret_code = (int32_t)((data[27] << 24) | (data[28] << 16) | (data[29] << 8) | data[30]);
 
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
