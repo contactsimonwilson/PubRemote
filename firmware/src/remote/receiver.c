@@ -76,7 +76,7 @@ static void process_data(esp_now_event_t evt) {
 
   data += 1; // Move data pointer to the actual data
 
-  ESP_LOGI(TAG, "Command: %d", command);
+  ESP_LOGD(TAG, "Command: %d", command);
 
   switch (command) {
   case REM_VERSION:
@@ -104,7 +104,7 @@ static void process_data(esp_now_event_t evt) {
     }
     break;
   case REM_SET_CORE_DATA:
-    ESP_LOGI(TAG, "Rec: Set data");
+    ESP_LOGD(TAG, "Rec: Set data");
     process_board_data(data, len);
     break;
   default:
