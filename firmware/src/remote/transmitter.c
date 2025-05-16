@@ -70,6 +70,7 @@ static void transmitter_task(void *pvParameters) {
 
       // Copy remote_data.bytes after secret_Code
       memcpy(data + ind, remote_data.bytes, sizeof(remote_data.bytes));
+      ind += sizeof(remote_data.bytes);
 
       uint8_t *mac_addr = pairing_settings.remote_addr;
       if (channel_lock()) {
@@ -90,6 +91,9 @@ static void transmitter_task(void *pvParameters) {
       LAST_COMMAND_TIME = newTime;
       ESP_LOGD(TAG, "Sent command");
     }
+    // Reset the index for the next data packet and clear the data buffer
+    ind = 0;
+    memset(data, 0, sizeof(data));
     vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
   }
 
