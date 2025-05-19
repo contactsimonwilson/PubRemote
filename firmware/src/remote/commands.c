@@ -5,10 +5,12 @@
 #include "stats.h"
 #include "time.h"
 #include "utilities/conversion_utils.h"
+#include <esp_log.h>
 #include <math.h>
 #include <string.h>
 
 static const char *TAG = "PUBREMOTE-COMMANDS";
+#define PUBMOTE_COMMANDS_DEBUG 0
 
 bool process_board_data(uint8_t *data, int len) {
   if ((connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
@@ -53,23 +55,24 @@ bool process_board_data(uint8_t *data, int len) {
       remoteStats.tripDistance = distance_abs;
       uint32_t odometer = (uint32_t)((data[26] << 24) | (data[27] << 16) | (data[28] << 8) | data[29]);
 
+#if PUBMOTE_COMMANDS_DEBUG
       // Print the extracted values
-      // ESP_LOGI(TAG, "Mode: %d", mode);
-      // ESP_LOGI(TAG, "Fault Code: %d", fault_code);
-      // ESP_LOGI(TAG, "Pitch Angle: %.1f", pitch_angle);
-      // ESP_LOGI(TAG, "Roll Angle: %.1f", roll_angle);
-      // ESP_LOGI(TAG, "State: %d", state);
-      // ESP_LOGI(TAG, "Switch State: %d", switch_state);
-      // ESP_LOGI(TAG, "Input Voltage Filtered: %.1f", input_voltage_filtered);
-      // ESP_LOGI(TAG, "RPM: %d", rpm);
-      // ESP_LOGI(TAG, "Speed: %.1f", speed);
-      // ESP_LOGI(TAG, "Total Current: %.1f", tot_current);
-      // ESP_LOGI(TAG, "Duty Cycle Now: %.2f", duty_cycle_now);
-      // ESP_LOGI(TAG, "Distance Absolute: %.2f", distance_abs);
-      // ESP_LOGI(TAG, "FET Temperature Filtered: %.1f", fet_temp_filtered);
-      // ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
-      // ESP_LOGI(TAG, "Odometer: %lu", odometer);
-      // ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
+      ESP_LOGI(TAG, "Fault Code: %d", fault_code);
+      ESP_LOGI(TAG, "Pitch Angle: %.1f", pitch_angle);
+      ESP_LOGI(TAG, "Roll Angle: %.1f", roll_angle);
+      ESP_LOGI(TAG, "State: %d", state);
+      ESP_LOGI(TAG, "Switch State: %d", switch_state);
+      ESP_LOGI(TAG, "Input Voltage Filtered: %.1f", input_voltage_filtered);
+      ESP_LOGI(TAG, "RPM: %d", rpm);
+      ESP_LOGI(TAG, "Speed: %.1f", speed);
+      ESP_LOGI(TAG, "Total Current: %.1f", tot_current);
+      ESP_LOGI(TAG, "Duty Cycle Now: %.2f", duty_cycle_now);
+      ESP_LOGI(TAG, "Distance Absolute: %.2f", distance_abs);
+      ESP_LOGI(TAG, "FET Temperature Filtered: %.1f", fet_temp_filtered);
+      ESP_LOGI(TAG, "Motor Temperature Filtered: %.1f", motor_temp_filtered);
+      ESP_LOGI(TAG, "Odometer: %lu", odometer);
+      ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
+#endif
 
       update_stats_display(); // TODO - use callbacks to update the UI instead of direct calls
       return true;

@@ -69,8 +69,8 @@ static void transmitter_task(void *pvParameters) {
       ind += sizeof(int32_t);
 
       // Copy remote_data.bytes after secret_Code
-      memcpy(data + ind, remote_data.bytes, sizeof(remote_data.bytes));
-      ind += sizeof(remote_data.bytes);
+      memcpy(data + ind, &remote_data, sizeof(remote_data));
+      ind += sizeof(remote_data);
 
       uint8_t *mac_addr = pairing_settings.remote_addr;
       if (channel_lock()) {
