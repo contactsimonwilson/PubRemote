@@ -32,7 +32,7 @@ void update_version_info_label() {
 
 void update_battery_percentage_label() {
   char *formattedString;
-  asprintf(&formattedString, "Battery: %.2fV | %d%%", remoteStats.remoteBatteryVoltage,
+  asprintf(&formattedString, "Battery: %.2fV | %d%%", ((float)remoteStats.remoteBatteryVoltage / 1000.0f),
            remoteStats.remoteBatteryPercentage);
   lv_label_set_text(ui_DebugInfoLabel, formattedString);
   free(formattedString);
