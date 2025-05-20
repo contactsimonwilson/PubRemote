@@ -116,10 +116,10 @@ static void thumbstick_task(void *pvParameters) {
     if (read_err == ESP_OK) {
       joystick_data.x = x_value;
       float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, false);
-      float curr_x = remote_data.data.js_x;
+      float curr_x = remote_data.js_x;
 
       if (new_x != curr_x) {
-        remote_data.data.js_x = new_x;
+        remote_data.js_x = new_x;
         trigger_sleep_disrupt = true;
       }
     }
