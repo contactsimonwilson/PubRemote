@@ -216,27 +216,6 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_bg_color(ui_RSSI3, lv_color_hex(0x717171), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_RSSI3, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_PocketModeContainer = lv_obj_create(ui_RemoteIndicatorContainer);
-    lv_obj_remove_style_all(ui_PocketModeContainer);
-    lv_obj_set_width(ui_PocketModeContainer, 22);
-    lv_obj_set_height(ui_PocketModeContainer, 14);
-    lv_obj_set_align(ui_PocketModeContainer, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_PocketModeContainer, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_PocketModeContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_PocketModeContainer, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_PocketModeContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-
-    ui_PocketModeText = lv_label_create(ui_PocketModeContainer);
-    lv_obj_set_width(ui_PocketModeText, lv_pct(100));
-    lv_obj_set_height(ui_PocketModeText, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_PocketModeText, 17);
-    lv_obj_set_y(ui_PocketModeText, -53);
-    lv_obj_set_align(ui_PocketModeText, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_PocketModeText, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_label_set_text(ui_PocketModeText, "POCKET MODE");
-    lv_obj_set_style_text_color(ui_PocketModeText, lv_color_hex(0xFF0101), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_PocketModeText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     ui_MessageText = lv_label_create(ui_StatsHeader);
     lv_obj_set_width(ui_MessageText, lv_pct(100));
     lv_obj_set_height(ui_MessageText, LV_SIZE_CONTENT);    /// 1
@@ -261,6 +240,30 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_StatsBody, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_StatsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_clear_flag(ui_StatsBody, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_RemoteModeContainer = lv_obj_create(ui_StatsBody);
+    lv_obj_remove_style_all(ui_RemoteModeContainer);
+    lv_obj_set_width(ui_RemoteModeContainer, lv_pct(25));
+    lv_obj_set_height(ui_RemoteModeContainer, LV_SIZE_CONTENT);    /// 50
+    lv_obj_set_align(ui_RemoteModeContainer, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_RemoteModeContainer, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_RemoteModeContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_RemoteModeContainer, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_clear_flag(ui_RemoteModeContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_pad_left(ui_RemoteModeContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_RemoteModeContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_RemoteModeContainer, -10, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_RemoteModeContainer, -11, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_RemoteModeText = lv_label_create(ui_RemoteModeContainer);
+    lv_obj_set_width(ui_RemoteModeText, lv_pct(100));
+    lv_obj_set_height(ui_RemoteModeText, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_RemoteModeText, 17);
+    lv_obj_set_y(ui_RemoteModeText, -53);
+    lv_obj_set_align(ui_RemoteModeText, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_RemoteModeText, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_text(ui_RemoteModeText, "POCKET MODE");
+    lv_obj_set_style_text_font(ui_RemoteModeText, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PrimaryStat = lv_label_create(ui_StatsBody);
     lv_obj_set_width(ui_PrimaryStat, lv_pct(100));
