@@ -39,7 +39,7 @@ typedef struct {
   // 0 to 100
   uint8_t batteryPercentage;
   // Remote battery voltage
-  float remoteBatteryVoltage;
+  uint16_t remoteBatteryVoltage;
   // 0 to 100
   uint8_t remoteBatteryPercentage;
   // Board trip distance
