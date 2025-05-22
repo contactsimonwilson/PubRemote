@@ -1,5 +1,6 @@
 #include "display_driver_sh8601.h"
 #include "driver/ledc.h"
+#include "read_lcd_id_bsp.h"
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_sh8601.h>
 #include <esp_log.h>
@@ -58,13 +59,13 @@ static esp_err_t tx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, const void 
   return esp_lcd_panel_io_tx_param(io, lcd_cmd, param, param_size);
 }
 
-static esp_err_t rx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, const void *param, size_t param_size) {
+static esp_err_t rx_param(esp_lcd_panel_io_handle_t io, int lcd_cmd, void *param, size_t param_size) {
   if (USE_QSPI_INTERFACE) {
     lcd_cmd &= 0xff;
     lcd_cmd <<= 8;
     lcd_cmd |= LCD_OPCODE_READ_CMD << 24;
   }
-  return esp_lcd_panel_io_tx_param(io, lcd_cmd, param, param_size);
+  return esp_lcd_panel_io_rx_param(io, lcd_cmd, param, param_size);
 }
 
 esp_err_t sh8601_test_display_communication(esp_lcd_panel_io_handle_t io_handle) {
@@ -92,4 +93,8 @@ esp_err_t sh8601_set_display_brightness(esp_lcd_panel_io_handle_t io_handle, uin
 
   // Send the command and brightness value over SPI
   return tx_param(io_handle, SH8601_W_WDBRIGHTNESSVALNOR, data, 1);
+}
+
+uint8_t sh8601_read_display_id() {
+  return read_lcd_id();
 }
