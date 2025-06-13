@@ -1,6 +1,7 @@
 import { ESPLoader, Transport, LoaderOptions } from "esptool-js";
 import { delay } from "../utils/delay";
 import { LogEntry, TerminalService } from "./terminal";
+import { FirmwareFiles } from "../types";
 
 const LogTypePrefixMap: Record<LogEntry["type"], Array<`${string} `>> = {
   info: ["I "],
@@ -50,6 +51,9 @@ const getEspLogInfo = (
   };
 };
 
+// Return true if the listener handled the log, false to ignore it
+type LogListener = (data: string, type: LogEntry["type"]) => boolean;
+
 export class ESPService {
   private espLoader: ESPLoader | null = null;
   private terminal?: TerminalService;
@@ -57,10 +61,12 @@ export class ESPService {
   private monitorSerial: boolean = false;
   private logBuffer: string = "";
 
-  private logListeners: Array<(data: string, type: LogEntry["type"]) => void> = [(d, t) => {
+  private logListeners: Array<LogListener> = [(d, t) => {
     this.terminal?.writeLine(
       d, t
     );
+
+    return true;
   }];
 
 
@@ -68,22 +74,32 @@ export class ESPService {
     this.terminal = terminal;
   }
 
-  private addLogListener(listener: (data: string, type: LogEntry["type"]) => void) {
-    this.logListeners.push(listener);
+  private addLogListener = (listener: LogListener) => {
+    this.logListeners.unshift(listener);
   }
 
-  private removeLogListener(listener: (data: string, type: LogEntry["type"]) => void) {
+  private removeLogListener = (listener: LogListener) => {
     this.logListeners = this.logListeners.filter((l) => l !== listener);
   }
 
-  private log(message: string, type: "info" | "error" | "success" = "info") {
+  private log = (message: string, type: "info" | "error" | "success" = "info") => {
     this.terminal?.writeLine(message, type);
   }
 
-  private processEspLog(data: string | Uint8Array) {
+  private emitToListeners = (...args: Parameters<LogListener>) => {
+    for (const listener of this.logListeners) {
+      if (listener(...args)) {
+        break; // Break on first listener that marks log as handled
+      }
+    }
+  }
+
+  private processEspLog = (data: string | Uint8Array) => {
     if (typeof data === "string") {
       const logInfo = getEspLogInfo(data);
-      this.terminal?.writeLine(logInfo.data, logInfo.type);
+      if (logInfo.data) {
+        this.emitToListeners(logInfo.data, logInfo.type);
+      }
     } else {
       // If log message is split into multiple chunks, buffer it until newline
       this.logBuffer += new TextDecoder().decode(data);
@@ -97,18 +113,17 @@ export class ESPService {
 
         const logInfo = getEspLogInfo(line);
         if (logInfo.data) {
-          this.logListeners.forEach((listener) => {
-            listener(logInfo.data, logInfo.type);
-          });
+          this.emitToListeners(logInfo.data, logInfo.type);
         }
       }
     }
   }
 
-  async getVersion(): Promise<{ version: string; variant: string }> {
+  getVersionInfo = async (): Promise<{ version: string; variant: string, hardware: string }> => {
     const timeout = 5000;
     let version: string | null = null;
     let variant: string | null = null;
+    let hardware: string | null = null;
 
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
@@ -118,7 +133,7 @@ export class ESPService {
 
       // Request firmware info
       this.log("Fetching firmware information...");
-      const versionLogListener = (data: string) => {
+      const versionLogListener: LogListener = (data) => {
         if (data.toLocaleLowerCase().startsWith("version:")) {
           // regex to match variant
           version = data.toLowerCase()
@@ -132,24 +147,33 @@ export class ESPService {
             .trim();
         }
 
-        if (version && variant) {
+        if (data.toLowerCase().startsWith("hardware:")) {
+          hardware = data.toLowerCase()
+            .replace(/^hardware:\s*/i, "")
+            .trim();
+        }
+
+        if (data === 'pubconsole>' && version && variant && hardware) {
           clearTimeout(timeoutId);
           this.removeLogListener(versionLogListener);
-          resolve({ version, variant });
+          resolve({ version, variant, hardware });
         }
+
+        return true; // Mark log as handled
       };
       this.addLogListener(versionLogListener);
       this.sendCommand("version")
     });
   }
 
-  async connect(): Promise<{
+  connect = async (): Promise<{
     connected: boolean;
     chipId: string;
     macAddress: string;
     version: string;
     variant: string;
-  }> {
+    hardware: string;
+  }> => {
     if (this.isConnecting) {
       throw new Error("Connection already in progress");
     }
@@ -215,11 +239,13 @@ export class ESPService {
       await delay(2000);
       let version: string = "";
       let variant: string = "";
+      let hardware: string = "";
 
       try {
-        const res = await this.getVersion();
+        const res = await this.getVersionInfo();
         version = res.version;
         variant = res.variant;
+        hardware = res.hardware;
       } catch (e) {
         this.log(
           `Connection failed: ${e instanceof Error ? e.message : "Unknown error"
@@ -228,20 +254,13 @@ export class ESPService {
         );
       }
 
-      if (!version) {
-        version = "Unknown";
-      }
-
-      if (!variant) {
-        variant = "Unknown";
-      }
-
       const info = {
         connected: true,
         chipId: chipId.toUpperCase(),
         macAddress: macAddress.toUpperCase(),
         version,
         variant,
+        hardware,
       };
 
       this.log(
@@ -303,11 +322,7 @@ export class ESPService {
     }
   }
 
-  async flash(firmware: {
-    bootloader: File;
-    partitionTable: File;
-    application: File;
-  }, eraseFlash: boolean = true, onFlashProgess: (update: {
+  async flash(firmware: FirmwareFiles, eraseFlash: boolean = true, onFlashProgess: (update: {
     status: string;
     progress: number;
   }) => void): Promise<void> {

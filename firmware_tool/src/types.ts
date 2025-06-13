@@ -10,6 +10,7 @@ export interface DeviceInfoData {
   macAddress?: string;
   version?: string;
   variant?: string;
+  hardware?: string;
 }
 
 export interface FlashProgress {
