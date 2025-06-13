@@ -7,6 +7,16 @@
 extern "C" {
 #endif
 
+#ifndef PMIC_SDA
+  #define PMIC_SDA -1
+#endif
+#ifndef PMIC_SCL
+  #define PMIC_SCL -1
+#endif
+#ifndef PMIC_INT
+  #define PMIC_INT -1
+#endif
+
 esp_err_t sy6970_charge_driver_init();
 uint16_t sy6970_get_battery_voltage();
 
