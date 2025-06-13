@@ -112,7 +112,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand,
         </div>
       ) : (
         <div className="flex items-center justify-between mb-6">
-          <p>Start here by connecting your ESP32-S3 display</p>
+          <p>Start here by connecting your remote</p>
         </div>
       )}
 
