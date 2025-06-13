@@ -33,7 +33,7 @@ const removeAnsiEscapeCodes = (data: string): string => {
     // eslint-disable-next-line no-control-regex
     /(?:\u001b|\x1b|\[)?(?:\[|\()(?:\d{1,3};)*\d{1,3}[A-Za-z]/g,
     ''
-);
+  );
 };
 
 const getEspLogInfo = (
@@ -57,8 +57,23 @@ export class ESPService {
   private monitorSerial: boolean = false;
   private logBuffer: string = "";
 
+  private logListeners: Array<(data: string, type: LogEntry["type"]) => void> = [(d, t) => {
+    this.terminal?.writeLine(
+      d, t
+    );
+  }];
+
+
   constructor(terminal?: TerminalService) {
     this.terminal = terminal;
+  }
+
+  private addLogListener(listener: (data: string, type: LogEntry["type"]) => void) {
+    this.logListeners.push(listener);
+  }
+
+  private removeLogListener(listener: (data: string, type: LogEntry["type"]) => void) {
+    this.logListeners = this.logListeners.filter((l) => l !== listener);
   }
 
   private log(message: string, type: "info" | "error" | "success" = "info") {
@@ -81,11 +96,51 @@ export class ESPService {
         this.logBuffer = rest.join("\n");
 
         const logInfo = getEspLogInfo(line);
-        this.terminal?.writeLine(
-          logInfo.data, logInfo.type
-        );
+        if (logInfo.data) {
+          this.logListeners.forEach((listener) => {
+            listener(logInfo.data, logInfo.type);
+          });
+        }
       }
     }
+  }
+
+  async getVersion(): Promise<{ version: string; variant: string }> {
+    const timeout = 5000;
+    let version: string | null = null;
+    let variant: string | null = null;
+
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        this.removeLogListener(versionLogListener);
+        reject(new Error("Timeout while waiting for version response"));
+      }, timeout);
+
+      // Request firmware info
+      this.log("Fetching firmware information...");
+      const versionLogListener = (data: string) => {
+        if (data.toLocaleLowerCase().startsWith("version:")) {
+          // regex to match variant
+          version = data.toLowerCase()
+            .replace(/^version:\s*/i, "")
+            .trim();
+        }
+
+        if (data.toLowerCase().startsWith("variant:")) {
+          variant = data.toLowerCase()
+            .replace(/^variant:\s*/i, "")
+            .trim();
+        }
+
+        if (version && variant) {
+          clearTimeout(timeoutId);
+          this.removeLogListener(versionLogListener);
+          resolve({ version, variant });
+        }
+      };
+      this.addLogListener(versionLogListener);
+      this.sendCommand("version")
+    });
   }
 
   async connect(): Promise<{
@@ -102,6 +157,10 @@ export class ESPService {
     try {
       this.isConnecting = true;
       this.log("Requesting serial port...");
+
+      if (!navigator.serial) {
+        throw new Error("Web Serial API not supported in this browser. Please use a compatible browser like Chrome or Edge.");
+      }
 
       const port = await navigator.serial.requestPort();
       const transport = new Transport(port, true);
@@ -151,19 +210,31 @@ export class ESPService {
       // Reconnect in normal mode to get firmware info
       await transport.connect(115200);
       this.espLoader = loader;
-
-      // Request firmware info
-      this.log("Fetching firmware information...");
-      await delay(1000);
-      const firmwareInformationResponse = await this.readResponse(2000);
-
-      // Parse firmware info from log
-      const version =
-        this.parseFirmwareResponse(firmwareInformationResponse, "version") || "Unknown";
-      const variant =
-        this.parseFirmwareResponse(firmwareInformationResponse, "variant") || "Unknown";
-
       this.addSerialMonitor();
+      // Wait for device to stabilize
+      await delay(2000);
+      let version: string = "";
+      let variant: string = "";
+
+      try {
+        const res = await this.getVersion();
+        version = res.version;
+        variant = res.variant;
+      } catch (e) {
+        this.log(
+          `Connection failed: ${e instanceof Error ? e.message : "Unknown error"
+          }`,
+          "error"
+        );
+      }
+
+      if (!version) {
+        version = "Unknown";
+      }
+
+      if (!variant) {
+        variant = "Unknown";
+      }
 
       const info = {
         connected: true,
@@ -180,8 +251,7 @@ export class ESPService {
       return info;
     } catch (error) {
       this.log(
-        `Connection failed: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Connection failed: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         "error"
       );
@@ -190,31 +260,6 @@ export class ESPService {
     } finally {
       this.isConnecting = false;
     }
-  }
-
-  private asciiCodesToText(asciiCodes: string): string {
-    // Split the string into an array of individual code strings
-    const codeArray = asciiCodes.split(',');
-    
-    // Convert each code to its corresponding ASCII character
-    const text = codeArray
-        .map(code => String.fromCharCode(parseInt(code, 10)))
-        .join('');
-    
-    return text;
-  }
-
-  private parseFirmwareResponse(
-    response: string,
-    type: "version" | "variant"
-  ): string | null {
-    const regex =
-      type === "version"
-        ? /(?<=86,101,114,115,105,111,110,32,40,)([0-9]{1,3}|,){1,20}(?=,41)/i
-        : /(?<=86,97,114,105,97,110,116,32,40,)([0-9]{1,3}|,){1,110}(?=,41)/i;
-
-    const match = response.match(regex);
-    return match ? this.asciiCodesToText(match[0]) : null;
   }
 
   private async readResponse(timeout = 1000): Promise<string> {
@@ -235,18 +280,22 @@ export class ESPService {
     return response;
   }
 
+  private encodeCommand(command: string): Uint8Array {
+    const encoder = new TextEncoder();
+    return encoder.encode(command + "\n");
+  }
+
   async sendCommand(command: string): Promise<void> {
     if (!this.espLoader || !this.isConnected()) {
       throw new Error("Device not connected");
     }
 
     try {
-      await this.espLoader.transport.write(command + "\n");
+      await this.espLoader.transport.write(this.encodeCommand(command + "\n"));
       this.log(`Sent command: ${command}`, "info");
     } catch (error) {
       this.log(
-        `Failed to send command: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Failed to send command: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         "error"
       );
@@ -285,24 +334,24 @@ export class ESPService {
         address: number;
         name: string;
       }> = [
-      ];
+        ];
 
       if (firmware.bootloader) {
         files.push(
-        {
-          data: await this.readFileAsString(firmware.bootloader),
-          address: 0x0,
-          name: "Bootloader",
-        });
+          {
+            data: await this.readFileAsString(firmware.bootloader),
+            address: 0x0,
+            name: "Bootloader",
+          });
 
       }
       if (firmware.partitionTable) {
         files.push(
-        {
-          data: await this.readFileAsString(firmware.partitionTable),
-          address: 0x8000,
-          name: "Partition Table",
-        });
+          {
+            data: await this.readFileAsString(firmware.partitionTable),
+            address: 0x8000,
+            name: "Partition Table",
+          });
       }
 
       if (firmware.application) {
@@ -339,8 +388,7 @@ export class ESPService {
       this.log("Device reset and ready", "success");
     } catch (error) {
       this.log(
-        `Flash failed: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Flash failed: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         "error"
       );
