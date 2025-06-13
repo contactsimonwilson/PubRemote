@@ -1,5 +1,4 @@
 #include "transmitter.h"
-#include "commands.h"
 #include "connection.h"
 #include "esp_event.h"
 #include "esp_log.h"
@@ -42,9 +41,7 @@ static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "Registered RX callback");
 
   ESP_LOGI(TAG, "TX task started");
-  uint8_t ind = 0;
-  uint8_t data[100];
-
+  uint8_t combined_data[sizeof(int32_t) + sizeof(remote_data.bytes)];
   while (1) {
     int64_t newTime = get_current_time_ms();
 
@@ -59,22 +56,17 @@ static void transmitter_task(void *pvParameters) {
         (connection_state == CONNECTION_STATE_CONNECTED || connection_state == CONNECTION_STATE_RECONNECTING ||
          connection_state == CONNECTION_STATE_CONNECTING)) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes
-      // printf("Thumbstick x-axis value: %f\n", remote_data.js_x);
-      // printf("Thumbstick y-axis value: %f\n", remote_data.js_y);
+      // printf("Thumbstick x-axis value: %f\n", remote_data.data.js_x);
+      // printf("Thumbstick y-axis value: %f\n", remote_data.data.js_y);
       // Copy secret_Code to the beginning of the buffer
-      data[0] = REM_REC_SET_REMOTE_STATE;
-      ind++;
-
-      memcpy(data + ind, &pairing_settings.secret_code, sizeof(int32_t));
-      ind += sizeof(int32_t);
+      memcpy(combined_data, &pairing_settings.secret_code, sizeof(int32_t));
 
       // Copy remote_data.bytes after secret_Code
-      memcpy(data + ind, &remote_data, sizeof(remote_data));
-      ind += sizeof(remote_data);
+      memcpy(combined_data + sizeof(int32_t), remote_data.bytes, sizeof(remote_data.bytes));
 
       uint8_t *mac_addr = pairing_settings.remote_addr;
       if (channel_lock()) {
-        esp_err_t result = esp_now_send(mac_addr, data, ind);
+        esp_err_t result = esp_now_send(mac_addr, combined_data, sizeof(combined_data));
         if (result != ESP_OK) {
           // Handle error if needed
           uint8_t chann = pairing_settings.channel;
@@ -91,9 +83,6 @@ static void transmitter_task(void *pvParameters) {
       LAST_COMMAND_TIME = newTime;
       ESP_LOGD(TAG, "Sent command");
     }
-    // Reset the index for the next data packet and clear the data buffer
-    ind = 0;
-    memset(data, 0, sizeof(data));
     vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
   }
 

@@ -31,7 +31,3 @@ void init_espnow() {
   // Initialize ESP-NOW
   ESP_ERROR_CHECK(esp_now_init());
 }
-
-bool is_same_mac(const uint8_t *mac1, const uint8_t *mac2) {
-  return memcmp(mac1, mac2, ESP_NOW_ETH_ALEN) == 0;
-}
