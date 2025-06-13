@@ -9,7 +9,10 @@
       "string": "c",
       "string_view": "c",
       "cstdint": "c",
-      "cstdlib": "c"
+      "cstdlib": "c",
+      "*.cpp": "cpp",
+      "*.hpp": "cpp",
+      "*.tpp": "cpp"
     },
     "editor.tabSize": 2,
     "files.eol": "\n",
