@@ -13,6 +13,7 @@
 #include "time.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
+#include <freertos/task.h>
 #include <math.h>
 #include <ui/ui.h>
 
@@ -23,7 +24,7 @@ static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
   #error "JOYSTICK_BUTTON_LEVEL must be defined"
 #endif
 
-RemoteData remote_data;
+RemoteDataUnion remote_data;
 JoystickData joystick_data;
 static button_handle_t gpio_btn_handle = NULL;
 
@@ -115,10 +116,10 @@ static void thumbstick_task(void *pvParameters) {
     if (read_err == ESP_OK) {
       joystick_data.x = x_value;
       float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, false);
-      float curr_x = remote_data.js_x;
+      float curr_x = remote_data.data.js_x;
 
       if (new_x != curr_x) {
-        remote_data.js_x = new_x;
+        remote_data.data.js_x = new_x;
         trigger_sleep_disrupt = true;
       }
     }
@@ -136,10 +137,10 @@ static void thumbstick_task(void *pvParameters) {
 
       joystick_data.y = y_value;
       float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, invert_y);
-      float curr_y = remote_data.js_y;
+      float curr_y = remote_data.data.js_y;
 
       if (new_y != curr_y) {
-        remote_data.js_y = new_y;
+        remote_data.data.js_y = new_y;
         trigger_sleep_disrupt = true;
       }
     }
@@ -169,7 +170,7 @@ void init_thumbstick() {
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
   reset_sleep_timer();
-  remote_data.bt_c = 1;
+  remote_data.data.bt_c = 1;
 
   // Start a timer to reset the button state after a certain duration
   esp_timer_handle_t reset_timer;
@@ -184,7 +185,7 @@ static void button_double_click_cb(void *arg, void *usr_data) {
 }
 
 void reset_button_state() {
-  remote_data.bt_c = 0;
+  remote_data.data.bt_c = 0;
 }
 
 void deinit_buttons() {
