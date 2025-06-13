@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "esp_console.h"
 #include "esp_log.h"
 #include "powermanagement.h"
@@ -11,13 +12,10 @@
 static const char *TAG = "PUBREMOTE-CONSOLE";
 #define PROMPT_STR "pubconsole"
 
-#ifndef RELEASE_VARIANT
-  #define RELEASE_VARIANT "dev"
-#endif
-
 static int get_version() {
-  printf("Version: %d.%d.%d.%s \n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, RELEASE_VARIANT);
+  printf("Version: %d.%d.%d\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
   printf("Variant: %s\n", RELEASE_VARIANT);
+  printf("Hardware: %s\n", HW_TYPE);
   printf("Build date: %s %s\n", __DATE__, __TIME__);
   printf("Build ID: %s\n", BUILD_ID);
   return 0;

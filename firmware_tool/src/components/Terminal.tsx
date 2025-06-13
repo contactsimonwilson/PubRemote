@@ -13,6 +13,8 @@ interface Props {
 
 export function Terminal({ terminal, onSendCommand, disabled = false, deviceInfo }: Props) {
   const [command, setCommand] = React.useState('');
+  const commandBuffer = React.useRef<string[]>([]);
+  const commandBufferIndex = React.useRef<number>(0);
   const [logs, setLogs] = React.useState<LogEntry[]>([]);
   const [enabledLogTypes, setEnabledLogTypes] = React.useState<string[]>([
     'info',
@@ -50,7 +52,10 @@ export function Terminal({ terminal, onSendCommand, disabled = false, deviceInfo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (command.trim()) {
-      onSendCommand(command.trim());
+      const finalCommand = command.trim();
+      commandBuffer.current.push(finalCommand);
+      commandBufferIndex.current = commandBuffer.current.length; // Reset index to the end
+      onSendCommand(finalCommand);
       setCommand('');
     }
   };
@@ -63,7 +68,7 @@ export function Terminal({ terminal, onSendCommand, disabled = false, deviceInfo
   const downloadLogs = () => {
     const deviceInfoText = deviceInfo?.connected
       ? `Device Information:
-- Chip ID: ${deviceInfo.chipId || 'N/A'}
+- Chip Type: ${deviceInfo.chipId || 'N/A'}
 - MAC Address: ${deviceInfo.macAddress || 'N/A'}
 - Firmware Version: ${deviceInfo.version || 'N/A'}
 - Firmware Variant: ${deviceInfo.variant || 'N/A'}
@@ -132,7 +137,7 @@ export function Terminal({ terminal, onSendCommand, disabled = false, deviceInfo
 
       <div
         ref={terminalRef}
-        className="font-mono text-sm h-64 overflow-y-auto bg-gray-950 rounded p-3 text-gray-300 space-y-1"
+        className="font-mono text-sm h-80 overflow-y-auto bg-gray-950 rounded p-3 text-gray-300 space-y-1"
       >
         {filteredLogs.length > 0 ? (
           filteredLogs.map((log, index) => (
@@ -167,6 +172,21 @@ export function Terminal({ terminal, onSendCommand, disabled = false, deviceInfo
           type="text"
           value={command}
           onChange={(e) => setCommand(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              if (commandBufferIndex.current > 0) {
+                commandBufferIndex.current -= 1;
+                setCommand(commandBuffer.current[commandBufferIndex.current] || '');
+              }
+            } else if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              if (commandBufferIndex.current < commandBuffer.current.length - 1) {
+                commandBufferIndex.current += 1;
+                setCommand(commandBuffer.current[commandBufferIndex.current] || '');
+              }
+            }
+          }}
           disabled={disabled}
           placeholder={disabled ? 'Connect device to send commands...' : 'Enter command...'}
           className="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
