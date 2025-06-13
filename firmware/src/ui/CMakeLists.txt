@@ -6,6 +6,7 @@ SET(SOURCES ui_SplashScreen.c
     ui_CalibrationScreen.c
     ui_AboutScreen.c
     ui_BMSScreen.c
+    ui_ChargingScreen.c
     ui.c
     ui_comp_hook.c
     ui_helpers.c
