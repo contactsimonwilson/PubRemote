@@ -1,6 +1,8 @@
 
 #include "esp_console.h"
 #include "esp_log.h"
+#include "powermanagement.h"
+#include "settings.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -32,6 +34,59 @@ static void register_version_command() {
   ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
 
+static int reboot_command() {
+  ESP_LOGI(TAG, "Rebooting...");
+  esp_restart();
+  return 0;
+}
+
+static void register_reboot_command() {
+  esp_console_cmd_t cmd = {
+      .command = "reboot",
+      .help = "Reboot the device.",
+      .hint = NULL,
+      .func = &reboot_command,
+  };
+  ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
+
+static int shutdown_command() {
+  enter_sleep();
+  return 0;
+}
+
+static void register_shutdown_command() {
+  esp_console_cmd_t cmd = {
+      .command = "shutdown",
+      .help = "Shutdown the device and enter sleep mode.",
+      .hint = NULL,
+      .func = &shutdown_command,
+  };
+  ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
+
+static int erase_command() {
+  ESP_LOGI(TAG, "Erasing flash memory...");
+  esp_err_t err = reset_all_settings();
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to erase flash: %s", esp_err_to_name(err));
+    return -1;
+  }
+  ESP_LOGI(TAG, "Flash memory erased successfully.");
+  esp_restart();
+  return 0;
+}
+
+static void register_erase_command() {
+  esp_console_cmd_t cmd = {
+      .command = "erase",
+      .help = "Erase the flash memory.",
+      .hint = NULL,
+      .func = &erase_command,
+  };
+  ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
+
 void init_console() {
   ESP_LOGI(TAG, "Initializing console");
   esp_console_repl_t *repl = NULL;
@@ -43,6 +98,9 @@ void init_console() {
   /* Register commands */
   esp_console_register_help_command();
   register_version_command();
+  register_reboot_command();
+  register_shutdown_command();
+  register_erase_command();
 
 #if defined(CONFIG_ESP_CONSOLE_UART_DEFAULT) || defined(CONFIG_ESP_CONSOLE_UART_CUSTOM)
   esp_console_dev_uart_config_t hw_config = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();
