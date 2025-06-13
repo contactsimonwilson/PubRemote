@@ -1,5 +1,4 @@
 #include "display/display_driver.h"
-#include "display/sh8601/read_lcd_id_bsp.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/ledc.h"
@@ -148,30 +147,6 @@ void set_bl_level(uint8_t level) {
 
 static esp_err_t app_lcd_init(void) {
   esp_err_t ret = ESP_OK;
-
-/* Display IDs for SH8601 vs CO5300 display */
-#define SH8601_ID 0x86
-#define CO5300_ID 0xff
-  static uint8_t READ_LCD_ID = 0x00;
-#ifndef DISP_CO5300
-  #define DISP_CO5300 0
-#endif
-
-#if DISP_SH8601 && DISP_CO5300
-  READ_LCD_ID = read_lcd_id();
-
-  if (READ_LCD_ID == CO5300_ID) {
-    ESP_LOGI(TAG, "CO5300 display detected. read_lcd_id() result: %d", READ_LCD_ID);
-    panel_x_gap = 6;
-  }
-  else if (READ_LCD_ID == SH8601_ID) {
-    ESP_LOGI(TAG, "SH8601 display detected. read_lcd_id() result: %d", READ_LCD_ID);
-  }
-  else {
-    ESP_LOGI(TAG, "Error reading display from ID");
-  }
-#endif
-
   display_driver_preinit();
   ESP_LOGI(TAG, "Initialize SPI bus");
 
@@ -202,9 +177,13 @@ static esp_err_t app_lcd_init(void) {
   gc9a01_vendor_config_t vendor_config = {};
 #elif DISP_SH8601 || DISP_CO5300
   sh8601_vendor_config_t vendor_config = {
-      .init_cmds = (READ_LCD_ID == CO5300_ID || DISP_CO5300) ? co5300_lcd_init_cmds : sh8601_lcd_init_cmds,
-      .init_cmds_size =
-          (READ_LCD_ID == CO5300_ID || DISP_CO5300) ? co5300_get_lcd_init_cmds_size() : sh8601_get_lcd_init_cmds_size(),
+  #if DISP_SH8601
+      .init_cmds = sh8601_lcd_init_cmds,
+      .init_cmds_size = sh8601_get_lcd_init_cmds_size(),
+  #elif DISP_CO5300
+      .init_cmds = co5300_lcd_init_cmds,
+      .init_cmds_size = co5300_get_lcd_init_cmds_size(),
+  #endif
       .flags =
           {
               .use_qspi_interface = 1,
