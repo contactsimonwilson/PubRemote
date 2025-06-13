@@ -49,6 +49,13 @@ void vibrate() {
 
 void init_haptic() {
 #if HAPTIC_ENABLED
-  //
+  #if HAPTIC_DRV2605
+  // Initialize the DRV2605 haptic driver
+  ESP_LOGI(TAG, "Initializing DRV2605 haptic driver");
+  // Add your DRV2605 initialization code here
+  #else
+  // Initialize the buzzer for haptic feedback
+  ESP_LOGI(TAG, "Initializing PWM haptic driver");
+  #endif
 #endif
 }
