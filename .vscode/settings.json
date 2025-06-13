@@ -8,7 +8,8 @@
       "array": "c",
       "string": "c",
       "string_view": "c",
-      "cstdint": "c"
+      "cstdint": "c",
+      "cstdlib": "c"
     },
     "editor.tabSize": 2,
     "files.eol": "\n",
