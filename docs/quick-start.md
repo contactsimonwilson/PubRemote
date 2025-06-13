@@ -86,13 +86,15 @@ Some common scenarios where a tilt remote may be useful:
 
 ## Common Issues and Mistakes
 
-### The Pubmote won't connect
+### The Pubmote won't connect / stay connected
 
 1. If VESC Express -> WiFi -> WiFi Mode is set to "Station Mode", it will cause connection failures with Pubmote.
 
 The fix: It must be set to "Access Point"
 
-2. If VESC Controller -> Refloat Cfg -> Remote ->
+### The Pubmote is connected but not doing anything to the board tilt
+
+1. If VESC Controller -> Refloat Cfg -> Remote ->
       - Remote Type is not set to UART
       - Tiltback Angle Limit is set to 0 °
       - Tiltback Speed is set to 0 °/s
@@ -100,14 +102,20 @@ The fix: It must be set to "Access Point"
 
 The fix: Ensure Remote Type of  UART, Tiltback Angle Limit of >0 °, Tiltback Speed of >0 °/s, and a relatively low Input Deadband
 
-### The direction of the tilt is backwards
-
-The fix: Re-run calibration and check "Invert Y"
-
 ### My Float Accessories package isn't connecting to my Refloat/Float package
 
 1. If your VESC Express and VESC Controller firmware versions are different, this will prevent communication
 2. If your CAN communication between the VESC Express and VESC Controller is not functioning properly, this will prevent communication
+
+### Pairing on the remote is stuck on 0000 when trying to pair to controller
+
+The fix: Ensure that...
+1. Both the VESC Express and your VESC are on at least version 6.05, as this is necessary for Float Accessories
+2. Float Accessories is not crashing (check the LispBM Scripting tab in VESC Tool for information)
+
+### The direction of the tilt is backwards
+
+The fix: Re-run calibration and check "Invert Y"
 
 ### My remote is showing 0% board battery all the time
 
