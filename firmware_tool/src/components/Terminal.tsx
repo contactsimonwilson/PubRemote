@@ -184,6 +184,9 @@ export function Terminal({ terminal, onSendCommand, disabled = false, deviceInfo
               if (commandBufferIndex.current < commandBuffer.current.length - 1) {
                 commandBufferIndex.current += 1;
                 setCommand(commandBuffer.current[commandBufferIndex.current] || '');
+              } else {
+                commandBufferIndex.current = commandBuffer.current.length; // Reset to end
+                setCommand('');
               }
             }
           }}
