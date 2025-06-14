@@ -49,5 +49,5 @@ uint16_t adc_get_battery_voltage() {
   }
 
   int battery_value = accumulated / num_successful_samples;
-  return (uint16_t)(battery_value * ((float)BAT_ADC_F) * 100) / 100;
+  return (uint16_t)(battery_value * BAT_ADC_F);
 }
