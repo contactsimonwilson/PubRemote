@@ -2,6 +2,7 @@
 #define __CHARGE_DRIVER_SY6970_HPP
 
 #include <esp_err.h>
+#include <charge/charge_driver.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +19,7 @@ extern "C" {
 #endif
 
 esp_err_t sy6970_charge_driver_init();
-uint16_t sy6970_get_battery_voltage();
+RemotePowerState sy6970_get_power_state();
 
 #ifdef __cplusplus
 }

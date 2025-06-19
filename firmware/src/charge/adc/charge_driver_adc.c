@@ -2,6 +2,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <charge/charge_driver.h>
 #include <esp_err.h>
 #include <remote/adc.h>
 
@@ -15,7 +16,7 @@ esp_err_t adc_charge_driver_init() {
   return adc_oneshot_config_channel(adc1_handle, BAT_ADC, &adc_channel_config);
 }
 
-uint16_t adc_get_battery_voltage() {
+static uint16_t adc_get_battery_voltage() {
 #define NUM_SAMPLES 3
   uint8_t num_successful_samples = 0;
   int32_t accumulated = 0;
@@ -50,4 +51,12 @@ uint16_t adc_get_battery_voltage() {
 
   int battery_value = accumulated / num_successful_samples;
   return (uint16_t)(battery_value * BAT_ADC_F);
+}
+
+RemotePowerState adc_get_power_state() {
+  RemotePowerState state = {.voltage = 0, .chargeState = CHARGE_STATE_UNKNOWN, .current = 0};
+  state.voltage = adc_get_battery_voltage();
+  state.chargeState = CHARGE_STATE_UNKNOWN; // ADC does not provide charging status
+  state.current = 0;                        // ADC does not provide current measurement
+  return state;
 }
