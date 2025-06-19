@@ -17,11 +17,11 @@ esp_err_t charge_driver_init() {
 #endif
 }
 
-uint16_t get_battery_voltage() {
+RemotePowerState get_power_state() {
   ESP_LOGD(TAG, "Getting battery voltage");
 #if PMIC_SY6970
-  return sy6970_get_battery_voltage();
+  return sy6970_get_power_state();
 #else
-  return adc_get_battery_voltage();
+  return adc_get_power_state();
 #endif
 }

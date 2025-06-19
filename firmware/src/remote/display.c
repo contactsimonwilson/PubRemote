@@ -1,3 +1,4 @@
+#include "display.h"
 #include "display/display_driver.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
@@ -48,13 +49,14 @@
 #elif TP_FT3168
   #include "esp_lcd_touch_ft3168.h"
   #define TOUCH_ENABLED 1
+#else
+  #define TOUCH_ENABLED 0
 #endif
-#include "display.h"
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define LCD_HOST SPI2_HOST
-#define TP_I2C_NUM 0
+#define TP_I2C_NUM I2C_NUM_0
 
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
@@ -98,8 +100,6 @@ static uint8_t panel_y_gap = PANEL_Y_GAP;
 #else
 static uint8_t panel_y_gap = 0;
 #endif
-
-static bool has_installed_drivers = false;
 
 #if ROUNDER_CALLBACK
 void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area) {
@@ -256,21 +256,7 @@ static esp_err_t app_lcd_init(void) {
 
 #if TOUCH_ENABLED
 static esp_err_t app_touch_init(void) {
-
-  if (!has_installed_drivers) {
-    /* Initilize I2C */
-    const i2c_config_t i2c_conf = {.mode = I2C_MODE_MASTER,
-                                   .sda_io_num = TP_SDA,
-                                   .sda_pullup_en = GPIO_PULLUP_DISABLE,
-                                   .scl_io_num = TP_SCL,
-                                   .scl_pullup_en = GPIO_PULLUP_DISABLE,
-                                   .master.clk_speed = 400000};
-
-    ESP_LOGI(TAG, "Initializing I2C for display touch");
-    /* Initialize I2C */
-    ESP_ERROR_CHECK(i2c_param_config(TP_I2C_NUM, &i2c_conf));
-    ESP_ERROR_CHECK(i2c_driver_install(TP_I2C_NUM, i2c_conf.mode, 0, 0, 0));
-  }
+  // I2C bus should already be initialized at this point
 
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
 
@@ -481,5 +467,4 @@ void init_display() {
   /* LVGL initialization */
   ESP_ERROR_CHECK(app_lvgl_init());
   ESP_ERROR_CHECK(display_ui());
-  has_installed_drivers = true;
 }
