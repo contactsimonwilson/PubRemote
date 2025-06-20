@@ -7,25 +7,35 @@
 #include "XPowersLib.h"
 #include <charge/charge_driver.h>
 #include "config.h"
+#include "remote/i2c.h"
 
 static const char *TAG = "PUBREMOTE-CHARGE_DRIVER_SY6970";
 
 // SY6970 I2C address (0x6A is the typical address)
 #define SY6970_ADDR                 0x6A
-#define SY6970_I2C_NUM             I2C_NUM_0
 
 // SY6970 instance
 static PowersSY6970 sy6970;
 
+static int sy6970_read_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t *data, uint8_t len)
+{
+    return (int)i2c_read_with_mutex(device_addr, reg_addr, data, len, 500);
+}
+
+static int sy6970_write_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t *data, uint8_t len)
+{
+    return (int)i2c_write_with_mutex(device_addr, reg_addr, data, len, 500);
+}
+
 /**
  * @brief Initialize the SY6970 power management chip
  */
-static esp_err_t sy6970_init(void)
+static esp_err_t sy6970_init()
 {
     #if defined(PMU_SDA) && defined(PMU_SCL)
 
     // Initialize the SY6970 with the XPowersLib
-    bool result = sy6970.begin(SY6970_I2C_NUM, SY6970_ADDR, PMU_SDA, PMU_SCL);
+    bool result = sy6970.begin(SY6970_ADDR, sy6970_read_reg, sy6970_write_reg);
     if (!result) {
         ESP_LOGE(TAG, "Failed to initialize SY6970");
         return ESP_FAIL;
@@ -43,7 +53,7 @@ static esp_err_t sy6970_init(void)
 /**
  * @brief Set power parameters for SY6970
  */
-static esp_err_t set_power_parameters(void)
+static esp_err_t set_power_parameters()
 {
     esp_err_t ret = ESP_OK;
     
