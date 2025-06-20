@@ -4,5 +4,6 @@
 
 void apply_ui_scale(lv_obj_t *element);
 void reload_screens();
+lv_group_t *create_navigation_group(lv_obj_t *container);
 
 #endif

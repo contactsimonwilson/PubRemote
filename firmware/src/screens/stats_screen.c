@@ -537,6 +537,7 @@ void stats_screen_load_start(lv_event_t *e) {
     lv_obj_clear_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
 #endif
+    create_navigation_group(ui_StatsContent);
     LVGL_unlock();
   }
 }

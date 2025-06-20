@@ -52,6 +52,7 @@
 #else
   #define TOUCH_ENABLED 0
 #endif
+#include "remoteinputs.h"
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
@@ -87,6 +88,9 @@ static lv_display_t *lvgl_disp = NULL;
 static lv_indev_t *lvgl_touch_indev = NULL;
 #endif
 
+static lv_indev_drv_t indev_drv_encoder;
+static lv_indev_t *lvgl_encoder_indev = NULL;
+
 /* LCD panel gap */
 
 #ifdef PANEL_X_GAP
@@ -117,6 +121,37 @@ void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area
   area->y2 = ((y2 >> 1) << 1) + 1;
 }
 #endif
+
+static void encoder_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
+  static int32_t last_encoder_value = 0;
+  static uint32_t last_time = 0;
+
+  uint32_t current_time = lv_tick_get();
+
+  int16_t enc_diff = 0;
+
+  if (remote_data.data.js_y > 0.5) {
+    // If joystick Y is pushed up, increase the encoder value
+    enc_diff = -1;
+  }
+  else if (remote_data.data.js_y < -0.5) {
+    // If joystick Y is pushed down, decrease the encoder value
+    enc_diff = 1;
+  }
+
+  if (last_encoder_value == enc_diff || (current_time - last_time) < 100) {
+    // If the encoder value hasn't changed or the time since last update is too short, return
+    data->enc_diff = 0;
+    data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+    return;
+  }
+
+  data->enc_diff = enc_diff;
+  data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+  // Update tracking variables
+  last_encoder_value = enc_diff; // Keep running total if needed
+  last_time = current_time;
+}
 
 bool LVGL_lock(int timeout_ms) {
   if (!lv_is_initialized()) {
@@ -374,7 +409,23 @@ static esp_err_t app_lvgl_init(void) {
   //  lv_indev_add_event_cb(lvgl_touch_indev, lv_touch_cb, LV_EVENT_ALL, NULL); //LVGL9
 #endif
 
+  // Initialize the encoder driver
+  lv_indev_drv_init(&indev_drv_encoder);
+  indev_drv_encoder.type = LV_INDEV_TYPE_ENCODER;
+  indev_drv_encoder.read_cb = encoder_read_cb;
+
+  // Register the encoder
+  lvgl_encoder_indev = lv_indev_drv_register(&indev_drv_encoder);
+
   return ESP_OK;
+}
+
+lv_indev_t *get_encoder() {
+  if (lvgl_encoder_indev == NULL) {
+    ESP_LOGE(TAG, "Encoder indev is not initialized");
+    return NULL;
+  }
+  return lvgl_encoder_indev;
 }
 
 #if SCREEN_TEST_UI
