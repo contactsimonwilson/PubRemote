@@ -18,6 +18,7 @@
 #include "hal/ledc_types.h"
 #include "lvgl.h"
 #include "powermanagement.h"
+#include "remote/i2c.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "utilities/screen_utils.h"
@@ -71,6 +72,9 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 static esp_lcd_panel_io_handle_t lcd_io = NULL;
 static esp_lcd_panel_handle_t lcd_panel = NULL;
 #if TOUCH_ENABLED
+typedef void (*lv_indev_read_cb_t)(struct _lv_indev_drv_t *indev_drv, lv_indev_data_t *data);
+static lv_indev_drv_t *indev_drv_touch = NULL;
+static lv_indev_read_cb_t original_read_cb = NULL;
 static esp_lcd_touch_handle_t touch_handle = NULL;
 #endif
 
@@ -319,9 +323,26 @@ static esp_err_t app_touch_init(void) {
   return ESP_OK;
 }
 
-static void lv_touch_cb(lv_event_t *e) {
-  ESP_LOGD(TAG, "Touch event");
-  reset_sleep_timer();
+static void lv_touch_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
+  if (i2c_lock(10)) {
+    // Call the original read callback
+    if (original_read_cb) {
+      original_read_cb(indev_drv, data);
+      static bool was_pressed = false;
+      bool was_press = (data->state == LV_INDEV_STATE_PRESSED);
+      if (was_press && !was_pressed) {
+        // Reset the sleep timer when touch is pressed
+        reset_sleep_timer();
+      }
+
+      was_pressed = was_press;
+    }
+    else {
+      ESP_LOGE(TAG, "Original read callback is NULL");
+      return;
+    }
+    i2c_unlock();
+  }
 }
 
 #endif // TOUCH_ENABLED
@@ -398,6 +419,11 @@ static esp_err_t app_lvgl_init(void) {
       .handle = touch_handle,
   };
   lvgl_touch_indev = lvgl_port_add_touch(&touch_cfg);
+  indev_drv_touch = lvgl_touch_indev->driver;
+  original_read_cb = lvgl_touch_indev->driver->read_cb;
+  // Replace the read callback with our own wrapped with mutex control
+  indev_drv_touch->read_cb = lv_touch_cb;
+
   //  lv_indev_add_event_cb(lvgl_touch_indev, lv_touch_cb, LV_EVENT_ALL, NULL); //LVGL9
 #endif
 
@@ -418,6 +444,14 @@ lv_indev_t *get_encoder() {
     return NULL;
   }
   return lvgl_encoder_indev;
+}
+
+lv_indev_t *get_touch() {
+  if (lvgl_touch_indev == NULL) {
+    ESP_LOGE(TAG, "Touch indev is not initialized");
+    return NULL;
+  }
+  return lvgl_touch_indev;
 }
 
 #if SCREEN_TEST_UI
