@@ -9,7 +9,6 @@
       "string": "c",
       "string_view": "c",
       "cstdint": "c",
-      "cstdlib": "c",
       "*.cpp": "cpp",
       "*.hpp": "cpp",
       "*.tpp": "cpp"
