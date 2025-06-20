@@ -8,33 +8,11 @@
 #endif
 
 // Power configuration
-#ifndef PMU_SDA
-  #define PMU_SDA -1
-#endif
-#ifndef PMU_SCL
-  #define PMU_SCL -1
-#endif
-#ifndef PMU_INT
-  #define PMU_INT -1
-#endif
-
 #ifndef FORCE_LIGHT_SLEEP
   #define FORCE_LIGHT_SLEEP 0
 #endif
 
 // Joystick configuration
-#ifndef JOYSTICK_BUTTON_PIN
-  #define JOYSTICK_BUTTON_PIN -1
-#endif
-
-#ifndef JOYSTICK_X_ADC
-  #define JOYSTICK_X_ADC -1
-#endif
-
-#ifndef JOYSTICK_Y_ADC
-  #define JOYSTICK_Y_ADC -1
-#endif
-
 #if JOYSTICK_BUTTON_PIN < 0
   #define JOYSTICK_BUTTON_ENABLED 0
 #else
@@ -106,18 +84,14 @@
   #define LED_DATA_PIN -1
 #endif
 
-#if (LED_POWER_PIN < 0 || LED_DATA_PIN < 0)
+#if defined(LED_POWER_PIN) && defined(LED_DATA_PIN)
   #define LED_ENABLED 0
 #else
   #define LED_ENABLED 1
 #endif
 
 // Buzzer configuration
-#ifndef BUZZER_PIN
-  #define BUZZER_PIN -1
-#endif
-
-#if (BUZZER_PIN < 0)
+#if defined(BUZZER_PIN)
   #define BUZZER_ENABLED 0
 #else
   #define BUZZER_ENABLED 1
