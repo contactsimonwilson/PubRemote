@@ -13,7 +13,6 @@ static const char *TAG = "PUBREMOTE-CHARGE_DRIVER_SY6970";
 
 // SY6970 I2C address (0x6A is the typical address)
 #define SY6970_ADDR                 0x6A
-#define SY6970_I2C_NUM             I2C_NUM_0
 
 // SY6970 instance
 static PowersSY6970 sy6970;
