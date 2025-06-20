@@ -1,31 +1,10 @@
 #include "i2c.h"
+#include "config.h"
 #include "driver/i2c.h"
 #include "esp_err.h"
 #include "esp_log.h"
 
 static const char *TAG = "PUBREMOTE-I2C";
-
-#if !defined(PMIC_SDA) && !defined(TP_SDA)
-  #define I2C_SDA -1
-#elif defined(PMIC_SDA)
-  #define I2C_SDA PMIC_SDA
-#elif defined(TP_SDA)
-  #define I2C_SDA TP_SDA
-#endif
-
-#if !defined(PMIC_SCL) && !defined(TP_SCL)
-  #define I2C_SCL -1
-#elif defined(PMIC_SCL)
-  #define I2C_SCL PMIC_SCL
-#elif defined(TP_SCL)
-  #define I2C_SCL TP_SCL
-#endif
-
-#if defined(TP_SDA) && defined(TP_SCL) && defined(PMIC_SDA) && defined(PMIC_SCL) &&                                    \
-    (TP_SDA != PMIC_SDA || TP_SCL != PMIC_SCL)
-  #error                                                                                                               \
-      "All I2C devices must share the same SDA and SCL pins. Please define either PMIC_SDA/PMIC_SCL or TP_SDA/TP_SCL, but not both."
-#endif
 
 // TODO -I2C mutex for thread safety
 // static SemaphoreHandle_t i2c_mutex = NULL;

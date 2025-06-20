@@ -6,6 +6,7 @@
 #include "driver/i2c.h"
 #include "XPowersLib.h"
 #include <charge/charge_driver.h>
+#include "config.h"
 
 static const char *TAG = "PUBREMOTE-CHARGE_DRIVER_SY6970";
 
@@ -21,8 +22,10 @@ static PowersSY6970 sy6970;
  */
 static esp_err_t sy6970_init(void)
 {
+    #if defined(PMU_SDA) && defined(PMU_SCL)
+
     // Initialize the SY6970 with the XPowersLib
-    bool result = sy6970.begin(SY6970_I2C_NUM, SY6970_ADDR, PMIC_SDA, PMIC_SCL);
+    bool result = sy6970.begin(SY6970_I2C_NUM, SY6970_ADDR, PMU_SDA, PMU_SCL);
     if (!result) {
         ESP_LOGE(TAG, "Failed to initialize SY6970");
         return ESP_FAIL;
@@ -31,6 +34,10 @@ static esp_err_t sy6970_init(void)
     
     ESP_LOGI(TAG, "SY6970 initialized successfully");
     return ESP_OK;
+    #else
+    ESP_LOGE(TAG, "PMU_SDA and PMU_SCL must be defined for SY6970 initialization");
+    return ESP_ERR_INVALID_ARG;
+    #endif
 }
 
 /**
@@ -111,7 +118,6 @@ extern "C" RemotePowerState sy6970_get_power_state()
     } else {
         state.chargeState = CHARGE_STATE_UNKNOWN;
     }
-
 
     ESP_LOGD(TAG, "BATT: %u mV", sy6970.getBattVoltage());
     ESP_LOGD(TAG, "VBUS: %u mV", sy6970.getVbusVoltage());

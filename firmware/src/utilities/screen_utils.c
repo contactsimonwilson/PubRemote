@@ -1,4 +1,5 @@
 #include "screen_utils.h"
+#include "config.h"
 #include "lvgl.h"
 #include "remote/display.h"
 #include <ui/ui.h>
@@ -288,7 +289,7 @@ lv_group_t *create_navigation_group(lv_obj_t *container) {
     }
   }
 
-  if (firstChild != NULL) {
+  if (JOYSTICK_ENABLED && firstChild != NULL) {
     lv_group_focus_obj(firstChild);
   }
 

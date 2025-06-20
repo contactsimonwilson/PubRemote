@@ -1,4 +1,5 @@
 #include "display.h"
+#include "config.h"
 #include "display/display_driver.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
@@ -43,15 +44,6 @@
   #error "ST7789 not supported"
 #endif
 
-#if TP_CST816S
-  #include "esp_lcd_touch_cst816s.h"
-  #define TOUCH_ENABLED 1
-#elif TP_FT3168
-  #include "esp_lcd_touch_ft3168.h"
-  #define TOUCH_ENABLED 1
-#else
-  #define TOUCH_ENABLED 0
-#endif
 #include "remoteinputs.h"
 
 static const char *TAG = "PUBREMOTE-DISPLAY";

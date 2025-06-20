@@ -1,5 +1,6 @@
 #include "remoteinputs.h"
 #include "adc.h"
+#include "config.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_log.h"
 #include "esp_sleep.h"

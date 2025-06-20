@@ -2,6 +2,7 @@
 #include "adc.h"
 #include "buzzer.h"
 #include "charge/charge_driver.h"
+#include "config.h"
 #include "display.h"
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
@@ -25,10 +26,6 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
-
-#ifndef FORCE_LIGHT_SLEEP
-  #define FORCE_LIGHT_SLEEP 0
-#endif
 
 static bool has_pull_resistor = true;
 
