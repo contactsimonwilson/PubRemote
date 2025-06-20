@@ -57,6 +57,7 @@ void about_screen_load_start(lv_event_t *e) {
 
     update_version_info_label();
     update_battery_percentage_label();
+    create_navigation_group(ui_AboutFooter);
 
     LVGL_unlock();
   }
