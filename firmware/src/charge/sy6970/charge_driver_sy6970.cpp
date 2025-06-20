@@ -22,6 +22,8 @@ static PowersSY6970 sy6970;
  */
 static esp_err_t sy6970_init(void)
 {
+    #if defined(PMU_SDA) && defined(PMU_SCL)
+
     // Initialize the SY6970 with the XPowersLib
     bool result = sy6970.begin(SY6970_I2C_NUM, SY6970_ADDR, PMU_SDA, PMU_SCL);
     if (!result) {
@@ -32,6 +34,10 @@ static esp_err_t sy6970_init(void)
     
     ESP_LOGI(TAG, "SY6970 initialized successfully");
     return ESP_OK;
+    #else
+    ESP_LOGE(TAG, "PMU_SDA and PMU_SCL must be defined for SY6970 initialization");
+    return ESP_ERR_INVALID_ARG;
+    #endif
 }
 
 /**

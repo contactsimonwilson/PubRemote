@@ -19,24 +19,16 @@
   #define JOYSTICK_BUTTON_ENABLED 1
 #endif
 
-#if JOYSTICK_X_ADC < 0
+#if !defined(JOYSTICK_X_ADC) || !defined(JOYSTICK_X_ADC_UNIT)
   #define JOYSTICK_X_ENABLED 0
 #else
   #define JOYSTICK_X_ENABLED 1
 #endif
 
-#if JOYSTICK_Y_ADC < 0
+#if !defined(JOYSTICK_Y_ADC) || !defined(JOYSTICK_Y_ADC_UNIT)
   #define JOYSTICK_Y_ENABLED 0
 #else
   #define JOYSTICK_Y_ENABLED 1
-#endif
-
-#if (JOYSTICK_Y_ENABLED && !defined(JOYSTICK_Y_ADC_UNIT))
-  #error "JOYSTICK_Y_ADC_UNIT must be defined"
-#endif
-
-#if (JOYSTICK_X_ENABLED && !defined(JOYSTICK_X_ADC_UNIT))
-  #error "JOYSTICK_X_ADC_UNIT must be defined"
 #endif
 
 #define JOYSTICK_ENABLED (JOYSTICK_X_ENABLED || JOYSTICK_Y_ENABLED)
