@@ -1,3 +1,4 @@
+#include "config.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "remote/screen.h"
