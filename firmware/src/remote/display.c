@@ -1,3 +1,5 @@
+#include "display.h"
+#include "config.h"
 #include "display/display_driver.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
@@ -16,6 +18,7 @@
 #include "hal/ledc_types.h"
 #include "lvgl.h"
 #include "powermanagement.h"
+#include "remote/i2c.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "utilities/screen_utils.h"
@@ -42,19 +45,12 @@
   #error "ST7789 not supported"
 #endif
 
-#if TP_CST816S
-  #include "esp_lcd_touch_cst816s.h"
-  #define TOUCH_ENABLED 1
-#elif TP_FT3168
-  #include "esp_lcd_touch_ft3168.h"
-  #define TOUCH_ENABLED 1
-#endif
-#include "display.h"
+#include "remoteinputs.h"
 
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define LCD_HOST SPI2_HOST
-#define TP_I2C_NUM 0
+#define TP_I2C_NUM I2C_NUM_0
 
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
@@ -76,6 +72,9 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 static esp_lcd_panel_io_handle_t lcd_io = NULL;
 static esp_lcd_panel_handle_t lcd_panel = NULL;
 #if TOUCH_ENABLED
+typedef void (*lv_indev_read_cb_t)(struct _lv_indev_drv_t *indev_drv, lv_indev_data_t *data);
+static lv_indev_drv_t *indev_drv_touch = NULL;
+static lv_indev_read_cb_t original_read_cb = NULL;
 static esp_lcd_touch_handle_t touch_handle = NULL;
 #endif
 
@@ -84,6 +83,9 @@ static lv_display_t *lvgl_disp = NULL;
 #if TOUCH_ENABLED
 static lv_indev_t *lvgl_touch_indev = NULL;
 #endif
+
+static lv_indev_drv_t indev_drv_encoder;
+static lv_indev_t *lvgl_encoder_indev = NULL;
 
 /* LCD panel gap */
 
@@ -98,8 +100,6 @@ static uint8_t panel_y_gap = PANEL_Y_GAP;
 #else
 static uint8_t panel_y_gap = 0;
 #endif
-
-static bool has_installed_drivers = false;
 
 #if ROUNDER_CALLBACK
 void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area) {
@@ -117,6 +117,37 @@ void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area
   area->y2 = ((y2 >> 1) << 1) + 1;
 }
 #endif
+
+static void encoder_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
+  static int32_t last_encoder_value = 0;
+  static uint32_t last_time = 0;
+
+  uint32_t current_time = lv_tick_get();
+
+  int16_t enc_diff = 0;
+
+  if (remote_data.data.js_y > 0.5) {
+    // If joystick Y is pushed up, increase the encoder value
+    enc_diff = -1;
+  }
+  else if (remote_data.data.js_y < -0.5) {
+    // If joystick Y is pushed down, decrease the encoder value
+    enc_diff = 1;
+  }
+
+  if (last_encoder_value == enc_diff || (current_time - last_time) < 100) {
+    // If the encoder value hasn't changed or the time since last update is too short, return
+    data->enc_diff = 0;
+    data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+    return;
+  }
+
+  data->enc_diff = enc_diff;
+  data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+  // Update tracking variables
+  last_encoder_value = enc_diff; // Keep running total if needed
+  last_time = current_time;
+}
 
 bool LVGL_lock(int timeout_ms) {
   if (!lv_is_initialized()) {
@@ -256,21 +287,7 @@ static esp_err_t app_lcd_init(void) {
 
 #if TOUCH_ENABLED
 static esp_err_t app_touch_init(void) {
-
-  if (!has_installed_drivers) {
-    /* Initilize I2C */
-    const i2c_config_t i2c_conf = {.mode = I2C_MODE_MASTER,
-                                   .sda_io_num = TP_SDA,
-                                   .sda_pullup_en = GPIO_PULLUP_DISABLE,
-                                   .scl_io_num = TP_SCL,
-                                   .scl_pullup_en = GPIO_PULLUP_DISABLE,
-                                   .master.clk_speed = 400000};
-
-    ESP_LOGI(TAG, "Initializing I2C for display touch");
-    /* Initialize I2C */
-    ESP_ERROR_CHECK(i2c_param_config(TP_I2C_NUM, &i2c_conf));
-    ESP_ERROR_CHECK(i2c_driver_install(TP_I2C_NUM, i2c_conf.mode, 0, 0, 0));
-  }
+  // I2C bus should already be initialized at this point
 
   esp_lcd_panel_io_handle_t tp_io_handle = NULL;
 
@@ -306,9 +323,26 @@ static esp_err_t app_touch_init(void) {
   return ESP_OK;
 }
 
-static void lv_touch_cb(lv_event_t *e) {
-  ESP_LOGD(TAG, "Touch event");
-  reset_sleep_timer();
+static void lv_touch_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
+  if (i2c_lock(10)) {
+    // Call the original read callback
+    if (original_read_cb) {
+      original_read_cb(indev_drv, data);
+      static bool was_pressed = false;
+      bool was_press = (data->state == LV_INDEV_STATE_PRESSED);
+      if (was_press && !was_pressed) {
+        // Reset the sleep timer when touch is pressed
+        reset_sleep_timer();
+      }
+
+      was_pressed = was_press;
+    }
+    else {
+      ESP_LOGE(TAG, "Original read callback is NULL");
+      return;
+    }
+    i2c_unlock();
+  }
 }
 
 #endif // TOUCH_ENABLED
@@ -385,10 +419,39 @@ static esp_err_t app_lvgl_init(void) {
       .handle = touch_handle,
   };
   lvgl_touch_indev = lvgl_port_add_touch(&touch_cfg);
+  indev_drv_touch = lvgl_touch_indev->driver;
+  original_read_cb = lvgl_touch_indev->driver->read_cb;
+  // Replace the read callback with our own wrapped with mutex control
+  indev_drv_touch->read_cb = lv_touch_cb;
+
   //  lv_indev_add_event_cb(lvgl_touch_indev, lv_touch_cb, LV_EVENT_ALL, NULL); //LVGL9
 #endif
 
+  // Initialize the encoder driver
+  lv_indev_drv_init(&indev_drv_encoder);
+  indev_drv_encoder.type = LV_INDEV_TYPE_ENCODER;
+  indev_drv_encoder.read_cb = encoder_read_cb;
+
+  // Register the encoder
+  lvgl_encoder_indev = lv_indev_drv_register(&indev_drv_encoder);
+
   return ESP_OK;
+}
+
+lv_indev_t *get_encoder() {
+  if (lvgl_encoder_indev == NULL) {
+    ESP_LOGE(TAG, "Encoder indev is not initialized");
+    return NULL;
+  }
+  return lvgl_encoder_indev;
+}
+
+lv_indev_t *get_touch() {
+  if (lvgl_touch_indev == NULL) {
+    ESP_LOGE(TAG, "Touch indev is not initialized");
+    return NULL;
+  }
+  return lvgl_touch_indev;
 }
 
 #if SCREEN_TEST_UI
@@ -481,5 +544,4 @@ void init_display() {
   /* LVGL initialization */
   ESP_ERROR_CHECK(app_lvgl_init());
   ESP_ERROR_CHECK(display_ui());
-  has_installed_drivers = true;
 }

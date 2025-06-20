@@ -2,6 +2,7 @@
 #include "adc.h"
 #include "buzzer.h"
 #include "charge/charge_driver.h"
+#include "config.h"
 #include "display.h"
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
@@ -25,10 +26,6 @@
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
-
-#ifndef FORCE_LIGHT_SLEEP
-  #define FORCE_LIGHT_SLEEP 0
-#endif
 
 static bool has_pull_resistor = true;
 
@@ -201,7 +198,7 @@ void reset_sleep_timer() {
   }
 
   if (duration_ms == 0) {
-    ESP_LOGI(TAG, "Deep sleep timer disabled.");
+    ESP_LOGD(TAG, "Deep sleep timer disabled.");
     xSemaphoreGive(timer_mutex);
     return;
   }
@@ -223,7 +220,7 @@ void power_management_task(void *pvParameters) {
 #define MAX_BATTERY_VOLTAGE 4200
 
   while (1) {
-    remoteStats.remoteBatteryVoltage = get_battery_voltage();
+    remoteStats.remoteBatteryVoltage = get_power_state().voltage;
     float battery_percentage = fmaxf(0, (float)(remoteStats.remoteBatteryVoltage - MIN_BATTERY_VOLTAGE)) /
                                (float)(MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE);
     remoteStats.remoteBatteryPercentage = clampu8((uint8_t)(battery_percentage * 100), 0, 100);

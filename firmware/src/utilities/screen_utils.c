@@ -1,4 +1,5 @@
 #include "screen_utils.h"
+#include "config.h"
 #include "lvgl.h"
 #include "remote/display.h"
 #include <ui/ui.h>
@@ -258,4 +259,39 @@ void reload_screens() {
     apply_ui_scale(ui_MenuScreen);
     LVGL_unlock();
   }
+}
+
+static lv_group_t *navigation_group = NULL;
+
+lv_group_t *create_navigation_group(lv_obj_t *container) {
+  if (navigation_group == NULL) {
+    navigation_group = lv_group_create();
+    // https://docs.lvgl.io/8.0/overview/indev.html#default-group
+    lv_group_set_default(navigation_group);
+    lv_indev_set_group(get_encoder(), navigation_group);
+  }
+  else {
+    // If a group already exists, clear it to remove old objects
+    lv_group_remove_all_objs(navigation_group);
+  }
+
+  // Iterate children of container and add them to the group
+  uint32_t childrenCount = lv_obj_get_child_cnt(container);
+  lv_obj_t *firstChild = NULL;
+  for (uint32_t i = 0; i < childrenCount; i++) {
+    lv_obj_t *child = lv_obj_get_child(container, i);
+    if (child != NULL) {
+      lv_group_add_obj(navigation_group, child);
+
+      if (i == 0) {
+        firstChild = child;
+      }
+    }
+  }
+
+  if (JOYSTICK_ENABLED && firstChild != NULL) {
+    lv_group_focus_obj(firstChild);
+  }
+
+  return navigation_group;
 }

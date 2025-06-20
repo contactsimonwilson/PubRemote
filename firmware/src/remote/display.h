@@ -37,4 +37,5 @@ void deinit_display();
 uint8_t get_bl_level();
 void set_bl_level(uint8_t level);
 void set_rotation(ScreenRotation rot);
+lv_indev_t *get_encoder();
 #endif

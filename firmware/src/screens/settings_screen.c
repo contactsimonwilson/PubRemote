@@ -91,6 +91,7 @@ void settings_screen_load_start(lv_event_t *e) {
       lv_obj_set_style_bg_color(item, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
       lv_obj_set_style_bg_opa(item, bg_opacity, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
+    create_navigation_group(ui_SettingsFooter);
 
     LVGL_unlock();
   }
