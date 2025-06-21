@@ -1,4 +1,6 @@
+#include "haptic.h"
 #include "buzzer.h"
+#include "config.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_now.h"
@@ -10,6 +12,12 @@
 #include <esp_wifi_types.h>
 #include <nvs.h>
 
+#ifdef HAPTIC_PWM
+  #include "haptic/pwm/haptic_driver_pwm.h"
+#elif HAPTIC_DRV2605
+  #include "haptic/drv2605/haptic_driver_drv2605.hpp"
+#endif
+
 static const char *TAG = "PUBREMOTE-HAPTIC";
 
 #if HAPTIC_ENABLED
@@ -17,25 +25,23 @@ static const char *TAG = "PUBREMOTE-HAPTIC";
 static SemaphoreHandle_t haptic_mutex;
 #endif
 
-static void play_vibration(uint8_t pattern) {
+// 0ms = play for pattern. Otherwise, play for duration_ms
+static void play_vibration(HapticFeedbackPattern pattern, uint32_t duration_ms) {
 #if HAPTIC_ENABLED
   // Take the mutex
-  if (haptic_mutex == NULL) {
-    haptic_mutex = xSemaphoreCreateMutex();
-  }
   xSemaphoreTake(haptic_mutex, portMAX_DELAY);
 
   // Do stuff
 
   // Release the mutex
-  xSemaphoreGive(buzzer_mutex);
+  xSemaphoreGive(haptic_mutex);
 #endif
 }
 
 #if HAPTIC_ENABLED
 // task to play melody
 static void play_vibration_task(void *pvParameters) {
-  play_vibration(0); // Example pattern, replace with actual pattern logic
+  play_vibration(HAPTIC_PATTERN_SHORT, 0); // Play a short vibration pattern
 
   vTaskDelete(NULL);
 }
@@ -49,13 +55,17 @@ void vibrate() {
 
 void init_haptic() {
 #if HAPTIC_ENABLED
+  if (haptic_mutex == NULL) {
+    haptic_mutex = xSemaphoreCreateMutex();
+  }
   #if HAPTIC_DRV2605
   // Initialize the DRV2605 haptic driver
   ESP_LOGI(TAG, "Initializing DRV2605 haptic driver");
-  // Add your DRV2605 initialization code here
-  #else
-  // Initialize the buzzer for haptic feedback
+  drv2605_haptic_driver_init();
+  #elif HAPTIC_PWM
+  // Initialize the PWM haptic driver
   ESP_LOGI(TAG, "Initializing PWM haptic driver");
+  pwm_haptic_driver_init();
   #endif
 #endif
 }
