@@ -83,10 +83,10 @@
 #endif
 
 // Buzzer configuration
-#if defined(BUZZER_PIN)
-  #define BUZZER_ENABLED 0
-#else
+#if defined(BUZZER_PWM)
   #define BUZZER_ENABLED 1
+#else
+  #define BUZZER_ENABLED 0
 #endif
 
 #ifndef BUZZER_INVERT
@@ -94,5 +94,10 @@
 #endif
 
 // Haptic configuration
+#if defined(HAPTIC_DRV2605) || defined(HAPTIC_PWM)
+  #define HAPTIC_ENABLED 1
+#else
+  #define HAPTIC_ENABLED 0
+#endif
 
 #endif

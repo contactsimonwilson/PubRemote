@@ -11,6 +11,7 @@
 #include "remote/console.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
+#include "remote/haptic.h"
 #include "remote/i2c.h"
 #include "remote/led.h"
 #include "remote/peers.h"
@@ -41,6 +42,7 @@ void app_main(void) {
   // Peripherals
   init_led();
   init_buzzer();
+  init_haptic();
   init_thumbstick();
   init_display();
 
