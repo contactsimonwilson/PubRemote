@@ -154,6 +154,7 @@ bool i2c_unlock() {
 }
 
 void init_i2c() {
+#if defined(I2C_SDA) && defined(I2C_SCL)
   // Create a mutex for I2C operations
   i2c_mutex = xSemaphoreCreateMutex();
 
@@ -169,4 +170,5 @@ void init_i2c() {
   /* Initialize I2C */
   ESP_ERROR_CHECK(i2c_param_config(I2C_MASTER_NUM, &i2c_conf));
   ESP_ERROR_CHECK(i2c_driver_install(I2C_MASTER_NUM, i2c_conf.mode, 0, 0, 0));
+#endif
 }
