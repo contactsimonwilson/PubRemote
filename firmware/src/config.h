@@ -46,7 +46,7 @@
 
 // i2c configuration
 #if !defined(PMU_SDA) && !defined(TP_SDA)
-  #define I2C_SDA -1
+// No I2C devices defined
 #elif defined(PMU_SDA)
   #define I2C_SDA PMU_SDA
 #elif defined(TP_SDA)
@@ -54,7 +54,7 @@
 #endif
 
 #if !defined(PMU_SCL) && !defined(TP_SCL)
-  #define I2C_SCL -1
+// No I2C devices defined
 #elif defined(PMU_SCL)
   #define I2C_SCL PMU_SCL
 #elif defined(TP_SCL)
@@ -68,25 +68,22 @@
 #endif
 
 // Led configuration
-#ifndef LED_POWER_PIN
-  #define LED_POWER_PIN -1
-#endif
 
-#ifndef LED_DATA_PIN
-  #define LED_DATA_PIN -1
-#endif
-
-#if defined(LED_POWER_PIN) && defined(LED_DATA_PIN)
-  #define LED_ENABLED 0
-#else
+#if defined(LED_DATA_PIN)
   #define LED_ENABLED 1
+#else
+  #define LED_ENABLED 0
+#endif
+
+#if LED_ENABLED && !defined(LED_COUNT)
+  #define LED_COUNT 1 // Default to 1 LED if not defined
 #endif
 
 // Buzzer configuration
 #if defined(BUZZER_PIN)
-  #define BUZZER_ENABLED 0
-#else
   #define BUZZER_ENABLED 1
+#else
+  #define BUZZER_ENABLED 0
 #endif
 
 #ifndef BUZZER_INVERT
