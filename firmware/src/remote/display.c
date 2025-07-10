@@ -2,7 +2,6 @@
 #include "config.h"
 #include "display/display_driver.h"
 #include "driver/gpio.h"
-#include "driver/i2c.h"
 #include "driver/ledc.h"
 #include "driver/spi_master.h"
 #include "esp_err.h"
@@ -446,6 +445,7 @@ lv_indev_t *get_encoder() {
   return lvgl_encoder_indev;
 }
 
+#if TOUCH_ENABLED
 lv_indev_t *get_touch() {
   if (lvgl_touch_indev == NULL) {
     ESP_LOGE(TAG, "Touch indev is not initialized");
@@ -453,6 +453,7 @@ lv_indev_t *get_touch() {
   }
   return lvgl_touch_indev;
 }
+#endif
 
 #if SCREEN_TEST_UI
 static void event_handler(lv_event_t *e) {
