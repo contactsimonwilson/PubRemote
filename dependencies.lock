@@ -1,10 +1,10 @@
 dependencies:
   espp/base_component:
-    component_hash: 01a3fc5a70fa56eb5ce37b4fbc94e7cb27402df0fb61327db872fb96f49f81bd
+    component_hash: 9282b2a1353fa8c6a871a258ed101419b8cf4173f3fffea5bcc50b2097541c4f
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.0.7
+    version: 1.0.12
   espp/base_peripheral:
     component_hash: e956923883ac06ad40913dde3b29ae497e5a21ceabc42538a92c0adde423fdf9
     source:
@@ -12,17 +12,17 @@ dependencies:
       type: service
     version: 1.0.7
   espp/format:
-    component_hash: a2a180d2603d6885c25babff12a1148eaafae3a2e439ae58d04dcb91eb4a6d11
+    component_hash: 856e9b1bfb7ec31fc7db1537ce54a2220ce6eaac843ed862e5435290f416f7ef
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.0.7
+    version: 1.0.12
   espp/logger:
-    component_hash: 789aa33f59405fd285fc3e7ab9609a1a53b70985463a01c1338181485d7ae8f5
+    component_hash: 4211ececbba3a5c4099e7ea1023df603896fd4ec47e904fd3f69525529d59013
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.0.7
+    version: 1.0.12
   espressif/cmake_utilities:
     component_hash: 351350613ceafba240b761b4ea991e0f231ac7a9f59a9ee901f751bddc0bb18f
     source:
@@ -46,6 +46,6 @@ dependencies:
       service_url: https://api.components.espressif.com/
       type: service
     version: 8.4.0
-manifest_hash: 927efc4f4d4c4f8c0939454a1adcaf4801587626251ccc5dba2e6a263f3d8add
+manifest_hash: 46fc8984a920ef07a3c160c2e1e8b3c9f4d959fa35236780fc283782864ef068
 target: esp32s3
 version: 1.0.0
