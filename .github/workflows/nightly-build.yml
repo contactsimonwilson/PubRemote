@@ -19,7 +19,7 @@ jobs:
 
     outputs:
       tag_up_to_date: ${{ steps.compare_hashes.outputs.TAG_UP_TO_DATE }}
-      tag_found: ${{ steps.check_for_tag.outputs.TAG_FOUND }} # Also expose TAG_FOUND for the delete job
+      tag_found: ${{ steps.check_for_tag.outputs.TAG_FOUND }}
 
     steps:
       - name: Checkout repository
