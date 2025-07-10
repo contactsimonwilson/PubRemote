@@ -3,7 +3,7 @@ name: Nightly Builds
 # Runs every night at 11:30 PM
 on:
   schedule:
-    - cron: "30 23 * * *" 
+    - cron: "30 23 * * *"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -15,21 +15,24 @@ permissions:
 jobs:
   check_tag_up_to_date:
     if: github.repository == 'contactsimonwilson/PubRemote'
-    
     runs-on: ubuntu-latest
+
+    outputs:
+      tag_up_to_date: ${{ steps.compare_hashes.outputs.TAG_UP_TO_DATE }}
+      tag_found: ${{ steps.check_for_tag.outputs.TAG_FOUND }} # Also expose TAG_FOUND for the delete job
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: master
-          fetch-depth: 0  # Fetch all history for tags
+          fetch-depth: 0 # Fetch all history for tags
 
       - name: Get latest commit hash from master
         id: get-master-hash
         run: |
           MASTER_HASH=$(git rev-parse master)
-          echo "MASTER_HASH=$MASTER_HASH" >> $GITHUB_ENV
+          echo "MASTER_HASH=$MASTER_HASH" >> $GITHUB_OUTPUT
 
       - name: Check if nightly tag exists
         id: check_for_tag
@@ -37,32 +40,32 @@ jobs:
           TAG_NAME="nightly"
           git fetch --tags
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            echo "TAG_FOUND=YES" >> $GITHUB_ENV
+            echo "TAG_FOUND=YES" >> $GITHUB_OUTPUT
             TAG_HASH=$(git rev-parse "$TAG_NAME")
-            echo "TAG_HASH=$TAG_HASH" >> $GITHUB_ENV
+            echo "TAG_HASH=$TAG_HASH" >> $GITHUB_OUTPUT
           else
-            echo "TAG_FOUND=NO" >> $GITHUB_ENV
+            echo "TAG_FOUND=NO" >> $GITHUB_OUTPUT
           fi
 
       - name: Compare master hash with nightly tag hash
         id: compare_hashes
         run: |
-          if [[ "${{ env.TAG_FOUND }}" == "YES" && "${{ env.MASTER_HASH }}" == "${{ env.TAG_HASH }}" ]]; then
-            echo "TAG_UP_TO_DATE=YES" >> $GITHUB_ENV
+          if [[ "${{ steps.check_for_tag.outputs.TAG_FOUND }}" == "YES" && "${{ steps.get-master-hash.outputs.MASTER_HASH }}" == "${{ steps.check_for_tag.outputs.TAG_HASH }}" ]]; then
+            echo "TAG_UP_TO_DATE=YES" >> $GITHUB_OUTPUT
           else
-            echo "TAG_UP_TO_DATE=NO" >> $GITHUB_ENV
+            echo "TAG_UP_TO_DATE=NO" >> $GITHUB_OUTPUT
           fi
 
       - name: Exit if nightly tag is up to date
-        if: ${{ env.TAG_UP_TO_DATE == 'YES' }}
+        if: ${{ steps.compare_hashes.outputs.TAG_UP_TO_DATE == 'YES' }}
         run: |
           echo "Nightly tag is already up to date with master. Skipping build."
           exit 0
 
   delete_old_release:
-    if: ${{ github.repository == 'contactsimonwilson/PubRemote' && env.TAG_UP_TO_DATE == 'NO' }}
+    if: ${{ github.repository == 'contactsimonwilson/PubRemote' && needs.check_tag_up_to_date.outputs.tag_up_to_date == 'NO' }}
     needs: check_tag_up_to_date
-    
+
     permissions:
       # Write permission is required to create a github release
       contents: write
@@ -75,32 +78,32 @@ jobs:
           ref: master
 
       - name: Check for Tag
-        id: check_for_tag
+        id: check_for_tag_in_delete_job # Give it a unique ID
         run: |
           TAG_NAME="nightly"
           git fetch --tags
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            echo "TAG_FOUND=YES" >> $GITHUB_ENV
+            echo "TAG_FOUND=YES" >> $GITHUB_OUTPUT
           else
-            echo "TAG_FOUND=NO" >> $GITHUB_ENV
+            echo "TAG_FOUND=NO" >> $GITHUB_OUTPUT
           fi
 
       # Delete the release if it already exists
       - name: Delete tag
-        if: ${{ env.TAG_FOUND == 'YES' }}
-        run: gh release delete nightly --cleanup-tag 
+        if: ${{ steps.check_for_tag_in_delete_job.outputs.TAG_FOUND == 'YES' }}
+        run: gh release delete nightly --cleanup-tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Wait for 2 seconds
         run: sleep 2
-         
+
   build_and_release:
-    if: ${{ github.repository == 'contactsimonwilson/PubRemote' && env.TAG_UP_TO_DATE == 'NO' }}
-    needs: delete_old_release
-    
+    # Access the output from the previous job
+    if: ${{ github.repository == 'contactsimonwilson/PubRemote' && needs.check_tag_up_to_date.outputs.tag_up_to_date == 'NO' }}
+    needs: [check_tag_up_to_date, delete_old_release] # Ensure both dependencies are met
+
     permissions:
-      # Write permission is required to create a github release
       contents: write
 
     runs-on: ubuntu-latest
@@ -116,7 +119,7 @@ jobs:
             ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
-          
+
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11
@@ -130,13 +133,14 @@ jobs:
           PLATFORMIO_BUILD_FLAGS: '-D RELEASE_VARIANT=\"nightly\"'
 
       - name: Get Current Date
-        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        id: get_date
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Attach ZIPs and Publish
         uses: softprops/action-gh-release@v2
-        with: 
+        with:
           files: "*.zip"
-          name: "${{ env.TODAY }} Nightly Build"
+          name: "${{ steps.get_date.outputs.TODAY }} Nightly Build" # Access output from the named step
           prerelease: true
           tag_name: "nightly"
           fail_on_unmatched_files: true
