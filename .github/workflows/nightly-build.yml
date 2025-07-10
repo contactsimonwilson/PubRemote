@@ -78,7 +78,7 @@ jobs:
           ref: master
 
       - name: Check for Tag
-        id: check_for_tag_in_delete_job # Give it a unique ID
+        id: check_for_tag_in_delete_job
         run: |
           TAG_NAME="nightly"
           git fetch --tags
@@ -101,7 +101,7 @@ jobs:
   build_and_release:
     # Access the output from the previous job
     if: ${{ github.repository == 'contactsimonwilson/PubRemote' && needs.check_tag_up_to_date.outputs.tag_up_to_date == 'NO' }}
-    needs: [check_tag_up_to_date, delete_old_release] # Ensure both dependencies are met
+    needs: [check_tag_up_to_date, delete_old_release]
 
     permissions:
       contents: write
@@ -140,7 +140,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: "*.zip"
-          name: "${{ steps.get_date.outputs.TODAY }} Nightly Build" # Access output from the named step
+          name: "${{ steps.get_date.outputs.TODAY }} Nightly Build"
           prerelease: true
           tag_name: "nightly"
           fail_on_unmatched_files: true
