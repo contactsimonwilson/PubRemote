@@ -6,17 +6,12 @@
 #include "esp_now.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
+#include "haptic/haptic_driver.h"
 #include "nvs_flash.h"
 #include "settings.h"
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
 #include <nvs.h>
-
-#ifdef HAPTIC_PWM
-  #include "haptic/pwm/haptic_driver_pwm.h"
-#elif HAPTIC_DRV2605
-  #include "haptic/drv2605/haptic_driver_drv2605.hpp"
-#endif
 
 static const char *TAG = "PUBREMOTE-HAPTIC";
 
@@ -58,14 +53,6 @@ void init_haptic() {
   if (haptic_mutex == NULL) {
     haptic_mutex = xSemaphoreCreateMutex();
   }
-  #if HAPTIC_DRV2605
-  // Initialize the DRV2605 haptic driver
-  ESP_LOGI(TAG, "Initializing DRV2605 haptic driver");
-  drv2605_haptic_driver_init();
-  #elif HAPTIC_PWM
-  // Initialize the PWM haptic driver
-  ESP_LOGI(TAG, "Initializing PWM haptic driver");
-  pwm_haptic_driver_init();
-  #endif
+  haptic_driver_init();
 #endif
 }

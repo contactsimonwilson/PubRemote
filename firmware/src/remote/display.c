@@ -301,7 +301,9 @@ static esp_err_t app_touch_init(void) {
   const esp_lcd_touch_config_t tp_cfg = {
       .x_max = LV_HOR_RES,
       .y_max = LV_VER_RES,
+  #ifdef TP_RST
       .rst_gpio_num = TP_RST,
+  #endif
       .int_gpio_num = TP_INT,
       .flags =
           {

@@ -1,5 +1,6 @@
 #include "haptic_driver_pwm.h"
 #include "config.h"
+#include "esp_err.h"
 #include "esp_log.h"
 #include <driver/ledc.h>
 
@@ -12,7 +13,7 @@ static const char *TAG = "PUBREMOTE-HAPTIC_DRIVER_PWM";
   #define HAPTIC_MAX_DUTY ((1 << 10) - 1)
 #endif
 
-void pwm_haptic_driver_init() {
+esp_err_t pwm_haptic_driver_init() {
 #if HAPTIC_ENABLED && defined(HAPTIC_PWM)
   #error "Implementation for HAPTIC_PWM is not complete yet. Please implement the PWM haptic driver."
   // Initialize the PWM for haptic feedback
@@ -42,4 +43,7 @@ void pwm_haptic_driver_init() {
 #else
   ESP_LOGW(TAG, "Haptic driver not enabled. Please check your configuration.");
 #endif
+
+  ESP_LOGI(TAG, "PWM haptic driver initialized successfully.");
+  return ESP_OK;
 }

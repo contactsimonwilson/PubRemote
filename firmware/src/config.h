@@ -13,27 +13,27 @@
 #endif
 
 // i2c configuration
-#if !defined(I2C_SDA) || !defined(I2C_SCL)
+#if (!defined(I2C_SDA) || !defined(I2C_SCL))
   #error "I2C_SDA and I2C_SCL must be defined for I2C communication. Please define them in your build flags."
 #endif
 
 // Joystick configuration
-#if JOYSTICK_BUTTON_PIN < 0
-  #define JOYSTICK_BUTTON_ENABLED 0
-#else
+#ifdef JOYSTICK_BUTTON_PIN
   #define JOYSTICK_BUTTON_ENABLED 1
+#else
+  #define JOYSTICK_BUTTON_ENABLED 0
 #endif
 
-#if !defined(JOYSTICK_X_ADC) || !defined(JOYSTICK_X_ADC_UNIT)
-  #define JOYSTICK_X_ENABLED 0
-#else
+#if defined(JOYSTICK_X_ADC) && defined(JOYSTICK_X_ADC_UNIT)
   #define JOYSTICK_X_ENABLED 1
+#else
+  #define JOYSTICK_X_ENABLED 0
 #endif
 
-#if !defined(JOYSTICK_Y_ADC) || !defined(JOYSTICK_Y_ADC_UNIT)
-  #define JOYSTICK_Y_ENABLED 0
-#else
+#if defined(JOYSTICK_Y_ADC) && defined(JOYSTICK_Y_ADC_UNIT)
   #define JOYSTICK_Y_ENABLED 1
+#else
+  #define JOYSTICK_Y_ENABLED 0
 #endif
 
 #define JOYSTICK_ENABLED (JOYSTICK_X_ENABLED || JOYSTICK_Y_ENABLED)

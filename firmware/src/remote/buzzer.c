@@ -57,7 +57,7 @@ static void play_note(int frequency, int duration) {
   ledc_timer_config(&timer_conf);
 
   // Calculate duty cycle based on volume (0-100)
-  uint32_t duty = MAX_DUTY / 2;
+  uint32_t duty = BUZZER_MAX_DUTY / 2;
   ESP_LOGD(TAG, "Playing note at %d Hz with duration %d ms", frequency, duration);
 
   // Start the buzzer
