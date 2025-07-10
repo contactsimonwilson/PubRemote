@@ -14,6 +14,7 @@ static const char *TAG = "PUBREMOTE-HAPTIC_DRIVER_PWM";
 
 void pwm_haptic_driver_init() {
 #if HAPTIC_ENABLED && defined(HAPTIC_PWM)
+  #error "Implementation for HAPTIC_PWM is not complete yet. Please implement the PWM haptic driver."
   // Initialize the PWM for haptic feedback
   ledc_timer_config_t timer_conf = {
       .speed_mode = LEDC_LOW_SPEED_MODE,
