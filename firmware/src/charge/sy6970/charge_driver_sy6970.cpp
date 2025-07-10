@@ -35,8 +35,6 @@ static int sy6970_write_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t *data
  */
 static esp_err_t sy6970_init()
 {
-    #if defined(PMU_SDA) && defined(PMU_SCL)
-    
     // Test I2C communication first
     uint8_t test_data;
     esp_err_t test_result = i2c_read_with_mutex(SY6970_ADDR, 0x0B, &test_data, 1, 500);
@@ -58,10 +56,6 @@ static esp_err_t sy6970_init()
     
     ESP_LOGI(TAG, "SY6970 initialized successfully");
     return ESP_OK;
-    #else
-    ESP_LOGE(TAG, "PMU_SDA and PMU_SCL must be defined for SY6970 initialization");
-    return ESP_ERR_INVALID_ARG;
-    #endif
 }
 
 /**
