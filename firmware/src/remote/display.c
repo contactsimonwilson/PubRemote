@@ -24,6 +24,13 @@
 #include "utilities/theme_utils.h"
 #include <stdio.h>
 
+// Display configuration
+#if TP_CST816S
+  #include "esp_lcd_touch_cst816s.h"
+#elif TP_FT3168
+  #include "esp_lcd_touch_ft3168.h"
+#endif
+
 // https://github.com/espressif/esp-idf/blob/master/examples/peripherals/lcd/spi_lcd_touch/main/spi_lcd_touch_example_main.c
 // https://github.com/espressif/esp-bsp/tree/master/components/lcd/esp_lcd_gc9a01
 // I2C touch controller
