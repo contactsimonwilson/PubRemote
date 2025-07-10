@@ -37,14 +37,14 @@ static const char *TAG = "PUBREMOTE-BUZZER";
 // mutex for buzzer
 static SemaphoreHandle_t buzzer_mutex;
 
-// Note (hz), volume (0-100), duration (ms)
-static const int melody[] = {NOTE_C4, 100, 100, NOTE_D4, 100, 100, NOTE_E4, 100, 100, NOTE_F4, 100, 100,
-                             NOTE_G4, 100, 100, NOTE_A4, 100, 100, NOTE_B4, 100, 100, NOTE_C5, 100, 200};
+// Note (hz), duration (ms)
+static const int melody[] = {NOTE_C4, 100, NOTE_D4, 100, NOTE_E4, 100, NOTE_F4, 100,
+                             NOTE_G4, 100, NOTE_A4, 100, NOTE_B4, 100, NOTE_C5, 200};
 
-static const int notes = sizeof(melody) / sizeof(melody[0]) / 3; // Number of notes
+static const int notes = sizeof(melody) / sizeof(melody[0]) / 2; // Number of notes
 #endif
 
-static void play_note(int frequency, int volume, int duration) {
+static void play_note(int frequency, int duration) {
 #if BUZZER_ENABLED
   // Take the mutex
   xSemaphoreTake(buzzer_mutex, portMAX_DELAY);
@@ -57,15 +57,8 @@ static void play_note(int frequency, int volume, int duration) {
   ledc_timer_config(&timer_conf);
 
   // Calculate duty cycle based on volume (0-100)
-  uint8_t final_volume = volume > 100 ? 100 : volume;
-  final_volume = volume < 0 ? 0 : volume;
-  #if BUZZER_INVERT
-  uint32_t duty = BUZZER_MAX_DUTY - (((float)final_volume / 100) * 100); // Level is inverted
-  #else
-  uint32_t duty = ((float)final_volume / 100) * 100;
-  #endif
-  ESP_LOGD(TAG, "Playing note at %d Hz with volume %d (duty: %ld) and duration %d ms", frequency, final_volume, duty,
-           duration);
+  uint32_t duty = MAX_DUTY / 2;
+  ESP_LOGD(TAG, "Playing note at %d Hz with duration %d ms", frequency, duration);
 
   // Start the buzzer
   ledc_set_duty(LEDC_LOW_SPEED_MODE, BUZZER_CHANNEL, duty);
@@ -90,7 +83,7 @@ static void play_note(int frequency, int volume, int duration) {
 // task to play melody
 static void play_melody_task(void *pvParameters) {
   for (int i = 0; i < notes; i++) {
-    play_note(melody[i * 3], melody[i * 3 + 1], melody[i * 3 + 2]);
+    play_note(melody[i * 2], melody[i * 2 + 1]);
   }
   vTaskDelete(NULL);
 }
@@ -127,7 +120,7 @@ void init_buzzer() {
     play_melody();
   }
   else if (device_settings.startup_sound == STARTUP_SOUND_BEEP) {
-    play_note(NOTE_C5, 100, 300);
+    play_note(NOTE_C5, 300);
   }
 #endif
 }

@@ -20,7 +20,6 @@ static const char *TAG = "PUBREMOTE-LED";
 #if LED_ENABLED
   #define LEDC_CHANNEL LEDC_CHANNEL_2
   #define LEDC_TIMER LEDC_TIMER_2
-  #define LED_COUNT 1
   #define LED_STRIP_RMT_RES_HZ (10 * 1000 * 1000)
 static led_strip_handle_t led_strip;
 
@@ -47,9 +46,11 @@ static void configure_led(void) {
 }
 
 static void led_power_on() {
+  #ifdef LED_POWER_PIN
   gpio_reset_pin(LED_POWER_PIN); // Initialize the pin
   gpio_set_direction(LED_POWER_PIN, GPIO_MODE_OUTPUT);
   gpio_set_level(LED_POWER_PIN, 1); // Turn on the LED power
+  #endif
 }
 
 typedef struct {

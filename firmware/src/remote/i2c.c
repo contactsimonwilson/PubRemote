@@ -1,10 +1,11 @@
 #include "i2c.h"
 #include "config.h"
-#include "driver/i2c.h"
+#include "driver/i2c_master.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include <string.h>
 
 static const char *TAG = "PUBREMOTE-I2C";
 
@@ -12,10 +13,57 @@ static SemaphoreHandle_t i2c_mutex = NULL;
 
 #define I2C_MASTER_NUM I2C_NUM_0
 
+// Global handles for new API
+static i2c_master_bus_handle_t i2c_bus_handle = NULL;
+
+// Device handle cache - we'll create handles as needed
+typedef struct {
+  uint8_t device_addr;
+  i2c_master_dev_handle_t handle;
+} device_handle_cache_t;
+
+// Simple cache for device handles (max 8 devices)
+static device_handle_cache_t device_cache[8];
+static int device_cache_count = 0;
+
+// Helper function to get or create device handle
+static i2c_master_dev_handle_t get_device_handle(uint8_t device_addr) {
+  // Check if we already have a handle for this device
+  for (int i = 0; i < device_cache_count; i++) {
+    if (device_cache[i].device_addr == device_addr) {
+      return device_cache[i].handle;
+    }
+  }
+
+  // Create new device handle if cache not full
+  if (device_cache_count < 8) {
+    i2c_device_config_t dev_config = {
+        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+        .device_address = device_addr,
+        .scl_speed_hz = 400000,
+    };
+
+    i2c_master_dev_handle_t new_handle;
+    if (i2c_master_bus_add_device(i2c_bus_handle, &dev_config, &new_handle) == ESP_OK) {
+      device_cache[device_cache_count].device_addr = device_addr;
+      device_cache[device_cache_count].handle = new_handle;
+      device_cache_count++;
+      return new_handle;
+    }
+  }
+
+  return NULL;
+}
+
 // I2C write function with mutex protection
 esp_err_t i2c_write_with_mutex(uint8_t device_addr, uint8_t reg_addr, uint8_t *data, size_t len, int timeout_ms) {
   if (i2c_mutex == NULL) {
     ESP_LOGE(TAG, "I2C mutex not initialized");
+    return ESP_FAIL;
+  }
+
+  if (i2c_bus_handle == NULL) {
+    ESP_LOGE(TAG, "I2C bus not initialized");
     return ESP_FAIL;
   }
 
@@ -26,30 +74,32 @@ esp_err_t i2c_write_with_mutex(uint8_t device_addr, uint8_t reg_addr, uint8_t *d
   }
 
   esp_err_t ret = ESP_OK;
-  i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+  i2c_master_dev_handle_t dev_handle = get_device_handle(device_addr);
 
-  // Start condition
-  i2c_master_start(cmd);
-
-  // Write device address + write bit
-  i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_WRITE, true);
-
-  // Write register address
-  i2c_master_write_byte(cmd, reg_addr, true);
-
-  // Write data
-  if (len > 0 && data != NULL) {
-    i2c_master_write(cmd, data, len, true);
+  if (dev_handle == NULL) {
+    ESP_LOGE(TAG, "Failed to get device handle for address 0x%02X", device_addr);
+    xSemaphoreGive(i2c_mutex);
+    return ESP_FAIL;
   }
 
-  // Stop condition
-  i2c_master_stop(cmd);
+  // Prepare write buffer: register address + data
+  uint8_t *write_buf = malloc(1 + len);
+  if (write_buf == NULL) {
+    ESP_LOGE(TAG, "Failed to allocate write buffer");
+    xSemaphoreGive(i2c_mutex);
+    return ESP_ERR_NO_MEM;
+  }
 
-  // Execute the command
-  ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, pdMS_TO_TICKS(timeout_ms));
+  write_buf[0] = reg_addr;
+  if (len > 0 && data != NULL) {
+    memcpy(&write_buf[1], data, len);
+  }
+
+  // Execute the write
+  ret = i2c_master_transmit(dev_handle, write_buf, 1 + len, timeout_ms);
 
   // Clean up
-  i2c_cmd_link_delete(cmd);
+  free(write_buf);
 
   // Release mutex
   xSemaphoreGive(i2c_mutex);
@@ -68,6 +118,11 @@ esp_err_t i2c_read_with_mutex(uint8_t device_addr, uint8_t reg_addr, uint8_t *da
     return ESP_FAIL;
   }
 
+  if (i2c_bus_handle == NULL) {
+    ESP_LOGE(TAG, "I2C bus not initialized");
+    return ESP_FAIL;
+  }
+
   if (data == NULL || len == 0) {
     ESP_LOGE(TAG, "Invalid read parameters");
     return ESP_ERR_INVALID_ARG;
@@ -80,37 +135,16 @@ esp_err_t i2c_read_with_mutex(uint8_t device_addr, uint8_t reg_addr, uint8_t *da
   }
 
   esp_err_t ret = ESP_OK;
-  i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+  i2c_master_dev_handle_t dev_handle = get_device_handle(device_addr);
 
-  // Start condition
-  i2c_master_start(cmd);
-
-  // Write device address + write bit to set register address
-  i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_WRITE, true);
-
-  // Write register address
-  i2c_master_write_byte(cmd, reg_addr, true);
-
-  // Repeated start condition
-  i2c_master_start(cmd);
-
-  // Write device address + read bit
-  i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_READ, true);
-
-  // Read data
-  if (len > 1) {
-    i2c_master_read(cmd, data, len - 1, I2C_MASTER_ACK);
+  if (dev_handle == NULL) {
+    ESP_LOGE(TAG, "Failed to get device handle for address 0x%02X", device_addr);
+    xSemaphoreGive(i2c_mutex);
+    return ESP_FAIL;
   }
-  i2c_master_read_byte(cmd, &data[len - 1], I2C_MASTER_NACK);
 
-  // Stop condition
-  i2c_master_stop(cmd);
-
-  // Execute the command
-  ret = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, pdMS_TO_TICKS(timeout_ms));
-
-  // Clean up
-  i2c_cmd_link_delete(cmd);
+  // Execute the read (write register address, then read data)
+  ret = i2c_master_transmit_receive(dev_handle, &reg_addr, 1, data, len, timeout_ms);
 
   // Release mutex
   xSemaphoreGive(i2c_mutex);
@@ -154,19 +188,48 @@ bool i2c_unlock() {
 }
 
 void init_i2c() {
+#if defined(I2C_SDA) && defined(I2C_SCL)
   // Create a mutex for I2C operations
   i2c_mutex = xSemaphoreCreateMutex();
 
-  /* Initilize I2C */
-  const i2c_config_t i2c_conf = {.mode = I2C_MODE_MASTER,
-                                 .sda_io_num = I2C_SDA,
-                                 .sda_pullup_en = GPIO_PULLUP_DISABLE,
-                                 .scl_io_num = I2C_SCL,
-                                 .scl_pullup_en = GPIO_PULLUP_DISABLE,
-                                 .master.clk_speed = 400000};
+  // Initialize I2C master bus
+  i2c_master_bus_config_t i2c_bus_config = {
+      .clk_source = I2C_CLK_SRC_DEFAULT,
+      .i2c_port = I2C_MASTER_NUM,
+      .scl_io_num = I2C_SCL,
+      .sda_io_num = I2C_SDA,
+      .glitch_ignore_cnt = 7,
+      .flags.enable_internal_pullup = false, // External pullups as you mentioned
+  };
 
   ESP_LOGI(TAG, "Initializing I2C for display touch");
-  /* Initialize I2C */
-  ESP_ERROR_CHECK(i2c_param_config(I2C_MASTER_NUM, &i2c_conf));
-  ESP_ERROR_CHECK(i2c_driver_install(I2C_MASTER_NUM, i2c_conf.mode, 0, 0, 0));
+  ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_bus_config, &i2c_bus_handle));
+
+  // Initialize device cache
+  device_cache_count = 0;
+  memset(device_cache, 0, sizeof(device_cache));
+#endif
+}
+
+// Optional: Cleanup function for proper resource management
+void deinit_i2c() {
+  // Remove all cached devices
+  for (int i = 0; i < device_cache_count; i++) {
+    if (device_cache[i].handle != NULL) {
+      i2c_master_bus_rm_device(device_cache[i].handle);
+    }
+  }
+  device_cache_count = 0;
+
+  // Delete the bus
+  if (i2c_bus_handle != NULL) {
+    i2c_del_master_bus(i2c_bus_handle);
+    i2c_bus_handle = NULL;
+  }
+
+  // Delete mutex
+  if (i2c_mutex != NULL) {
+    vSemaphoreDelete(i2c_mutex);
+    i2c_mutex = NULL;
+  }
 }

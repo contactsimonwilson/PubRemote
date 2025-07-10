@@ -12,6 +12,11 @@
   #define FORCE_LIGHT_SLEEP 0
 #endif
 
+// i2c configuration
+#if !defined(I2C_SDA) || !defined(I2C_SCL)
+  #error "I2C_SDA and I2C_SCL must be defined for I2C communication. Please define them in your build flags."
+#endif
+
 // Joystick configuration
 #if JOYSTICK_BUTTON_PIN < 0
   #define JOYSTICK_BUTTON_ENABLED 0
@@ -44,42 +49,15 @@
   #define TOUCH_ENABLED 0
 #endif
 
-// i2c configuration
-#if !defined(PMU_SDA) && !defined(TP_SDA)
-  #define I2C_SDA -1
-#elif defined(PMU_SDA)
-  #define I2C_SDA PMU_SDA
-#elif defined(TP_SDA)
-  #define I2C_SDA TP_SDA
-#endif
-
-#if !defined(PMU_SCL) && !defined(TP_SCL)
-  #define I2C_SCL -1
-#elif defined(PMU_SCL)
-  #define I2C_SCL PMU_SCL
-#elif defined(TP_SCL)
-  #define I2C_SCL TP_SCL
-#endif
-
-#if defined(TP_SDA) && defined(TP_SCL) && defined(PMU_SDA) && defined(PMU_SCL) &&                                      \
-    (TP_SDA != PMU_SDA || TP_SCL != PMU_SCL)
-  #error                                                                                                               \
-      "All I2C devices must share the same SDA and SCL pins. Please define either PMU_SDA/PMU_SCL or TP_SDA/TP_SCL, but not both."
-#endif
-
 // Led configuration
-#ifndef LED_POWER_PIN
-  #define LED_POWER_PIN -1
-#endif
-
-#ifndef LED_DATA_PIN
-  #define LED_DATA_PIN -1
-#endif
-
-#if defined(LED_POWER_PIN) && defined(LED_DATA_PIN)
-  #define LED_ENABLED 0
-#else
+#if defined(LED_DATA_PIN)
   #define LED_ENABLED 1
+#else
+  #define LED_ENABLED 0
+#endif
+
+#if LED_ENABLED && !defined(LED_COUNT)
+  #define LED_COUNT 1 // Default to 1 LED if not defined
 #endif
 
 // Buzzer configuration
