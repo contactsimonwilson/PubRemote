@@ -17,6 +17,8 @@
   #error "I2C_SDA and I2C_SCL must be defined for I2C communication. Please define them in your build flags."
 #endif
 
+#define I2C_SCL_FREQ_HZ 100000
+
 // Joystick configuration
 #ifdef JOYSTICK_BUTTON_PIN
   #define JOYSTICK_BUTTON_ENABLED 1

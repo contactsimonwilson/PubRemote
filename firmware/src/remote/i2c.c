@@ -40,7 +40,7 @@ static i2c_master_dev_handle_t get_device_handle(uint8_t device_addr) {
     i2c_device_config_t dev_config = {
         .dev_addr_length = I2C_ADDR_BIT_LEN_7,
         .device_address = device_addr,
-        .scl_speed_hz = 400000,
+        .scl_speed_hz = I2C_SCL_FREQ_HZ,
     };
 
     i2c_master_dev_handle_t new_handle;
@@ -53,6 +53,14 @@ static i2c_master_dev_handle_t get_device_handle(uint8_t device_addr) {
   }
 
   return NULL;
+}
+
+i2c_master_bus_handle_t get_i2c_bus_handle() {
+  if (i2c_bus_handle == NULL) {
+    ESP_LOGE(TAG, "I2C bus handle is not initialized");
+    return NULL;
+  }
+  return i2c_bus_handle;
 }
 
 // I2C write function with mutex protection
