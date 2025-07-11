@@ -67,6 +67,8 @@
       "All I2C devices must share the same SDA and SCL pins. Please define either PMU_SDA/PMU_SCL or TP_SDA/TP_SCL, but not both."
 #endif
 
+#define I2C_SCL_FREQ_HZ 100000
+
 // Led configuration
 
 #if defined(LED_DATA_PIN)

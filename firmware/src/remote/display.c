@@ -49,7 +49,6 @@
 static const char *TAG = "PUBREMOTE-DISPLAY";
 
 #define LCD_HOST SPI2_HOST
-#define TP_I2C_NUM I2C_NUM_0
 
 // Bit number used to represent command and parameter
 #define LCD_CMD_BITS 8
@@ -295,8 +294,10 @@ static esp_err_t app_touch_init(void) {
   #elif TP_FT3168
   esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_FT3168_CONFIG();
   #endif
+
+  tp_io_config.scl_speed_hz = I2C_SCL_FREQ_HZ;
   // Attach the TOUCH to the I2C bus
-  ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)TP_I2C_NUM, &tp_io_config, &tp_io_handle));
+  ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c_v2(get_i2c_bus_handle(), &tp_io_config, &tp_io_handle));
 
   const esp_lcd_touch_config_t tp_cfg = {
       .x_max = LV_HOR_RES,
