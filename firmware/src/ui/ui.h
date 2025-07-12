@@ -25,8 +25,7 @@ extern "C" {
 #include "ui_PairingScreen.h"
 #include "ui_CalibrationScreen.h"
 #include "ui_AboutScreen.h"
-#include "ui_BMSScreen.h"
-#include "ui_ChargingScreen.h"
+#include "ui_ChargeScreen.h"
 
 ///////////////////// VARIABLES ////////////////////
 

@@ -16,8 +16,15 @@ typedef struct {
   uint16_t current;              // Charging current in mA
 } RemotePowerState;
 
-// Generic interface for display commands
+typedef struct {
+  uint16_t voltage_mv; // Voltage in millivolts
+  float percentage;
+} VoltagePoint;
+
+// Generic interface for charge driver
+char *charge_state_to_string(RemoteChargeState state);
 esp_err_t charge_driver_init();
 RemotePowerState get_power_state();
+float battery_mv_to_percent(uint16_t voltage_mv);
 
 #endif

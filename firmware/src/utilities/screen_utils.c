@@ -1,6 +1,7 @@
 #include "screen_utils.h"
 #include "config.h"
 #include "lvgl.h"
+#include "number_utils.h"
 #include "remote/display.h"
 #include <ui/ui.h>
 
@@ -294,4 +295,48 @@ lv_group_t *create_navigation_group(lv_obj_t *container) {
   }
 
   return navigation_group;
+}
+
+void add_page_scroll_indicators(lv_obj_t *header_item, lv_obj_t *body_item) {
+  // How many scroll icons already exist
+  uint32_t total_scroll_icons = lv_obj_get_child_cnt(header_item);
+  uint32_t total_settings = lv_obj_get_child_cnt(body_item);
+
+  for (uint32_t i = 0; i < total_settings; i++) {
+    uint8_t bg_opacity = i == 0 ? 255 : 100;
+
+    // Either get existing settings header icons or create them if needed
+    lv_obj_t *item = total_scroll_icons == 0 ? lv_obj_create(header_item) : lv_obj_get_child(header_item, i);
+
+    lv_obj_remove_style_all(item);
+    lv_obj_set_width(item, 10 * SCALE_FACTOR);
+    lv_obj_set_height(item, 10 * SCALE_FACTOR);
+    lv_obj_set_align(item, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(item, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
+    lv_obj_set_style_radius(item, 5 * SCALE_FACTOR, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(item, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(item, bg_opacity, LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+}
+
+void paged_scroll_event_cb(lv_event_t *e) {
+  lv_obj_t *cont = lv_event_get_target(e);
+  uint8_t total_items = lv_obj_get_child_cnt(cont);
+  lv_obj_t *indicator_target = (lv_obj_t *)lv_event_get_user_data(e); // Get the passed header object
+
+  lv_coord_t visible_width = lv_obj_get_width(cont);
+  lv_coord_t scroll_x = lv_obj_get_scroll_x(cont);
+  uint8_t page_index = (scroll_x + (visible_width / 2)) / visible_width;
+
+  // Ensure we don't exceed total items
+  uint8_t current_page = clampu8(page_index, 0, total_items - 1);
+
+  if (LVGL_lock(-1)) {
+    for (uint8_t i = 0; i < total_items; i++) {
+      // get scroll indicator
+      lv_obj_t *indicator = lv_obj_get_child(indicator_target, i);
+      lv_obj_set_style_bg_opa(indicator, i == current_page ? 255 : 100, LV_PART_MAIN);
+    }
+    LVGL_unlock();
+  }
 }

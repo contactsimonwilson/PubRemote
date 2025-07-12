@@ -2,6 +2,7 @@
 #ifndef __STATS_H
 #define __STATS_H
 #include "receiver.h"
+#include <charge/charge_driver.h>
 #include <stdio.h>
 
 typedef enum {
@@ -42,6 +43,8 @@ typedef struct {
   uint16_t remoteBatteryVoltage;
   // 0 to 100
   uint8_t remoteBatteryPercentage;
+  RemoteChargeState chargeState; // Current charge state
+  uint16_t chargeCurrent;        // Charge current in mA
   // Board trip distance
   float tripDistance;
   // Board motor temperature
