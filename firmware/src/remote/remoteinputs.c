@@ -171,15 +171,17 @@ void init_thumbstick() {
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
   reset_sleep_timer();
-  remote_data.data.bt_c = 1;
-
-  // Start a timer to reset the button state after a certain duration
-  esp_timer_handle_t reset_timer;
-  esp_timer_create_args_t timer_args = {.callback = reset_button_state, .name = "reset_button_timer"};
-  ESP_ERROR_CHECK(esp_timer_create(&timer_args, &reset_timer));
-  ESP_ERROR_CHECK(esp_timer_start_once(reset_timer, 1000000)); // 1000ms delay
 }
 
+static void button_down_cb(void *arg, void *usr_data) {
+  ESP_LOGI(TAG, "BUTTON DOWN");
+  remote_data.data.bt_c = 1;
+}
+
+static void button_up_cb(void *arg, void *usr_data) {
+  ESP_LOGI(TAG, "BUTTON UP");
+  remote_data.data.bt_c = 0;
+}
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
   reset_sleep_timer();
@@ -220,6 +222,8 @@ void init_buttons() {
     ESP_LOGE(TAG, "Button create failed");
   }
 
+  iot_button_register_cb(gpio_btn_handle, BUTTON_PRESS_DOWN, button_down_cb, NULL);
+  iot_button_register_cb(gpio_btn_handle, BUTTON_PRESS_UP, button_up_cb, NULL);
   iot_button_register_cb(gpio_btn_handle, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
   iot_button_register_cb(gpio_btn_handle, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
 #endif
