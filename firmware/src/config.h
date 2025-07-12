@@ -12,6 +12,9 @@
   #define FORCE_LIGHT_SLEEP 0
 #endif
 
+#define MIN_BATTERY_VOLTAGE 3300
+#define MAX_BATTERY_VOLTAGE 4200
+
 // Joystick configuration
 #if JOYSTICK_BUTTON_PIN < 0
   #define JOYSTICK_BUTTON_ENABLED 0

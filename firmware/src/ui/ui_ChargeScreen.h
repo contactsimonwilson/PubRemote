@@ -3,17 +3,18 @@
 // LVGL version: 8.3.11
 // Project name: PubRemote
 
-#ifndef UI_CHARGINGSCREEN_H
-#define UI_CHARGINGSCREEN_H
+#ifndef UI_CHARGESCREEN_H
+#define UI_CHARGESCREEN_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// SCREEN: ui_ChargingScreen
-extern void ui_ChargingScreen_screen_init(void);
-extern void ui_ChargingScreen_screen_destroy(void);
-extern lv_obj_t * ui_ChargingScreen;
+// SCREEN: ui_ChargeScreen
+extern void ui_ChargeScreen_screen_init(void);
+extern void ui_ChargeScreen_screen_destroy(void);
+extern void ui_event_ChargeScreen(lv_event_t * e);
+extern lv_obj_t * ui_ChargeScreen;
 extern lv_obj_t * ui_ChargeLevelDial;
 extern lv_obj_t * ui_ChargeInfoContainer;
 extern lv_obj_t * ui_ChargeInfoPrimaryLabel;

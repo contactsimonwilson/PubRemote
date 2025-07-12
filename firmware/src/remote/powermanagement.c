@@ -216,14 +216,13 @@ void reset_sleep_timer() {
 void power_management_task(void *pvParameters) {
   ESP_ERROR_CHECK(charge_driver_init());
   vTaskDelay(pdMS_TO_TICKS(1000));
-#define MIN_BATTERY_VOLTAGE 3000
-#define MAX_BATTERY_VOLTAGE 4200
 
   while (1) {
-    remoteStats.remoteBatteryVoltage = get_power_state().voltage;
-    float battery_percentage = fmaxf(0, (float)(remoteStats.remoteBatteryVoltage - MIN_BATTERY_VOLTAGE)) /
-                               (float)(MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE);
-    remoteStats.remoteBatteryPercentage = clampu8((uint8_t)(battery_percentage * 100), 0, 100);
+    RemotePowerState powerState = get_power_state();
+    remoteStats.remoteBatteryVoltage = powerState.voltage;
+    remoteStats.remoteBatteryPercentage = (uint8_t)(battery_mv_to_percent(remoteStats.remoteBatteryVoltage));
+    remoteStats.chargeState = powerState.chargeState;
+    remoteStats.chargeCurrent = powerState.current;
     ESP_LOGD(TAG, "Battery volts: %u %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
