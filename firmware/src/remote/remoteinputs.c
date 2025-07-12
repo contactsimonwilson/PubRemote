@@ -101,12 +101,16 @@ static void thumbstick_task(void *pvParameters) {
   while (1) {
     bool trigger_sleep_disrupt = false;
     int16_t deadband = calibration_settings.deadband;
-    int16_t x_center = calibration_settings.x_center;
+#if JOYSTICK_Y_ENABLED
     int16_t y_center = calibration_settings.y_center;
     int16_t y_max = calibration_settings.y_max;
-    int16_t x_max = calibration_settings.x_max;
     int16_t y_min = calibration_settings.y_min;
+#endif
+#if JOYSTICK_X_ENABLED
+    int16_t x_center = calibration_settings.x_center;
     int16_t x_min = calibration_settings.x_min;
+    int16_t y_min = calibration_settings.y_min;
+#endif
     float expo = calibration_settings.expo;
     bool invert_y = calibration_settings.invert_y;
     esp_err_t read_err;

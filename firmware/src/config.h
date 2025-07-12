@@ -15,65 +15,44 @@
 #define MIN_BATTERY_VOLTAGE 3300
 #define MAX_BATTERY_VOLTAGE 4200
 
+// i2c configuration
+#if (!defined(I2C_SDA) || !defined(I2C_SCL))
+  #error "I2C_SDA and I2C_SCL must be defined for I2C communication. Please define them in your build flags."
+#endif
+
+#define I2C_SCL_FREQ_HZ 100000
+
 // Joystick configuration
-#if JOYSTICK_BUTTON_PIN < 0
-  #define JOYSTICK_BUTTON_ENABLED 0
-#else
+#ifdef JOYSTICK_BUTTON_PIN
   #define JOYSTICK_BUTTON_ENABLED 1
+#else
+  #define JOYSTICK_BUTTON_ENABLED 0
 #endif
 
-#if !defined(JOYSTICK_X_ADC) || !defined(JOYSTICK_X_ADC_UNIT)
-  #define JOYSTICK_X_ENABLED 0
-#else
+#if defined(JOYSTICK_X_ADC) && defined(JOYSTICK_X_ADC_UNIT)
   #define JOYSTICK_X_ENABLED 1
+#else
+  #define JOYSTICK_X_ENABLED 0
 #endif
 
-#if !defined(JOYSTICK_Y_ADC) || !defined(JOYSTICK_Y_ADC_UNIT)
-  #define JOYSTICK_Y_ENABLED 0
-#else
+#if defined(JOYSTICK_Y_ADC) && defined(JOYSTICK_Y_ADC_UNIT)
   #define JOYSTICK_Y_ENABLED 1
+#else
+  #define JOYSTICK_Y_ENABLED 0
 #endif
 
 #define JOYSTICK_ENABLED (JOYSTICK_X_ENABLED || JOYSTICK_Y_ENABLED)
 
 // Display configuration
 #if TP_CST816S
-  #include "esp_lcd_touch_cst816s.h"
   #define TOUCH_ENABLED 1
 #elif TP_FT3168
-  #include "esp_lcd_touch_ft3168.h"
   #define TOUCH_ENABLED 1
 #else
   #define TOUCH_ENABLED 0
 #endif
 
-// i2c configuration
-#if !defined(PMU_SDA) && !defined(TP_SDA)
-// No I2C devices defined
-#elif defined(PMU_SDA)
-  #define I2C_SDA PMU_SDA
-#elif defined(TP_SDA)
-  #define I2C_SDA TP_SDA
-#endif
-
-#if !defined(PMU_SCL) && !defined(TP_SCL)
-// No I2C devices defined
-#elif defined(PMU_SCL)
-  #define I2C_SCL PMU_SCL
-#elif defined(TP_SCL)
-  #define I2C_SCL TP_SCL
-#endif
-
-#if defined(TP_SDA) && defined(TP_SCL) && defined(PMU_SDA) && defined(PMU_SCL) &&                                      \
-    (TP_SDA != PMU_SDA || TP_SCL != PMU_SCL)
-  #error                                                                                                               \
-      "All I2C devices must share the same SDA and SCL pins. Please define either PMU_SDA/PMU_SCL or TP_SDA/TP_SCL, but not both."
-#endif
-
-#define I2C_SCL_FREQ_HZ 100000
-
 // Led configuration
-
 #if defined(LED_DATA_PIN)
   #define LED_ENABLED 1
 #else
@@ -85,7 +64,7 @@
 #endif
 
 // Buzzer configuration
-#if defined(BUZZER_PIN)
+#if defined(BUZZER_PWM)
   #define BUZZER_ENABLED 1
 #else
   #define BUZZER_ENABLED 0
@@ -96,5 +75,10 @@
 #endif
 
 // Haptic configuration
+#if defined(HAPTIC_DRV2605) || defined(HAPTIC_PWM)
+  #define HAPTIC_ENABLED 1
+#else
+  #define HAPTIC_ENABLED 0
+#endif
 
 #endif
