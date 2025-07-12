@@ -214,3 +214,15 @@ def screen_rotation_change(event_struct):
 def menu_pocket_mode_press(event_struct):
     return
 
+
+def charge_screen_load_start(event_struct):
+    return
+
+
+def charge_screen_loaded(event_struct):
+    return
+
+
+def charge_screen_unloaded(event_struct):
+    return
+

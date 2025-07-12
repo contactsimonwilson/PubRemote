@@ -1,5 +1,4 @@
 #include "esp_log.h"
-#include "utilities/number_utils.h"
 #include "utilities/screen_utils.h"
 #include "utilities/theme_utils.h"
 #include <remote/display.h>
@@ -13,27 +12,6 @@ bool is_settings_screen_active() {
   return active_screen == ui_SettingsScreen;
 }
 
-static void scroll_event_cb(lv_event_t *e) {
-  lv_obj_t *cont = lv_event_get_target(e);
-  uint8_t total_items = lv_obj_get_child_cnt(cont);
-
-  lv_coord_t visible_width = lv_obj_get_width(cont);
-  lv_coord_t scroll_x = lv_obj_get_scroll_x(cont);
-  uint8_t page_index = (scroll_x + (visible_width / 2)) / visible_width;
-
-  // Ensure we don't exceed total items
-  uint8_t current_page = clampu8(page_index, 0, total_items - 1);
-
-  if (LVGL_lock(-1)) {
-    for (uint8_t i = 0; i < total_items; i++) {
-      // get scroll indicator
-      lv_obj_t *indicator = lv_obj_get_child(ui_SettingsHeader, i);
-      lv_obj_set_style_bg_opa(indicator, i == current_page ? 255 : 100, LV_PART_MAIN);
-    }
-    LVGL_unlock();
-  }
-}
-
 // Event handlers
 void settings_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen load start");
@@ -42,7 +20,6 @@ void settings_screen_load_start(lv_event_t *e) {
 
     // Set the scroll snap
     lv_obj_set_scroll_snap_x(ui_SettingsBody, LV_SCROLL_SNAP_CENTER);
-    lv_obj_add_event_cb(ui_SettingsBody, scroll_event_cb, LV_EVENT_SCROLL, NULL);
     // lv_obj_scroll_to_x(ui_SettingsBody, 0, LV_ANIM_OFF);
 
     // Brightness
@@ -71,26 +48,9 @@ void settings_screen_load_start(lv_event_t *e) {
       lv_obj_add_state(ui_DarkText, LV_STATE_CHECKED);
     }
 
-    // How many scroll icons already exist
-    uint32_t total_scroll_icons = lv_obj_get_child_cnt(ui_SettingsHeader);
-    uint32_t total_settings = lv_obj_get_child_cnt(ui_SettingsBody);
+    lv_obj_add_event_cb(ui_SettingsBody, paged_scroll_event_cb, LV_EVENT_SCROLL, ui_SettingsHeader);
+    add_page_scroll_indicators(ui_SettingsHeader, ui_SettingsBody);
 
-    for (uint32_t i = 0; i < total_settings; i++) {
-      uint8_t bg_opacity = i == 0 ? 255 : 100;
-
-      // Either get existing settings header icons or create them if needed
-      lv_obj_t *item =
-          total_scroll_icons == 0 ? lv_obj_create(ui_SettingsHeader) : lv_obj_get_child(ui_SettingsHeader, i);
-
-      lv_obj_remove_style_all(item);
-      lv_obj_set_width(item, 10 * SCALE_FACTOR);
-      lv_obj_set_height(item, 10 * SCALE_FACTOR);
-      lv_obj_set_align(item, LV_ALIGN_CENTER);
-      lv_obj_clear_flag(item, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
-      lv_obj_set_style_radius(item, 5 * SCALE_FACTOR, LV_PART_MAIN | LV_STATE_DEFAULT);
-      lv_obj_set_style_bg_color(item, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-      lv_obj_set_style_bg_opa(item, bg_opacity, LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
     create_navigation_group(ui_SettingsFooter);
 
     LVGL_unlock();
@@ -103,7 +63,7 @@ void settings_screen_loaded(lv_event_t *e) {
 
 void settings_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen unloaded");
-  lv_obj_remove_event_cb(ui_SettingsBody, scroll_event_cb);
+  lv_obj_remove_event_cb(ui_SettingsBody, paged_scroll_event_cb);
 }
 
 void brightness_slider_change(lv_event_t *e) {
