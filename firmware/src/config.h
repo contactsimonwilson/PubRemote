@@ -12,6 +12,9 @@
   #define FORCE_LIGHT_SLEEP 0
 #endif
 
+#define MIN_BATTERY_VOLTAGE 3300
+#define MAX_BATTERY_VOLTAGE 4200
+
 // i2c configuration
 #if (!defined(I2C_SDA) || !defined(I2C_SCL))
   #error "I2C_SDA and I2C_SCL must be defined for I2C communication. Please define them in your build flags."

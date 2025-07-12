@@ -126,31 +126,26 @@ void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area
 static void encoder_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
   static int32_t last_encoder_value = 0;
   static uint32_t last_time = 0;
-
   uint32_t current_time = lv_tick_get();
-
   int16_t enc_diff = 0;
+  data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
   if (remote_data.data.js_y > 0.5) {
-    // If joystick Y is pushed up, increase the encoder value
     enc_diff = -1;
   }
   else if (remote_data.data.js_y < -0.5) {
-    // If joystick Y is pushed down, decrease the encoder value
     enc_diff = 1;
   }
 
+  // Apply throttling ONLY to encoder movement
   if (last_encoder_value == enc_diff || (current_time - last_time) < 100) {
-    // If the encoder value hasn't changed or the time since last update is too short, return
     data->enc_diff = 0;
-    data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
     return;
   }
 
   data->enc_diff = enc_diff;
-  data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
   // Update tracking variables
-  last_encoder_value = enc_diff; // Keep running total if needed
+  last_encoder_value = enc_diff;
   last_time = current_time;
 }
 
@@ -440,6 +435,7 @@ static esp_err_t app_lvgl_init(void) {
   lv_indev_drv_init(&indev_drv_encoder);
   indev_drv_encoder.type = LV_INDEV_TYPE_ENCODER;
   indev_drv_encoder.read_cb = encoder_read_cb;
+  // lv_timer_set_period(indev_timer, 10); // 10ms instead of default 30ms
 
   // Register the encoder
   lvgl_encoder_indev = lv_indev_drv_register(&indev_drv_encoder);

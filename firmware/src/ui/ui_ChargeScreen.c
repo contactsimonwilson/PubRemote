@@ -5,24 +5,38 @@
 
 #include "ui.h"
 
-lv_obj_t * ui_ChargingScreen = NULL;
+lv_obj_t * ui_ChargeScreen = NULL;
 lv_obj_t * ui_ChargeLevelDial = NULL;
 lv_obj_t * ui_ChargeInfoContainer = NULL;
 lv_obj_t * ui_ChargeInfoPrimaryLabel = NULL;
 lv_obj_t * ui_ChargeInfoLevelLabel = NULL;
 // event funtions
+void ui_event_ChargeScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        charge_screen_load_start(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        charge_screen_loaded(e);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOADED) {
+        charge_screen_unloaded(e);
+    }
+}
 
 // build funtions
 
-void ui_ChargingScreen_screen_init(void)
+void ui_ChargeScreen_screen_init(void)
 {
-    ui_ChargingScreen = lv_obj_create(NULL);
-    lv_obj_clear_flag(ui_ChargingScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_add_event_cb(ui_ChargingScreen, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_ChargingScreen);
-    lv_obj_set_style_bg_color(ui_ChargingScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_ChargingScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_ChargeScreen = lv_obj_create(NULL);
+    lv_obj_clear_flag(ui_ChargeScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_event_cb(ui_ChargeScreen, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_ChargeScreen);
+    lv_obj_set_style_bg_color(ui_ChargeScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ChargeScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_ChargeLevelDial = lv_arc_create(ui_ChargingScreen);
+    ui_ChargeLevelDial = lv_arc_create(ui_ChargeScreen);
     lv_obj_set_width(ui_ChargeLevelDial, lv_pct(100));
     lv_obj_set_height(ui_ChargeLevelDial, lv_pct(100));
     lv_obj_set_align(ui_ChargeLevelDial, LV_ALIGN_CENTER);
@@ -35,7 +49,7 @@ void ui_ChargingScreen_screen_init(void)
     lv_obj_set_style_bg_color(ui_ChargeLevelDial, lv_color_hex(0xFFFFFF), LV_PART_KNOB | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ChargeLevelDial, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
 
-    ui_ChargeInfoContainer = lv_obj_create(ui_ChargingScreen);
+    ui_ChargeInfoContainer = lv_obj_create(ui_ChargeScreen);
     lv_obj_remove_style_all(ui_ChargeInfoContainer);
     lv_obj_set_width(ui_ChargeInfoContainer, LV_SIZE_CONTENT);   /// 100
     lv_obj_set_height(ui_ChargeInfoContainer, LV_SIZE_CONTENT);    /// 50
@@ -58,14 +72,16 @@ void ui_ChargingScreen_screen_init(void)
     lv_obj_set_align(ui_ChargeInfoLevelLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_ChargeInfoLevelLabel, "0%");
 
+    lv_obj_add_event_cb(ui_ChargeScreen, ui_event_ChargeScreen, LV_EVENT_ALL, NULL);
+
 }
 
-void ui_ChargingScreen_screen_destroy(void)
+void ui_ChargeScreen_screen_destroy(void)
 {
-    if(ui_ChargingScreen) lv_obj_del(ui_ChargingScreen);
+    if(ui_ChargeScreen) lv_obj_del(ui_ChargeScreen);
 
     // NULL screen variables
-    ui_ChargingScreen = NULL;
+    ui_ChargeScreen = NULL;
     ui_ChargeLevelDial = NULL;
     ui_ChargeInfoContainer = NULL;
     ui_ChargeInfoPrimaryLabel = NULL;
