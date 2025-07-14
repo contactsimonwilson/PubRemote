@@ -37,11 +37,11 @@ void app_main(void) {
   init_settings();
   init_adcs();
   init_buttons(); // Required before power management for boot button detection
+  init_led();
+  init_buzzer();
   init_power_management();
 
   // Peripherals
-  init_led();
-  init_buzzer();
   init_haptic();
   init_thumbstick();
   init_display();
@@ -52,4 +52,6 @@ void app_main(void) {
   init_receiver();
   init_transmitter();
   init_console();
+
+  play_startup_sound();
 }

@@ -8,6 +8,7 @@
 #include "led_strip.h"
 #include "nvs_flash.h"
 #include "settings.h"
+#include "tones.h"
 #include <driver/ledc.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
@@ -23,16 +24,6 @@ static const char *TAG = "PUBREMOTE-BUZZER";
   #define BUZZER_MAX_DUTY ((1 << 10) - 1)
 #endif
 
-// Define notes (frequencies in Hz)
-#define NOTE_C4 261
-#define NOTE_D4 294
-#define NOTE_E4 329
-#define NOTE_F4 349
-#define NOTE_G4 392
-#define NOTE_A4 440
-#define NOTE_B4 493
-#define NOTE_C5 523
-
 #if BUZZER_ENABLED
 // mutex for buzzer
 static SemaphoreHandle_t buzzer_mutex;
@@ -44,7 +35,7 @@ static const int melody[] = {NOTE_C4, 100, NOTE_D4, 100, NOTE_E4, 100, NOTE_F4, 
 static const int notes = sizeof(melody) / sizeof(melody[0]) / 2; // Number of notes
 #endif
 
-static void play_note(int frequency, int duration) {
+void play_note(int frequency, int duration) {
 #if BUZZER_ENABLED
   // Take the mutex
   xSemaphoreTake(buzzer_mutex, portMAX_DELAY);
@@ -115,7 +106,12 @@ void init_buzzer() {
       .hpoint = 0,
   };
   ledc_channel_config(&channel_conf);
+#endif
+}
 
+void play_startup_sound() {
+#if BUZZER_ENABLED
+  ESP_LOGI(TAG, "Playing startup sound");
   if (device_settings.startup_sound == STARTUP_SOUND_MELODY) {
     play_melody();
   }
