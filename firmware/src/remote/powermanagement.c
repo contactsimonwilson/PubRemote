@@ -30,7 +30,13 @@
 
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
-RTC_DATA_ATTR bool was_power_connected = false; // Store power state across deep sleep
+#define INT_SETTLE_TIME_MS 200
+
+#ifdef PMU_INT
+  #define PMU_INT_NOTE_DURATION 100
+#endif
+
+RTC_DATA_ATTR bool is_power_connected = false; // Store power state across deep sleep
 static bool has_pull_resistor = true;
 
 static QueueHandle_t pmu_evt_queue = NULL;
@@ -41,8 +47,22 @@ static void IRAM_ATTR pmu_isr_handler(void *arg) {
   xQueueSendFromISR(pmu_evt_queue, &gpio_num, NULL);
 }
 
+static void power_state_update() {
+  RemotePowerState powerState = get_power_state();
+  remoteStats.remoteBatteryVoltage = powerState.voltage;
+  remoteStats.remoteBatteryPercentage = (uint8_t)(battery_mv_to_percent(remoteStats.remoteBatteryVoltage));
+  remoteStats.chargeState = powerState.chargeState;
+  remoteStats.chargeCurrent = powerState.current;
+  ESP_LOGD(TAG, "Battery volts: %u %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
+  is_power_connected = powerState.isPowered;
+}
+
 static bool get_use_light_sleep() {
   return FORCE_LIGHT_SLEEP || !has_pull_resistor || !gpio_supports_wakeup_from_deep_sleep(JOYSTICK_BUTTON_PIN);
+}
+
+static bool uses_deep_sleep() {
+  return esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep();
 }
 
 static bool get_button_pressed() {
@@ -67,15 +87,19 @@ static esp_err_t enable_wake() {
   if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
     uint64_t io_mask = BIT64(JOYSTICK_BUTTON_PIN);
 
-#ifdef PMU_INT
-    io_mask |= BIT64(PMU_INT);
-#endif
-
     res = esp_sleep_enable_ext1_wakeup(io_mask,
                                        JOYSTICK_BUTTON_LEVEL ? ESP_EXT1_WAKEUP_ANY_HIGH : ESP_EXT1_WAKEUP_ANY_LOW);
     if (res != ESP_OK) {
       ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
     }
+
+    // Use PMU as secondary wake source if available
+#ifdef PMU_INT
+    res = esp_sleep_enable_ext0_wakeup(PMU_INT, 0);
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to enable PMU interrupt wake-up.");
+    }
+#endif
   }
   else {
     ESP_LOGI(TAG, "Button pin is not available for wake. Using light sleep instead.");
@@ -135,11 +159,26 @@ static void power_button_initial_release(void *arg, void *usr_data) {
   bind_power_button();
 }
 
+#ifdef PMU_INT
+static void await_pmu_int_reset() {
+  // Wait for PMU_INT to go high
+  int timeout = INT_SETTLE_TIME_MS;
+  while (gpio_get_level(PMU_INT) == 0 && timeout > 0) {
+    vTaskDelay(pdMS_TO_TICKS(10));
+    timeout -= 10;
+    ESP_LOGD(TAG, "Waiting for PMU_INT to go high...");
+  }
+
+  if (timeout <= 0) {
+    ESP_LOGE(TAG, "PMU_INT did not go high within the expected time.");
+  }
+}
+#endif
+
 void enter_sleep() {
   // Disable some things so they don't run during wake check
   update_connection_state(CONNECTION_STATE_DISCONNECTED);
   unbind_power_button();
-  was_power_connected = get_power_state().isPowered;
 
 #if PMU_SY6970
   disable_watchdog();
@@ -148,11 +187,16 @@ void enter_sleep() {
   // Turn off screen before sleep
   set_bl_level(0);
   set_led_brightness(0);
-  vTaskDelay(50); // Allow gpio level to settle before going into sleep
   enable_wake();
+  vTaskDelay(50); // Allow gpio level to settle before going into sleep
+
+#ifdef PMU_INT
+  await_pmu_int_reset();
+  power_state_update();
+#endif
 
   while (1) {
-    if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
+    if (uses_deep_sleep()) {
       ESP_LOGI(TAG, "Entering deep sleep mode");
       esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
       esp_deep_sleep_start(); // No code executes after esp_deep_sleep_start()
@@ -258,12 +302,12 @@ void power_management_task(void *pvParameters) {
     while (xQueueReceive(pmu_evt_queue, &io_num, 0) == pdTRUE) {
       if (io_num == PMU_INT) {
         ESP_LOGI(TAG, "PMU interrupt received on GPIO %lu", io_num);
-        bool last_power_connected = was_power_connected;
+        bool last_power_connected = is_power_connected;
         power_state_update();
         last_time = esp_timer_get_time(); // Update last time in milliseconds
 
-        if (was_power_connected != last_power_connected) {
-          play_note(was_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
+        if (is_power_connected != last_power_connected) {
+          play_note(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
         }
       }
     }
@@ -284,26 +328,56 @@ void power_management_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
+#ifdef PMU_INT
+static bool check_pmu_should_wake(bool last_powered) {
+  await_pmu_int_reset();
+  power_state_update();
+  if (is_power_connected && !last_powered) {
+    play_note(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
+    // Power was connected after last sleep - continue to normal operation
+  }
+  else {
+    if (!is_power_connected && last_powered) {
+      play_note(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+    }
+    enter_sleep();
+    return false;
+  }
+  return true;
+}
+#endif
+
 void init_power_management() {
+  bool power_was_connected = is_power_connected;
   ESP_ERROR_CHECK(charge_driver_init());
   init_sleep_timer();
   vTaskDelay(pdMS_TO_TICKS(50)); // Allow time for peripherals to initialize
   esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
   uint64_t wakeup_pin_mask = esp_sleep_get_ext1_wakeup_status();
-  RemotePowerState powerState = get_power_state();
-  bool is_fault = powerState.isFault;
-  bool is_powered_connected = powerState.isPowered;
-  was_power_connected = is_powered_connected;
+  power_state_update();
 
   ESP_LOGI(TAG, "Wake-up reason: %d", wakeup_reason);
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0:
     ESP_LOGI(TAG, "Woken up by external signal on EXT0.");
     // Proceed to check if the button is still pressed
-    if (!check_button_press()) {
-      enter_sleep();
-      return;
+    if (!uses_deep_sleep()) {
+      if (!check_button_press()) {
+        enter_sleep();
+        return;
+      }
     }
+    else {
+#ifdef PMU_INT
+      // Use PMU as secondary wake source if available
+      ESP_LOGI(TAG, "Woken up by PMU interrupt.");
+      if (!check_pmu_should_wake(power_was_connected)) {
+        enter_sleep();
+        return;
+      }
+#endif
+    }
+
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
     ESP_LOGI(TAG, "Woken up by external signal on EXT1.");
@@ -316,11 +390,9 @@ void init_power_management() {
     }
 #ifdef PMU_INT
     else if (wakeup_pin_mask & BIT64(PMU_INT)) {
-      if (is_fault) {
-        play_melody(NOTE_ERROR, 300);
-      }
-
-      if (!was_power_connected == is_powered_connected || !is_powered_connected) {
+      // Use PMU as secondary wake source if available
+      ESP_LOGI(TAG, "Woken up by PMU interrupt.");
+      if (!check_pmu_should_wake(power_was_connected)) {
         enter_sleep();
         return;
       }

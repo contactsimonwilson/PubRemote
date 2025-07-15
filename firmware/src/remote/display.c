@@ -106,6 +106,8 @@ static uint8_t panel_y_gap = PANEL_Y_GAP;
 static uint8_t panel_y_gap = 0;
 #endif
 
+static bool is_initialized = false;
+
 #if ROUNDER_CALLBACK
 void LVGL_port_rounder_callback(struct _lv_disp_drv_t *disp_drv, lv_area_t *area) {
   uint16_t x1 = area->x1;
@@ -172,8 +174,10 @@ uint8_t get_bl_level() {
 }
 
 void set_bl_level(uint8_t level) {
-  bl_level = level;
-  set_display_brightness(lcd_io, bl_level);
+  if (is_initialized) {
+    bl_level = level;
+    set_display_brightness(lcd_io, bl_level);
+  }
 }
 
 static esp_err_t app_lcd_init(void) {
@@ -307,7 +311,9 @@ static esp_err_t app_touch_init(void) {
   #ifdef TP_RST
       .rst_gpio_num = TP_RST,
   #endif
+  #ifdef TP_INT
       .int_gpio_num = TP_INT,
+  #endif
       .flags =
           {
               .swap_xy = 0,
@@ -506,7 +512,7 @@ static esp_err_t display_ui() {
 #endif
     LVGL_unlock();
     // Delay backlight turn on to avoid flickering
-    vTaskDelay(pdMS_TO_TICKS(200));
+    vTaskDelay(pdMS_TO_TICKS(250));
     set_bl_level(device_settings.bl_level);
     return ESP_OK;
   }
@@ -550,5 +556,6 @@ void init_display() {
 #endif
   /* LVGL initialization */
   ESP_ERROR_CHECK(app_lvgl_init());
+  is_initialized = true;
   ESP_ERROR_CHECK(display_ui());
 }

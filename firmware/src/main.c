@@ -37,12 +37,12 @@ void app_main(void) {
   init_settings();
   init_adcs();
   init_buttons(); // Required before power management for boot button detection
-  init_led();
-  init_buzzer();
+  init_buzzer();  // Required before power management for buzzer control
+  init_haptic();  // Required before power management for haptic control
   init_power_management();
 
   // Peripherals
-  init_haptic();
+  init_led();
   init_thumbstick();
   init_display();
 
@@ -54,4 +54,5 @@ void app_main(void) {
   init_console();
 
   play_startup_sound();
+  ESP_LOGI(TAG, "Boot complete");
 }
