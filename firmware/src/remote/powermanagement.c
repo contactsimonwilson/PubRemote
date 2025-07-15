@@ -281,16 +281,6 @@ void reset_sleep_timer() {
   xSemaphoreGive(timer_mutex);
 }
 
-static void power_state_update() {
-  RemotePowerState powerState = get_power_state();
-  remoteStats.remoteBatteryVoltage = powerState.voltage;
-  remoteStats.remoteBatteryPercentage = (uint8_t)(battery_mv_to_percent(remoteStats.remoteBatteryVoltage));
-  remoteStats.chargeState = powerState.chargeState;
-  remoteStats.chargeCurrent = powerState.current;
-  ESP_LOGD(TAG, "Battery volts: %u %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
-  was_power_connected = powerState.isPowered;
-}
-
 void power_management_task(void *pvParameters) {
 #define POWER_MANAGEMENT_MAX_DELAY 1000 * 1000 // 1 second in microseconds
   static int64_t last_time = 0;
