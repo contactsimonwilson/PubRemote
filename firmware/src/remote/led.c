@@ -141,6 +141,8 @@ void init_led() {
 }
 
 void set_led_brightness(uint8_t brightness) {
+#if LED_ENABLED
   brightness_level = brightness;
   apply_led_effect();
+#endif
 }
