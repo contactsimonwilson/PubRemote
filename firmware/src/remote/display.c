@@ -311,7 +311,9 @@ static esp_err_t app_touch_init(void) {
   #ifdef TP_RST
       .rst_gpio_num = TP_RST,
   #endif
+  #ifdef TP_INT
       .int_gpio_num = TP_INT,
+  #endif
       .flags =
           {
               .swap_xy = 0,
