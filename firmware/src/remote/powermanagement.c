@@ -30,7 +30,7 @@
 
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
-#define INT_SETTLE_TIME_MS 500
+#define INT_SETTLE_TIME_MS 200
 
 #ifdef PMU_INT
   #define PMU_INT_NOTE_DURATION 100
