@@ -21,7 +21,14 @@ static const char *TAG = "PUBREMOTE-LED";
   #define LEDC_CHANNEL LEDC_CHANNEL_2
   #define LEDC_TIMER LEDC_TIMER_2
   #define LED_STRIP_RMT_RES_HZ (10 * 1000 * 1000)
-static led_strip_handle_t led_strip;
+static led_strip_handle_t led_strip = NULL;
+
+static uint8_t brightness_level = 255; // Brightness setting for the LED strip
+static uint8_t current_brightness = 0; // Effective brightness for the animation
+static RGB rgb = {255, 255, 255};
+
+  #define ANIMATION_DELAY_MS 10 // Delay for the LED animation task
+  #define BRIGHTNESS_STEP 5     // Step size for brightness adjustment
 
 static void configure_led(void) {
   // LED strip general initialization, according to your led board design
@@ -53,12 +60,6 @@ static void led_power_on() {
   #endif
 }
 
-typedef struct {
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-} RGB;
-
 static RGB adjustBrightness(RGB originalColor, float brightnessScaling) {
   float gamma = 2.2; // Typical gamma value for WS2812 LEDs
 
@@ -78,43 +79,51 @@ static void led_off() {
   ESP_ERROR_CHECK(led_strip_refresh(led_strip));
 }
 
+static void apply_led_effect() {
+  if (led_strip == NULL) {
+    ESP_LOGE(TAG, "LED strip not initialized");
+    return;
+  }
+  if (current_brightness == 0) {
+    uint32_t color = device_settings.theme_color;
+    rgb.r = (color >> 16) & 0xff;
+    rgb.g = (color >> 8) & 0xff;
+    rgb.b = color & 0xff;
+  }
+
+  RGB new_col = adjustBrightness(rgb, current_brightness / 255.0);
+
+  for (int i = 0; i < LED_COUNT; i++) {
+    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, new_col.r, new_col.g, new_col.b));
+  }
+  /* Refresh the strip to send data */
+  ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+}
+
 static void led_task(void *pvParameters) {
-  RGB rgb = {255, 255, 255};
-  uint8_t brightness = 0;
   bool increasing = true;
 
   ESP_LOGD(TAG, "Start blinking LED strip");
   while (1) {
-    if (brightness == 0) {
-      uint32_t color = device_settings.theme_color;
-      rgb.r = (color >> 16) & 0xff;
-      rgb.g = (color >> 8) & 0xff;
-      rgb.b = color & 0xff;
-    }
-
-    RGB new_col = adjustBrightness(rgb, brightness / 255.0);
-
-    for (int i = 0; i < LED_COUNT; i++) {
-      ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, new_col.r, new_col.g, new_col.b));
-    }
-    /* Refresh the strip to send data */
-    ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+    apply_led_effect();
 
     if (increasing) {
-      brightness += 5;
+      current_brightness += BRIGHTNESS_STEP;
     }
     else {
-      brightness -= 5;
+      current_brightness -= BRIGHTNESS_STEP;
     }
 
-    if (brightness >= 255) {
+    if (current_brightness >= brightness_level) {
+      current_brightness = brightness_level;
       increasing = false;
     }
-    else if (brightness <= 0) {
+    else if (current_brightness <= 0) {
+      current_brightness = 0;
       increasing = true;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(10));
+    vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
   }
   led_off();
   vTaskDelete(NULL);
@@ -129,4 +138,9 @@ void init_led() {
 
   xTaskCreate(led_task, "led_task", 4096, NULL, 2, NULL);
 #endif
+}
+
+void set_led_brightness(uint8_t brightness) {
+  brightness_level = brightness;
+  apply_led_effect();
 }

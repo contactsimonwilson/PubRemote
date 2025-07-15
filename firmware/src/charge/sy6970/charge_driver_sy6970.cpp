@@ -10,6 +10,7 @@
 #include "config.h"
 #include "remote/i2c.h"
 #include <charge/charge_driver.h>
+#include <driver/gpio.h>
 
 static const char *TAG = "PUBREMOTE-CHARGE_DRIVER_SY6970";
 
@@ -49,6 +50,7 @@ static esp_err_t sy6970_init() {
   PPM.setChargerConstantCurr(1024);
   PPM.enableMeasure(); // ADC must be enabled before reading voltages
   PPM.enableCharge();
+  PPM.enableWatchdog(PowersSY6970::TIMER_OUT_40SEC);
 
   ESP_LOGI(TAG, "SY6970 initialized successfully");
   return ESP_OK;
@@ -63,16 +65,13 @@ extern "C" esp_err_t sy6970_charge_driver_init() {
     return ret;
   }
 
-  if (ret != ESP_OK) {
-    return ret;
-  }
-
   ESP_LOGI(TAG, "SY6970 charge driver initialized successfully");
   return ESP_OK;
 }
 
 extern "C" RemotePowerState sy6970_get_power_state() {
-  RemotePowerState state = {.voltage = 0, .chargeState = CHARGE_STATE_UNKNOWN, .current = 0};
+  PPM.feedWatchdog();
+  RemotePowerState state = {.voltage = 0, .chargeState = CHARGE_STATE_UNKNOWN, .current = 0, .isPowered = false, .isFault = false};
   state.voltage = PPM.getBattVoltage();
   state.current = PPM.getChargeCurrent();
 
@@ -96,9 +95,23 @@ extern "C" RemotePowerState sy6970_get_power_state() {
     break;
   }
 
+  state.isPowered = PPM.isVbusIn();
+  state.isFault = PPM.getFaultStatus() != 0;
+
+
   ESP_LOGD(TAG, "\nVBUS: %s %04dmV\nVBAT: %04dmV\nVSYS: %04dmV\nBus state: %s\nCharge state: %s\nCharge Current: %04dmA",
            PPM.isVbusIn() ? "Connected" : "Disconnect", PPM.getVbusVoltage(), PPM.getBattVoltage(),
            PPM.getSystemVoltage(), PPM.getBusStatusString(), PPM.getChargeStatusString(), PPM.getChargeCurrent());
 
   return state;
+}
+
+void sy6970_disable_watchdog() {
+  PPM.disableWatchdog();
+  ESP_LOGI(TAG, "SY6970 watchdog disabled");
+}
+
+void sy6970_enable_watchdog() {
+  PPM.enableWatchdog(PowersSY6970::TIMER_OUT_40SEC);
+  ESP_LOGI(TAG, "SY6970 watchdog enabled");
 }

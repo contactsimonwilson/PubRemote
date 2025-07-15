@@ -87,3 +87,19 @@ float battery_mv_to_percent(uint16_t voltage_mv) {
 
   return 0.0f; // Fallback - should not reach here
 }
+
+void disable_watchdog() {
+#if PMU_SY6970
+  sy6970_disable_watchdog();
+#else
+  ESP_LOGW(TAG, "Watchdog not supported by ADC driver");
+#endif
+}
+
+void enable_watchdog() {
+#if PMU_SY6970
+  sy6970_enable_watchdog();
+#else
+  ESP_LOGW(TAG, "Watchdog not supported by ADC driver");
+#endif
+}

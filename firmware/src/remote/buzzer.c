@@ -8,6 +8,7 @@
 #include "led_strip.h"
 #include "nvs_flash.h"
 #include "settings.h"
+#include "tones.h"
 #include <driver/ledc.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
@@ -20,18 +21,8 @@ static const char *TAG = "PUBREMOTE-BUZZER";
   #define BUZZER_CHANNEL LEDC_CHANNEL_1
   #define BUZZER_TIMER LEDC_TIMER_1
   #define BUZZER_RESOLUTION LEDC_TIMER_10_BIT
-  #define MAX_DUTY ((1 << 10) - 1)
+  #define BUZZER_MAX_DUTY ((1 << 10) - 1)
 #endif
-
-// Define notes (frequencies in Hz)
-#define NOTE_C4 261
-#define NOTE_D4 294
-#define NOTE_E4 329
-#define NOTE_F4 349
-#define NOTE_G4 392
-#define NOTE_A4 440
-#define NOTE_B4 493
-#define NOTE_C5 523
 
 #if BUZZER_ENABLED
 // mutex for buzzer
@@ -44,12 +35,9 @@ static const int melody[] = {NOTE_C4, 100, NOTE_D4, 100, NOTE_E4, 100, NOTE_F4, 
 static const int notes = sizeof(melody) / sizeof(melody[0]) / 2; // Number of notes
 #endif
 
-static void play_note(int frequency, int duration) {
+void play_note(int frequency, int duration) {
 #if BUZZER_ENABLED
   // Take the mutex
-  if (buzzer_mutex == NULL) {
-    buzzer_mutex = xSemaphoreCreateMutex();
-  }
   xSemaphoreTake(buzzer_mutex, portMAX_DELAY);
   // Configure the timer with the new frequency
   ledc_timer_config_t timer_conf = {.speed_mode = LEDC_LOW_SPEED_MODE,
@@ -60,7 +48,7 @@ static void play_note(int frequency, int duration) {
   ledc_timer_config(&timer_conf);
 
   // Calculate duty cycle based on volume (0-100)
-  uint32_t duty = MAX_DUTY / 2;
+  uint32_t duty = BUZZER_MAX_DUTY / 2;
   ESP_LOGD(TAG, "Playing note at %d Hz with duration %d ms", frequency, duration);
 
   // Start the buzzer
@@ -71,7 +59,7 @@ static void play_note(int frequency, int duration) {
 
   // Stop the buzzer
   #if BUZZER_INVERT
-  ledc_set_duty(LEDC_LOW_SPEED_MODE, BUZZER_CHANNEL, MAX_DUTY);
+  ledc_set_duty(LEDC_LOW_SPEED_MODE, BUZZER_CHANNEL, BUZZER_MAX_DUTY);
   #else
   ledc_set_duty(LEDC_LOW_SPEED_MODE, BUZZER_CHANNEL, 0);
   #endif
@@ -100,21 +88,30 @@ void play_melody() {
 
 void init_buzzer() {
 #if BUZZER_ENABLED
+  if (buzzer_mutex == NULL) {
+    buzzer_mutex = xSemaphoreCreateMutex();
+  }
+
   ledc_channel_config_t channel_conf = {
-      .gpio_num = BUZZER_PIN,
+      .gpio_num = BUZZER_PWM,
       .speed_mode = LEDC_LOW_SPEED_MODE,
       .channel = BUZZER_CHANNEL,
       .intr_type = LEDC_INTR_DISABLE,
       .timer_sel = BUZZER_TIMER,
   #if BUZZER_INVERT
-      .duty = MAX_DUTY,
+      .duty = BUZZER_MAX_DUTY,
   #else
       .duty = 0, // Initially off
   #endif
       .hpoint = 0,
   };
   ledc_channel_config(&channel_conf);
+#endif
+}
 
+void play_startup_sound() {
+#if BUZZER_ENABLED
+  ESP_LOGI(TAG, "Playing startup sound");
   if (device_settings.startup_sound == STARTUP_SOUND_MELODY) {
     play_melody();
   }
