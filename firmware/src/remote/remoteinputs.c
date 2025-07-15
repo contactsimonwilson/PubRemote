@@ -108,8 +108,8 @@ static void thumbstick_task(void *pvParameters) {
 #endif
 #if JOYSTICK_X_ENABLED
     int16_t x_center = calibration_settings.x_center;
-    int16_t x_min = calibration_settings.x_min;
-    int16_t y_min = calibration_settings.y_min;
+    int16_t x_max = calibration_settings.x_max;
+    int16_t x_min = calibration_settings.y_min;
 #endif
     float expo = calibration_settings.expo;
     bool invert_y = calibration_settings.invert_y;
