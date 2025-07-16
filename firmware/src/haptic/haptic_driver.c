@@ -1,8 +1,6 @@
 #include "haptic_driver.h"
 #include "esp_log.h"
-#ifdef HAPTIC_PWM
-  #include "haptic/pwm/haptic_driver_pwm.h"
-#elif HAPTIC_DRV2605
+#if HAPTIC_DRV2605
   #include "haptic/drv2605/haptic_driver_drv2605.hpp"
 #endif
 
@@ -17,5 +15,8 @@ esp_err_t haptic_driver_init() {
   // Initialize the PWM haptic driver
   ESP_LOGI(TAG, "Initializing PWM haptic driver");
   return pwm_haptic_driver_init();
+#else
+  ESP_LOGE(TAG, "No haptic driver defined");
+  return ESP_ERR_NOT_SUPPORTED;
 #endif
 }
