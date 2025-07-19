@@ -30,6 +30,17 @@ static int sy6970_write_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t *data
   return (result == ESP_OK) ? 0 : -1; // XPowersLib expects 0=success, -1=failure
 }
 
+static void configure_min_system_voltage() {
+    // Set system voltage target
+  uint8_t reg03_value = PPM.readRegister(POWERS_PPM_REG_03H);
+  reg03_value = (reg03_value & 0xF1) | (0x05 << 1);
+  // 3.0V: (reg03_value & 0xF1) | (0x00 << 1)
+  // 3.3V: (reg03_value & 0xF1) | (0x03 << 1)
+  // 3.5V: (reg03_value & 0xF1) | (0x05 << 1) (default)
+  // 3.7V: (reg03_value & 0xF1) | (0x07 << 1)
+  PPM.writeRegister(POWERS_PPM_REG_03H, reg03_value);
+}
+
 /**
  * @brief Initialize the SY6970 power management chip
  */
@@ -42,15 +53,19 @@ static esp_err_t sy6970_init() {
   }
 
   PPM.init();
-  PPM.setSysPowerDownVoltage(3000); // Low voltage protection
+  PPM.setSysPowerDownVoltage(MIN_BATTERY_VOLTAGE); // Low voltage protection
   PPM.setInputCurrentLimit(1500);
   PPM.disableCurrentLimitPin();
   PPM.setChargeTargetVoltage(4224);
-  PPM.setPrechargeCurr(128);
-  PPM.setChargerConstantCurr(1024);
+  PPM.setPrechargeCurr(640);
+  PPM.setChargerConstantCurr(2048);
+  PPM.enableAutoDetectionDPDM(); // Enable DPDM auto-detection
+  PPM.enableHVDCP(); // Enable HVDCP detection
+  PPM.setHighVoltageRequestedRange(PowersSY6970::REQUEST_9V); // Set high voltage request to 9V
   PPM.enableMeasure(); // ADC must be enabled before reading voltages
   PPM.enableCharge();
   PPM.enableWatchdog(PowersSY6970::TIMER_OUT_40SEC);
+  configure_min_system_voltage(); // Set minimum system voltage to 3.0V
 
   ESP_LOGI(TAG, "SY6970 initialized successfully");
   return ESP_OK;
