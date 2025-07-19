@@ -16,6 +16,7 @@ static const char *TAG = "PUBREMOTE-CHARGE_DRIVER_SY6970";
 
 // SY6970 I2C address (0x6A is the typical address)
 #define SY6970_ADDR 0x6A
+#define SY6970_DEBUG 0
 
 // SY6970 instance
 static XPowersPPM PPM;
@@ -84,6 +85,62 @@ extern "C" esp_err_t sy6970_charge_driver_init() {
   return ESP_OK;
 }
 
+// Option 2: Static buffer (simpler but not thread-safe)
+char* uint8_to_bits_static(uint8_t value) {
+    static char buffer[9];  // 8 bits + null terminator
+    for (int i = 7; i >= 0; i--) {
+        buffer[7-i] = ((value >> i) & 1) ? '1' : '0';
+    }
+    buffer[8] = '\0';
+    return buffer;
+}
+
+#if SY6970_DEBUG
+static void log_registers() {
+   char bit_string[9];
+  uint8_t reg1 = PPM.readRegister(POWERS_PPM_REG_01H);
+  ESP_LOGI(TAG, "REG01H: %s", uint8_to_bits_static(reg1));
+  uint8_t reg2 = PPM.readRegister(POWERS_PPM_REG_02H);
+  ESP_LOGI(TAG, "REG02H: %s", uint8_to_bits_static(reg2));
+  uint8_t reg3 = PPM.readRegister(POWERS_PPM_REG_03H);
+  ESP_LOGI(TAG, "REG03H: %s", uint8_to_bits_static(reg3));
+  uint8_t reg4 = PPM.readRegister(POWERS_PPM_REG_04H);
+  ESP_LOGI(TAG, "REG04H: %s", uint8_to_bits_static(reg4));
+  uint8_t reg5 = PPM.readRegister(POWERS_PPM_REG_05H);
+  ESP_LOGI(TAG, "REG05H: %s", uint8_to_bits_static(reg5));
+  uint8_t reg6 = PPM.readRegister(POWERS_PPM_REG_06H);
+  ESP_LOGI(TAG, "REG06H: %s", uint8_to_bits_static(reg6));
+  uint8_t reg7 = PPM.readRegister(POWERS_PPM_REG_07H);
+  ESP_LOGI(TAG, "REG07H: %s", uint8_to_bits_static(reg7));
+  uint8_t reg8 = PPM.readRegister(POWERS_PPM_REG_08H);
+  ESP_LOGI(TAG, "REG08H: %s", uint8_to_bits_static(reg8));
+  uint8_t reg9 = PPM.readRegister(POWERS_PPM_REG_09H);
+  ESP_LOGI(TAG, "REG09H: %s", uint8_to_bits_static(reg9));
+  uint8_t reg10 = PPM.readRegister(POWERS_PPM_REG_0AH);
+  ESP_LOGI(TAG, "REG0AH: %s", uint8_to_bits_static(reg10));
+  uint8_t reg11 = PPM.readRegister(POWERS_PPM_REG_0BH);
+  ESP_LOGI(TAG, "REG0BH: %s", uint8_to_bits_static(reg11));
+  uint8_t reg12 = PPM.readRegister(POWERS_PPM_REG_0CH);
+  ESP_LOGI(TAG, "REG0CH: %s", uint8_to_bits_static(reg12));
+  uint8_t reg13 = PPM.readRegister(POWERS_PPM_REG_0DH);
+  ESP_LOGI(TAG, "REG0DH: %s", uint8_to_bits_static(reg13));
+  uint8_t reg14 = PPM.readRegister(POWERS_PPM_REG_0EH);
+  ESP_LOGI(TAG, "REG0EH: %s", uint8_to_bits_static(reg14));
+  uint8_t reg15 = PPM.readRegister(POWERS_PPM_REG_0FH);
+  ESP_LOGI(TAG, "REG0FH: %s", uint8_to_bits_static(reg15));
+  uint8_t reg16 = PPM.readRegister(POWERS_PPM_REG_10H);
+  ESP_LOGI(TAG, "REG10H: %s", uint8_to_bits_static(reg16));
+  uint8_t reg17 = PPM.readRegister(POWERS_PPM_REG_11H);
+  ESP_LOGI(TAG, "REG11H: %s", uint8_to_bits_static(reg17));
+  uint8_t reg18 = PPM.readRegister(POWERS_PPM_REG_12H);
+  ESP_LOGI(TAG, "REG12H: %s", uint8_to_bits_static(reg18));
+  uint8_t reg19 = PPM.readRegister(POWERS_PPM_REG_13H);
+  ESP_LOGI(TAG, "REG13H: %s", uint8_to_bits_static(reg19));
+  uint8_t reg20 = PPM.readRegister(POWERS_PPM_REG_14H);
+  ESP_LOGI(TAG, "REG14H: %s", uint8_to_bits_static(reg20));
+}
+#endif
+
 extern "C" RemotePowerState sy6970_get_power_state() {
   PPM.feedWatchdog();
   RemotePowerState state = {.voltage = 0, .chargeState = CHARGE_STATE_UNKNOWN, .current = 0, .isPowered = false, .isFault = false};
@@ -117,6 +174,9 @@ extern "C" RemotePowerState sy6970_get_power_state() {
   ESP_LOGD(TAG, "\nVBUS: %s %04dmV\nVBAT: %04dmV\nVSYS: %04dmV\nBus state: %s\nCharge state: %s\nCharge Current: %04dmA",
            PPM.isVbusIn() ? "Connected" : "Disconnect", PPM.getVbusVoltage(), PPM.getBattVoltage(),
            PPM.getSystemVoltage(), PPM.getBusStatusString(), PPM.getChargeStatusString(), PPM.getChargeCurrent());
+  #if SY6970_DEBUG
+    log_registers();
+  #endif
 
   return state;
 }
