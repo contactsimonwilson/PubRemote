@@ -50,7 +50,7 @@ static void IRAM_ATTR pmu_isr_handler(void *arg) {
 static void power_state_update() {
   RemotePowerState powerState = get_power_state();
   remoteStats.remoteBatteryVoltage = powerState.voltage;
-  remoteStats.remoteBatteryPercentage = (uint8_t)(battery_mv_to_percent(remoteStats.remoteBatteryVoltage));
+  remoteStats.remoteBatteryPercentage = battery_mv_to_percent(remoteStats.remoteBatteryVoltage);
   remoteStats.chargeState = powerState.chargeState;
   remoteStats.chargeCurrent = powerState.current;
   ESP_LOGD(TAG, "Battery volts: %u %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
@@ -308,6 +308,13 @@ void power_management_task(void *pvParameters) {
     if (current_time - last_time > POWER_MANAGEMENT_MAX_DELAY) {
       power_state_update();
       last_time = current_time;
+    }
+
+    if (remoteStats.remoteBatteryVoltage <= MIN_BATTERY_VOLTAGE) {
+      ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
+      play_note(NOTE_ERROR, 1000);
+      // If battery is too low, enter sleep immediately
+      enter_sleep();
     }
 
     vTaskDelay(pdMS_TO_TICKS(100));

@@ -12,7 +12,7 @@
   #define FORCE_LIGHT_SLEEP 0
 #endif
 
-#define MIN_BATTERY_VOLTAGE 3300
+#define MIN_BATTERY_VOLTAGE 3000
 #define MAX_BATTERY_VOLTAGE 4200
 
 // i2c configuration

@@ -3,6 +3,7 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include "settings.h"
+#include <esp_log.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
 #include <nvs.h>
@@ -30,4 +31,5 @@ void init_espnow() {
 
   // Initialize ESP-NOW
   ESP_ERROR_CHECK(esp_now_init());
+  ESP_LOGI(TAG, "ESP-NOW initialized");
 }
