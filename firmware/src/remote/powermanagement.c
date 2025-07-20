@@ -185,7 +185,7 @@ void enter_sleep() {
 #endif
 
   // Turn off screen before sleep
-  set_bl_level(0);
+  disp_off();
   set_led_brightness(0);
   enable_wake();
   vTaskDelay(50); // Allow gpio level to settle before going into sleep
@@ -310,12 +310,13 @@ void power_management_task(void *pvParameters) {
       last_time = current_time;
     }
 
-    if (remoteStats.remoteBatteryVoltage <= MIN_BATTERY_VOLTAGE) {
-      ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
-      play_note(NOTE_ERROR, 1000);
-      // If battery is too low, enter sleep immediately
-      enter_sleep();
-    }
+    // Todo - Check battery voltage and enter sleep if too low
+    // if (remoteStats.remoteBatteryVoltage <= MIN_BATTERY_VOLTAGE && !is_power_connected) {
+    //   ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
+    //   play_note(NOTE_ERROR, 1000);
+    //   // If battery is too low, enter sleep immediately
+    //   enter_sleep();
+    // }
 
     vTaskDelay(pdMS_TO_TICKS(100));
   }

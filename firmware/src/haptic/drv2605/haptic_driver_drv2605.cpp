@@ -37,10 +37,12 @@ static esp_err_t drv2605_init()
 {
     std::error_code ec;
 
+    #ifdef HAPTIC_EN
     // Enable pin
     gpio_reset_pin((gpio_num_t)HAPTIC_EN); // Initialize the pin
     gpio_set_direction((gpio_num_t)HAPTIC_EN, GPIO_MODE_OUTPUT);
     gpio_set_level((gpio_num_t)HAPTIC_EN, 1); // Turn on the LED power
+    #endif
 
     // Configure DRV2605
     espp::Drv2605::Config drv_config{
