@@ -50,7 +50,7 @@ static void IRAM_ATTR pmu_isr_handler(void *arg) {
 static void power_state_update() {
   RemotePowerState powerState = get_power_state();
   remoteStats.remoteBatteryVoltage = powerState.voltage;
-  remoteStats.remoteBatteryPercentage = (uint8_t)(battery_mv_to_percent(remoteStats.remoteBatteryVoltage));
+  remoteStats.remoteBatteryPercentage = battery_mv_to_percent(remoteStats.remoteBatteryVoltage);
   remoteStats.chargeState = powerState.chargeState;
   remoteStats.chargeCurrent = powerState.current;
   ESP_LOGD(TAG, "Battery volts: %u %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
@@ -185,7 +185,7 @@ void enter_sleep() {
 #endif
 
   // Turn off screen before sleep
-  set_bl_level(0);
+  disp_off();
   set_led_brightness(0);
   enable_wake();
   vTaskDelay(50); // Allow gpio level to settle before going into sleep
@@ -291,7 +291,7 @@ void power_management_task(void *pvParameters) {
     uint32_t io_num;
     while (xQueueReceive(pmu_evt_queue, &io_num, 0) == pdTRUE) {
       if (io_num == PMU_INT) {
-        ESP_LOGI(TAG, "PMU interrupt received on GPIO %lu", io_num);
+        ESP_LOGD(TAG, "PMU interrupt received on GPIO %lu", io_num);
         bool last_power_connected = is_power_connected;
         power_state_update();
         last_time = esp_timer_get_time(); // Update last time in milliseconds
@@ -309,6 +309,14 @@ void power_management_task(void *pvParameters) {
       power_state_update();
       last_time = current_time;
     }
+
+    // Todo - Check battery voltage and enter sleep if too low
+    // if (remoteStats.remoteBatteryVoltage <= MIN_BATTERY_VOLTAGE && !is_power_connected) {
+    //   ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
+    //   play_note(NOTE_ERROR, 1000);
+    //   // If battery is too low, enter sleep immediately
+    //   enter_sleep();
+    // }
 
     vTaskDelay(pdMS_TO_TICKS(100));
   }

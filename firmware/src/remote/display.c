@@ -559,3 +559,12 @@ void init_display() {
   is_initialized = true;
   ESP_ERROR_CHECK(display_ui());
 }
+
+void disp_off() {
+  // Turn off backlight
+  ESP_LOGI(TAG, "Display sleep");
+  // Turn off display
+  if (lcd_panel) {
+    esp_lcd_panel_disp_on_off(lcd_panel, false);
+  }
+}
