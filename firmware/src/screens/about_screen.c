@@ -1,3 +1,4 @@
+#include "config.h"
 #include "esp_log.h"
 #include "remote/display.h"
 #include "utilities/screen_utils.h"
@@ -7,12 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ui/ui.h>
-
-// Set in env
-// Powershell: $env:PLATFORMIO_BUILD_FLAGS='-D RELEASE_VARIANT=\"release\"'
-#ifndef RELEASE_VARIANT
-  #define RELEASE_VARIANT "dev"
-#endif
 
 static const char *TAG = "PUBREMOTE-ABOUT_SCREEN";
 
@@ -24,16 +19,21 @@ bool is_about_screen_active() {
 // Set version label string
 void update_version_info_label() {
   char *formattedString;
-  asprintf(&formattedString, "Version: %d.%d.%d.%s\nType: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
-           RELEASE_VARIANT, BUILD_TYPE, BUILD_ID);
+  asprintf(&formattedString, "Version: %d.%d.%d.%s\nHW: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
+           RELEASE_VARIANT, HW_TYPE, BUILD_ID);
   lv_label_set_text(ui_VersionInfoLabel, formattedString);
   free(formattedString);
 }
 
 void update_battery_percentage_label() {
   char *formattedString;
-  asprintf(&formattedString, "Battery: %.2fV | %d%%", remoteStats.remoteBatteryVoltage,
-           remoteStats.remoteBatteryPercentage);
+  asprintf(&formattedString, "Battery: %.2fV | %d%%\nState: %s", ((float)remoteStats.remoteBatteryVoltage / 1000.0f),
+           remoteStats.remoteBatteryPercentage, charge_state_to_string(remoteStats.chargeState));
+
+  if (remoteStats.chargeState != CHARGE_STATE_NOT_CHARGING) {
+    asprintf(&formattedString, "%s\nCurrent: %umA", formattedString, remoteStats.chargeCurrent);
+  }
+
   lv_label_set_text(ui_DebugInfoLabel, formattedString);
   free(formattedString);
 }
@@ -59,9 +59,11 @@ void about_screen_load_start(lv_event_t *e) {
 
   if (LVGL_lock(0)) {
     apply_ui_scale(NULL);
-
     update_version_info_label();
     update_battery_percentage_label();
+    lv_obj_add_event_cb(ui_AboutBody, paged_scroll_event_cb, LV_EVENT_SCROLL, ui_AboutHeader);
+    add_page_scroll_indicators(ui_AboutHeader, ui_AboutBody);
+    create_navigation_group(ui_AboutFooter);
 
     LVGL_unlock();
   }
@@ -76,6 +78,7 @@ void about_screen_loaded(lv_event_t *e) {
 
 void about_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen unloaded");
+  lv_obj_remove_event_cb(ui_AboutBody, paged_scroll_event_cb);
 }
 
 void update_button_press(lv_event_t *e) {

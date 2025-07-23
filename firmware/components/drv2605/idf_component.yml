@@ -1,0 +1,20 @@
+dependencies:
+  espp/base_peripheral: '>=1.0'
+  espp/cli: '>=1.0'
+  idf:
+    version: '>=5.0'
+description: DRV2605 Haptic Driver component for ESP-IDF
+documentation: https://esp-cpp.github.io/espp/haptics/drv2605.html
+license: MIT
+maintainers:
+- William Emfinger <waemfinger@gmail.com>
+repository: git://github.com/esp-cpp/espp.git
+tags:
+- cpp
+- Component
+- Haptics
+- DRV2605
+- Motor
+- Vibration
+url: https://github.com/esp-cpp/espp/tree/main/components/drv2605
+version: 1.0.12

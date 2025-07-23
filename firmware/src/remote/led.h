@@ -3,20 +3,13 @@
 
 #include <stdio.h>
 
-#ifndef LED_POWER_PIN
-  #define LED_POWER_PIN -1
-#endif
-
-#ifndef LED_DATA_PIN
-  #define LED_DATA_PIN -1
-#endif
-
-#if (LED_POWER_PIN < 0 || LED_DATA_PIN < 0)
-  #define LED_ENABLED 0
-#else
-  #define LED_ENABLED 1
-#endif
+typedef struct {
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+} RGB;
 
 void init_led();
+void set_led_brightness(uint8_t brightness);
 
 #endif

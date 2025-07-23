@@ -8,7 +8,10 @@
       "array": "c",
       "string": "c",
       "string_view": "c",
-      "cstdint": "c"
+      "cstdint": "c",
+      "*.cpp": "cpp",
+      "*.hpp": "cpp",
+      "*.tpp": "cpp"
     },
     "editor.tabSize": 2,
     "files.eol": "\n",
@@ -25,5 +28,9 @@
     },
     "C_Cpp.clang_format_style": "{ BasedOnStyle: Microsoft, IndentWidth: 2, ColumnLimit: 120, IndentPPDirectives: BeforeHash, BraceWrapping: { AfterControlStatement: false, AfterFunction: false, AfterClass: false, AfterStruct: false, AfterEnum: false } }",
     "cmake.configureOnOpen": false,
+    "files.exclude": {
+      "*.dev.zip": true,
+      "sdkconfig.*.old": true
+    },
   }
   

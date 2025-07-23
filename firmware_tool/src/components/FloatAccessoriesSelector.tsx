@@ -28,6 +28,18 @@ export function FloatAccessoriesSelector() {
         }
       ],
       releaseType: ReleaseType.Release
+    },
+    {
+      version: "v2.8.0",
+      date: "5/27/2025",
+      variants: [
+        {
+          zipUrl: "/float_accessories/float_accessories-2.8.vescpkg.zip",
+          date: "5/27/2025",
+          variant: "float_accessories-2.8.vescpkg"
+        }
+      ],
+      releaseType: ReleaseType.Release
     }
   ] as FirmwareVersion[];
 

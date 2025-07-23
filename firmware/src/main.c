@@ -11,6 +11,7 @@
 #include "remote/console.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
+#include "remote/i2c.h"
 #include "remote/led.h"
 #include "remote/peers.h"
 #include "remote/powermanagement.h"
@@ -31,14 +32,15 @@ int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
   // Core setup
+  init_i2c();
   init_settings();
   init_adcs();
   init_buttons(); // Required before power management for boot button detection
+  init_buzzer();  // Required before power management for buzzer control
   init_power_management();
 
   // Peripherals
   init_led();
-  init_buzzer();
   init_thumbstick();
   init_display();
 
@@ -48,4 +50,7 @@ void app_main(void) {
   init_receiver();
   init_transmitter();
   init_console();
+
+  play_startup_sound();
+  ESP_LOGI(TAG, "Boot complete");
 }

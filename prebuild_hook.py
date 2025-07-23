@@ -3,7 +3,7 @@ from datetime import datetime
 import hashlib
 
 major_version = 0
-minor_version = 3
+minor_version = 4
 patch_version = 0
 
 def generate_build_id():
@@ -27,10 +27,10 @@ def generate_build_id():
     return build_id
 
 # Add build ID to environment
-build_type = env["PIOENV"]
+hw_type = env["PIOENV"]
 build_id = generate_build_id()
 
-env.Append(BUILD_FLAGS=[f'-D BUILD_TYPE=\\"{build_type}\\"'])
+env.Append(BUILD_FLAGS=[f'-D HW_TYPE=\\"{hw_type}\\"'])
 env.Append(BUILD_FLAGS=[f'-D BUILD_ID=\\"{build_id}\\"'])
 env.Append(BUILD_FLAGS=[f'-D VERSION_MAJOR={major_version}'])
 env.Append(BUILD_FLAGS=[f'-D VERSION_MINOR={minor_version}'])

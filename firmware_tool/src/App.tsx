@@ -1,22 +1,20 @@
-import React, { useRef, useState } from 'react';
-import { Usb } from 'lucide-react';
-import { DeviceInfo } from './components/DeviceInfo';
-import { FirmwareSelector } from './components/FirmwareSelector';
-import { FlashProgress } from './components/FlashProgress';
-import { FloatAccessoriesSelector } from './components/FloatAccessoriesSelector';
-import { Header } from './components/Header';
-import { ESPService } from './services/espService';
-import { TerminalService } from './services/terminal';
-import { DeviceInfoData, FlashProgress as FlashProgressType } from './types';
+import React, { useRef, useState } from "react";
+import { Usb } from "lucide-react";
+import { DeviceInfo } from "./components/DeviceInfo";
+import { FirmwareSelector } from "./components/FirmwareSelector";
+import { FlashProgress } from "./components/FlashProgress";
+import { FloatAccessoriesSelector } from "./components/FloatAccessoriesSelector";
+import { Header } from "./components/Header";
+import { ESPService } from "./services/espService";
+import { TerminalService } from "./services/terminal";
+import { DeviceInfoData, FirmwareFiles, FlashProgress as FlashProgressType } from "./types";
 
 function App() {
   const terminal = useRef<TerminalService>(new TerminalService()).current;
   const espService = useRef<ESPService>(new ESPService(terminal)).current;
-  const [selectedFirmware, setSelectedFirmware] = useState<
-    File | string | null
-  >(null);
+  const [selectedFirmware, setSelectedFirmware] = useState<FirmwareFiles| null>(null);
   const [flashProgress, setFlashProgress] = useState<FlashProgressType>({
-    status: 'idle',
+    status: "idle",
     progress: 0,
   });
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfoData>({
@@ -33,7 +31,7 @@ function App() {
         connected: true,
       });
     } catch (error) {
-      console.error('Connection error:', error);
+      console.error("Connection error:", error);
       setDeviceInfo({ connected: false });
       throw error;
     }
@@ -48,7 +46,7 @@ function App() {
     try {
       await espService.sendCommand(command);
     } catch (error) {
-      console.error('Command error:', error);
+      console.error("Command error:", error);
     }
   };
 
@@ -57,29 +55,34 @@ function App() {
 
     try {
       if (!espService.isConnected()) {
-        setFlashProgress({ status: 'connecting', progress: 0 });
+        setFlashProgress({ status: "connecting", progress: 0 });
         await handleConnect();
       }
 
       if (eraseFlash) {
-        setFlashProgress({ status: 'erasing', progress: 20 });
+        setFlashProgress({ status: "erasing", progress: 20 });
       }
 
       const currentProgress = 20;
 
-      await espService.flash(selectedFirmware, eraseFlash, status => {
-        setFlashProgress({ status: 'flashing', progress: Math.round(currentProgress + status.progress * (100 - currentProgress)) });
+      await espService.flash(selectedFirmware, eraseFlash, (status) => {
+        setFlashProgress({
+          status: "flashing",
+          progress: Math.round(
+            currentProgress + status.progress * (100 - currentProgress)
+          ),
+        });
       });
 
-      setFlashProgress({ status: 'complete', progress: 100 });
+      setFlashProgress({ status: "complete", progress: 100 });
       handleDisconnect();
     } catch (error) {
-      console.error('Flash error:', error);
+      console.error("Flash error:", error);
       setFlashProgress({
-        status: 'error',
+        status: "error",
         progress: 0,
         error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+          error instanceof Error ? error.message : "Unknown error occurred",
       });
     }
   };
@@ -89,7 +92,7 @@ function App() {
       <Header />
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mx-auto max-w-3xl space-y-8">
+        <div className="mx-auto max-w-4xl space-y-8">
           <DeviceInfo
             deviceInfo={deviceInfo}
             onConnect={handleConnect}
@@ -99,16 +102,16 @@ function App() {
           />
 
           <div className="rounded-lg bg-gray-900 p-6">
-            <FirmwareSelector
-              onSelectFirmware={setSelectedFirmware}
-            />
+            <FirmwareSelector onSelectFirmware={setSelectedFirmware} deviceInfo={deviceInfo} />
           </div>
 
           <div className="rounded-lg bg-gray-900 p-6">
             <h2 className="mb-6 text-xl font-semibold">Flash Firmware</h2>
 
             <div className="flex items-center justify-between mb-6">
-              <p>Finally, flash your selected firmware to the connected device</p>
+              <p>
+                Finally, flash your selected firmware to the connected device. Enable erase flash if you want to clear the device's existing data before flashing the new firmware.
+              </p>
             </div>
 
             <div className="space-y-4">
@@ -124,7 +127,7 @@ function App() {
                 disabled={
                   !selectedFirmware ||
                   !deviceInfo.connected ||
-                  !['complete', 'idle'].includes(flashProgress.status)
+                  !["complete", "idle"].includes(flashProgress.status)
                 }
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-700"
               >
@@ -134,7 +137,7 @@ function App() {
             </div>
           </div>
 
-          <hr/>
+          <hr />
 
           <div className="rounded-lg bg-gray-900 p-6">
             <FloatAccessoriesSelector />

@@ -13,6 +13,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@icons-pack/react-simple-icons": "^13.1.0",
     "clsx": "^2.1.0",
     "esptool-js": "^0.4.1",
     "jszip": "^3.10.1",

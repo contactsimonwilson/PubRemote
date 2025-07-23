@@ -1,5 +1,7 @@
 #include "screen_utils.h"
+#include "config.h"
 #include "lvgl.h"
+#include "number_utils.h"
 #include "remote/display.h"
 #include <ui/ui.h>
 
@@ -256,6 +258,85 @@ void reload_screens() {
     ui_StatsScreen_screen_init();
     apply_ui_scale(ui_StatsScreen);
     apply_ui_scale(ui_MenuScreen);
+    LVGL_unlock();
+  }
+}
+
+static lv_group_t *navigation_group = NULL;
+
+lv_group_t *create_navigation_group(lv_obj_t *container) {
+  if (navigation_group == NULL) {
+    navigation_group = lv_group_create();
+    // https://docs.lvgl.io/8.0/overview/indev.html#default-group
+    lv_group_set_default(navigation_group);
+    lv_indev_set_group(get_encoder(), navigation_group);
+  }
+  else {
+    // If a group already exists, clear it to remove old objects
+    lv_group_remove_all_objs(navigation_group);
+  }
+
+  // Iterate children of container and add them to the group
+  uint32_t childrenCount = lv_obj_get_child_cnt(container);
+  lv_obj_t *firstChild = NULL;
+  for (uint32_t i = 0; i < childrenCount; i++) {
+    lv_obj_t *child = lv_obj_get_child(container, i);
+    if (child != NULL) {
+      lv_group_add_obj(navigation_group, child);
+
+      if (i == 0) {
+        firstChild = child;
+      }
+    }
+  }
+
+  if (JOYSTICK_ENABLED && firstChild != NULL) {
+    lv_group_focus_obj(firstChild);
+  }
+
+  return navigation_group;
+}
+
+void add_page_scroll_indicators(lv_obj_t *header_item, lv_obj_t *body_item) {
+  // How many scroll icons already exist
+  uint32_t total_scroll_icons = lv_obj_get_child_cnt(header_item);
+  uint32_t total_settings = lv_obj_get_child_cnt(body_item);
+
+  for (uint32_t i = 0; i < total_settings; i++) {
+    uint8_t bg_opacity = i == 0 ? 255 : 100;
+
+    // Either get existing settings header icons or create them if needed
+    lv_obj_t *item = total_scroll_icons == 0 ? lv_obj_create(header_item) : lv_obj_get_child(header_item, i);
+
+    lv_obj_remove_style_all(item);
+    lv_obj_set_width(item, 10 * SCALE_FACTOR);
+    lv_obj_set_height(item, 10 * SCALE_FACTOR);
+    lv_obj_set_align(item, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(item, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
+    lv_obj_set_style_radius(item, 5 * SCALE_FACTOR, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(item, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(item, bg_opacity, LV_PART_MAIN | LV_STATE_DEFAULT);
+  }
+}
+
+void paged_scroll_event_cb(lv_event_t *e) {
+  lv_obj_t *cont = lv_event_get_target(e);
+  uint8_t total_items = lv_obj_get_child_cnt(cont);
+  lv_obj_t *indicator_target = (lv_obj_t *)lv_event_get_user_data(e); // Get the passed header object
+
+  lv_coord_t visible_width = lv_obj_get_width(cont);
+  lv_coord_t scroll_x = lv_obj_get_scroll_x(cont);
+  uint8_t page_index = (scroll_x + (visible_width / 2)) / visible_width;
+
+  // Ensure we don't exceed total items
+  uint8_t current_page = clampu8(page_index, 0, total_items - 1);
+
+  if (LVGL_lock(-1)) {
+    for (uint8_t i = 0; i < total_items; i++) {
+      // get scroll indicator
+      lv_obj_t *indicator = lv_obj_get_child(indicator_target, i);
+      lv_obj_set_style_bg_opa(indicator, i == current_page ? 255 : 100, LV_PART_MAIN);
+    }
     LVGL_unlock();
   }
 }

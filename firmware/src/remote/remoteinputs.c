@@ -1,5 +1,6 @@
 #include "remoteinputs.h"
 #include "adc.h"
+#include "config.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
@@ -100,12 +101,16 @@ static void thumbstick_task(void *pvParameters) {
   while (1) {
     bool trigger_sleep_disrupt = false;
     int16_t deadband = calibration_settings.deadband;
-    int16_t x_center = calibration_settings.x_center;
+#if JOYSTICK_Y_ENABLED
     int16_t y_center = calibration_settings.y_center;
     int16_t y_max = calibration_settings.y_max;
-    int16_t x_max = calibration_settings.x_max;
     int16_t y_min = calibration_settings.y_min;
-    int16_t x_min = calibration_settings.x_min;
+#endif
+#if JOYSTICK_X_ENABLED
+    int16_t x_center = calibration_settings.x_center;
+    int16_t x_max = calibration_settings.x_max;
+    int16_t x_min = calibration_settings.y_min;
+#endif
     float expo = calibration_settings.expo;
     bool invert_y = calibration_settings.invert_y;
     esp_err_t read_err;
@@ -170,15 +175,17 @@ void init_thumbstick() {
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
   reset_sleep_timer();
-  remote_data.bt_c = 1;
-
-  // Start a timer to reset the button state after a certain duration
-  esp_timer_handle_t reset_timer;
-  esp_timer_create_args_t timer_args = {.callback = reset_button_state, .name = "reset_button_timer"};
-  ESP_ERROR_CHECK(esp_timer_create(&timer_args, &reset_timer));
-  ESP_ERROR_CHECK(esp_timer_start_once(reset_timer, 1000000)); // 1000ms delay
 }
 
+static void button_down_cb(void *arg, void *usr_data) {
+  ESP_LOGI(TAG, "BUTTON DOWN");
+  remote_data.data.bt_c = 1;
+}
+
+static void button_up_cb(void *arg, void *usr_data) {
+  ESP_LOGI(TAG, "BUTTON UP");
+  remote_data.data.bt_c = 0;
+}
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
   reset_sleep_timer();
@@ -219,6 +226,8 @@ void init_buttons() {
     ESP_LOGE(TAG, "Button create failed");
   }
 
+  iot_button_register_cb(gpio_btn_handle, BUTTON_PRESS_DOWN, button_down_cb, NULL);
+  iot_button_register_cb(gpio_btn_handle, BUTTON_PRESS_UP, button_up_cb, NULL);
   iot_button_register_cb(gpio_btn_handle, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
   iot_button_register_cb(gpio_btn_handle, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
 #endif

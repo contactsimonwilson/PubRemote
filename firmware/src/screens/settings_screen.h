@@ -1,7 +1,7 @@
-#include <ui/ui.h>
 #ifndef __SETTINGS_SCREEN_H
-  #define __SETTINGS_SCREEN_H
+#define __SETTINGS_SCREEN_H
 
+#include <ui/ui.h>
 bool is_settings_screen_active();
 
 void settings_screen_load_start(lv_event_t *e);

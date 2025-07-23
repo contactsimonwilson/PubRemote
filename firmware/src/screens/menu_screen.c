@@ -32,6 +32,11 @@ bool is_menu_screen_active() {
 void menu_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Menu screen load start");
   // Permanent screen - don't apply scale
+
+  if (LVGL_lock(0)) {
+    create_navigation_group(ui_MenuBody);
+    LVGL_unlock();
+  }
 }
 
 void menu_screen_loaded(lv_event_t *e) {

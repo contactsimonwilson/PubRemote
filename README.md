@@ -6,6 +6,9 @@ Welcome to Pubmote!
 
 Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels. Pubmote connects to a VESC Express receiver running the Float Accessories package, which provides a feature-rich platform and easy configuration experience.
 
+> [!TIP]
+> Want an easy way to update firmware or flash a new device? Head over to the firmware tool at [https://pubmote.techfoundry.nz](https://pubmote.techfoundry.nz)
+
 ## Getting started
 
 ### Hardware Prerequisites

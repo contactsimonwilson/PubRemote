@@ -1,8 +1,8 @@
-import React from 'react';
-import { Cpu, Wifi, Tag, Box, Link, Link2Off } from 'lucide-react';
-import { DeviceInfoData } from '../types';
-import { Terminal } from './Terminal';
-import { TerminalService } from '../services/terminal';
+import React from "react";
+import { Cpu, Wifi, Tag, Box, Link, Link2Off } from "lucide-react";
+import { DeviceInfoData } from "../types";
+import { Terminal } from "./Terminal";
+import { TerminalService } from "../services/terminal";
 
 interface Props {
   deviceInfo: DeviceInfoData;
@@ -12,7 +12,13 @@ interface Props {
   terminal: TerminalService;
 }
 
-export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand, terminal }: Props) {
+export function DeviceInfo({
+  deviceInfo,
+  onConnect,
+  onDisconnect,
+  onSendCommand,
+  terminal,
+}: Props) {
   const [isConnecting, setIsConnecting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -23,7 +29,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand,
       await onConnect();
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Unknown error occurred';
+        err instanceof Error ? err.message : "Unknown error occurred";
       setError(errorMessage);
     } finally {
       setIsConnecting(false);
@@ -53,7 +59,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand,
             className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
           >
             <Link className="h-4 w-4" />
-            {isConnecting ? 'Connecting...' : 'Connect Device'}
+            {isConnecting ? "Connecting..." : "Connect Device"}
           </button>
         )}
       </div>
@@ -70,7 +76,7 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand,
             <div className="flex items-center gap-3 rounded-lg bg-gray-800/50 p-4">
               <Cpu className="h-5 w-5 text-blue-500" />
               <div>
-                <div className="text-sm text-gray-400">Chip ID</div>
+                <div className="text-sm text-gray-400">Chip Type</div>
                 <div className="font-medium text-gray-200">
                   {deviceInfo.chipId}
                 </div>
@@ -91,28 +97,30 @@ export function DeviceInfo({ deviceInfo, onConnect, onDisconnect, onSendCommand,
           )}
 
           <div className="flex items-center gap-3 rounded-lg bg-gray-800/50 p-4">
-            <Tag className="h-5 w-5 text-blue-500" />
+            <Box className="h-5 w-5 text-blue-500" />
             <div>
-              <div className="text-sm text-gray-400">Firmware Version</div>
+              <div className="text-sm text-gray-400">Hardware</div>
               <div className="font-medium text-gray-200">
-                {deviceInfo.version || 'Unknown'}
+                {deviceInfo.hardware || "Unknown"}
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3 rounded-lg bg-gray-800/50 p-4">
-            <Box className="h-5 w-5 text-blue-500" />
+            <Tag className="h-5 w-5 text-blue-500" />
             <div>
-              <div className="text-sm text-gray-400">Firmware Variant</div>
+              <div className="text-sm text-gray-400">Firmware Version</div>
               <div className="font-medium text-gray-200">
-                {deviceInfo.variant || 'Unknown'}
+                {`${deviceInfo.version || "Unknown"} (${
+                  deviceInfo.variant || "unknown"
+                })`}
               </div>
             </div>
           </div>
         </div>
       ) : (
         <div className="flex items-center justify-between mb-6">
-          <p>Start here by connecting your ESP32-S3 display</p>
+          <p>Start here by connecting your remote</p>
         </div>
       )}
 

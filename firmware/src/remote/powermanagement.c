@@ -1,6 +1,8 @@
 #include "powermanagement.h"
 #include "adc.h"
 #include "buzzer.h"
+#include "charge/charge_driver.h"
+#include "config.h"
 #include "display.h"
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
@@ -9,7 +11,9 @@
 #include "esp_sleep.h"
 #include "esp_timer.h"
 #include "gpio_detection.h"
+#include "remote/tones.h"
 #include "remoteinputs.h"
+#include "screens/charge_screen.h"
 #include "settings.h"
 #include "stats.h"
 #include "utilities/number_utils.h"
@@ -21,63 +25,44 @@
 #include <freertos/task.h>
 #include <math.h>
 #include <remote/connection.h>
+#include <remote/led.h>
 #include <ui/ui.h>
 
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
-#ifndef BAT_ADC_F
-  #define BAT_ADC_F 3
+#define INT_SETTLE_TIME_MS 200
+
+#ifdef PMU_INT
+  #define PMU_INT_NOTE_DURATION 100
 #endif
 
-#ifndef FORCE_LIGHT_SLEEP
-  #define FORCE_LIGHT_SLEEP 0
-#endif
-
-static esp_err_t init_battery_read() {
-  return adc_oneshot_config_channel(adc1_handle, BAT_ADC, &adc_channel_config);
-}
-
-static float get_battery_voltage() {
-#define NUM_SAMPLES 5
-  uint8_t num_successful_samples = 0;
-  int32_t accumulated = 0;
-
-  for (int i = 0; i < NUM_SAMPLES; i++) {
-    int sample = 0;
-    int voltage_mv = 0;
-    esp_err_t res = ESP_OK;
-    res = adc_oneshot_read(adc1_handle, BAT_ADC, &sample);
-
-    if (res != ESP_OK) {
-      ESP_LOGE(TAG, "Failed to read battery voltage.");
-      continue;
-    }
-
-    res = adc_cali_raw_to_voltage(adc1_cali_handle, sample, &voltage_mv);
-
-    if (res != ESP_OK) {
-      ESP_LOGE(TAG, "Failed to convert raw value to voltage.");
-      continue;
-    }
-
-    accumulated += voltage_mv;
-    num_successful_samples++;
-    vTaskDelay(pdMS_TO_TICKS(1));
-  }
-
-  if (num_successful_samples == 0) {
-    ESP_LOGE(TAG, "Failed to read battery voltage.");
-    return 0.0f;
-  }
-
-  int battery_value = accumulated / num_successful_samples;
-  return roundf(battery_value = 0.001f * battery_value * ((float)BAT_ADC_F) * 100.0f) / 100.0f;
-}
-
+RTC_DATA_ATTR bool is_power_connected = false; // Store power state across deep sleep
 static bool has_pull_resistor = true;
+
+static QueueHandle_t pmu_evt_queue = NULL;
+
+// Interrupt handler function (runs in IRAM)
+static void IRAM_ATTR pmu_isr_handler(void *arg) {
+  uint32_t gpio_num = (uint32_t)arg;
+  xQueueSendFromISR(pmu_evt_queue, &gpio_num, NULL);
+}
+
+static void power_state_update() {
+  RemotePowerState powerState = get_power_state();
+  remoteStats.remoteBatteryVoltage = powerState.voltage;
+  remoteStats.remoteBatteryPercentage = battery_mv_to_percent(remoteStats.remoteBatteryVoltage);
+  remoteStats.chargeState = powerState.chargeState;
+  remoteStats.chargeCurrent = powerState.current;
+  ESP_LOGD(TAG, "Battery volts: %u %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
+  is_power_connected = powerState.isPowered;
+}
 
 static bool get_use_light_sleep() {
   return FORCE_LIGHT_SLEEP || !has_pull_resistor || !gpio_supports_wakeup_from_deep_sleep(JOYSTICK_BUTTON_PIN);
+}
+
+static bool uses_deep_sleep() {
+  return esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep();
 }
 
 static bool get_button_pressed() {
@@ -96,16 +81,25 @@ static bool check_button_press() {
   return false;
 }
 
-#define BUTTON_PIN_BITMASK(GPIO) (1ULL << GPIO) // 2 ^ GPIO_NUMBER in hex
-
 static esp_err_t enable_wake() {
   esp_err_t res = ESP_OK;
 
   if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
-    res = esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK(JOYSTICK_BUTTON_PIN), JOYSTICK_BUTTON_LEVEL);
+    uint64_t io_mask = BIT64(JOYSTICK_BUTTON_PIN);
+
+    res = esp_sleep_enable_ext1_wakeup(io_mask,
+                                       JOYSTICK_BUTTON_LEVEL ? ESP_EXT1_WAKEUP_ANY_HIGH : ESP_EXT1_WAKEUP_ANY_LOW);
     if (res != ESP_OK) {
       ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
     }
+
+    // Use PMU as secondary wake source if available
+#ifdef PMU_INT
+    res = esp_sleep_enable_ext0_wakeup(PMU_INT, 0);
+    if (res != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to enable PMU interrupt wake-up.");
+    }
+#endif
   }
   else {
     ESP_LOGI(TAG, "Button pin is not available for wake. Using light sleep instead.");
@@ -165,17 +159,44 @@ static void power_button_initial_release(void *arg, void *usr_data) {
   bind_power_button();
 }
 
+#ifdef PMU_INT
+static void await_pmu_int_reset() {
+  // Wait for PMU_INT to go high
+  int timeout = INT_SETTLE_TIME_MS;
+  while (gpio_get_level(PMU_INT) == 0 && timeout > 0) {
+    vTaskDelay(pdMS_TO_TICKS(10));
+    timeout -= 10;
+    ESP_LOGD(TAG, "Waiting for PMU_INT to go high...");
+  }
+
+  if (timeout <= 0) {
+    ESP_LOGE(TAG, "PMU_INT did not go high within the expected time.");
+  }
+}
+#endif
+
 void enter_sleep() {
   // Disable some things so they don't run during wake check
   update_connection_state(CONNECTION_STATE_DISCONNECTED);
   unbind_power_button();
-  enable_wake();
-  vTaskDelay(10); // Allow gpio level to settle before going into sleep
+
+#if PMU_SY6970
+  disable_watchdog();
+#endif
+
   // Turn off screen before sleep
-  set_bl_level(0);
+  disp_off();
+  set_led_brightness(0);
+  enable_wake();
+  vTaskDelay(50); // Allow gpio level to settle before going into sleep
+
+#ifdef PMU_INT
+  await_pmu_int_reset();
+  power_state_update();
+#endif
 
   while (1) {
-    if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
+    if (uses_deep_sleep()) {
       ESP_LOGI(TAG, "Entering deep sleep mode");
       esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
       esp_deep_sleep_start(); // No code executes after esp_deep_sleep_start()
@@ -245,7 +266,7 @@ void reset_sleep_timer() {
   }
 
   if (duration_ms == 0) {
-    ESP_LOGI(TAG, "Deep sleep timer disabled.");
+    ESP_LOGD(TAG, "Deep sleep timer disabled.");
     xSemaphoreGive(timer_mutex);
     return;
   }
@@ -261,18 +282,43 @@ void reset_sleep_timer() {
 }
 
 void power_management_task(void *pvParameters) {
-  ESP_ERROR_CHECK(init_battery_read());
-  vTaskDelay(pdMS_TO_TICKS(1000));
-#define MIN_BATTERY_VOLTAGE 3.0
-#define MAX_BATTERY_VOLTAGE 4.2
+#define POWER_MANAGEMENT_MAX_DELAY 1000 * 1000 // 1 second in microseconds
+  static int64_t last_time = 0;
 
   while (1) {
-    remoteStats.remoteBatteryVoltage = get_battery_voltage();
-    float battery_percentage = fmaxf(0, (remoteStats.remoteBatteryVoltage - MIN_BATTERY_VOLTAGE)) /
-                               (MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE);
-    remoteStats.remoteBatteryPercentage = clampu8((uint8_t)(battery_percentage * 100), 0, 100);
-    ESP_LOGD(TAG, "Battery volts: %.1f %d", remoteStats.remoteBatteryVoltage, remoteStats.remoteBatteryPercentage);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+#ifdef PMU_INT
+    // Handle interrupts so we can react to power state changes almost immediately
+    uint32_t io_num;
+    while (xQueueReceive(pmu_evt_queue, &io_num, 0) == pdTRUE) {
+      if (io_num == PMU_INT) {
+        ESP_LOGD(TAG, "PMU interrupt received on GPIO %lu", io_num);
+        bool last_power_connected = is_power_connected;
+        power_state_update();
+        last_time = esp_timer_get_time(); // Update last time in milliseconds
+
+        if (is_power_connected != last_power_connected) {
+          play_note(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
+        }
+      }
+    }
+#endif
+
+    // Poll in 1s intervals
+    int64_t current_time = esp_timer_get_time();
+    if (current_time - last_time > POWER_MANAGEMENT_MAX_DELAY) {
+      power_state_update();
+      last_time = current_time;
+    }
+
+    // Todo - Check battery voltage and enter sleep if too low
+    // if (remoteStats.remoteBatteryVoltage <= MIN_BATTERY_VOLTAGE && !is_power_connected) {
+    //   ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
+    //   play_note(NOTE_ERROR, 1000);
+    //   // If battery is too low, enter sleep immediately
+    //   enter_sleep();
+    // }
+
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 
   ESP_LOGI(TAG, "Power management task ended");
@@ -280,27 +326,81 @@ void power_management_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
+#ifdef PMU_INT
+static bool check_pmu_should_wake(bool last_powered) {
+  await_pmu_int_reset();
+  power_state_update();
+  if (is_power_connected && !last_powered) {
+    play_note(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
+    // Power was connected after last sleep - continue to normal operation
+  }
+  else {
+    if (!is_power_connected && last_powered) {
+      play_note(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+    }
+    enter_sleep();
+    return false;
+  }
+  return true;
+}
+#endif
+
 void init_power_management() {
+  bool power_was_connected = is_power_connected;
+  ESP_ERROR_CHECK(charge_driver_init());
   init_sleep_timer();
-  esp_sleep_wakeup_cause_t wakeup_reason;
-  wakeup_reason = esp_sleep_get_wakeup_cause();
+  vTaskDelay(pdMS_TO_TICKS(50)); // Allow time for peripherals to initialize
+  esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+  uint64_t wakeup_pin_mask = esp_sleep_get_ext1_wakeup_status();
+  power_state_update();
+
   ESP_LOGI(TAG, "Wake-up reason: %d", wakeup_reason);
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0:
     ESP_LOGI(TAG, "Woken up by external signal on EXT0.");
     // Proceed to check if the button is still pressed
-    if (!check_button_press()) {
-      enter_sleep();
-      return;
+    if (!uses_deep_sleep()) {
+      if (!check_button_press()) {
+        enter_sleep();
+        return;
+      }
     }
+    else {
+#ifdef PMU_INT
+      // Use PMU as secondary wake source if available
+      ESP_LOGI(TAG, "Woken up by PMU interrupt.");
+      if (!check_pmu_should_wake(power_was_connected)) {
+        enter_sleep();
+        return;
+      }
+#endif
+    }
+
     break;
   case ESP_SLEEP_WAKEUP_EXT1:
     ESP_LOGI(TAG, "Woken up by external signal on EXT1.");
     // Proceed to check if the button is still pressed
-    if (!check_button_press()) {
+    if (wakeup_pin_mask & BIT64(JOYSTICK_BUTTON_PIN)) {
+      if (!check_button_press()) {
+        enter_sleep();
+        return;
+      }
+    }
+#ifdef PMU_INT
+    else if (wakeup_pin_mask & BIT64(PMU_INT)) {
+      // Use PMU as secondary wake source if available
+      ESP_LOGI(TAG, "Woken up by PMU interrupt.");
+      if (!check_pmu_should_wake(power_was_connected)) {
+        enter_sleep();
+        return;
+      }
+    }
+#endif
+    else {
       enter_sleep();
       return;
     }
+
     break;
   case ESP_SLEEP_WAKEUP_TIMER:
   case ESP_SLEEP_WAKEUP_TOUCHPAD:
@@ -321,6 +421,20 @@ void init_power_management() {
   else {
     power_button_initial_release(NULL, NULL);
   }
+
+#ifdef PMU_INT
+  gpio_config_t pmu_io_conf = {};
+  pmu_io_conf.intr_type = GPIO_INTR_NEGEDGE;
+  pmu_io_conf.mode = GPIO_MODE_INPUT;
+  pmu_io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+  pmu_io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+  pmu_io_conf.pin_bit_mask = BIT64(PMU_INT);
+  gpio_config(&pmu_io_conf);
+  pmu_evt_queue = xQueueCreate(1, sizeof(uint32_t));
+
+  gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
+  gpio_isr_handler_add(PMU_INT, pmu_isr_handler, (void *)PMU_INT);
+#endif
 
   xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
 }
