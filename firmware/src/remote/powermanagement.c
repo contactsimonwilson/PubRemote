@@ -291,7 +291,7 @@ void power_management_task(void *pvParameters) {
     uint32_t io_num;
     while (xQueueReceive(pmu_evt_queue, &io_num, 0) == pdTRUE) {
       if (io_num == PMU_INT) {
-        ESP_LOGI(TAG, "PMU interrupt received on GPIO %lu", io_num);
+        ESP_LOGD(TAG, "PMU interrupt received on GPIO %lu", io_num);
         bool last_power_connected = is_power_connected;
         power_state_update();
         last_time = esp_timer_get_time(); // Update last time in milliseconds
