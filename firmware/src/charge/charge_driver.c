@@ -47,22 +47,25 @@ char *charge_state_to_string(RemoteChargeState state) {
 }
 
 static const VoltagePoint dischargeCurve[] = {
-    {MAX_BATTERY_VOLTAGE, 100.0f}, // Fully charged
-    {4050, 90.0f},                 // High
-    {3900, 80.0f},                 // Good
-    {3800, 70.0f},                 // Above nominal
-    {3750, 60.0f},                 // Near nominal
-    {3700, 50.0f},                 // Nominal voltage point
-    {3650, 40.0f},                 // Below nominal
-    {3600, 30.0f},                 // Getting low
-    {3500, 20.0f},                 // Low
-    {3400, 10.0f},                 // Very low
-    {MIN_BATTERY_VOLTAGE, 0.0f}    // Empty/cutoff
+    {4200, 100}, // Fully charged (4.2V)
+    {4100, 90},  // Very high
+    {4000, 78},  // High
+    {3900, 66},  // Good
+    {3800, 55},  // Above nominal
+    {3750, 48},  // Near nominal
+    {3700, 42},  // Nominal voltage point
+    {3650, 36},  // Below nominal
+    {3600, 30},  // Getting low
+    {3500, 24},  // Low - still significant capacity remaining
+    {3400, 15},  // Very low
+    {3300, 8},   // Critical
+    {3200, 3},   // Almost empty
+    {3000, 0}    // Empty/cutoff (3.0V)
 };
 
 #define CURVE_SIZE (sizeof(dischargeCurve) / sizeof(VoltagePoint))
 
-float battery_mv_to_percent(uint16_t voltage_mv) {
+uint8_t battery_mv_to_percent(uint16_t voltage_mv) {
   // Handle edge cases
   if (voltage_mv >= dischargeCurve[0].voltage_mv) {
     return dischargeCurve[0].percentage;
@@ -77,15 +80,15 @@ float battery_mv_to_percent(uint16_t voltage_mv) {
       // Linear interpolation between two points
       uint16_t v1 = dischargeCurve[i].voltage_mv;
       uint16_t v2 = dischargeCurve[i + 1].voltage_mv;
-      float p1 = dischargeCurve[i].percentage;
-      float p2 = dischargeCurve[i + 1].percentage;
+      uint8_t p1 = dischargeCurve[i].percentage;
+      uint8_t p2 = dischargeCurve[i + 1].percentage;
 
       float percentage = p1 + ((float)(voltage_mv - v1) / (float)(v2 - v1)) * (p2 - p1);
-      return percentage;
+      return (uint8_t)percentage; // Return as uint8_t to match percentage type
     }
   }
 
-  return 0.0f; // Fallback - should not reach here
+  return 0; // Fallback - should not reach here
 }
 
 void disable_watchdog() {

@@ -164,13 +164,13 @@ static void process_data(esp_now_event_t evt) {
     reset_sleep_timer();
     remoteStats.lastUpdated = get_current_time_ms();
 
-    uint8_t mode = data[0];
-    uint8_t fault_code = data[1];
-    float pitch_angle = (int16_t)((data[2] << 8) | data[3]) / 10.0;
-    float roll_angle = (int16_t)((data[4] << 8) | data[5]) / 10.0;
+    // uint8_t mode = data[0];
+    // uint8_t fault_code = data[1];
+    // float pitch_angle = (int16_t)((data[2] << 8) | data[3]) / 10.0;
+    // float roll_angle = (int16_t)((data[4] << 8) | data[5]) / 10.0;
     float input_voltage_filtered = (int16_t)((data[8] << 8) | data[9]) / 10.0;
-    int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
-    float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
+    // int16_t rpm = (int16_t)((data[10] << 8) | data[11]);
+    // float tot_current = (int16_t)((data[14] << 8) | data[15]) / 10.0;
 
     // Get RemoteStats
     float speed = (int16_t)((data[12] << 8) | data[13]) / 10.0;
@@ -197,9 +197,9 @@ static void process_data(esp_now_event_t evt) {
     float distance_abs;
     memcpy(&distance_abs, &data[17], sizeof(float));
     remoteStats.tripDistance = distance_abs;
-    uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
+    // uint32_t odometer = (uint32_t)((data[23] << 24) | (data[24] << 16) | (data[25] << 8) | data[26]);
 
-    int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
+    // int32_t super_secret_code = (int32_t)((data[28] << 24) | (data[29] << 16) | (data[30] << 8) | data[31]);
 
     // Print the extracted values
     // ESP_LOGI(TAG, "Mode: %d", mode);
