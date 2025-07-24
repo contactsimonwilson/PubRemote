@@ -62,6 +62,10 @@ static void transmitter_task(void *pvParameters) {
         should_transmit = false;
       }
     }
+    else {
+      // If not transmitting, reset last send time
+      last_send_time = new_time;
+    }
 
     if (should_transmit) {
       // Create a new buffer to hold both secret_Code and remote_data.bytes
@@ -95,7 +99,7 @@ static void transmitter_task(void *pvParameters) {
     }
 
     int64_t elapsed = get_current_time_ms() - last_send_time;
-    if (elapsed > 0 && elapsed < TX_RATE_MS) {
+    if (elapsed >= 0 && elapsed < TX_RATE_MS) {
       vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS - elapsed));
     }
   }
