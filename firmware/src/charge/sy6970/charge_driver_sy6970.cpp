@@ -85,8 +85,8 @@ extern "C" esp_err_t sy6970_charge_driver_init() {
   return ESP_OK;
 }
 
-// Option 2: Static buffer (simpler but not thread-safe)
-char* uint8_to_bits_static(uint8_t value) {
+#if SY6970_DEBUG
+static char* uint8_to_bits_static(uint8_t value) {
     static char buffer[9];  // 8 bits + null terminator
     for (int i = 7; i >= 0; i--) {
         buffer[7-i] = ((value >> i) & 1) ? '1' : '0';
@@ -95,7 +95,7 @@ char* uint8_to_bits_static(uint8_t value) {
     return buffer;
 }
 
-#if SY6970_DEBUG
+
 static void log_registers() {
   uint8_t reg1 = PPM.readRegister(POWERS_PPM_REG_01H);
   ESP_LOGI(TAG, "REG01H: %s", uint8_to_bits_static(reg1));

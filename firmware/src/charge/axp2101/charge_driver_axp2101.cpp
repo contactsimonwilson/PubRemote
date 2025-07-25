@@ -66,16 +66,6 @@ extern "C" esp_err_t axp2101_charge_driver_init() {
   return ESP_OK;
 }
 
-// Option 2: Static buffer (simpler but not thread-safe)
-char* uint8_to_bits_static(uint8_t value) {
-    static char buffer[9];  // 8 bits + null terminator
-    for (int i = 7; i >= 0; i--) {
-        buffer[7-i] = ((value >> i) & 1) ? '1' : '0';
-    }
-    buffer[8] = '\0';
-    return buffer;
-}
-
 #if AXP2101_DEBUG
 // Define debug logging functions here
 #endif
