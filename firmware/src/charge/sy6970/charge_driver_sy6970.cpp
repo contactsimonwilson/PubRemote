@@ -97,7 +97,6 @@ char* uint8_to_bits_static(uint8_t value) {
 
 #if SY6970_DEBUG
 static void log_registers() {
-   char bit_string[9];
   uint8_t reg1 = PPM.readRegister(POWERS_PPM_REG_01H);
   ESP_LOGI(TAG, "REG01H: %s", uint8_to_bits_static(reg1));
   uint8_t reg2 = PPM.readRegister(POWERS_PPM_REG_02H);
