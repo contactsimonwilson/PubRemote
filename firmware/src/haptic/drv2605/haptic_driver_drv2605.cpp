@@ -111,24 +111,30 @@ void drv2605_haptic_play_vibration(HapticFeedbackPattern pattern) {
 // Define because of circular reference
 static void schedule_calibration_cb();
 
+static esp_timer_handle_t calibration_timer = NULL;
+
 static void calibration_callback(void* arg) {
     // Read bit 3 of register 0x00 to check if calibration is complete
     uint8_t status = 0;
-    drv2605_read_reg(DRV2605_ADDR, 0, &status, 1);
+    drv2605_read_reg(DRV2605_ADDR, 0x00, &status, 1);  // STATUS register
     if (status & 0x08) {
-        schedule_calibration_cb();
-        ESP_LOGI(TAG, "Calibration in progress, rescheduling...");
+        ESP_LOGE(TAG, "Calibration failed");
         return;
     } else {
         ESP_LOGI(TAG, "Calibration complete");
         drv.setMode(SensorDRV2605::MODE_INTTRIG); // Switch back to internal trigger mode
         haptic_initialized = true;
-        drv2605_haptic_play_vibration(HAPTIC_SINGLE_CLICK); // Play a click to indicate calibration start
+        drv2605_haptic_play_vibration(HAPTIC_SINGLE_CLICK);
         return;
     }
 }
 
 static void schedule_calibration_cb() {
+    if (calibration_timer != NULL) {
+        esp_timer_delete(calibration_timer);
+        calibration_timer = NULL;
+    }
+
     // Timer configuration
     esp_timer_create_args_t timer_args = {
         .callback = calibration_callback,
