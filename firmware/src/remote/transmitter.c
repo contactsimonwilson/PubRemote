@@ -30,7 +30,7 @@ static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) 
     if (connection_state == CONNECTION_STATE_CONNECTED) {
       ESP_LOGE(TAG, "Failed to send data to %02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2],
                mac_addr[3], mac_addr[4], mac_addr[5]);
-      last_send_time = 0; // Reset last send time on failure to ensure we retry sending
+      last_send_time = 0; // Reset last send time on failure to ensure we send in the next cycle
     }
   }
 }
