@@ -15,44 +15,15 @@
 
 static const char *TAG = "PUBREMOTE-HAPTIC";
 
+void vibrate(HapticFeedbackPattern pattern) {
 #if HAPTIC_ENABLED
-// mutex for haptic
-static SemaphoreHandle_t haptic_mutex;
-#endif
-
-// 0ms = play for pattern. Otherwise, play for duration_ms
-static void play_vibration(HapticFeedbackPattern pattern, uint32_t duration_ms) {
-#if HAPTIC_ENABLED
-  // Take the mutex
-  xSemaphoreTake(haptic_mutex, portMAX_DELAY);
-
-  // Do stuff
-
-  // Release the mutex
-  xSemaphoreGive(haptic_mutex);
-#endif
-}
-
-#if HAPTIC_ENABLED
-// task to play melody
-static void play_vibration_task(void *pvParameters) {
-  play_vibration(HAPTIC_PATTERN_SHORT, 0); // Play a short vibration pattern
-
-  vTaskDelete(NULL);
-}
-#endif
-
-void vibrate() {
-#if HAPTIC_ENABLED
-  xTaskCreate(play_vibration_task, "play_vibration_task", 4096, NULL, 2, NULL);
+  ESP_LOGI(TAG, "Vibrating with pattern: %d", pattern);
+  haptic_play_vibration(pattern);
 #endif
 }
 
 void init_haptic() {
 #if HAPTIC_ENABLED
-  if (haptic_mutex == NULL) {
-    haptic_mutex = xSemaphoreCreateMutex();
-  }
   haptic_driver_init();
 #endif
 }

@@ -1,7 +1,8 @@
 #include "haptic_driver_drv2605.hpp"
 #include "esp_log.h"
 #include "esp_err.h"
-#include "drv2605.hpp"
+#define CONFIG_SENSORLIB_ESP_IDF_NEW_API
+#include "SensorDRV2605.hpp"
 #include "remote/i2c.h"
 #include <driver/gpio.h>
 #include <memory>
@@ -20,8 +21,7 @@ static const char *TAG = "PUBREMOTE-HAPTIC_DRIVER_DRV2605";
 // Convert voltage to register value (assuming 0-255 range for 0-5.6V)
 #define VOLTAGE_TO_REG(voltage)     (uint8_t)((voltage / 5.6f) * 255.0f)
 
-// DRV2605 instance using smart pointer for better memory management
-static std::unique_ptr<espp::Drv2605> drv2605;
+static SensorDRV2605 drv;
 static bool haptic_initialized = false;
 
 static bool drv2605_write_reg(uint8_t reg_addr, const uint8_t *data, size_t len)
@@ -35,10 +35,117 @@ bool drv2605_read_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t* data, size
     return (result == ESP_OK);
 }
 
+static bool drv2605_reg_cb(uint8_t addr, uint8_t reg, uint8_t *buf, size_t len, bool writeReg, bool isWrite) {
+    if (isWrite) {
+        return drv2605_write_reg(reg, buf, len);
+    } else {
+        return drv2605_read_reg(addr, reg, buf, len);
+    }
+}
+
+void drv2605_haptic_play_vibration(HapticFeedbackPattern pattern) {
+    if (!haptic_initialized) {
+        ESP_LOGE(TAG, "DRV2605 not initialized");
+        return;
+    }
+
+    ESP_LOGI(TAG, "Playing vibration pattern: %d", (int)pattern);
+
+    // Clear any existing waveforms
+    drv.stop();
+    
+    // Configure waveform based on pattern using available waveforms
+    switch (pattern) {
+        case HAPTIC_SINGLE_CLICK:
+            drv.setWaveform(0, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        case HAPTIC_DOUBLE_CLICK:
+            drv.setWaveform(10, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        case HAPTIC_TRIPLE_CLICK:
+            drv.setWaveform(12, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        case HAPTIC_SOFT_BUMP:
+            drv.setWaveform(7, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        case HAPTIC_SOFT_BUZZ:
+            drv.setWaveform(13, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        case HAPTIC_STRONG_BUZZ:
+            drv.setWaveform(14, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        case HAPTIC_ALERT_750MS:
+            drv.setWaveform(15, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        case HAPTIC_ALERT_1000MS:
+            drv.setWaveform(16, 1);
+            drv.setWaveform(1, 0);
+            break;
+            
+        default:
+            ESP_LOGW(TAG, "Unknown vibration pattern: %d, using default", (int)pattern);
+            break;
+    }
+
+
+    // Start the waveform sequence
+    drv.run();
+
+    ESP_LOGI(TAG, "Vibration pattern %d played successfully", (int)pattern);
+}
+
+// Define because of circular reference
+static void schedule_calibration_cb();
+
+static void calibration_callback(void* arg) {
+    // Read bit 3 of register 0x00 to check if calibration is complete
+    uint8_t status = 0;
+    drv2605_read_reg(DRV2605_ADDR, 0, &status, 1);
+    if (status & 0x08) {
+        schedule_calibration_cb();
+        ESP_LOGI(TAG, "Calibration in progress, rescheduling...");
+        return;
+    } else {
+        ESP_LOGI(TAG, "Calibration complete");
+        drv.setMode(SensorDRV2605::MODE_INTTRIG); // Switch back to internal trigger mode
+        haptic_initialized = true;
+        drv2605_haptic_play_vibration(HAPTIC_SINGLE_CLICK); // Play a click to indicate calibration start
+        return;
+    }
+}
+
+static void schedule_calibration_cb() {
+    // Timer configuration
+    esp_timer_create_args_t timer_args = {
+        .callback = calibration_callback,
+        .arg = NULL,
+        .dispatch_method = ESP_TIMER_TASK,
+        .name = "haptic_calibration",
+        .skip_unhandled_events = false
+    };
+
+    esp_timer_handle_t timer_handle;
+    // Create the timer
+    esp_timer_create(&timer_args, &timer_handle);
+    esp_timer_start_once(timer_handle, 100 * 1000);
+}
+
 static esp_err_t drv2605_init()
 {
-    std::error_code ec;
-
     #ifdef HAPTIC_EN
     // Enable pin configuration
     gpio_reset_pin((gpio_num_t)HAPTIC_EN);
@@ -50,209 +157,30 @@ static esp_err_t drv2605_init()
     vTaskDelay(pdMS_TO_TICKS(50));
     #endif
 
-    // Configure DRV2605
-    espp::Drv2605::Config drv_config{
-        .device_address = DRV2605_ADDR,
-        .write = drv2605_write_reg,
-        .read_register = drv2605_read_reg,
-        .motor_type = espp::Drv2605::MotorType::LRA,
-        .log_level = espp::Logger::Verbosity::DEBUG
-    };
+    drv.begin(drv2605_reg_cb);
+    drv.selectLibrary(6); // USE LRA library (6 is LRA, 1-5 are ERM)
+    drv.useLRA(); // Set to LRA mode
+    drv.setMode(7); // Set to Auto Calibration mode
 
-    // Create DRV2605 instance using smart pointer
-    drv2605 = std::make_unique<espp::Drv2605>(drv_config);
-
-    if (!drv2605) {
-        ESP_LOGE(TAG, "Failed to create DRV2605 instance");
-        return ESP_FAIL;
-    }
-
-        // Select LRA library
-    bool lib_success = drv2605->select_library(espp::Drv2605::Library::LRA, ec);
-    if (!lib_success || ec) {
-        ESP_LOGE(TAG, "Failed to select LRA library: %s", ec.message().c_str());
-        return ESP_FAIL;
-    }
-
-    // // Initialize the device
-    // bool init_success = drv2605->initialize(ec);
-    // if (!init_success || ec) {
-    //     ESP_LOGE(TAG, "Failed to initialize DRV2605: %s", ec.message().c_str());
-    //     return ESP_FAIL;
-    // }
-    ESP_LOGI(TAG, "LRA library selected successfully");
-
-    // ===================================================================
-    // LRA AUTOMATIC CALIBRATION PROCESS
-    // ===================================================================
-    // The DRV2605 needs to be calibrated for optimal LRA performance.
-    // This process:
-    // 1. Measures the LRA's back-EMF at resonance
-    // 2. Determines optimal drive levels
-    // 3. Sets up closed-loop control parameters
-    // 4. Ensures maximum efficiency and consistent response
-    // 
-    // The motor WILL vibrate during this process - this is normal!
-    // ===================================================================
-
-    // Configure LRA calibration settings using our defined parameters
-    ESP_LOGI(TAG, "=== LRA CALIBRATION STARTING ===");
-    ESP_LOGI(TAG, "Motor specifications:");
-    ESP_LOGI(TAG, "  - Rated voltage: %.1fV RMS", LRA_RATED_VOLTAGE);
-    ESP_LOGI(TAG, "  - Overdrive voltage: %.1fV (%.1fx rated)", LRA_OVERDRIVE_VOLTAGE, LRA_OVERDRIVE_VOLTAGE/LRA_RATED_VOLTAGE);
-    ESP_LOGI(TAG, "  - Resonant frequency: %.1fHz", LRA_FREQUENCY);
-    ESP_LOGI(TAG, "  - Impedance: %.1fΩ", LRA_IMPEDANCE);
-
-    espp::Drv2605::LraCalibrationSettings lra_calibration_settings{};
-    lra_calibration_settings.rated_voltage = VOLTAGE_TO_REG(LRA_RATED_VOLTAGE);
-    lra_calibration_settings.overdrive_clamp = VOLTAGE_TO_REG(LRA_OVERDRIVE_VOLTAGE);
-    lra_calibration_settings.drive_time = espp::Drv2605::lra_freq_to_drive_time(LRA_FREQUENCY);
-    
-    ESP_LOGI(TAG, "Calibration register values:");
-    ESP_LOGI(TAG, "  - Rated voltage reg: %d/255 (%.2fV)", lra_calibration_settings.rated_voltage, 
-             (lra_calibration_settings.rated_voltage / 255.0f) * 5.6f);
-    ESP_LOGI(TAG, "  - Overdrive clamp reg: %d/255 (%.2fV)", lra_calibration_settings.overdrive_clamp,
-             (lra_calibration_settings.overdrive_clamp / 255.0f) * 5.6f);
-    ESP_LOGI(TAG, "  - Drive time reg: %d (%.1fHz)", lra_calibration_settings.drive_time, LRA_FREQUENCY);
-
-    ESP_LOGI(TAG, "Starting automatic LRA calibration...");
-    ESP_LOGI(TAG, "⚠️  Motor will vibrate during calibration process");
-    
-    // Perform LRA motor calibration - this is the key step!
-    espp::Drv2605::CalibratedData calibrated_data;
-    uint32_t calibration_start = esp_log_timestamp();
-    
-    bool calibration_success = drv2605->calibrate(lra_calibration_settings, calibrated_data, ec);
-    
-    uint32_t calibration_duration = esp_log_timestamp() - calibration_start;
-    
-    if (!calibration_success) {
-        ESP_LOGE(TAG, "❌ LRA calibration FAILED after %lums", calibration_duration);
-        ESP_LOGE(TAG, "Error: %s", ec.message().c_str());
-        ESP_LOGE(TAG, "Possible causes:");
-        ESP_LOGE(TAG, "  - Motor not connected properly");
-        ESP_LOGE(TAG, "  - Wrong motor specifications");
-        ESP_LOGE(TAG, "  - I2C communication issues");
-        ESP_LOGE(TAG, "  - Insufficient power supply");
-        return ESP_FAIL;
-    }
-
-    ESP_LOGI(TAG, "✅ LRA calibration SUCCESS! (took %lums)", calibration_duration);
-    ESP_LOGI(TAG, "Motor is now optimally tuned for:");
-    ESP_LOGI(TAG, "  - Maximum efficiency");
-    ESP_LOGI(TAG, "  - Consistent haptic response");
-    ESP_LOGI(TAG, "  - Proper frequency matching");
-    ESP_LOGI(TAG, "=== LRA CALIBRATION COMPLETE ===");
-    haptic_initialized = true;
+    // Wait for calibration in timer to speed up boot
+    schedule_calibration_cb();
 
     return ESP_OK;
 }
 
-void drv2605_haptic_play_vibration(HapticFeedbackPattern pattern) {
-    if (!drv2605 || !haptic_initialized) {
-        ESP_LOGE(TAG, "DRV2605 not initialized");
-        return;
-    }
-
-    std::error_code ec;
-    ESP_LOGI(TAG, "Playing vibration pattern: %d", (int)pattern);
-
-    // Clear any existing waveforms
-    drv2605->stop(ec);
-    
-    // Configure waveform based on pattern using available waveforms
-    switch (pattern) {
-        case HAPTIC_SINGLE_CLICK:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::STRONG_CLICK, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_DOUBLE_CLICK:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::DOUBLE_CLICK, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_TRIPLE_CLICK:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::TRIPLE_CLICK, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_SOFT_BUMP:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::SOFT_BUMP, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_STRONG_CLICK:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::STRONG_CLICK, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_SHARP_CLICK:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::SHARP_CLICK, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_SOFT_BUZZ:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::SOFT_FUZZ, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_STRONG_BUZZ:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::STRONG_BUZZ, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_ALERT_750MS:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::ALERT_750MS, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        case HAPTIC_ALERT_1000MS:
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::ALERT_1000MS, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-            
-        default:
-            ESP_LOGW(TAG, "Unknown vibration pattern: %d, using default", (int)pattern);
-            drv2605->set_waveform(0, espp::Drv2605::Waveform::STRONG_CLICK, ec);
-            drv2605->set_waveform(1, espp::Drv2605::Waveform::END, ec);
-            break;
-    }
-
-    if (ec) {
-        ESP_LOGE(TAG, "Failed to set waveform: %s", ec.message().c_str());
-        return;
-    }
-
-    // Start the waveform sequence
-    drv2605->start(ec);
-    if (ec) {
-        ESP_LOGE(TAG, "Failed to start vibration: %s", ec.message().c_str());
-        return;
-    }
-
-    ESP_LOGI(TAG, "Vibration pattern %d played successfully", (int)pattern);
-}
-
 void drv2605_haptic_stop() {
-    if (!drv2605 || !haptic_initialized) {
+    if (!haptic_initialized) {
         ESP_LOGW(TAG, "DRV2605 not initialized");
         return;
     }
     
-    std::error_code ec;
-    drv2605->stop(ec);
-    if (ec) {
-        ESP_LOGE(TAG, "Failed to stop vibration: %s", ec.message().c_str());
-    } else {
-        ESP_LOGI(TAG, "Vibration stopped");
-    }
+    drv.stop();
 }
 
 bool drv2605_is_active() {
     // Simple check - return true if driver is initialized
     // Without access to hardware status, we can't determine actual playing state
-    return (drv2605 != nullptr && haptic_initialized);
+    return  haptic_initialized;
 }
 
 esp_err_t drv2605_haptic_driver_init() {
@@ -264,14 +192,6 @@ esp_err_t drv2605_haptic_driver_init() {
         haptic_initialized = false;
         return ret;
     }
-
-    // Debug
-    // while (true) {
-    //     // Play a test vibration pattern
-    //     drv2605_haptic_play_vibration(HAPTIC_ALERT_1000MS);
-    //     ESP_LOGI(TAG, "DRV2605 haptic driver initialized and playing test pattern");
-    //     vTaskDelay(pdMS_TO_TICKS(500)); // Keep the task alive to prevent deletion
-    // }
     
     ESP_LOGI(TAG, "DRV2605 haptic driver initialized successfully");
     return ESP_OK;
@@ -280,12 +200,7 @@ esp_err_t drv2605_haptic_driver_init() {
 void drv2605_haptic_driver_deinit() {
     ESP_LOGI(TAG, "Deinitializing DRV2605 haptic driver");
     
-    if (drv2605) {
-        std::error_code ec;
-        drv2605->stop(ec);
-        drv2605.reset(); // Release the smart pointer
-    }
-    
+    drv.stop();
     haptic_initialized = false;
     
     #ifdef HAPTIC_EN

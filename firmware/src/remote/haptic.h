@@ -1,14 +1,8 @@
 #ifndef __HAPTIC_H
 #define __HAPTIC_H
+#include "haptic/haptic_driver.h"
 
-typedef enum {
-  HAPTIC_PATTERN_SHORT,
-  HAPTIC_PATTERN_LONG,
-  HAPTIC_PATTERN_ERROR,
-  HAPTIC_PATTERN_SUCCESS
-} HapticFeedbackPattern;
-
-void vibrate();
+void vibrate(HapticFeedbackPattern pattern);
 void init_haptic();
 
 #endif

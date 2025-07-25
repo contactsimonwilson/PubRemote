@@ -3,26 +3,11 @@
 #include "esp_err.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include "haptic/haptic_driver.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Haptic feedback patterns available for the DRV2605
- */
-typedef enum {
-    HAPTIC_SINGLE_CLICK = 0,    ///< Single strong click
-    HAPTIC_DOUBLE_CLICK,        ///< Two quick clicks
-    HAPTIC_TRIPLE_CLICK,        ///< Three quick clicks
-    HAPTIC_SOFT_BUMP,          ///< Gentle bump sensation
-    HAPTIC_STRONG_CLICK,       ///< Strong tactile click
-    HAPTIC_SHARP_CLICK,        ///< Sharp click vibration
-    HAPTIC_SOFT_BUZZ,          ///< Soft buzzing vibration
-    HAPTIC_STRONG_BUZZ,        ///< Strong buzzing vibration
-    HAPTIC_ALERT_750MS,        ///< Alert pattern 750ms
-    HAPTIC_ALERT_1000MS        ///< Alert pattern 1000ms
-} HapticFeedbackPattern;
 
 /**
  * @brief Initialize the DRV2605 haptic driver
