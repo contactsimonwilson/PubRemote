@@ -18,9 +18,21 @@
 static const char *TAG = "PUBREMOTE-TRANSMITTER";
 #define COMMAND_TIMEOUT 1000
 
+static int64_t last_send_time = 0;
+
 static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // This callback runs in WiFi task context!
-  ESP_LOGD(TAG, "SENT");
+  if (status == ESP_NOW_SEND_SUCCESS) {
+    ESP_LOGD(TAG, "Data sent successfully to %02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2],
+             mac_addr[3], mac_addr[4], mac_addr[5]);
+  }
+  else {
+    if (connection_state == CONNECTION_STATE_CONNECTED) {
+      ESP_LOGE(TAG, "Failed to send data to %02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2],
+               mac_addr[3], mac_addr[4], mac_addr[5]);
+      last_send_time = 0; // Reset last send time on failure to ensure we retry sending
+    }
+  }
 }
 
 static uint8_t get_peer_channel(const uint8_t *peer_mac) {
@@ -45,7 +57,6 @@ static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "TX task started");
   uint8_t last_bytes[sizeof(remote_data.bytes)] = {0};
   uint8_t combined_data[sizeof(int32_t) + sizeof(remote_data.bytes)];
-  int64_t last_send_time = 0;
   while (1) {
     int64_t new_time = get_current_time_ms();
 

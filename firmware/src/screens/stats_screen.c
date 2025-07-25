@@ -72,7 +72,7 @@ static void update_utilization_dial_display() {
   lv_bar_set_value(ui_UtilizationBar, remoteStats.dutyCycle, LV_ANIM_OFF);
 
   // set arc color
-  lv_color_t color = lv_color_hex(COLOR_STRUCTURE);
+  lv_color_t color = lv_color_hex(COLOR_ACTIVE);
 
   if (remoteStats.dutyCycle > 90) {
     color = lv_color_hex(COLOR_DANGER);
@@ -82,9 +82,6 @@ static void update_utilization_dial_display() {
   }
   else if (remoteStats.dutyCycle > 70) {
     color = lv_color_hex(COLOR_WARNING);
-  }
-  else if (remoteStats.dutyCycle > 20) {
-    color = lv_color_hex(COLOR_ACTIVE);
   }
 
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
