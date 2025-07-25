@@ -39,6 +39,7 @@ static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 RTC_DATA_ATTR bool is_power_connected = false; // Store power state across deep sleep
 static bool has_pull_resistor = true;
 
+#ifdef PMU_INT
 static QueueHandle_t pmu_evt_queue = NULL;
 
 // Interrupt handler function (runs in IRAM)
@@ -46,6 +47,7 @@ static void IRAM_ATTR pmu_isr_handler(void *arg) {
   uint32_t gpio_num = (uint32_t)arg;
   xQueueSendFromISR(pmu_evt_queue, &gpio_num, NULL);
 }
+#endif
 
 static void power_state_update() {
   RemotePowerState powerState = get_power_state();

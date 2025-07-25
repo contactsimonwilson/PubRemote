@@ -9,6 +9,8 @@ static const char *TAG = "PUBREMOTE-CHARGE-DRIVER";
 
 #if PMU_SY6970
   #include "sy6970/charge_driver_sy6970.hpp"
+#elif PMU_AXP2101
+  #include "axp2101/charge_driver_axp2101.hpp"
 #else
   #include "adc/charge_driver_adc.h"
 #endif
@@ -17,6 +19,8 @@ esp_err_t charge_driver_init() {
   ESP_LOGI(TAG, "Init charge driver");
 #if PMU_SY6970
   return sy6970_charge_driver_init();
+#elif PMU_AXP2101
+  return axp2101_charge_driver_init();
 #else
   return adc_charge_driver_init();
 #endif
@@ -26,6 +30,8 @@ RemotePowerState get_power_state() {
   ESP_LOGD(TAG, "Getting battery voltage");
 #if PMU_SY6970
   return sy6970_get_power_state();
+#elif PMU_AXP2101
+  return axp2101_get_power_state();
 #else
   return adc_get_power_state();
 #endif
@@ -94,6 +100,8 @@ uint8_t battery_mv_to_percent(uint16_t voltage_mv) {
 void disable_watchdog() {
 #if PMU_SY6970
   sy6970_disable_watchdog();
+#elif PMU_AXP2101
+  axp2101_disable_watchdog();
 #else
   ESP_LOGW(TAG, "Watchdog not supported by ADC driver");
 #endif
@@ -102,6 +110,8 @@ void disable_watchdog() {
 void enable_watchdog() {
 #if PMU_SY6970
   sy6970_enable_watchdog();
+#elif PMU_AXP2101
+  axp2101_enable_watchdog();
 #else
   ESP_LOGW(TAG, "Watchdog not supported by ADC driver");
 #endif

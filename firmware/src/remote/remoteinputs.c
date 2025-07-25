@@ -99,6 +99,7 @@ static void thumbstick_task(void *pvParameters) {
 #endif
 
   while (1) {
+    uint64_t newTime = get_current_time_ms();
     bool trigger_sleep_disrupt = false;
     int16_t deadband = calibration_settings.deadband;
 #if JOYSTICK_Y_ENABLED
@@ -159,7 +160,10 @@ static void thumbstick_task(void *pvParameters) {
       reset_sleep_timer();
     }
 
-    vTaskDelay(pdMS_TO_TICKS(INPUT_RATE_MS));
+    int64_t elapsed = get_current_time_ms() - newTime;
+    if (elapsed > 0 && elapsed < INPUT_RATE_MS) {
+      vTaskDelay(pdMS_TO_TICKS(INPUT_RATE_MS - elapsed));
+    }
   }
 
   ESP_LOGI(TAG, "Thumbstick task ended");

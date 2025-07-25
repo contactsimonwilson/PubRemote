@@ -29,7 +29,6 @@
 #include <string.h>
 
 static const char *TAG = "PUBREMOTE-MAIN";
-int64_t LAST_COMMAND_TIME = 0;
 
 void app_main(void) {
   // Core setup
