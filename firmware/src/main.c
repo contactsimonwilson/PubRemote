@@ -13,6 +13,7 @@
 #include "remote/espnow.h"
 #include "remote/haptic.h"
 #include "remote/i2c.h"
+#include "remote/imu.h"
 #include "remote/led.h"
 #include "remote/peers.h"
 #include "remote/powermanagement.h"
@@ -44,6 +45,7 @@ void app_main(void) {
   init_led();
   init_thumbstick();
   init_display();
+  init_imu();
 
   // Comms
   init_espnow();
