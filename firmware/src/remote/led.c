@@ -8,6 +8,9 @@
 #include "led_strip.h"
 #include "nvs_flash.h"
 #include "settings.h"
+#include "stats.h"
+#include "time.h"
+#include "vehicle_status.h"
 #include <driver/ledc.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
@@ -84,12 +87,6 @@ static void apply_led_effect() {
     ESP_LOGE(TAG, "LED strip not initialized");
     return;
   }
-  if (current_brightness == 0) {
-    uint32_t color = device_settings.theme_color;
-    rgb.r = (color >> 16) & 0xff;
-    rgb.g = (color >> 8) & 0xff;
-    rgb.b = color & 0xff;
-  }
 
   RGB new_col = adjustBrightness(rgb, current_brightness / 255.0);
 
@@ -100,29 +97,65 @@ static void apply_led_effect() {
   ESP_ERROR_CHECK(led_strip_refresh(led_strip));
 }
 
+static RGB hex_to_rgb(uint32_t hex) {
+  RGB color;
+  color.r = (hex >> 16) & 0xFF;
+  color.g = (hex >> 8) & 0xFF;
+  color.b = hex & 0xFF;
+  return color;
+}
+
+static void pulse_effect() {
+  static bool increasing = true;
+
+  if (increasing) {
+    current_brightness += BRIGHTNESS_STEP;
+  }
+  else {
+    current_brightness -= BRIGHTNESS_STEP;
+  }
+
+  if (current_brightness >= brightness_level) {
+    current_brightness = brightness_level;
+    increasing = false;
+  }
+  else if (current_brightness <= 0) {
+    current_brightness = 0;
+    increasing = true;
+  }
+  apply_led_effect();
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
+
+static void solid_effect(uint32_t hex) {
+  current_brightness = brightness_level;
+  rgb = hex_to_rgb(hex);
+  apply_led_effect();
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
+
 static void led_task(void *pvParameters) {
-  bool increasing = true;
-
   ESP_LOGD(TAG, "Start blinking LED strip");
+  rgb = hex_to_rgb(device_settings.theme_color);
+  bool is_booting = true;
+  // timer to set boot animation off
+  apply_led_effect();
   while (1) {
+    DutyStatus dutyStatus = get_duty_status(remoteStats.dutyCycle);
+    if (dutyStatus != DUTY_STATUS_NONE) {
+      solid_effect(get_duty_color(dutyStatus));
+      continue;
+    }
+
+    if (is_booting) {
+      // Set is_booting to false after 3 seconds
+      is_booting = get_current_time_ms() < 3000;
+      pulse_effect();
+      continue;
+    }
+
+    current_brightness = 0;
     apply_led_effect();
-
-    if (increasing) {
-      current_brightness += BRIGHTNESS_STEP;
-    }
-    else {
-      current_brightness -= BRIGHTNESS_STEP;
-    }
-
-    if (current_brightness >= brightness_level) {
-      current_brightness = brightness_level;
-      increasing = false;
-    }
-    else if (current_brightness <= 0) {
-      current_brightness = 0;
-      increasing = true;
-    }
-
     vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
   }
   led_off();

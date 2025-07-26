@@ -17,7 +17,6 @@
 #include "remote/peers.h"
 #include "remote/powermanagement.h"
 #include "remote/receiver.h"
-#include "remote/remote.h"
 #include "remote/remoteinputs.h"
 #include "remote/screen.h"
 #include "remote/settings.h"

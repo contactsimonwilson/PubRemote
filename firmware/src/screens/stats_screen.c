@@ -1,6 +1,7 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
 #include "remote/display.h"
+#include "remote/vehicle_status.h"
 #include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>
@@ -74,14 +75,10 @@ static void update_utilization_dial_display() {
   // set arc color
   lv_color_t color = lv_color_hex(COLOR_ACTIVE);
 
-  if (remoteStats.dutyCycle > 90) {
-    color = lv_color_hex(COLOR_DANGER);
-  }
-  else if (remoteStats.dutyCycle > 80) {
-    color = lv_color_hex(COLOR_ALERT);
-  }
-  else if (remoteStats.dutyCycle > 70) {
-    color = lv_color_hex(COLOR_WARNING);
+  DutyStatus duty_status = get_duty_status(remoteStats.dutyCycle);
+
+  if (duty_status != DUTY_STATUS_NONE) {
+    color = lv_color_hex(get_duty_color(duty_status));
   }
 
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
