@@ -2,7 +2,6 @@
 #define __CHARGE_DRIVER_AXP2101_HPP
 
 #include <esp_err.h>
-#include <cmath>
 #include <charge/charge_driver.h>
 
 #ifdef __cplusplus

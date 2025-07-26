@@ -131,7 +131,7 @@ static void update_min_max() {
 }
 
 static void update_stick_press_indicator() {
-  bool is_stick_down = gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL;
+  bool is_stick_down = gpio_get_level(PRIMARY_BUTTON) == JOYSTICK_BUTTON_LEVEL;
   if (is_stick_down) {
     lv_obj_set_style_bg_color(ui_PositionIndicatorHoriz, lv_color_hex(COLOR_PRIMARY), LV_PART_MAIN);
     lv_obj_set_style_bg_color(ui_PositionIndicatorVert, lv_color_hex(COLOR_PRIMARY), LV_PART_MAIN);

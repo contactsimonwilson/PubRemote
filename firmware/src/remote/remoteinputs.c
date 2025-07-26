@@ -215,7 +215,7 @@ void init_buttons() {
       .short_press_time = CONFIG_BUTTON_SHORT_PRESS_TIME_MS,
       .gpio_button_config =
           {
-              .gpio_num = JOYSTICK_BUTTON_PIN,
+              .gpio_num = PRIMARY_BUTTON,
               .active_level = JOYSTICK_BUTTON_LEVEL,
           },
   };
