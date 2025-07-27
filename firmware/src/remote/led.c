@@ -19,6 +19,8 @@
 
 static const char *TAG = "PUBREMOTE-LED";
 
+static LedEffect current_effect = LED_EFFECT_NONE;
+
 #if LED_ENABLED
   #define LEDC_CHANNEL LEDC_CHANNEL_2
   #define LEDC_TIMER LEDC_TIMER_2
@@ -28,7 +30,6 @@ static led_strip_handle_t led_strip = NULL;
 static uint8_t brightness_level = 255; // Brightness setting for the LED strip
 static uint8_t current_brightness = 0; // Effective brightness for the animation
 static RGB rgb = {255, 255, 255};
-static LedEffect current_effect = LED_EFFECT_NONE;
 
   #define ANIMATION_DELAY_MS 10 // Delay for the LED animation task
   #define BRIGHTNESS_STEP 5     // Step size for brightness adjustment
@@ -179,32 +180,6 @@ static void no_effect() {
   vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
 }
 
-void set_led_effect_solid(uint32_t color) {
-  rgb = hex_to_rgb(color);
-  current_effect = LED_EFFECT_SOLID;
-  current_brightness = brightness_level;
-  // TODO - Spawn task (kill existing task if running)
-}
-
-void set_led_effect_pulse(uint32_t color) {
-  rgb = hex_to_rgb(color);
-  current_effect = LED_EFFECT_PULSE;
-  current_brightness = 0;
-  // TODO - Spawn task (kill existing task if running)
-}
-
-void set_led_effect_rainbow() {
-  current_effect = LED_EFFECT_RAINBOW;
-  current_brightness = brightness_level;
-  // TODO - Spawn task (kill existing task if running)
-}
-
-void set_led_effect_none() {
-  current_effect = LED_EFFECT_NONE;
-  current_brightness = 0;
-  // TODO - Kill running task
-}
-
 // TODO - make this a spawned task rather than always running
 static void led_task(void *pvParameters) {
   bool is_booting = true;
@@ -250,6 +225,40 @@ static void led_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 #endif
+
+void set_led_effect_solid(uint32_t color) {
+#if LED_ENABLED
+  rgb = hex_to_rgb(color);
+  current_effect = LED_EFFECT_SOLID;
+  current_brightness = brightness_level;
+// TODO - Spawn task (kill existing task if running)
+#endif
+}
+
+void set_led_effect_pulse(uint32_t color) {
+#if LED_ENABLED
+  rgb = hex_to_rgb(color);
+  current_effect = LED_EFFECT_PULSE;
+  current_brightness = 0;
+// TODO - Spawn task (kill existing task if running)
+#endif
+}
+
+void set_led_effect_rainbow() {
+#if LED_ENABLED
+  current_effect = LED_EFFECT_RAINBOW;
+  current_brightness = brightness_level;
+// TODO - Spawn task (kill existing task if running)
+#endif
+}
+
+void set_led_effect_none() {
+#if LED_ENABLED
+  current_effect = LED_EFFECT_NONE;
+  current_brightness = 0;
+// TODO - Kill running task
+#endif
+}
 
 void init_led() {
 #if LED_ENABLED
