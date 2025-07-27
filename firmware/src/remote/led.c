@@ -19,6 +19,7 @@
 
 static const char *TAG = "PUBREMOTE-LED";
 
+static bool is_initialized = false;
 static LedEffect current_effect = LED_EFFECT_NONE;
 
 #if LED_ENABLED
@@ -180,13 +181,12 @@ static void no_effect() {
   vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
 }
 
-// TODO - make this a spawned task rather than always running
 static void led_task(void *pvParameters) {
   bool is_booting = true;
   set_led_effect_pulse(device_settings.theme_color);
   apply_led_effect();
 
-  while (1) {
+  while (is_initialized) {
     if (is_booting) {
       // Set is_booting to false after 3 seconds
       is_booting = get_current_time_ms() < 3000;
@@ -231,7 +231,6 @@ void set_led_effect_solid(uint32_t color) {
   rgb = hex_to_rgb(color);
   current_effect = LED_EFFECT_SOLID;
   current_brightness = brightness_level;
-// TODO - Spawn task (kill existing task if running)
 #endif
 }
 
@@ -240,7 +239,6 @@ void set_led_effect_pulse(uint32_t color) {
   rgb = hex_to_rgb(color);
   current_effect = LED_EFFECT_PULSE;
   current_brightness = 0;
-// TODO - Spawn task (kill existing task if running)
 #endif
 }
 
@@ -248,7 +246,6 @@ void set_led_effect_rainbow() {
 #if LED_ENABLED
   current_effect = LED_EFFECT_RAINBOW;
   current_brightness = brightness_level;
-// TODO - Spawn task (kill existing task if running)
 #endif
 }
 
@@ -256,7 +253,6 @@ void set_led_effect_none() {
 #if LED_ENABLED
   current_effect = LED_EFFECT_NONE;
   current_brightness = 0;
-// TODO - Kill running task
 #endif
 }
 
@@ -265,7 +261,7 @@ void init_led() {
   ESP_LOGI(TAG, "Initializing LED strip");
   led_power_on();
   configure_led();
-
+  is_initialized = true;
   xTaskCreate(led_task, "led_task", 4096, NULL, 2, NULL);
 #endif
 }

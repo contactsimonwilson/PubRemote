@@ -56,11 +56,14 @@ void drv2605_haptic_play_vibration(HapticFeedbackPattern pattern) {
     
     // Configure waveform based on pattern using available waveforms
     switch (pattern) {
+        case HAPTIC_NONE:
+            drv.stop(); // Stop any ongoing vibration
+            return; // Nothing to play
+            break;
         case HAPTIC_SINGLE_CLICK:
             drv.setWaveform(0, 1);
             drv.setWaveform(1, 0);
             break;
-            
         case HAPTIC_DOUBLE_CLICK:
             drv.setWaveform(10, 1);
             drv.setWaveform(1, 0);

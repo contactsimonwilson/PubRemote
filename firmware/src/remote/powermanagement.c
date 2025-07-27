@@ -299,7 +299,7 @@ void power_management_task(void *pvParameters) {
         last_time = esp_timer_get_time(); // Update last time in milliseconds
 
         if (is_power_connected != last_power_connected) {
-          play_note(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
+          set_buzzer_tone(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
         }
       }
     }
@@ -333,12 +333,12 @@ static bool check_pmu_should_wake(bool last_powered) {
   await_pmu_int_reset();
   power_state_update();
   if (is_power_connected && !last_powered) {
-    play_note(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
+    set_buzzer_tone(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
     // Power was connected after last sleep - continue to normal operation
   }
   else {
     if (!is_power_connected && last_powered) {
-      play_note(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+      set_buzzer_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
     }
     enter_sleep();
     return false;

@@ -2,6 +2,7 @@
 #define __HAPTIC_PATTERNS_H
 
 typedef enum {
+  HAPTIC_NONE,         ///< No vibration
   HAPTIC_SINGLE_CLICK, ///< Single strong click
   HAPTIC_DOUBLE_CLICK, ///< Two quick clicks
   HAPTIC_TRIPLE_CLICK, ///< Three quick clicks
