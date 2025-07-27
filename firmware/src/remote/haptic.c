@@ -22,6 +22,13 @@ void vibrate(HapticFeedbackPattern pattern) {
 #endif
 }
 
+void stop_vibration() {
+#if HAPTIC_ENABLED
+  ESP_LOGI(TAG, "Stopping vibration");
+  haptic_stop_vibration();
+#endif
+}
+
 void init_haptic() {
 #if HAPTIC_ENABLED
   haptic_driver_init();

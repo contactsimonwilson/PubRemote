@@ -1,7 +1,7 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
 #include "remote/display.h"
-#include "remote/vehicle_status.h"
+#include "remote/vehicle_state.h"
 #include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>

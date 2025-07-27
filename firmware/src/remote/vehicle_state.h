@@ -1,5 +1,5 @@
-#ifndef __VEHICLE_STATUS_H
-#define __VEHICLE_STATUS_H
+#ifndef __VEHICLE_STATE_H
+#define __VEHICLE_STATE_H
 #include "colors.h"
 #include <stdint.h>
 
@@ -25,5 +25,6 @@ typedef enum {
 
 DutyStatus get_duty_status(uint8_t duty);
 DutyStatusColor get_duty_color(DutyStatus status);
+void init_vechicle_state_monitor();
 
 #endif

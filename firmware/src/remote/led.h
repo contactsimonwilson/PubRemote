@@ -17,5 +17,8 @@ typedef enum {
 
 void init_led();
 void set_led_brightness(uint8_t brightness);
+void set_led_effect_solid(uint32_t color);
+void set_led_effect_pulse(uint32_t color);
+void set_led_effect_none();
 
 #endif

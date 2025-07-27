@@ -10,7 +10,6 @@
 #include "settings.h"
 #include "stats.h"
 #include "time.h"
-#include "vehicle_status.h"
 #include <driver/ledc.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
@@ -29,6 +28,7 @@ static led_strip_handle_t led_strip = NULL;
 static uint8_t brightness_level = 255; // Brightness setting for the LED strip
 static uint8_t current_brightness = 0; // Effective brightness for the animation
 static RGB rgb = {255, 255, 255};
+static LedEffect current_effect = LED_EFFECT_NONE;
 
   #define ANIMATION_DELAY_MS 10 // Delay for the LED animation task
   #define BRIGHTNESS_STEP 5     // Step size for brightness adjustment
@@ -127,33 +127,73 @@ static void pulse_effect() {
   vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
 }
 
-static void solid_effect(uint32_t hex) {
+static void solid_effect() {
   current_brightness = brightness_level;
-  rgb = hex_to_rgb(hex);
   apply_led_effect();
   vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
 }
 
-static void led_task(void *pvParameters) {
-  ESP_LOGD(TAG, "Start blinking LED strip");
-  rgb = hex_to_rgb(device_settings.theme_color);
-  bool is_booting = true;
-  // timer to set boot animation off
+static void no_effect() {
+  current_brightness = 0;
   apply_led_effect();
-  while (1) {
-    DutyStatus dutyStatus = get_duty_status(remoteStats.dutyCycle);
-    if (dutyStatus != DUTY_STATUS_NONE) {
-      solid_effect(get_duty_color(dutyStatus));
-      continue;
-    }
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
 
+void set_led_effect_solid(uint32_t color) {
+  rgb = hex_to_rgb(color);
+  current_effect = LED_EFFECT_SOLID;
+  current_brightness = brightness_level;
+  apply_led_effect();
+  // TODO - Spawn task (kill existing task if running)
+}
+
+void set_led_effect_pulse(uint32_t color) {
+  rgb = hex_to_rgb(color);
+  current_effect = LED_EFFECT_PULSE;
+  current_brightness = brightness_level;
+  apply_led_effect();
+  // TODO - Spawn task (kill existing task if running)
+}
+
+void set_led_effect_none() {
+  current_effect = LED_EFFECT_NONE;
+  current_brightness = 0;
+  apply_led_effect();
+  // TODO - Kill running task
+}
+
+// TODO - make this a spawned task rather than always running
+static void led_task(void *pvParameters) {
+  bool is_booting = true;
+  set_led_effect_pulse(device_settings.theme_color);
+  apply_led_effect();
+
+  while (1) {
     if (is_booting) {
       // Set is_booting to false after 3 seconds
       is_booting = get_current_time_ms() < 3000;
+      if (!is_booting) {
+        current_effect = LED_EFFECT_NONE;
+      }
+    }
+
+    if (current_effect == LED_EFFECT_PULSE) {
       pulse_effect();
       continue;
     }
 
+    if (current_effect == LED_EFFECT_SOLID) {
+      solid_effect();
+      continue;
+    }
+
+    if (current_effect == LED_EFFECT_NONE) {
+      no_effect();
+      continue;
+    }
+
+    // Default off in case of an unknown effect
+    ESP_LOGW(TAG, "Unknown LED effect: %d", current_effect);
     current_brightness = 0;
     apply_led_effect();
     vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));

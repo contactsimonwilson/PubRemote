@@ -28,3 +28,11 @@ void haptic_play_vibration(HapticFeedbackPattern pattern) {
   drv2605_haptic_play_vibration(pattern);
 #endif
 }
+
+void haptic_stop_vibration() {
+#if HAPTIC_DRV2605
+  // Stop vibration using the DRV2605 driver
+  ESP_LOGI(TAG, "Stopping vibration");
+  drv2605_haptic_stop();
+#endif
+}
