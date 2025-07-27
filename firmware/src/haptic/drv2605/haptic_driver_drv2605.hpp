@@ -3,7 +3,7 @@
 #include "esp_err.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "haptic/haptic_driver.h"
+#include "haptic/haptic_patterns.h"
 
 #ifdef __cplusplus
 extern "C" {

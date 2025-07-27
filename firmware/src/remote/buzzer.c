@@ -35,6 +35,7 @@ static const int melody[] = {NOTE_C4, 100, NOTE_D4, 100, NOTE_E4, 100, NOTE_F4, 
 static const int notes = sizeof(melody) / sizeof(melody[0]) / 2; // Number of notes
 #endif
 
+// TODO - make this spawn a task
 void play_note(int frequency, int duration) {
 #if BUZZER_ENABLED
   // Take the mutex

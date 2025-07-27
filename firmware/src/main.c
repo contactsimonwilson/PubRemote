@@ -17,13 +17,13 @@
 #include "remote/peers.h"
 #include "remote/powermanagement.h"
 #include "remote/receiver.h"
-#include "remote/remote.h"
 #include "remote/remoteinputs.h"
 #include "remote/screen.h"
 #include "remote/settings.h"
 #include "remote/stats.h"
 #include "remote/time.h"
 #include "remote/transmitter.h"
+#include "remote/vehicle_state.h"
 #include "ui/ui.h"
 #include <stdio.h>
 #include <string.h>
@@ -44,6 +44,7 @@ void app_main(void) {
   init_led();
   init_thumbstick();
   init_display();
+  init_vechicle_state_monitor();
 
   // Comms
   init_espnow();

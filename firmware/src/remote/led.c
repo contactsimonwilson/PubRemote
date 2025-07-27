@@ -8,6 +8,8 @@
 #include "led_strip.h"
 #include "nvs_flash.h"
 #include "settings.h"
+#include "stats.h"
+#include "time.h"
 #include <driver/ledc.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
@@ -16,6 +18,8 @@
 #include <nvs.h>
 
 static const char *TAG = "PUBREMOTE-LED";
+
+static LedEffect current_effect = LED_EFFECT_NONE;
 
 #if LED_ENABLED
   #define LEDC_CHANNEL LEDC_CHANNEL_2
@@ -84,12 +88,6 @@ static void apply_led_effect() {
     ESP_LOGE(TAG, "LED strip not initialized");
     return;
   }
-  if (current_brightness == 0) {
-    uint32_t color = device_settings.theme_color;
-    rgb.r = (color >> 16) & 0xff;
-    rgb.g = (color >> 8) & 0xff;
-    rgb.b = color & 0xff;
-  }
 
   RGB new_col = adjustBrightness(rgb, current_brightness / 255.0);
 
@@ -100,35 +98,167 @@ static void apply_led_effect() {
   ESP_ERROR_CHECK(led_strip_refresh(led_strip));
 }
 
+static RGB hex_to_rgb(uint32_t hex) {
+  RGB color;
+  color.r = (hex >> 16) & 0xFF;
+  color.g = (hex >> 8) & 0xFF;
+  color.b = hex & 0xFF;
+  return color;
+}
+
+static void pulse_effect() {
+  static bool increasing = true;
+
+  if (increasing) {
+    current_brightness += BRIGHTNESS_STEP;
+  }
+  else {
+    current_brightness -= BRIGHTNESS_STEP;
+  }
+
+  if (current_brightness >= brightness_level) {
+    current_brightness = brightness_level;
+    increasing = false;
+  }
+  else if (current_brightness <= 0) {
+    current_brightness = 0;
+    increasing = true;
+  }
+  apply_led_effect();
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
+
+static void solid_effect() {
+  current_brightness = brightness_level;
+  apply_led_effect();
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
+
+static void rainbow_effect() {
+  static int hue = 0;
+  hue = (hue + 1) % 360; // Increment hue for rainbow effect
+
+  // Convert hue to RGB
+  float r, g, b;
+  int i = hue / 60;
+  float f = (hue / 60.0) - i;
+
+  switch (i % 6) {
+  case 0:
+    r = 1, g = f, b = 0;
+    break;
+  case 1:
+    r = f, g = 1, b = 0;
+    break;
+  case 2:
+    r = 0, g = 1, b = f;
+    break;
+  case 3:
+    r = 0, g = f, b = 1;
+    break;
+  case 4:
+    r = f, g = 0, b = 1;
+    break;
+  case 5:
+    r = 1, g = 0, b = f;
+    break;
+  default:
+    r = g = b = 0;
+    break;
+  }
+
+  rgb.r = (uint8_t)(r * brightness_level);
+  rgb.g = (uint8_t)(g * brightness_level);
+  rgb.b = (uint8_t)(b * brightness_level);
+  apply_led_effect();
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
+
+static void no_effect() {
+  current_brightness = 0;
+  apply_led_effect();
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
+
+// TODO - make this a spawned task rather than always running
 static void led_task(void *pvParameters) {
-  bool increasing = true;
+  bool is_booting = true;
+  set_led_effect_pulse(device_settings.theme_color);
+  apply_led_effect();
 
-  ESP_LOGD(TAG, "Start blinking LED strip");
   while (1) {
+    if (is_booting) {
+      // Set is_booting to false after 3 seconds
+      is_booting = get_current_time_ms() < 3000;
+      if (!is_booting) {
+        current_effect = LED_EFFECT_NONE;
+      }
+    }
+
+    if (current_effect == LED_EFFECT_PULSE) {
+      pulse_effect();
+      continue;
+    }
+
+    if (current_effect == LED_EFFECT_SOLID) {
+      solid_effect();
+      continue;
+    }
+
+    if (current_effect == LED_EFFECT_RAINBOW) {
+      rainbow_effect();
+      continue;
+    }
+
+    if (current_effect == LED_EFFECT_NONE) {
+      no_effect();
+      continue;
+    }
+
+    // Default off in case of an unknown effect
+    ESP_LOGW(TAG, "Unknown LED effect: %d", current_effect);
+    current_brightness = 0;
     apply_led_effect();
-
-    if (increasing) {
-      current_brightness += BRIGHTNESS_STEP;
-    }
-    else {
-      current_brightness -= BRIGHTNESS_STEP;
-    }
-
-    if (current_brightness >= brightness_level) {
-      current_brightness = brightness_level;
-      increasing = false;
-    }
-    else if (current_brightness <= 0) {
-      current_brightness = 0;
-      increasing = true;
-    }
-
     vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
   }
   led_off();
   vTaskDelete(NULL);
 }
 #endif
+
+void set_led_effect_solid(uint32_t color) {
+#if LED_ENABLED
+  rgb = hex_to_rgb(color);
+  current_effect = LED_EFFECT_SOLID;
+  current_brightness = brightness_level;
+// TODO - Spawn task (kill existing task if running)
+#endif
+}
+
+void set_led_effect_pulse(uint32_t color) {
+#if LED_ENABLED
+  rgb = hex_to_rgb(color);
+  current_effect = LED_EFFECT_PULSE;
+  current_brightness = 0;
+// TODO - Spawn task (kill existing task if running)
+#endif
+}
+
+void set_led_effect_rainbow() {
+#if LED_ENABLED
+  current_effect = LED_EFFECT_RAINBOW;
+  current_brightness = brightness_level;
+// TODO - Spawn task (kill existing task if running)
+#endif
+}
+
+void set_led_effect_none() {
+#if LED_ENABLED
+  current_effect = LED_EFFECT_NONE;
+  current_brightness = 0;
+// TODO - Kill running task
+#endif
+}
 
 void init_led() {
 #if LED_ENABLED

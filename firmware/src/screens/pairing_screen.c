@@ -1,4 +1,5 @@
 #include "esp_log.h"
+#include "remote/led.h"
 #include "utilities/screen_utils.h"
 #include <remote/connection.h>
 #include <remote/display.h>
@@ -15,6 +16,7 @@ bool is_pairing_screen_active() {
 // Event handlers
 void pairing_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Pairing screen load start");
+  set_led_effect_rainbow();
   if (LVGL_lock(0)) {
     apply_ui_scale(NULL);
     create_navigation_group(ui_PairingFooter);
@@ -26,6 +28,11 @@ void pairing_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Pairing screen loaded");
   update_connection_state(CONNECTION_STATE_DISCONNECTED);
   pairing_state = PAIRING_STATE_UNPAIRED;
+}
+
+void pairing_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Pairing screen unload start");
+  set_led_effect_none();
 }
 
 void pairing_screen_unloaded(lv_event_t *e) {
