@@ -29,9 +29,11 @@ DutyStatus get_duty_status(uint8_t duty) {
 BuzzerToneFrequency get_buzzer_tone(DutyStatus status) {
   switch (status) {
   case DUTY_STATUS_CAUTION:
-    return NOTE_CAUTION;
+    // return NOTE_CAUTION;
+    return 0;
   case DUTY_STATUS_WARNING:
-    return NOTE_WARNING;
+    // return NOTE_WARNING;
+    return 0;
   case DUTY_STATUS_CRITICAL:
     return NOTE_CRITICAL;
   default:
@@ -87,8 +89,11 @@ static void monitor_task(void *pvParameters) {
       if (is_duty_alert) {
         ESP_LOGW(TAG, "Duty cycle alert: %d%%", remoteStats.dutyCycle);
         set_led_effect_solid(get_duty_color(current_duty_status));
-        vibrate(get_haptic_pattern(current_duty_status));
-        set_buzzer_tone(get_buzzer_tone(current_duty_status), 200 * current_duty_status);
+        if (current_duty_status > last_duty_status) {
+          // Duty cycle increased, alert with haptic and buzzer
+          vibrate(get_haptic_pattern(current_duty_status));
+          set_buzzer_tone(get_buzzer_tone(current_duty_status), 200 * current_duty_status);
+        }
       }
       else {
         ESP_LOGD(TAG, "Duty cycle normal: %d%%", remoteStats.dutyCycle);
