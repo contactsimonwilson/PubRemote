@@ -1,18 +1,18 @@
 #ifndef __BUZZER_H
 #define __BUZZER_H
 
+#include "tones.h"
 #include <stdio.h>
 
 typedef enum {
   BUZZER_PATTERN_NONE,
-  BUZZER_PATTERN_STARTUP_JINGLE,
-  BUZZER_PATTERN_BEEP,
+  BUZZER_PATTERN_MELODY,
   BUZZER_PATTERN_SOLID,
 } BuzzerPatttern;
 
-void play_note(int frequency, int duration);
-void play_melody();
 void init_buzzer();
-void play_startup_sound();
+void set_buzzer_pattern(BuzzerPatttern pattern);
+void set_buzzer_tone(BuzzerToneFrequency note, int duration);
+void stop_buzzer();
 
 #endif

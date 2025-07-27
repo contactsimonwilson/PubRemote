@@ -932,7 +932,7 @@
                 "strtype": "ARC/Range",
                 "intarray": [
                   0,
-                  100
+                  95
                 ],
                 "InheritedType": 7
               },
@@ -27324,7 +27324,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1379,
+    "backup_cnt": 1380,
     "autosave_cnt": 0,
     "group_color_cnt": 0,
     "lvgl_version": "8.3.11",

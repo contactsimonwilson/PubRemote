@@ -226,3 +226,7 @@ def charge_screen_loaded(event_struct):
 def charge_screen_unloaded(event_struct):
     return
 
+
+def pairing_screen_unload_start(event_struct):
+    return
+

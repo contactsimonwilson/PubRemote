@@ -53,6 +53,5 @@ void app_main(void) {
   init_transmitter();
   init_console();
 
-  play_startup_sound();
   ESP_LOGI(TAG, "Boot complete");
 }

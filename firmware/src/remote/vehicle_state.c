@@ -2,12 +2,14 @@
 #include "esp_log.h"
 #include "esp_task.h"
 #include "haptic/haptic_patterns.h"
+#include "remote/buzzer.h"
 #include "remote/haptic.h"
 #include "remote/led.h"
 #include "remote/stats.h"
 
 static const char *TAG = "PUBREMOTE-VEHICLE_STATE";
 #define VEHICLE_STATE_LOOP_TIME_MS 100
+#define VEHICLE_STATE_DEBUG 0
 
 DutyStatus get_duty_status(uint8_t duty) {
   if (duty >= DUTY_THRESHOLD_CRITICAL) {
@@ -24,6 +26,21 @@ DutyStatus get_duty_status(uint8_t duty) {
   }
 }
 
+BuzzerToneFrequency get_buzzer_tone(DutyStatus status) {
+  switch (status) {
+  case DUTY_STATUS_CAUTION:
+    // return NOTE_CAUTION;
+    return 0;
+  case DUTY_STATUS_WARNING:
+    // return NOTE_WARNING;
+    return 0;
+  case DUTY_STATUS_CRITICAL:
+    return NOTE_CRITICAL;
+  default:
+    return 0; // No alert tone
+  }
+}
+
 DutyStatusColor get_duty_color(DutyStatus status) {
   switch (status) {
   case DUTY_STATUS_CAUTION:
@@ -37,23 +54,52 @@ DutyStatusColor get_duty_color(DutyStatus status) {
   }
 }
 
+HapticFeedbackPattern get_haptic_pattern(DutyStatus status) {
+  switch (status) {
+  case DUTY_STATUS_CAUTION:
+    return HAPTIC_SOFT_BUZZ;
+  case DUTY_STATUS_WARNING:
+    return HAPTIC_ALERT_750MS;
+  case DUTY_STATUS_CRITICAL:
+    return HAPTIC_ALERT_1000MS;
+  default:
+    return HAPTIC_NONE; // No alert pattern
+  }
+}
+
 static void monitor_task(void *pvParameters) {
   DutyStatus last_duty_status = DUTY_STATUS_NONE;
+#if VEHICLE_STATE_DEBUG
+  int count = 0;
+#endif
   while (1) {
+
+#if VEHICLE_STATE_DEBUG
+    update_stats_display();
+    remoteStats.dutyCycle = count;
+    count++;
+    if (count >= 100) {
+      count = 0;
+    }
+#endif
+
     DutyStatus current_duty_status = get_duty_status(remoteStats.dutyCycle);
     bool is_duty_alert = get_duty_status(remoteStats.dutyCycle) != DUTY_STATUS_NONE;
     if (current_duty_status != last_duty_status) {
       if (is_duty_alert) {
         ESP_LOGW(TAG, "Duty cycle alert: %d%%", remoteStats.dutyCycle);
         set_led_effect_solid(get_duty_color(current_duty_status));
-        vibrate(HAPTIC_ALERT_1000MS);
-        // TODO - Set buzzer
+        if (current_duty_status > last_duty_status) {
+          // Duty cycle increased, alert with haptic and buzzer
+          vibrate(get_haptic_pattern(current_duty_status));
+          set_buzzer_tone(get_buzzer_tone(current_duty_status), 200 * current_duty_status);
+        }
       }
       else {
-        ESP_LOGI(TAG, "Duty cycle normal: %d%%", remoteStats.dutyCycle);
+        ESP_LOGD(TAG, "Duty cycle normal: %d%%", remoteStats.dutyCycle);
         set_led_effect_none();
         stop_vibration();
-        // TODO - Reset buzzer
+        stop_buzzer();
       }
       last_duty_status = current_duty_status;
       continue;
