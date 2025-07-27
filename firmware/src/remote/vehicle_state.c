@@ -47,13 +47,13 @@ static void monitor_task(void *pvParameters) {
         ESP_LOGW(TAG, "Duty cycle alert: %d%%", remoteStats.dutyCycle);
         set_led_effect_solid(get_duty_color(current_duty_status));
         vibrate(HAPTIC_ALERT_1000MS);
-        // Set buzzer
+        // TODO - Set buzzer
       }
       else {
         ESP_LOGI(TAG, "Duty cycle normal: %d%%", remoteStats.dutyCycle);
         set_led_effect_none();
         stop_vibration();
-        // Reset buzzer
+        // TODO - Reset buzzer
       }
       last_duty_status = current_duty_status;
       continue;
