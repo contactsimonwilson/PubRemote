@@ -133,6 +133,46 @@ static void solid_effect() {
   vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
 }
 
+static void rainbow_effect() {
+  static int hue = 0;
+  hue = (hue + 1) % 360; // Increment hue for rainbow effect
+
+  // Convert hue to RGB
+  float r, g, b;
+  int i = hue / 60;
+  float f = (hue / 60.0) - i;
+
+  switch (i % 6) {
+  case 0:
+    r = 1, g = f, b = 0;
+    break;
+  case 1:
+    r = f, g = 1, b = 0;
+    break;
+  case 2:
+    r = 0, g = 1, b = f;
+    break;
+  case 3:
+    r = 0, g = f, b = 1;
+    break;
+  case 4:
+    r = f, g = 0, b = 1;
+    break;
+  case 5:
+    r = 1, g = 0, b = f;
+    break;
+  default:
+    r = g = b = 0;
+    break;
+  }
+
+  rgb.r = (uint8_t)(r * brightness_level);
+  rgb.g = (uint8_t)(g * brightness_level);
+  rgb.b = (uint8_t)(b * brightness_level);
+  apply_led_effect();
+  vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
+}
+
 static void no_effect() {
   current_brightness = 0;
   apply_led_effect();
@@ -143,22 +183,25 @@ void set_led_effect_solid(uint32_t color) {
   rgb = hex_to_rgb(color);
   current_effect = LED_EFFECT_SOLID;
   current_brightness = brightness_level;
-  apply_led_effect();
   // TODO - Spawn task (kill existing task if running)
 }
 
 void set_led_effect_pulse(uint32_t color) {
   rgb = hex_to_rgb(color);
   current_effect = LED_EFFECT_PULSE;
+  current_brightness = 0;
+  // TODO - Spawn task (kill existing task if running)
+}
+
+void set_led_effect_rainbow() {
+  current_effect = LED_EFFECT_RAINBOW;
   current_brightness = brightness_level;
-  apply_led_effect();
   // TODO - Spawn task (kill existing task if running)
 }
 
 void set_led_effect_none() {
   current_effect = LED_EFFECT_NONE;
   current_brightness = 0;
-  apply_led_effect();
   // TODO - Kill running task
 }
 
@@ -184,6 +227,11 @@ static void led_task(void *pvParameters) {
 
     if (current_effect == LED_EFFECT_SOLID) {
       solid_effect();
+      continue;
+    }
+
+    if (current_effect == LED_EFFECT_RAINBOW) {
+      rainbow_effect();
       continue;
     }
 

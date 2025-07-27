@@ -44,7 +44,7 @@
 #define JOYSTICK_ENABLED (JOYSTICK_X_ENABLED || JOYSTICK_Y_ENABLED)
 
 // Display configuration
-#if defined(TP_CST816S) || defined(TP_3168) || defined(TP_CST9217)
+#if defined(TP_CST816S) || defined(TP_FT3168) || defined(TP_CST9217)
   #define TOUCH_ENABLED 1
 #else
   #define TOUCH_ENABLED 0
