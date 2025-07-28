@@ -28,3 +28,4 @@
 *.db binary
 *.jar binary
 *.pdf binary
+*.zip binary
