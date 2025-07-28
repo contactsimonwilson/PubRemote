@@ -39,6 +39,7 @@ static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 RTC_DATA_ATTR bool is_power_connected = false; // Store power state across deep sleep
 static bool has_pull_resistor = true;
 
+#ifdef PMU_INT
 static QueueHandle_t pmu_evt_queue = NULL;
 
 // Interrupt handler function (runs in IRAM)
@@ -46,6 +47,7 @@ static void IRAM_ATTR pmu_isr_handler(void *arg) {
   uint32_t gpio_num = (uint32_t)arg;
   xQueueSendFromISR(pmu_evt_queue, &gpio_num, NULL);
 }
+#endif
 
 static void power_state_update() {
   RemotePowerState powerState = get_power_state();
@@ -58,15 +60,15 @@ static void power_state_update() {
 }
 
 static bool get_use_light_sleep() {
-  return FORCE_LIGHT_SLEEP || !has_pull_resistor || !gpio_supports_wakeup_from_deep_sleep(JOYSTICK_BUTTON_PIN);
+  return FORCE_LIGHT_SLEEP || !has_pull_resistor || !gpio_supports_wakeup_from_deep_sleep(PRIMARY_BUTTON);
 }
 
 static bool uses_deep_sleep() {
-  return esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep();
+  return esp_sleep_is_valid_wakeup_gpio(PRIMARY_BUTTON) && !get_use_light_sleep();
 }
 
 static bool get_button_pressed() {
-  return gpio_get_level(JOYSTICK_BUTTON_PIN) == JOYSTICK_BUTTON_LEVEL;
+  return gpio_get_level(PRIMARY_BUTTON) == JOYSTICK_BUTTON_LEVEL;
 }
 
 static bool check_button_press() {
@@ -84,8 +86,8 @@ static bool check_button_press() {
 static esp_err_t enable_wake() {
   esp_err_t res = ESP_OK;
 
-  if (esp_sleep_is_valid_wakeup_gpio(JOYSTICK_BUTTON_PIN) && !get_use_light_sleep()) {
-    uint64_t io_mask = BIT64(JOYSTICK_BUTTON_PIN);
+  if (esp_sleep_is_valid_wakeup_gpio(PRIMARY_BUTTON) && !get_use_light_sleep()) {
+    uint64_t io_mask = BIT64(PRIMARY_BUTTON);
 
     res = esp_sleep_enable_ext1_wakeup(io_mask,
                                        JOYSTICK_BUTTON_LEVEL ? ESP_EXT1_WAKEUP_ANY_HIGH : ESP_EXT1_WAKEUP_ANY_LOW);
@@ -103,7 +105,7 @@ static esp_err_t enable_wake() {
   }
   else {
     ESP_LOGI(TAG, "Button pin is not available for wake. Using light sleep instead.");
-    res = gpio_wakeup_enable(JOYSTICK_BUTTON_PIN, JOYSTICK_BUTTON_LEVEL ? GPIO_INTR_HIGH_LEVEL : GPIO_INTR_LOW_LEVEL);
+    res = gpio_wakeup_enable(PRIMARY_BUTTON, JOYSTICK_BUTTON_LEVEL ? GPIO_INTR_HIGH_LEVEL : GPIO_INTR_LOW_LEVEL);
     if (res != ESP_OK) {
       ESP_LOGE(TAG, "Failed to enable wake-up on button press.");
     }
@@ -144,7 +146,7 @@ void unbind_power_button() {
 
 static void power_button_initial_release(void *arg, void *usr_data) {
   unregister_primary_button_cb(BUTTON_PRESS_UP);
-  external_pull_t resistor = detect_gpio_external_pull(JOYSTICK_BUTTON_PIN);
+  external_pull_t resistor = detect_gpio_external_pull(PRIMARY_BUTTON);
   deinit_buttons();
   init_buttons(); // Reinit buttons after detect to ensure correct gpio config
 
@@ -297,7 +299,7 @@ void power_management_task(void *pvParameters) {
         last_time = esp_timer_get_time(); // Update last time in milliseconds
 
         if (is_power_connected != last_power_connected) {
-          play_note(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
+          set_buzzer_tone(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
         }
       }
     }
@@ -331,12 +333,12 @@ static bool check_pmu_should_wake(bool last_powered) {
   await_pmu_int_reset();
   power_state_update();
   if (is_power_connected && !last_powered) {
-    play_note(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
+    set_buzzer_tone(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
     // Power was connected after last sleep - continue to normal operation
   }
   else {
     if (!is_power_connected && last_powered) {
-      play_note(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+      set_buzzer_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
     }
     enter_sleep();
     return false;
@@ -380,7 +382,7 @@ void init_power_management() {
   case ESP_SLEEP_WAKEUP_EXT1:
     ESP_LOGI(TAG, "Woken up by external signal on EXT1.");
     // Proceed to check if the button is still pressed
-    if (wakeup_pin_mask & BIT64(JOYSTICK_BUTTON_PIN)) {
+    if (wakeup_pin_mask & BIT64(PRIMARY_BUTTON)) {
       if (!check_button_press()) {
         enter_sleep();
         return;

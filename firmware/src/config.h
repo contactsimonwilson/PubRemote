@@ -12,7 +12,7 @@
   #define FORCE_LIGHT_SLEEP 0
 #endif
 
-#define MIN_BATTERY_VOLTAGE 3300
+#define MIN_BATTERY_VOLTAGE 3000
 #define MAX_BATTERY_VOLTAGE 4200
 
 // i2c configuration
@@ -23,7 +23,7 @@
 #define I2C_SCL_FREQ_HZ 100000
 
 // Joystick configuration
-#ifdef JOYSTICK_BUTTON_PIN
+#ifdef PRIMARY_BUTTON
   #define JOYSTICK_BUTTON_ENABLED 1
 #else
   #define JOYSTICK_BUTTON_ENABLED 0
@@ -44,16 +44,14 @@
 #define JOYSTICK_ENABLED (JOYSTICK_X_ENABLED || JOYSTICK_Y_ENABLED)
 
 // Display configuration
-#if TP_CST816S
-  #define TOUCH_ENABLED 1
-#elif TP_FT3168
+#if defined(TP_CST816S) || defined(TP_FT3168) || defined(TP_CST9217)
   #define TOUCH_ENABLED 1
 #else
   #define TOUCH_ENABLED 0
 #endif
 
 // Led configuration
-#if defined(LED_DATA_PIN)
+#if defined(LED_DATA)
   #define LED_ENABLED 1
 #else
   #define LED_ENABLED 0

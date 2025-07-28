@@ -1,12 +1,25 @@
 name: Publish Release
 
 # Runs on every update to the master branch with a change to the prebuild_hook.py
+# OR can be manually triggered
 on:
   push:
     branches:
       - master
     paths:
       - prebuild_hook.py
+  workflow_dispatch:
+    inputs:
+      force_run:
+        description: 'Force run without version check'
+        required: false
+        default: false
+        type: boolean
+      custom_version:
+        description: 'Custom version tag (e.g., v1.2.3) - leave empty to use version from prebuild_hook.py'
+        required: false
+        default: ''
+        type: string
         
 concurrency:
   group: ${{ github.workflow }}
@@ -35,6 +48,14 @@ jobs:
       - name: Identify Changed Version
         id: check_changes
         run: |
+          # If manually triggered with force_run, skip version checks
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.force_run }}" == "true" ]]; then
+            echo "Manual run with force_run enabled. Skipping version checks."
+            echo "should_continue=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # If manually triggered without force_run, still check for version changes
           FILE="prebuild_hook.py"
 
           # These are the lines of the file to check
@@ -75,12 +96,18 @@ jobs:
       - name: Extract Version
         id: extract_version
         run: |
-          MAJOR=$(grep '^major_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
-          MINOR=$(grep '^minor_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
-          PATCH=$(grep '^patch_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
-          VERSION_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          # Use custom version if provided, otherwise extract from file
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.custom_version }}" ]]; then
+            VERSION_TAG="${{ github.event.inputs.custom_version }}"
+            echo "Using custom version: $VERSION_TAG"
+          else
+            MAJOR=$(grep '^major_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
+            MINOR=$(grep '^minor_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
+            PATCH=$(grep '^patch_version' prebuild_hook.py | awk -F'=' '{print $2}' | tr -d '[:space:]')
+            VERSION_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+            echo "Extracted Version from file: $VERSION_TAG"
+          fi
 
-          echo "Extracted Version: $VERSION_TAG"
           echo "version_tag=$VERSION_TAG" >> $GITHUB_OUTPUT
 
   build_and_release:
@@ -127,4 +154,4 @@ jobs:
         prerelease: true
         fail_on_unmatched_files: true
         generate_release_notes: true
-                              
+        

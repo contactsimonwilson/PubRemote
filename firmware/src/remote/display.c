@@ -29,6 +29,8 @@
   #include "esp_lcd_touch_cst816s.h"
 #elif TP_FT3168
   #include "esp_lcd_touch_ft3168.h"
+#elif TP_CST9217
+  #include "esp_lcd_touch_cst9217.h"
 #endif
 
 // https://github.com/espressif/esp-idf/blob/master/examples/peripherals/lcd/spi_lcd_touch/main/spi_lcd_touch_example_main.c
@@ -299,6 +301,8 @@ static esp_err_t app_touch_init(void) {
   esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_CST816S_CONFIG();
   #elif TP_FT3168
   esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_FT3168_CONFIG();
+  #elif TP_CST9217
+  esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_CST9217_CONFIG();
   #endif
 
   tp_io_config.scl_speed_hz = I2C_SCL_FREQ_HZ;
@@ -328,6 +332,9 @@ static esp_err_t app_touch_init(void) {
   #elif TP_FT3168
   ESP_LOGI(TAG, "Initialize touch controller FT3168");
   ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_ft3168(tp_io_handle, &tp_cfg, &touch_handle));
+  #elif TP_CST9217
+  ESP_LOGI(TAG, "Initialize touch controller CST9217");
+  ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_cst9217(tp_io_handle, &tp_cfg, &touch_handle));
   #endif
 
   return ESP_OK;

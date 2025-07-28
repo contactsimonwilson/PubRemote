@@ -56,9 +56,6 @@ static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *da
 static void process_data(esp_now_event_t evt) {
   uint8_t *data = evt.data;
   int len = evt.len;
-  int64_t deltaTime = get_current_time_ms() - LAST_COMMAND_TIME;
-  LAST_COMMAND_TIME = 0;
-  ESP_LOGD(TAG, "RTT: %lld", deltaTime);
 
   bool is_pairing_start = pairing_state == PAIRING_STATE_UNPAIRED && is_pairing_screen_active();
   // Check mac for security on anything other than initial pairing
