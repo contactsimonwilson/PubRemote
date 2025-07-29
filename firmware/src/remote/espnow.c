@@ -33,3 +33,7 @@ void init_espnow() {
   ESP_ERROR_CHECK(esp_now_init());
   ESP_LOGI(TAG, "ESP-NOW initialized");
 }
+
+bool is_same_mac(const uint8_t *mac1, const uint8_t *mac2) {
+  return memcmp(mac1, mac2, ESP_NOW_ETH_ALEN) == 0;
+}

@@ -4,10 +4,10 @@
 
 RemoteStats remoteStats;
 
-void update_stats_display() {
-  if (is_stats_screen_active()) {
-    update_stats_screen_display();
-  }
+static callback_registry_t stats_update_registry = {0};
+
+void update_stats() {
+  registry_cb(&stats_update_registry, false);
 }
 
 static void reset_stats() {
@@ -24,9 +24,20 @@ static void reset_stats() {
   remoteStats.signalStrength = -255;
   remoteStats.state = BOARD_STATE_STARTUP;
   remoteStats.switchState = SWITCH_STATE_OFF;
+
+  update_stats();
 }
 
 void init_stats() {
   reset_stats();
-  update_stats_display();
+}
+
+void register_stats_update_cb(callback_t callback) {
+  // Register the callback for stats updates
+  register_cb(&stats_update_registry, callback);
+}
+
+void unregister_stats_update_cb(callback_t callback) {
+  // Unregister the callback for stats updates
+  remove_cb(&stats_update_registry, callback);
 }

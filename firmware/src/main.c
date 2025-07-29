@@ -20,6 +20,7 @@
 #include "remote/remoteinputs.h"
 #include "remote/screen.h"
 #include "remote/settings.h"
+#include "remote/startup.h"
 #include "remote/stats.h"
 #include "remote/time.h"
 #include "remote/transmitter.h"
@@ -52,6 +53,8 @@ void app_main(void) {
   init_receiver();
   init_transmitter();
   init_console();
+
+  startup_cb();
 
   ESP_LOGI(TAG, "Boot complete");
 }
