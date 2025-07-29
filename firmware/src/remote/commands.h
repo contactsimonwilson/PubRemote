@@ -8,7 +8,7 @@ typedef enum {
   // Receiver version commands
   REM_VERSION = 0,
   // Receiver version commands
-  REM_REC_VERSION = 5,
+  REM_RECEIVER_VERSION = 5,
   // Pairing commands
   REM_PAIR_INIT = 10,
   REM_PAIR_BOND = 11,
@@ -16,7 +16,7 @@ typedef enum {
   // Remote specific commands
   REM_SET_CORE_DATA = 100,
   // Receiver specific commands
-  REM_REC_SET_REMOTE_STATE = 150,
+  REM_SET_INPUT_STATE = 150,
 } RemoteCommands;
 
 bool process_board_data(uint8_t *data, int len);

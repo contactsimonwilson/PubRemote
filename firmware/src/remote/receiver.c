@@ -78,8 +78,9 @@ static void process_data(esp_now_event_t evt) {
   switch (command) {
   case REM_VERSION:
     ESP_LOGI(TAG, "Rec: Version: %d", data[1]);
+    // TODO - send back receiver version
     break;
-  case REM_REC_VERSION:
+  case REM_RECEIVER_VERSION:
     ESP_LOGI(TAG, "Rec: Receiver version: %d", data[1]);
     break;
   case REM_PAIR_INIT:
