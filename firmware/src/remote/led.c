@@ -7,10 +7,12 @@
 #include "esp_wifi.h"
 #include "led_strip.h"
 #include "nvs_flash.h"
+#include "remote/startup.h"
 #include "settings.h"
 #include "stats.h"
 #include "time.h"
 #include <driver/ledc.h>
+#include <esp_timer.h>
 #include <esp_wifi.h>
 #include <esp_wifi_types.h>
 #include <led_strip_types.h>
@@ -181,20 +183,39 @@ static void no_effect() {
   vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
 }
 
-static void led_task(void *pvParameters) {
-  bool is_booting = true;
+static esp_timer_handle_t led_startup_off_timer = NULL;
+
+static void startup_effect_stop() {
+  set_led_effect_none();
+
+  if (led_startup_off_timer != NULL) {
+    esp_timer_delete(led_startup_off_timer);
+    led_startup_off_timer = NULL;
+  }
+}
+
+static void play_startup_effect() {
+  if (led_startup_off_timer != NULL) {
+    esp_timer_delete(led_startup_off_timer);
+    led_startup_off_timer = NULL;
+  }
+
+  // Timer configuration
+  esp_timer_create_args_t timer_args = {.callback = startup_effect_stop,
+                                        .arg = NULL,
+                                        .dispatch_method = ESP_TIMER_TASK,
+                                        .name = "led_startup_off",
+                                        .skip_unhandled_events = false};
+
+  // Create the timer
+  esp_timer_create(&timer_args, &led_startup_off_timer);
+  esp_timer_start_once(led_startup_off_timer, 3000 * 1000);
+
   set_led_effect_pulse(device_settings.theme_color);
-  apply_led_effect();
+}
 
+static void led_task(void *pvParameters) {
   while (is_initialized) {
-    if (is_booting) {
-      // Set is_booting to false after 3 seconds
-      is_booting = get_current_time_ms() < 3000;
-      if (!is_booting) {
-        current_effect = LED_EFFECT_NONE;
-      }
-    }
-
     if (current_effect == LED_EFFECT_PULSE) {
       pulse_effect();
       continue;
@@ -263,6 +284,7 @@ void init_led() {
   configure_led();
   is_initialized = true;
   xTaskCreate(led_task, "led_task", 4096, NULL, 2, NULL);
+  register_startup_cb(play_startup_effect);
 #endif
 }
 

@@ -127,7 +127,6 @@ static void calibration_callback(void* arg) {
         ESP_LOGI(TAG, "Calibration complete");
         drv.setMode(SensorDRV2605::MODE_INTTRIG); // Switch back to internal trigger mode
         haptic_initialized = true;
-        drv2605_haptic_play_vibration(HAPTIC_SINGLE_CLICK);
         return;
     }
 }
@@ -147,10 +146,9 @@ static void schedule_calibration_cb() {
         .skip_unhandled_events = false
     };
 
-    esp_timer_handle_t timer_handle;
     // Create the timer
-    esp_timer_create(&timer_args, &timer_handle);
-    esp_timer_start_once(timer_handle, 100 * 1000);
+    esp_timer_create(&timer_args, &calibration_timer);
+    esp_timer_start_once(calibration_timer, 100 * 1000);
 }
 
 static esp_err_t drv2605_init()

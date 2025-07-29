@@ -7,6 +7,7 @@
 #include "esp_wifi.h"
 #include "led_strip.h"
 #include "nvs_flash.h"
+#include "remote/startup.h"
 #include "settings.h"
 #include "tones.h"
 #include <driver/ledc.h>
@@ -160,7 +161,7 @@ static void process_buzzer_pattern() {
 
 #endif
 
-void play_startup_tone() {
+static void play_startup_effect() {
 #if BUZZER_ENABLED
   // Handle startup
   if (device_settings.startup_sound == STARTUP_SOUND_MELODY) {
@@ -215,5 +216,6 @@ void init_buzzer() {
   ledc_channel_config(&channel_conf);
   is_initialized = true;
   xTaskCreate(buzzer_task, "buzzer_task", 4096, NULL, 2, NULL);
+  register_startup_cb(play_startup_effect);
 #endif
 }
