@@ -59,7 +59,7 @@ static void transmitter_task(void *pvParameters) {
   uint8_t ind = 0;
   uint8_t data[100];
 
-  uint8_t last_bytes[sizeof(remote_data.bytes)] = {0};
+  RemoteData last_message = {};
   while (1) {
     int64_t new_time = get_current_time_ms();
 
@@ -70,7 +70,7 @@ static void transmitter_task(void *pvParameters) {
 
     if (should_transmit) {
       // Check if data is the same as last time
-      if (memcmp(remote_data.bytes, last_bytes, sizeof(remote_data.bytes)) == 0 &&
+      if (memcmp(&remote_data, &last_message, sizeof(remote_data)) == 0 &&
           new_time - last_send_time < MAX_UPDATE_DELAY_MS) {
         // No change in data, skip transmission
         should_transmit = false;
@@ -110,7 +110,7 @@ static void transmitter_task(void *pvParameters) {
                    chann, wifi_chann, peer_chann);
         }
         else {
-          memcpy(last_bytes, remote_data.bytes, sizeof(remote_data.bytes));
+          memcpy(&last_message, &remote_data, sizeof(remote_data));
           last_send_time = new_time;
           ESP_LOGD(TAG, "Sent command");
         }

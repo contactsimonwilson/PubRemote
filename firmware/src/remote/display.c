@@ -132,12 +132,12 @@ static void encoder_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
   static uint32_t last_time = 0;
   uint32_t current_time = lv_tick_get();
   int16_t enc_diff = 0;
-  data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+  data->state = remote_data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
-  if (remote_data.data.js_y > 0.5) {
+  if (remote_data.js_y > 0.5) {
     enc_diff = -1;
   }
-  else if (remote_data.data.js_y < -0.5) {
+  else if (remote_data.js_y < -0.5) {
     enc_diff = 1;
   }
 

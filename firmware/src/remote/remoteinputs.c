@@ -183,12 +183,12 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_down_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOWN");
-  remote_data.data.bt_c = 1;
+  remote_data.bt_c = 1;
 }
 
 static void button_up_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON UP");
-  remote_data.data.bt_c = 0;
+  remote_data.bt_c = 0;
 }
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
