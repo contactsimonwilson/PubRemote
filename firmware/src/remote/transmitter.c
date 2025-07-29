@@ -86,7 +86,7 @@ static void transmitter_task(void *pvParameters) {
       // ESP_LOGI(TAG, "Thumbstick x-axis value: %f\n", remote_data.js_x);
       // ESP_LOGI(TAG, "Thumbstick y-axis value: %f\n", remote_data.js_y);
       // Copy secret_Code to the beginning of the buffer
-      data[0] = REM_REC_SET_REMOTE_STATE;
+      data[0] = REM_SET_INPUT_STATE;
       ind++;
 
       memcpy(data + ind, &pairing_settings.secret_code, sizeof(int32_t));

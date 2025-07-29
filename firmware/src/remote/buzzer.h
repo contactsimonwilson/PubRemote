@@ -14,5 +14,6 @@ void init_buzzer();
 void set_buzzer_pattern(BuzzerPatttern pattern);
 void set_buzzer_tone(BuzzerToneFrequency note, int duration);
 void stop_buzzer();
+void play_startup_tone();
 
 #endif

@@ -52,6 +52,7 @@ void app_main(void) {
   init_receiver();
   init_transmitter();
   init_console();
+  play_startup_tone();
 
   ESP_LOGI(TAG, "Boot complete");
 }

@@ -160,9 +160,8 @@ static void process_buzzer_pattern() {
 
 #endif
 
+void play_startup_tone() {
 #if BUZZER_ENABLED
-// task to play melody
-static void buzzer_task(void *pvParameters) {
   // Handle startup
   if (device_settings.startup_sound == STARTUP_SOUND_MELODY) {
     set_buzzer_pattern(BUZZER_PATTERN_MELODY);
@@ -170,6 +169,12 @@ static void buzzer_task(void *pvParameters) {
   else if (device_settings.startup_sound == STARTUP_SOUND_BEEP) {
     set_buzzer_tone(NOTE_C5, 500); // Default beep tone
   }
+#endif
+}
+
+#if BUZZER_ENABLED
+// task to play melody
+static void buzzer_task(void *pvParameters) {
 
   while (is_initialized) {
     if (current_time_left == 0 || current_pattern == BUZZER_PATTERN_NONE) {
