@@ -60,7 +60,13 @@ static void transmitter_task(void *pvParameters) {
   uint8_t data[100];
 
   RemoteData last_message = {};
+  ConnectionState last_connection_state = connection_state;
+  bool should_emit_version = false;
   while (1) {
+    if (connection_state == CONNECTION_STATE_CONNECTED && last_connection_state != CONNECTION_STATE_CONNECTED) {
+      should_emit_version = true;
+    }
+
     int64_t new_time = get_current_time_ms();
 
     bool should_transmit =
@@ -82,10 +88,6 @@ static void transmitter_task(void *pvParameters) {
     }
 
     if (should_transmit) {
-      // Create a new buffer to hold both secret_Code and remote_data.bytes
-      // ESP_LOGI(TAG, "Thumbstick x-axis value: %f\n", remote_data.js_x);
-      // ESP_LOGI(TAG, "Thumbstick y-axis value: %f\n", remote_data.js_y);
-      // Copy secret_Code to the beginning of the buffer
       data[0] = REM_SET_INPUT_STATE;
       ind++;
 
@@ -99,6 +101,7 @@ static void transmitter_task(void *pvParameters) {
       uint8_t *mac_addr = pairing_settings.remote_addr;
       if (channel_lock()) {
         esp_err_t result = esp_now_send(mac_addr, data, ind);
+
         if (result != ESP_OK) {
           // Handle error if needed
           uint8_t chann = pairing_settings.channel;
@@ -114,14 +117,27 @@ static void transmitter_task(void *pvParameters) {
           last_send_time = new_time;
           ESP_LOGD(TAG, "Sent command");
         }
+
+        if (should_emit_version) {
+          ind = 0;
+          data[ind++] = REM_VERSION;
+          memcpy(data + ind, &pairing_settings.secret_code, sizeof(int32_t));
+          ind += sizeof(int32_t);
+          uint8_t version[3] = {VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH};
+          memcpy(data + ind, &version, sizeof(version));
+          ind += sizeof(version);
+          esp_now_send(mac_addr, data, ind);
+          should_emit_version = false;
+        }
+
         channel_unlock();
       }
     }
     // Reset the index for the next data packet and clear the data buffer
     ind = 0;
     memset(data, 0, sizeof(data));
-    vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS));
 
+    last_connection_state = connection_state;
     int64_t elapsed = get_current_time_ms() - last_send_time;
     if (elapsed >= 0 && elapsed < TX_RATE_MS) {
       vTaskDelay(pdMS_TO_TICKS(TX_RATE_MS - elapsed));
