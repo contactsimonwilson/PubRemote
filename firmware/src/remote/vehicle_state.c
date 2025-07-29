@@ -75,8 +75,8 @@ static void monitor_task(void *pvParameters) {
   while (1) {
 
 #if VEHICLE_STATE_DEBUG
-    update_stats_display();
     remoteStats.dutyCycle = count;
+    update_stats();
     count++;
     if (count >= 100) {
       count = 0;

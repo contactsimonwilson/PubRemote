@@ -74,7 +74,7 @@ bool process_board_data(uint8_t *data, int len) {
       ESP_LOGI(TAG, "Battery Level: %.1f", battery_level);
 #endif
 
-      update_stats_display(); // TODO - use callbacks to update the UI instead of direct calls
+      update_stats();
       return true;
     }
     else {

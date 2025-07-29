@@ -39,7 +39,7 @@ void update_connection_state(ConnectionState state) {
     remoteStats.signalStrength = -255;
   }
 
-  update_stats_display();
+  update_stats();
 }
 
 // Use task rather than a timer so we can do heavy lifting in here
