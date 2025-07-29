@@ -48,7 +48,7 @@ static uint8_t get_peer_channel(const uint8_t *peer_mac) {
   return peer_info.channel;
 }
 
-#define MAX_UPDATE_DELAY_MS 1000
+#define MAX_UPDATE_DELAY_MS 500
 
 // Function to send ESP-NOW data
 static void transmitter_task(void *pvParameters) {
