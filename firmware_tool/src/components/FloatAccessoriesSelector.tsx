@@ -10,7 +10,7 @@ export function FloatAccessoriesSelector() {
       date: "2/6/2025",
       variants: [
         {
-          zipUrl: "/float_accessories/float_accessories-2.5.vescpkg.zip",
+          zipUrl: "/float_accessories/float_accessories-2.5.0.vescpkg",
           date: "2/6/2025",
           variant: "float_accessories-2.5.vescpkg"
         }
@@ -22,7 +22,7 @@ export function FloatAccessoriesSelector() {
       date: "3/28/2025",
       variants: [
         {
-          zipUrl: "/float_accessories/float_accessories-2.6.vescpkg.zip",
+          zipUrl: "/float_accessories/float_accessories-2.6.0.vescpkg",
           date: "3/28/2025",
           variant: "float_accessories-2.6.vescpkg"
         }
@@ -30,16 +30,28 @@ export function FloatAccessoriesSelector() {
       releaseType: ReleaseType.Release
     },
     {
-      version: "v2.8.0",
-      date: "5/27/2025",
+      version: "v3.1.2",
+      date: "7/24/2025",
       variants: [
         {
-          zipUrl: "/float_accessories/float_accessories-2.8.vescpkg.zip",
-          date: "5/27/2025",
-          variant: "float_accessories-2.8.vescpkg"
+          zipUrl: "/float_accessories/float_accessories-3.1.2.vescpkg",
+          date: "7/24/2025",
+          variant: "float_accessories-3.1.2.vescpkg"
         }
       ],
       releaseType: ReleaseType.Release
+    },
+    {
+      version: "v3.2.0",
+      date: "7/29/2025",
+      variants: [
+        {
+          zipUrl: "/float_accessories/float_accessories-3.2.0.vescpkg",
+          date: "5/27/2025",
+          variant: "float_accessories-3.2.0.vescpkg"
+        }
+      ],
+      releaseType: ReleaseType.Nightly
     }
   ] as FirmwareVersion[];
 
