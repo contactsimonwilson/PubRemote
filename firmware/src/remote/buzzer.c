@@ -160,7 +160,7 @@ static void process_buzzer_pattern() {
 
 #endif
 
-static void haptic_play_startup_effect() {
+static void play_startup_effect() {
 #if BUZZER_ENABLED
   // Handle startup
   if (device_settings.startup_sound == STARTUP_SOUND_MELODY) {
@@ -215,6 +215,6 @@ void buzzer_init() {
   ledc_channel_config(&channel_conf);
   is_initialized = true;
   xTaskCreate(buzzer_task, "buzzer_task", 4096, NULL, 2, NULL);
-  register_startup_cb(haptic_play_startup_effect);
+  register_startup_cb(play_startup_effect);
 #endif
 }

@@ -19,14 +19,14 @@ static const char *TAG = "PUBREMOTE-HAPTIC";
 void haptic_vibrate(HapticFeedbackPattern pattern) {
 #if HAPTIC_ENABLED
   ESP_LOGI(TAG, "Vibrating with pattern: %d", pattern);
-  haptic_play_vibration(pattern);
+  haptic_driver_play_vibration(pattern);
 #endif
 }
 
 void haptic_stop_vibration() {
 #if HAPTIC_ENABLED
   ESP_LOGI(TAG, "Stopping vibration");
-  haptic_haptic_stop_vibration();
+  haptic_driver_stop_vibration();
 #endif
 }
 

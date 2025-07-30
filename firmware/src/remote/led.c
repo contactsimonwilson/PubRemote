@@ -194,7 +194,7 @@ static void startup_effect_stop() {
   }
 }
 
-static void haptic_play_startup_effect() {
+static void play_startup_effect() {
   if (led_startup_off_timer != NULL) {
     esp_timer_delete(led_startup_off_timer);
     led_startup_off_timer = NULL;
@@ -284,7 +284,7 @@ void led_init() {
   configure_led();
   is_initialized = true;
   xTaskCreate(led_task, "led_task", 4096, NULL, 2, NULL);
-  register_startup_cb(haptic_play_startup_effect);
+  register_startup_cb(play_startup_effect);
 #endif
 }
 
