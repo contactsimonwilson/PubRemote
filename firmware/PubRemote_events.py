@@ -254,3 +254,15 @@ def settings_screen_unload_start(event_struct):
 def calibration_screen_unload_start(event_struct):
     return
 
+
+def update_screen_loaded(event_struct):
+    return
+
+
+def update_screen_load_start(event_struct):
+    return
+
+
+def update_screen_unload_start(event_struct):
+    return
+

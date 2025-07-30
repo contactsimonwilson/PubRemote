@@ -37,7 +37,7 @@ void ui_event_UpdateButton(lv_event_t *e) {
   lv_event_code_t event_code = lv_event_get_code(e);
 
   if (event_code == LV_EVENT_CLICKED) {
-    update_button_press(e);
+    _ui_screen_change(&ui_UpdateScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_UpdateScreen_screen_init);
   }
 }
 
@@ -118,11 +118,16 @@ void ui_AboutScreen_screen_init(void) {
   lv_obj_clear_flag(ui_VersionInfoLabel, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
 
   ui_UpdateButton = lv_btn_create(ui_VersionInfoContainer);
-  lv_obj_set_height(ui_UpdateButton, 42);
+  lv_obj_set_height(ui_UpdateButton, 32);
   lv_obj_set_width(ui_UpdateButton, LV_SIZE_CONTENT); /// 1
   lv_obj_set_align(ui_UpdateButton, LV_ALIGN_CENTER);
   lv_obj_add_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
   lv_obj_clear_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+  lv_obj_set_style_bg_color(ui_UpdateButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_opa(ui_UpdateButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_border_color(ui_UpdateButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_border_opa(ui_UpdateButton, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_border_width(ui_UpdateButton, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_font(ui_UpdateButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_UpdateButtonLabel = lv_label_create(ui_UpdateButton);

@@ -26,6 +26,7 @@ extern "C"
 #include "ui_SettingsScreen.h"
 #include "ui_SplashScreen.h"
 #include "ui_StatsScreen.h"
+#include "ui_UpdateScreen.h"
 
   ///////////////////// VARIABLES ////////////////////
 

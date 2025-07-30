@@ -53,7 +53,7 @@ typedef struct {
  *     - ESP_ERR_NO_MEM: Memory allocation failed
  *     - Other ESP_ERR_* codes from underlying functions
  */
-esp_err_t wifi_init_from_espnow(void);
+esp_err_t wifi_init(void);
 
 /**
  * @brief Scan for available WiFi networks and return list

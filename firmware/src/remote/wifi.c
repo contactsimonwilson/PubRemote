@@ -5,7 +5,7 @@
 #define RECONNECT_DELAY_MS 5000
 
 static bool is_initialized = false;
-static const char *TAG = "wifi_station";
+static const char *TAG = "PUBMOTE-WIFI";
 static EventGroupHandle_t s_wifi_event_group;
 static int s_retry_num = 0;
 static wifi_connection_state_t s_wifi_state = WIFI_STATE_DISCONNECTED;
@@ -87,7 +87,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 }
 
 // Initialize WiFi station mode after ESP-NOW
-esp_err_t wifi_init_from_espnow(void) {
+esp_err_t wifi_init(void) {
   ESP_LOGI(TAG, "Initializing WiFi station mode after ESP-NOW");
 
   // Note: Call esp_now_deinit() before calling this function
