@@ -158,6 +158,13 @@ void update_task(void *pvParameters) {
     vTaskDelay(pdMS_TO_TICKS(LV_DISP_DEF_REFR_PERIOD));
   }
 
+  if (wifi_is_initialized()) {
+    wifi_uninit();
+  }
+  if (!espnow_is_initialized()) {
+    espnow_init();
+  }
+
   ESP_LOGI(TAG, "Update task ended");
   vTaskDelete(NULL);
   update_task_handle = NULL;
@@ -220,16 +227,6 @@ void update_screen_loaded(lv_event_t *e) {
 }
 
 void update_screen_unload_start(lv_event_t *e) {
-  // if (update_task_handle != NULL) {
-  //   vTaskDelete(update_task_handle);
-  //   update_task_handle = NULL;
-  // }
-  if (wifi_is_initialized()) {
-    wifi_uninit();
-  }
-  if (!espnow_is_initialized()) {
-    espnow_init();
-  }
   ESP_LOGI(TAG, "Update screen unload start");
 }
 
