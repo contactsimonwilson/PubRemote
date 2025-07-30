@@ -55,7 +55,7 @@ static i2c_master_dev_handle_t get_device_handle(uint8_t device_addr) {
   return NULL;
 }
 
-i2c_master_bus_handle_t get_i2c_bus_handle() {
+i2c_master_bus_handle_t i2c_get_bus_handle() {
   if (i2c_bus_handle == NULL) {
     ESP_LOGE(TAG, "I2C bus handle is not initialized");
     return NULL;

@@ -12,7 +12,7 @@ typedef enum {
   EXTERNAL_PULL_ERROR
 } external_pull_t;
 
-external_pull_t detect_gpio_external_pull(int gpio_num);
+external_pull_t gpio_detect_external_pull(int gpio_num);
 bool gpio_supports_wakeup_from_deep_sleep(gpio_num_t gpio_num);
 
 #endif

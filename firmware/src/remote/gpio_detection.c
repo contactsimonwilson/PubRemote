@@ -5,7 +5,7 @@ static const char *TAG = "PUBREMOTE-GPIO_DETECTION";
 #define GPIO_SETTLE_TIME 10
 
 // Detect if a GPIO pin has an external pull-up or pull-down resistor
-external_pull_t detect_gpio_external_pull(int gpio_num) {
+external_pull_t gpio_detect_external_pull(int gpio_num) {
   external_pull_t result = EXTERNAL_PULL_NONE;
 
   // Step 1: Configure GPIO as input with no pull-up/down

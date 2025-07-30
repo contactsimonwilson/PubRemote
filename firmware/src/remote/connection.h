@@ -19,9 +19,9 @@ typedef enum {
 extern ConnectionState connection_state;
 extern PairingState pairing_state;
 
-void update_connection_state(ConnectionState state);
-void init_connection();
-void connect_to_peer(uint8_t *mac_addr, uint8_t channel);
-void connect_to_default_peer();
+void connection_update_state(ConnectionState state);
+void connection_init();
+void connection_connect_to_peer(uint8_t *mac_addr, uint8_t channel);
+void connection_connect_to_default_peer();
 
 #endif

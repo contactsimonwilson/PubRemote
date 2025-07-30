@@ -40,7 +40,7 @@ static const int melody[] = {NOTE_C4, 100, NOTE_D4, 100, NOTE_E4, 100, NOTE_F4, 
 static const int melody_duration = 900;
 #endif
 
-void stop_buzzer() {
+void buzzer_stop() {
 #if BUZZER_ENABLED
   int duty = BUZZER_INVERT ? BUZZER_MAX_DUTY : 0; // Invert duty if needed
   current_pattern = BUZZER_PATTERN_NONE;          // Reset pattern
@@ -102,7 +102,7 @@ static void process_melody() {
   current_frequency = frequency;
 }
 
-void set_buzzer_pattern(BuzzerPatttern pattern) {
+void buzzer_set_pattern(BuzzerPatttern pattern) {
 #if BUZZER_ENABLED
   ESP_LOGI(TAG, "Setting buzzer pattern to %d", pattern);
 
@@ -121,8 +121,7 @@ void set_buzzer_pattern(BuzzerPatttern pattern) {
     ESP_LOGI(TAG, "Buzzer pattern set to SOLID");
     break;
   default:
-    ESP_LOGW(TAG, "Unsupported buzzer pattern: %d", pattern);
-    stop_buzzer();                         // Stop any current sound
+    buzzer_stop();                         // Stop any current sound
     current_pattern = BUZZER_PATTERN_NONE; // Reset pattern
     current_frequency = 0;                 // Reset frequency
     current_time_left = 0;                 // Reset time left
@@ -131,14 +130,14 @@ void set_buzzer_pattern(BuzzerPatttern pattern) {
 #endif
 }
 
-void set_buzzer_tone(BuzzerToneFrequency frequency, int duration) {
+void buzzer_set_tone(BuzzerToneFrequency frequency, int duration) {
 #if BUZZER_ENABLED
   if (!frequency || !duration) {
     ESP_LOGW(TAG, "Invalid frequency or duration for buzzer tone");
-    set_buzzer_pattern(BUZZER_PATTERN_NONE); // Reset to no pattern
+    buzzer_set_pattern(BUZZER_PATTERN_NONE); // Reset to no pattern
     return;
   }
-  stop_buzzer();                          // Stop any current sound
+  buzzer_stop();                          // Stop any current sound
   current_pattern = BUZZER_PATTERN_SOLID; // Set to solid tone
   current_frequency = frequency;
   current_time_left = duration;
@@ -161,14 +160,14 @@ static void process_buzzer_pattern() {
 
 #endif
 
-static void play_startup_effect() {
+static void haptic_play_startup_effect() {
 #if BUZZER_ENABLED
   // Handle startup
   if (device_settings.startup_sound == STARTUP_SOUND_MELODY) {
-    set_buzzer_pattern(BUZZER_PATTERN_MELODY);
+    buzzer_set_pattern(BUZZER_PATTERN_MELODY);
   }
   else if (device_settings.startup_sound == STARTUP_SOUND_BEEP) {
-    set_buzzer_tone(NOTE_C5, 500); // Default beep tone
+    buzzer_set_tone(NOTE_C5, 500); // Default beep tone
   }
 #endif
 }
@@ -181,7 +180,7 @@ static void buzzer_task(void *pvParameters) {
     if (current_time_left == 0 || current_pattern == BUZZER_PATTERN_NONE) {
       current_pattern = BUZZER_PATTERN_NONE; // Reset pattern
       current_time_left = 0;                 // Reset time left
-      stop_buzzer();
+      buzzer_stop();
       vTaskDelay(pdMS_TO_TICKS(BUZZER_DELAY_MS));
       continue;
     }
@@ -193,12 +192,12 @@ static void buzzer_task(void *pvParameters) {
     }
     vTaskDelay(pdMS_TO_TICKS(BUZZER_DELAY_MS));
   }
-  stop_buzzer();
+  buzzer_stop();
   vTaskDelete(NULL);
 }
 #endif
 
-void init_buzzer() {
+void buzzer_init() {
 #if BUZZER_ENABLED
   ledc_channel_config_t channel_conf = {
       .gpio_num = BUZZER_PWM,
@@ -216,6 +215,6 @@ void init_buzzer() {
   ledc_channel_config(&channel_conf);
   is_initialized = true;
   xTaskCreate(buzzer_task, "buzzer_task", 4096, NULL, 2, NULL);
-  register_startup_cb(play_startup_effect);
+  register_startup_cb(haptic_play_startup_effect);
 #endif
 }

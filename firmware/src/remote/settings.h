@@ -7,11 +7,8 @@
 #include <esp_now.h>
 #include <remote/receiver.h>
 
-// Function to initialize NVS
-esp_err_t init_nvs();
-
 // Function to initialize settings (and NVS)
-esp_err_t init_settings();
+esp_err_t settings_init();
 
 // Function to write an integer to NVS
 esp_err_t nvs_write_int(const char *key, uint32_t value);

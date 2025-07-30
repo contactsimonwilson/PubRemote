@@ -493,7 +493,7 @@ static void update_footpad_display() {
   last_value = remoteStats.switchState;
 }
 
-static void update_stats_screen_display() {
+static void stats_update_screen_display() {
   if (LVGL_lock(-1)) {
     if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
       lv_label_set_text(ui_PrimaryStatUnit, KILOMETERS_PER_HOUR_LABEL);
@@ -535,12 +535,12 @@ void stats_screen_load_start(lv_event_t *e) {
     LVGL_unlock();
   }
 
-  register_stats_update_cb(update_stats_screen_display);
+  stats_register_update_cb(stats_update_screen_display);
 }
 
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
-  update_stats_screen_display();
+  stats_update_screen_display();
 
   if (LVGL_lock(-1)) {
     lv_obj_set_scroll_snap_x(ui_SecondaryStatContainer, LV_SCROLL_SNAP_CENTER);
@@ -550,7 +550,7 @@ void stats_screen_loaded(lv_event_t *e) {
 
 void stats_screen_unloaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen unloaded");
-  unregister_stats_update_cb(update_stats_screen_display);
+  stats_unregister_update_cb(stats_update_screen_display);
 }
 
 void stat_long_press(lv_event_t *e) {

@@ -27,19 +27,19 @@ ConnectionState connection_state = CONNECTION_STATE_DISCONNECTED;
 PairingState pairing_state = PAIRING_STATE_UNPAIRED;
 static int64_t last_connection_state_change = 0;
 
-void update_connection_state(ConnectionState state) {
+void connection_update_state(ConnectionState state) {
   connection_state = state;
   last_connection_state_change = get_current_time_ms();
 
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
     // Reset all stats when moving to disconnected state
-    init_stats();
+    stats_init();
   }
   else if (connection_state == CONNECTION_STATE_RECONNECTING) {
     remoteStats.signalStrength = -255;
   }
 
-  update_stats();
+  stats_update();
 }
 
 // Use task rather than a timer so we can do heavy lifting in here
@@ -51,18 +51,18 @@ static void connection_task(void *pvParameters) {
     else if (connection_state == CONNECTION_STATE_CONNECTED) {
       if (get_current_time_ms() - remoteStats.lastUpdated > RECONNECTING_DURATION_MS) {
         // No data received for a while - update connection state
-        update_connection_state(CONNECTION_STATE_RECONNECTING);
+        connection_update_state(CONNECTION_STATE_RECONNECTING);
       }
     }
     else if (connection_state == CONNECTION_STATE_CONNECTING) {
       if (get_current_time_ms() - last_connection_state_change > TIMEOUT_DURATION_MS) {
         // Never connected - reset the connection state
-        update_connection_state(CONNECTION_STATE_DISCONNECTED);
+        connection_update_state(CONNECTION_STATE_DISCONNECTED);
       }
       else if (remoteStats.lastUpdated > 0 &&
                get_current_time_ms() - remoteStats.lastUpdated < RECONNECTING_DURATION_MS) {
         // Connected - update connection state
-        update_connection_state(CONNECTION_STATE_CONNECTED);
+        connection_update_state(CONNECTION_STATE_CONNECTED);
         // Save pairing data. This way we remember the last channel we connected on
         save_pairing_data();
       }
@@ -70,11 +70,11 @@ static void connection_task(void *pvParameters) {
     else if (connection_state == CONNECTION_STATE_RECONNECTING) {
       if (get_current_time_ms() - last_connection_state_change > TIMEOUT_DURATION_MS) {
         // Reconnect failed - reset the connection state
-        update_connection_state(CONNECTION_STATE_DISCONNECTED);
+        connection_update_state(CONNECTION_STATE_DISCONNECTED);
       }
       else if (get_current_time_ms() - remoteStats.lastUpdated < RECONNECTING_DURATION_MS) {
         // Reconnected - update connection state
-        update_connection_state(CONNECTION_STATE_CONNECTED);
+        connection_update_state(CONNECTION_STATE_CONNECTED);
       }
     }
 
@@ -86,7 +86,7 @@ static void connection_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
-void connect_to_peer(uint8_t *mac_addr, uint8_t channel) {
+void connection_connect_to_peer(uint8_t *mac_addr, uint8_t channel) {
   esp_now_peer_info_t peerInfo = {};
   peerInfo.channel = channel; // Set the channel number (0-14)
   peerInfo.encrypt = false;
@@ -102,28 +102,28 @@ void connect_to_peer(uint8_t *mac_addr, uint8_t channel) {
   esp_err_t result = esp_now_add_peer(&peerInfo);
 
   if (result == ESP_OK) {
-    update_connection_state(CONNECTION_STATE_CONNECTING);
+    connection_update_state(CONNECTION_STATE_CONNECTING);
   }
   else {
     ESP_LOGE(TAG, "Failed to add peer");
   }
 }
 
-void connect_to_default_peer() {
+void connection_connect_to_default_peer() {
   if (pairing_state == PAIRING_STATE_PAIRED) {
     uint8_t *mac_addr = pairing_settings.remote_addr;
-    connect_to_peer(mac_addr, pairing_settings.channel);
+    connection_connect_to_peer(mac_addr, pairing_settings.channel);
   }
 }
 
-void init_connection() {
+void connection_init() {
   if (pairing_settings.secret_code != DEFAULT_PAIRING_SECRET_CODE) {
     pairing_state = PAIRING_STATE_PAIRED;
   }
 
   // start off in connecting mode
   if (pairing_state == PAIRING_STATE_PAIRED) {
-    connect_to_default_peer();
+    connection_connect_to_default_peer();
   }
 
   xTaskCreatePinnedToCore(connection_task, "connection_task", 4096, NULL, 20, NULL, 0);

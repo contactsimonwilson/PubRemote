@@ -16,30 +16,30 @@
 
 static const char *TAG = "PUBREMOTE-HAPTIC";
 
-void vibrate(HapticFeedbackPattern pattern) {
+void haptic_vibrate(HapticFeedbackPattern pattern) {
 #if HAPTIC_ENABLED
   ESP_LOGI(TAG, "Vibrating with pattern: %d", pattern);
   haptic_play_vibration(pattern);
 #endif
 }
 
-void stop_vibration() {
+void haptic_stop_vibration() {
 #if HAPTIC_ENABLED
   ESP_LOGI(TAG, "Stopping vibration");
-  haptic_stop_vibration();
+  haptic_haptic_stop_vibration();
 #endif
 }
 
-static void play_startup_effect() {
+static void haptic_play_startup_effect() {
 #if HAPTIC_ENABLED
-  vibrate(HAPTIC_SINGLE_CLICK);
+  haptic_vibrate(HAPTIC_SINGLE_CLICK);
   // Additional startup effects can be added here
 #endif
 }
 
-void init_haptic() {
+void haptic_init() {
 #if HAPTIC_ENABLED
   haptic_driver_init();
-  register_startup_cb(play_startup_effect);
+  register_startup_cb(haptic_play_startup_effect);
 #endif
 }

@@ -62,9 +62,9 @@ typedef struct {
 
 extern RemoteStats remoteStats;
 
-void update_stats();
-void init_stats();
-void register_stats_update_cb(callback_t callback);
-void unregister_stats_update_cb(callback_t callback);
+void stats_update();
+void stats_init();
+void stats_register_update_cb(callback_t callback);
+void stats_unregister_update_cb(callback_t callback);
 
 #endif

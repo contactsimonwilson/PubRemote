@@ -76,7 +76,7 @@ static void monitor_task(void *pvParameters) {
 
 #if VEHICLE_STATE_DEBUG
     remoteStats.dutyCycle = count;
-    update_stats();
+    stats_update();
     count++;
     if (count >= 100) {
       count = 0;
@@ -88,18 +88,18 @@ static void monitor_task(void *pvParameters) {
     if (current_duty_status != last_duty_status) {
       if (is_duty_alert) {
         ESP_LOGW(TAG, "Duty cycle alert: %d%%", remoteStats.dutyCycle);
-        set_led_effect_solid(get_duty_color(current_duty_status));
+        led_set_effect_solid(get_duty_color(current_duty_status));
         if (current_duty_status > last_duty_status) {
           // Duty cycle increased, alert with haptic and buzzer
-          vibrate(get_haptic_pattern(current_duty_status));
-          set_buzzer_tone(get_buzzer_tone(current_duty_status), 200 * current_duty_status);
+          haptic_vibrate(get_haptic_pattern(current_duty_status));
+          buzzer_set_tone(get_buzzer_tone(current_duty_status), 200 * current_duty_status);
         }
       }
       else {
         ESP_LOGD(TAG, "Duty cycle normal: %d%%", remoteStats.dutyCycle);
-        set_led_effect_none();
-        stop_vibration();
-        stop_buzzer();
+        led_set_effect_none();
+        haptic_stop_vibration();
+        buzzer_stop();
       }
       last_duty_status = current_duty_status;
       continue;
@@ -110,7 +110,7 @@ static void monitor_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
-void init_vechicle_state_monitor() {
+void vehicle_monitor_init() {
   xTaskCreate(monitor_task, "monitor_task", 4096, NULL, 5, NULL);
   ESP_LOGI("VEHICLE_STATE", "Vehicle state monitor initialized");
 }

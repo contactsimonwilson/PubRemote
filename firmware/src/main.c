@@ -34,25 +34,25 @@ static const char *TAG = "PUBREMOTE-MAIN";
 void app_main(void) {
   // Core setup
   init_i2c();
-  init_settings();
+  settings_init();
   init_adcs();
-  init_buttons(); // Required before power management for boot button detection
-  init_buzzer();  // Required before power management for buzzer control
-  init_haptic();  // Required before power management for haptic control
-  init_power_management();
+  buttons_init(); // Required before power management for boot button detection
+  buzzer_init();  // Required before power management for buzzer control
+  haptic_init();  // Required before power management for haptic control
+  power_management_init();
 
   // Peripherals
-  init_led();
-  init_thumbstick();
-  init_display();
-  init_vechicle_state_monitor();
+  led_init();
+  thumbstick_init();
+  display_init();
+  vehicle_monitor_init();
 
   // Comms
-  init_espnow();
-  init_connection();
-  init_receiver();
-  init_transmitter();
-  init_console();
+  espnow_init();
+  connection_init();
+  receiver_init();
+  transmitter_init();
+  console_init();
 
   startup_cb();
 

@@ -30,8 +30,8 @@ typedef enum {
   BOARD_STATE_DISABLED = 15,
 } BoardState;
 
-bool channel_lock();
-void channel_unlock();
-void init_receiver();
+bool receiver_lock_channel();
+void receiver_unlock_channel();
+void receiver_init();
 
 #endif

@@ -83,10 +83,10 @@ void menu_connect_press(lv_event_t *e) {
   ESP_LOGI(TAG, "Connect button pressed");
 
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
-    connect_to_default_peer();
+    connection_connect_to_default_peer();
   }
   else {
-    update_connection_state(CONNECTION_STATE_DISCONNECTED);
+    connection_update_state(CONNECTION_STATE_DISCONNECTED);
   }
 
   if (LVGL_lock(0)) {

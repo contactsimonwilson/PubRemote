@@ -9,7 +9,7 @@
 
 static const char *TAG = "PUBREMOTE-PAIRING";
 
-bool process_pairing_init(uint8_t *data, int len, esp_now_event_t evt) {
+bool pairing_process_init_event(uint8_t *data, int len, esp_now_event_t evt) {
   if (len == 6) {
     uint8_t rec_mac[ESP_NOW_ETH_ALEN];
     memcpy(rec_mac, data, ESP_NOW_ETH_ALEN);
@@ -34,7 +34,7 @@ bool process_pairing_init(uint8_t *data, int len, esp_now_event_t evt) {
     uint8_t *mac_addr = pairing_settings.remote_addr;
     esp_err_t result = ESP_FAIL;
 
-    if (channel_lock()) {
+    if (receiver_lock_channel()) {
       if (esp_now_is_peer_exist(mac_addr)) {
         esp_err_t res = esp_now_del_peer(mac_addr);
         if (res != ESP_OK) {
@@ -45,7 +45,7 @@ bool process_pairing_init(uint8_t *data, int len, esp_now_event_t evt) {
       esp_now_add_peer(&peerInfo);
 
       result = esp_now_send(mac_addr, (uint8_t *)&PAIR_BOND_RES, sizeof(PAIR_BOND_RES));
-      channel_unlock();
+      receiver_unlock_channel();
     }
 
     if (result != ESP_OK) {
@@ -65,7 +65,7 @@ bool process_pairing_init(uint8_t *data, int len, esp_now_event_t evt) {
   return false;
 }
 
-bool process_pairing_bond(uint8_t *data, int len) {
+bool pairing_process_bond_event(uint8_t *data, int len) {
   ESP_LOGI(TAG, "Pairing bond");
   if (pairing_state == PAIRING_STATE_PAIRING && len == 4) {
     // grab secret code
@@ -89,7 +89,7 @@ bool process_pairing_bond(uint8_t *data, int len) {
   return false;
 }
 
-bool process_pairing_complete(uint8_t *data, int len) {
+bool pairing_process_completion_event(uint8_t *data, int len) {
   if (pairing_state == PAIRING_STATE_PENDING && len == 1) {
     ESP_LOGI(TAG, "Grabbing response");
     ESP_LOGI(TAG, "packet Length: %d", len);
@@ -100,7 +100,7 @@ bool process_pairing_complete(uint8_t *data, int len) {
       if (LVGL_lock(0)) {
         pairing_state = PAIRING_STATE_PAIRED;
         save_pairing_data();
-        connect_to_default_peer();
+        connection_connect_to_default_peer();
         lv_disp_load_scr(ui_StatsScreen);
         LVGL_unlock();
       }
