@@ -35,8 +35,8 @@ void ui_ChargeScreen_screen_init(void) {
   lv_obj_set_style_bg_opa(ui_ChargeScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_ChargeLevelDial = lv_arc_create(ui_ChargeScreen);
-  lv_obj_set_width(ui_ChargeLevelDial, lv_pct(100));
-  lv_obj_set_height(ui_ChargeLevelDial, lv_pct(100));
+  lv_obj_set_width(ui_ChargeLevelDial, 240);
+  lv_obj_set_height(ui_ChargeLevelDial, 240);
   lv_obj_set_align(ui_ChargeLevelDial, LV_ALIGN_CENTER);
   lv_arc_set_value(ui_ChargeLevelDial, 0);
   lv_arc_set_bg_angles(ui_ChargeLevelDial, 90, 89);

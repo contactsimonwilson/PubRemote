@@ -93,8 +93,8 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_style_bg_opa(ui_StatsScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_SpeedDial = lv_arc_create(ui_StatsScreen);
-  lv_obj_set_width(ui_SpeedDial, lv_pct(100));
-  lv_obj_set_height(ui_SpeedDial, lv_pct(100));
+  lv_obj_set_width(ui_SpeedDial, 240);
+  lv_obj_set_height(ui_SpeedDial, 240);
   lv_obj_set_align(ui_SpeedDial, LV_ALIGN_CENTER);
   lv_arc_set_range(ui_SpeedDial, 0, 40);
   lv_arc_set_value(ui_SpeedDial, 0);
@@ -147,7 +147,7 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_style_bg_opa(ui_UtilizationBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_LeftSensor = lv_arc_create(ui_StatsScreen);
-  lv_obj_set_width(ui_LeftSensor, lv_pct(100));
+  lv_obj_set_width(ui_LeftSensor, 240);
   lv_obj_set_height(ui_LeftSensor, lv_pct(100));
   lv_obj_set_align(ui_LeftSensor, LV_ALIGN_CENTER);
   lv_arc_set_range(ui_LeftSensor, 0, 1);
@@ -165,7 +165,7 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_style_bg_opa(ui_LeftSensor, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
 
   ui_RightSensor = lv_arc_create(ui_StatsScreen);
-  lv_obj_set_width(ui_RightSensor, lv_pct(100));
+  lv_obj_set_width(ui_RightSensor, 240);
   lv_obj_set_height(ui_RightSensor, lv_pct(100));
   lv_obj_set_align(ui_RightSensor, LV_ALIGN_CENTER);
   lv_arc_set_range(ui_RightSensor, 0, 1);

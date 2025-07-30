@@ -10,6 +10,7 @@
 #include <remote/stats.h>
 
 static const char *TAG = "PUBREMOTE-ESPNOW";
+static bool is_initialized = false;
 
 void espnow_init() {
   // Initialize NVS (handle case where already initialized)
@@ -74,6 +75,7 @@ void espnow_init() {
   // Initialize ESP-NOW
   ESP_ERROR_CHECK(esp_now_init());
   ESP_LOGI(TAG, "ESP-NOW initialized successfully");
+  is_initialized = true;
 }
 
 void espnow_deinit() {
@@ -81,8 +83,13 @@ void espnow_deinit() {
   ESP_ERROR_CHECK(esp_wifi_stop());
   ESP_ERROR_CHECK(esp_wifi_deinit());
   ESP_LOGI(TAG, "ESP-NOW deinitialized");
+  is_initialized = false;
 }
 
 bool is_same_mac(const uint8_t *mac1, const uint8_t *mac2) {
   return memcmp(mac1, mac2, ESP_NOW_ETH_ALEN) == 0;
+}
+
+bool espnow_is_initialized() {
+  return is_initialized;
 }

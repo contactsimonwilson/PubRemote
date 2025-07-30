@@ -4,6 +4,7 @@
 #define ESP_MAXIMUM_RETRY 5
 #define RECONNECT_DELAY_MS 5000
 
+static bool is_initialized = false;
 static const char *TAG = "wifi_station";
 static EventGroupHandle_t s_wifi_event_group;
 static int s_retry_num = 0;
@@ -179,6 +180,7 @@ esp_err_t wifi_init_from_espnow(void) {
   }
 
   ESP_LOGI(TAG, "WiFi station initialization completed after ESP-NOW transition");
+  is_initialized = true;
   return ESP_OK;
 }
 
@@ -398,6 +400,7 @@ esp_err_t wifi_uninit(void) {
   s_wifi_state = WIFI_STATE_DISCONNECTED;
 
   ESP_LOGI(TAG, "WiFi uninitialized");
+  is_initialized = false;
   return ESP_OK;
 }
 
@@ -438,4 +441,8 @@ void wifi_set_auto_reconnect(bool enable) {
 // Check if auto-reconnect is enabled
 bool wifi_is_auto_reconnect_enabled(void) {
   return s_auto_reconnect_enabled;
+}
+
+bool wifi_is_initialized() {
+  return is_initialized;
 }

@@ -80,8 +80,12 @@ void about_screen_loaded(lv_event_t *e) {
 }
 
 void about_screen_unload_start(lv_event_t *e) {
-  wifi_uninit();
-  espnow_init();
+  if (wifi_is_initialized()) {
+    wifi_uninit();
+  }
+  if (!espnow_is_initialized()) {
+    espnow_init();
+  }
   ESP_LOGI(TAG, "About screen unload start");
   lv_obj_remove_event_cb(ui_AboutBody, paged_scroll_event_cb);
 }

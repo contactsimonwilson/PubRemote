@@ -445,11 +445,11 @@
               },
               {
                 "nid": 146886161,
-                "flags": 34,
+                "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  100,
-                  100
+                  240,
+                  240
                 ],
                 "InheritedType": 7
               },
@@ -1244,7 +1244,7 @@
             "guid": "GUID1394275-268032S439341",
             "deepid": 1569709554,
             "dont_export": false,
-            "locked": true,
+            "locked": false,
             "properties": [
               {
                 "nid": -1143115570,
@@ -1287,10 +1287,10 @@
               },
               {
                 "nid": 975299675,
-                "flags": 34,
+                "flags": 33,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  100,
+                  240,
                   100
                 ],
                 "InheritedType": 7
@@ -1492,7 +1492,7 @@
             "guid": "GUID26296149-272421S367341",
             "deepid": 1569709554,
             "dont_export": false,
-            "locked": true,
+            "locked": false,
             "properties": [
               {
                 "nid": -40236738,
@@ -1535,10 +1535,10 @@
               },
               {
                 "nid": 1106916137,
-                "flags": 34,
+                "flags": 33,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  100,
+                  240,
                   100
                 ],
                 "InheritedType": 7
@@ -26273,11 +26273,11 @@
               },
               {
                 "nid": 60,
-                "flags": 34,
+                "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  100,
-                  100
+                  240,
+                  240
                 ],
                 "InheritedType": 7
               },
@@ -27259,7 +27259,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1395,
+    "backup_cnt": 1398,
     "autosave_cnt": 0,
     "group_color_cnt": 0,
     "lvgl_version": "8.3.11",
