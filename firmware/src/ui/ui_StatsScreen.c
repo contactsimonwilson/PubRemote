@@ -52,8 +52,8 @@ void ui_event_StatsScreen(lv_event_t *e) {
   if (event_code == LV_EVENT_SCREEN_LOADED) {
     stats_screen_loaded(e);
   }
-  if (event_code == LV_EVENT_SCREEN_UNLOADED) {
-    stats_screen_unloaded(e);
+  if (event_code == LV_EVENT_SCREEN_UNLOAD_START) {
+    stats_screen_unload_start(e);
   }
   if (event_code == LV_EVENT_SCREEN_LOAD_START) {
     stats_screen_load_start(e);

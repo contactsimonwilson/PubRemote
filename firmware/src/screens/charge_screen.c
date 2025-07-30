@@ -58,6 +58,6 @@ void charge_screen_loaded(lv_event_t *e) {
   xTaskCreate(charge_task, "charge_task", 4096, NULL, 2, NULL);
 }
 
-void charge_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Charge screen unloaded");
+void charge_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Charge screen unload start");
 }

@@ -548,8 +548,8 @@ void stats_screen_loaded(lv_event_t *e) {
   }
 }
 
-void stats_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Stats screen unloaded");
+void stats_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Stats screen unload start");
   stats_unregister_update_cb(stats_update_screen_display);
 }
 

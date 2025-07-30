@@ -43,8 +43,8 @@ void ui_event_SettingsScreen(lv_event_t *e) {
   if (event_code == LV_EVENT_SCREEN_LOADED) {
     settings_screen_loaded(e);
   }
-  if (event_code == LV_EVENT_SCREEN_UNLOADED) {
-    settings_screen_unloaded(e);
+  if (event_code == LV_EVENT_SCREEN_UNLOAD_START) {
+    settings_screen_unload_start(e);
   }
   if (event_code == LV_EVENT_SCREEN_LOAD_START) {
     settings_screen_load_start(e);

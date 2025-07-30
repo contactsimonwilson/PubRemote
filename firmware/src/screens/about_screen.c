@@ -79,8 +79,10 @@ void about_screen_loaded(lv_event_t *e) {
   xTaskCreate(about_task, "about_task", 4096, NULL, 2, NULL);
 }
 
-void about_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "About screen unloaded");
+void about_screen_unload_start(lv_event_t *e) {
+  wifi_uninit();
+  espnow_init();
+  ESP_LOGI(TAG, "About screen unload start");
   lv_obj_remove_event_cb(ui_AboutBody, paged_scroll_event_cb);
 }
 

@@ -71,8 +71,8 @@ void menu_screen_loaded(lv_event_t *e) {
   }
 }
 
-void menu_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Menu screen unloaded");
+void menu_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Menu screen unload start");
 }
 
 void enter_deep_sleep(lv_event_t *e) {
