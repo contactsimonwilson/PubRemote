@@ -12,8 +12,10 @@ lv_obj_t *ui_UpdateHeaderLabel = NULL;
 lv_obj_t *ui_UpdateBody = NULL;
 lv_obj_t *ui_UpdateBodyLabel = NULL;
 lv_obj_t *ui_UpdateFooter = NULL;
-lv_obj_t *ui_UpdateMainActionButton = NULL;
-lv_obj_t *ui_UpdateMainActionButtonLabel = NULL;
+lv_obj_t *ui_UpdateSecondaryActionButton = NULL;
+lv_obj_t *ui_UpdateSecondaryActionButtonLabel = NULL;
+lv_obj_t *ui_UpdatePrimaryActionButton = NULL;
+lv_obj_t *ui_UpdatePrimaryActionButtonLabel = NULL;
 // event funtions
 void ui_event_UpdateScreen(lv_event_t *e) {
   lv_event_code_t event_code = lv_event_get_code(e);
@@ -29,11 +31,20 @@ void ui_event_UpdateScreen(lv_event_t *e) {
   }
 }
 
-void ui_event_UpdateMainActionButton(lv_event_t *e) {
+void ui_event_UpdateSecondaryActionButton(lv_event_t *e) {
   lv_event_code_t event_code = lv_event_get_code(e);
 
   if (event_code == LV_EVENT_CLICKED) {
     _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MenuScreen_screen_init);
+    update_secondary_button_press(e);
+  }
+}
+
+void ui_event_UpdatePrimaryActionButton(lv_event_t *e) {
+  lv_event_code_t event_code = lv_event_get_code(e);
+
+  if (event_code == LV_EVENT_CLICKED) {
+    update_primary_button_press(e);
   }
 }
 
@@ -45,6 +56,7 @@ void ui_UpdateScreen_screen_init(void) {
   lv_obj_add_event_cb(ui_UpdateScreen, scr_unloaded_delete_cb, LV_EVENT_SCREEN_UNLOADED, &ui_UpdateScreen);
   lv_obj_set_style_bg_color(ui_UpdateScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_opa(ui_UpdateScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_text_font(ui_UpdateScreen, &ui_font_Inter_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_UpdateContent = lv_obj_create(ui_UpdateScreen);
   lv_obj_remove_style_all(ui_UpdateContent);
@@ -90,18 +102,20 @@ void ui_UpdateScreen_screen_init(void) {
   lv_obj_set_style_pad_right(ui_UpdateBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_top(ui_UpdateBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_bottom(ui_UpdateBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_pad_row(ui_UpdateBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_pad_column(ui_UpdateBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_UpdateBodyLabel = lv_label_create(ui_UpdateBody);
-  lv_obj_set_width(ui_UpdateBodyLabel, LV_SIZE_CONTENT);  /// 1
+  lv_obj_set_width(ui_UpdateBodyLabel, lv_pct(100));
   lv_obj_set_height(ui_UpdateBodyLabel, LV_SIZE_CONTENT); /// 1
   lv_obj_set_x(ui_UpdateBodyLabel, 19);
   lv_obj_set_y(ui_UpdateBodyLabel, 38);
   lv_obj_set_align(ui_UpdateBodyLabel, LV_ALIGN_CENTER);
-  lv_label_set_text(ui_UpdateBodyLabel, "Wifi: disconnected");
+  lv_label_set_text(ui_UpdateBodyLabel, "Click next to scan for networks");
 
   ui_UpdateFooter = lv_obj_create(ui_UpdateContent);
   lv_obj_remove_style_all(ui_UpdateFooter);
-  lv_obj_set_width(ui_UpdateFooter, lv_pct(65));
+  lv_obj_set_width(ui_UpdateFooter, lv_pct(100));
   lv_obj_set_height(ui_UpdateFooter, lv_pct(25));
   lv_obj_set_align(ui_UpdateFooter, LV_ALIGN_CENTER);
   lv_obj_set_flex_flow(ui_UpdateFooter, LV_FLEX_FLOW_ROW);
@@ -110,21 +124,36 @@ void ui_UpdateScreen_screen_init(void) {
   lv_obj_set_style_pad_row(ui_UpdateFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_column(ui_UpdateFooter, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  ui_UpdateMainActionButton = lv_btn_create(ui_UpdateFooter);
-  lv_obj_set_width(ui_UpdateMainActionButton, 80);
-  lv_obj_set_height(ui_UpdateMainActionButton, 42);
-  lv_obj_set_align(ui_UpdateMainActionButton, LV_ALIGN_CENTER);
-  lv_obj_add_flag(ui_UpdateMainActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
-  lv_obj_clear_flag(ui_UpdateMainActionButton, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
-  lv_obj_set_style_text_font(ui_UpdateMainActionButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+  ui_UpdateSecondaryActionButton = lv_btn_create(ui_UpdateFooter);
+  lv_obj_set_width(ui_UpdateSecondaryActionButton, 60);
+  lv_obj_set_height(ui_UpdateSecondaryActionButton, 42);
+  lv_obj_set_align(ui_UpdateSecondaryActionButton, LV_ALIGN_CENTER);
+  lv_obj_add_flag(ui_UpdateSecondaryActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+  lv_obj_clear_flag(ui_UpdateSecondaryActionButton, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+  lv_obj_set_style_text_font(ui_UpdateSecondaryActionButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  ui_UpdateMainActionButtonLabel = lv_label_create(ui_UpdateMainActionButton);
-  lv_obj_set_width(ui_UpdateMainActionButtonLabel, LV_SIZE_CONTENT);  /// 1
-  lv_obj_set_height(ui_UpdateMainActionButtonLabel, LV_SIZE_CONTENT); /// 1
-  lv_obj_set_align(ui_UpdateMainActionButtonLabel, LV_ALIGN_CENTER);
-  lv_label_set_text(ui_UpdateMainActionButtonLabel, "Cancel");
+  ui_UpdateSecondaryActionButtonLabel = lv_label_create(ui_UpdateSecondaryActionButton);
+  lv_obj_set_width(ui_UpdateSecondaryActionButtonLabel, LV_SIZE_CONTENT);  /// 1
+  lv_obj_set_height(ui_UpdateSecondaryActionButtonLabel, LV_SIZE_CONTENT); /// 1
+  lv_obj_set_align(ui_UpdateSecondaryActionButtonLabel, LV_ALIGN_CENTER);
+  lv_label_set_text(ui_UpdateSecondaryActionButtonLabel, "Cancel");
 
-  lv_obj_add_event_cb(ui_UpdateMainActionButton, ui_event_UpdateMainActionButton, LV_EVENT_ALL, NULL);
+  ui_UpdatePrimaryActionButton = lv_btn_create(ui_UpdateFooter);
+  lv_obj_set_width(ui_UpdatePrimaryActionButton, 60);
+  lv_obj_set_height(ui_UpdatePrimaryActionButton, 42);
+  lv_obj_set_align(ui_UpdatePrimaryActionButton, LV_ALIGN_CENTER);
+  lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+  lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+  lv_obj_set_style_text_font(ui_UpdatePrimaryActionButton, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+  ui_UpdatePrimaryActionButtonLabel = lv_label_create(ui_UpdatePrimaryActionButton);
+  lv_obj_set_width(ui_UpdatePrimaryActionButtonLabel, LV_SIZE_CONTENT);  /// 1
+  lv_obj_set_height(ui_UpdatePrimaryActionButtonLabel, LV_SIZE_CONTENT); /// 1
+  lv_obj_set_align(ui_UpdatePrimaryActionButtonLabel, LV_ALIGN_CENTER);
+  lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Next");
+
+  lv_obj_add_event_cb(ui_UpdateSecondaryActionButton, ui_event_UpdateSecondaryActionButton, LV_EVENT_ALL, NULL);
+  lv_obj_add_event_cb(ui_UpdatePrimaryActionButton, ui_event_UpdatePrimaryActionButton, LV_EVENT_ALL, NULL);
   lv_obj_add_event_cb(ui_UpdateScreen, ui_event_UpdateScreen, LV_EVENT_ALL, NULL);
 }
 
@@ -140,6 +169,8 @@ void ui_UpdateScreen_screen_destroy(void) {
   ui_UpdateBody = NULL;
   ui_UpdateBodyLabel = NULL;
   ui_UpdateFooter = NULL;
-  ui_UpdateMainActionButton = NULL;
-  ui_UpdateMainActionButtonLabel = NULL;
+  ui_UpdateSecondaryActionButton = NULL;
+  ui_UpdateSecondaryActionButtonLabel = NULL;
+  ui_UpdatePrimaryActionButton = NULL;
+  ui_UpdatePrimaryActionButtonLabel = NULL;
 }

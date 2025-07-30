@@ -266,3 +266,11 @@ def update_screen_load_start(event_struct):
 def update_screen_unload_start(event_struct):
     return
 
+
+def update_primary_button_press(event_struct):
+    return
+
+
+def update_secondary_button_press(event_struct):
+    return
+

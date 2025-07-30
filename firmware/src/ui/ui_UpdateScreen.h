@@ -22,9 +22,12 @@ extern "C"
   extern lv_obj_t *ui_UpdateBody;
   extern lv_obj_t *ui_UpdateBodyLabel;
   extern lv_obj_t *ui_UpdateFooter;
-  extern void ui_event_UpdateMainActionButton(lv_event_t *e);
-  extern lv_obj_t *ui_UpdateMainActionButton;
-  extern lv_obj_t *ui_UpdateMainActionButtonLabel;
+  extern void ui_event_UpdateSecondaryActionButton(lv_event_t *e);
+  extern lv_obj_t *ui_UpdateSecondaryActionButton;
+  extern lv_obj_t *ui_UpdateSecondaryActionButtonLabel;
+  extern void ui_event_UpdatePrimaryActionButton(lv_event_t *e);
+  extern lv_obj_t *ui_UpdatePrimaryActionButton;
+  extern lv_obj_t *ui_UpdatePrimaryActionButtonLabel;
   // CUSTOM VARIABLES
 
 #ifdef __cplusplus

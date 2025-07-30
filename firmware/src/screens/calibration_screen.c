@@ -333,7 +333,7 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
 }
 
 void calibration_settings_secondary_button_press(lv_event_t *e) {
-  // empty - already handled by screen switch
+  // change to menu screen with 200ms move left animation
 }
 
 void expo_slider_change(lv_event_t *e) {

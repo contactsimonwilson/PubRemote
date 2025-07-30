@@ -13,6 +13,7 @@ static bool s_auto_reconnect_enabled = true;
 static char s_stored_ssid[33] = "";
 static char s_stored_password[65] = "";
 static TimerHandle_t s_reconnect_timer = NULL;
+esp_netif_t *wifi_netif_sta = NULL;
 
 // Timer callback for automatic reconnection
 static void reconnect_timer_callback(TimerHandle_t xTimer) {
@@ -145,7 +146,9 @@ esp_err_t wifi_init(void) {
   }
 
   // Create WiFi station network interface
-  esp_netif_create_default_wifi_sta();
+  if (wifi_netif_sta == NULL) {
+    wifi_netif_sta = esp_netif_create_default_wifi_sta();
+  }
 
   // WiFi should already be initialized from ESP-NOW
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();

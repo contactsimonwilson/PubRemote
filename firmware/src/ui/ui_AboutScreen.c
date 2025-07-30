@@ -119,7 +119,7 @@ void ui_AboutScreen_screen_init(void) {
 
   ui_UpdateButton = lv_btn_create(ui_VersionInfoContainer);
   lv_obj_set_height(ui_UpdateButton, 32);
-  lv_obj_set_width(ui_UpdateButton, LV_SIZE_CONTENT); /// 1
+  lv_obj_set_width(ui_UpdateButton, lv_pct(100));
   lv_obj_set_align(ui_UpdateButton, LV_ALIGN_CENTER);
   lv_obj_add_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
   lv_obj_clear_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLLABLE);    /// Flags

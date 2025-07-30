@@ -53,6 +53,8 @@ extern "C"
   void update_screen_loaded(lv_event_t *e);
   void update_screen_load_start(lv_event_t *e);
   void update_screen_unload_start(lv_event_t *e);
+  void update_secondary_button_press(lv_event_t *e);
+  void update_primary_button_press(lv_event_t *e);
   void charge_screen_load_start(lv_event_t *e);
   void charge_screen_loaded(lv_event_t *e);
   void charge_screen_unload_start(lv_event_t *e);
