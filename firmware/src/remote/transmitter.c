@@ -99,7 +99,7 @@ static void transmitter_task(void *pvParameters) {
       ind += sizeof(remote_data);
 
       uint8_t *mac_addr = pairing_settings.remote_addr;
-      if (channel_lock()) {
+      if (receiver_lock_channel()) {
         esp_err_t result = esp_now_send(mac_addr, data, ind);
 
         if (result != ESP_OK) {
@@ -130,7 +130,7 @@ static void transmitter_task(void *pvParameters) {
           should_emit_version = false;
         }
 
-        channel_unlock();
+        receiver_unlock_channel();
       }
     }
     // Reset the index for the next data packet and clear the data buffer
@@ -148,6 +148,6 @@ static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "TX task ended");
   vTaskDelete(NULL);
 }
-void init_transmitter() {
+void transmitter_init() {
   xTaskCreatePinnedToCore(transmitter_task, "transmitter_task", 4096, NULL, 20, NULL, 0);
 }

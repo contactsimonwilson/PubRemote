@@ -69,7 +69,7 @@ void settings_screen_unloaded(lv_event_t *e) {
 void brightness_slider_change(lv_event_t *e) {
   int val = lv_slider_get_value(ui_BrightnessSlider);
   device_settings.bl_level = (uint8_t)val;
-  set_bl_level(device_settings.bl_level);
+  display_set_bl_level(device_settings.bl_level);
 }
 
 void auto_off_select_change(lv_event_t *e) {
@@ -126,7 +126,7 @@ void screen_rotation_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_Rotation);
   uint8_t new_val = (val % 4);
   device_settings.screen_rotation = (ScreenRotation)new_val;
-  set_rotation(device_settings.screen_rotation);
+  display_set_rotation(device_settings.screen_rotation);
 }
 
 void settings_save(lv_event_t *e) {

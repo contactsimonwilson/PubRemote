@@ -11,7 +11,7 @@
 
 static const char *TAG = "PUBREMOTE-ESPNOW";
 
-void init_espnow() {
+void espnow_init() {
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
   // Initialize NVS
   esp_err_t ret = nvs_flash_init();
@@ -32,6 +32,14 @@ void init_espnow() {
   // Initialize ESP-NOW
   ESP_ERROR_CHECK(esp_now_init());
   ESP_LOGI(TAG, "ESP-NOW initialized");
+}
+
+void espnow_deinit() {
+  ESP_ERROR_CHECK(esp_now_deinit());
+  ESP_LOGI(TAG, "ESP-NOW deinitialized");
+  ESP_ERROR_CHECK(esp_wifi_stop());
+  ESP_ERROR_CHECK(esp_wifi_deinit());
+  ESP_ERROR_CHECK(nvs_flash_deinit());
 }
 
 bool is_same_mac(const uint8_t *mac1, const uint8_t *mac2) {

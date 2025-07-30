@@ -186,7 +186,7 @@ static void no_effect() {
 static esp_timer_handle_t led_startup_off_timer = NULL;
 
 static void startup_effect_stop() {
-  set_led_effect_none();
+  led_set_effect_none();
 
   if (led_startup_off_timer != NULL) {
     esp_timer_delete(led_startup_off_timer);
@@ -211,7 +211,7 @@ static void play_startup_effect() {
   esp_timer_create(&timer_args, &led_startup_off_timer);
   esp_timer_start_once(led_startup_off_timer, 3000 * 1000);
 
-  set_led_effect_pulse(device_settings.theme_color);
+  led_set_effect_pulse(device_settings.theme_color);
 }
 
 static void led_task(void *pvParameters) {
@@ -247,7 +247,7 @@ static void led_task(void *pvParameters) {
 }
 #endif
 
-void set_led_effect_solid(uint32_t color) {
+void led_set_effect_solid(uint32_t color) {
 #if LED_ENABLED
   rgb = hex_to_rgb(color);
   current_effect = LED_EFFECT_SOLID;
@@ -255,7 +255,7 @@ void set_led_effect_solid(uint32_t color) {
 #endif
 }
 
-void set_led_effect_pulse(uint32_t color) {
+void led_set_effect_pulse(uint32_t color) {
 #if LED_ENABLED
   rgb = hex_to_rgb(color);
   current_effect = LED_EFFECT_PULSE;
@@ -263,21 +263,21 @@ void set_led_effect_pulse(uint32_t color) {
 #endif
 }
 
-void set_led_effect_rainbow() {
+void led_set_effect_rainbow() {
 #if LED_ENABLED
   current_effect = LED_EFFECT_RAINBOW;
   current_brightness = brightness_level;
 #endif
 }
 
-void set_led_effect_none() {
+void led_set_effect_none() {
 #if LED_ENABLED
   current_effect = LED_EFFECT_NONE;
   current_brightness = 0;
 #endif
 }
 
-void init_led() {
+void led_init() {
 #if LED_ENABLED
   ESP_LOGI(TAG, "Initializing LED strip");
   led_power_on();
@@ -288,7 +288,7 @@ void init_led() {
 #endif
 }
 
-void set_led_brightness(uint8_t brightness) {
+void led_set_brightness(uint8_t brightness) {
 #if LED_ENABLED
   brightness_level = brightness;
   apply_led_effect();

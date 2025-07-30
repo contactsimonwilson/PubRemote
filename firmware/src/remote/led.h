@@ -16,11 +16,11 @@ typedef enum {
   LED_EFFECT_RAINBOW
 } LedEffect;
 
-void init_led();
-void set_led_brightness(uint8_t brightness);
-void set_led_effect_solid(uint32_t color);
-void set_led_effect_pulse(uint32_t color);
-void set_led_effect_rainbow();
-void set_led_effect_none();
+void led_init();
+void led_set_brightness(uint8_t brightness);
+void led_set_effect_solid(uint32_t color);
+void led_set_effect_pulse(uint32_t color);
+void led_set_effect_rainbow();
+void led_set_effect_none();
 
 #endif

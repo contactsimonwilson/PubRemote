@@ -6,7 +6,7 @@ RemoteStats remoteStats;
 
 static callback_registry_t stats_update_registry = {0};
 
-void update_stats() {
+void stats_update() {
   registry_cb(&stats_update_registry, false);
 }
 
@@ -25,19 +25,19 @@ static void reset_stats() {
   remoteStats.state = BOARD_STATE_STARTUP;
   remoteStats.switchState = SWITCH_STATE_OFF;
 
-  update_stats();
+  stats_update();
 }
 
-void init_stats() {
+void stats_init() {
   reset_stats();
 }
 
-void register_stats_update_cb(callback_t callback) {
+void stats_register_update_cb(callback_t callback) {
   // Register the callback for stats updates
   register_cb(&stats_update_registry, callback);
 }
 
-void unregister_stats_update_cb(callback_t callback) {
+void stats_unregister_update_cb(callback_t callback) {
   // Unregister the callback for stats updates
   remove_cb(&stats_update_registry, callback);
 }

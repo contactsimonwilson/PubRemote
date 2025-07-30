@@ -12,7 +12,7 @@ extern "C"
 {
 #endif
 
-  i2c_master_bus_handle_t get_i2c_bus_handle();
+  i2c_master_bus_handle_t i2c_get_bus_handle();
   esp_err_t i2c_write_with_mutex(uint8_t device_addr, uint8_t reg_addr, uint8_t *data, size_t len, int timeout_ms);
   esp_err_t i2c_read_with_mutex(uint8_t device_addr, uint8_t reg_addr, uint8_t *data, size_t len, int timeout_ms);
   bool i2c_lock(int timeout_ms);

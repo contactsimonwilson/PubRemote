@@ -171,11 +171,11 @@ void LVGL_unlock(void) {
 
 static uint8_t bl_level = 0;
 
-uint8_t get_bl_level() {
+uint8_t display_get_bl_level() {
   return bl_level;
 }
 
-void set_bl_level(uint8_t level) {
+void display_set_bl_level(uint8_t level) {
   if (is_initialized) {
     bl_level = level;
     set_display_brightness(lcd_io, bl_level);
@@ -307,7 +307,7 @@ static esp_err_t app_touch_init(void) {
 
   tp_io_config.scl_speed_hz = I2C_SCL_FREQ_HZ;
   // Attach the TOUCH to the I2C bus
-  ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c_v2(get_i2c_bus_handle(), &tp_io_config, &tp_io_handle));
+  ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c_v2(i2c_get_bus_handle(), &tp_io_config, &tp_io_handle));
 
   const esp_lcd_touch_config_t tp_cfg = {
       .x_max = LV_HOR_RES,
@@ -364,7 +364,7 @@ static void lv_touch_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
 
 #endif // TOUCH_ENABLED
 
-void set_rotation(ScreenRotation rot) {
+void display_set_rotation(ScreenRotation rot) {
   lv_disp_set_rotation(lvgl_disp, (lv_disp_rot_t)rot);
 }
 
@@ -428,7 +428,7 @@ static esp_err_t app_lvgl_init(void) {
   lvgl_disp->driver->rounder_cb = LVGL_port_rounder_callback;
 #endif
 
-  set_rotation(device_settings.screen_rotation);
+  display_set_rotation(device_settings.screen_rotation);
 
 #if TOUCH_ENABLED
   const lvgl_port_touch_cfg_t touch_cfg = {
@@ -520,15 +520,15 @@ static esp_err_t display_ui() {
     LVGL_unlock();
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(250));
-    set_bl_level(device_settings.bl_level);
+    display_set_bl_level(device_settings.bl_level);
     return ESP_OK;
   }
   return ESP_FAIL;
 }
 
-void deinit_display() {
+void display_deinit() {
   ESP_LOGI(TAG, "Deinit display");
-  set_bl_level(0);
+  display_set_bl_level(0);
 
   if (lv_is_initialized()) {
 
@@ -553,7 +553,7 @@ void deinit_display() {
   }
 }
 
-void init_display() {
+void display_init() {
   ESP_LOGI(TAG, "Create LVGL conf");
   /* LCD HW initialization */
   ESP_ERROR_CHECK(app_lcd_init());
@@ -567,7 +567,7 @@ void init_display() {
   ESP_ERROR_CHECK(display_ui());
 }
 
-void disp_off() {
+void display_off() {
   // Turn off backlight
   ESP_LOGI(TAG, "Display sleep");
   // Turn off display

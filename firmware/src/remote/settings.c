@@ -134,7 +134,7 @@ void save_calibration() {
 }
 
 // Function to initialize NVS
-esp_err_t init_nvs() {
+static esp_err_t init_nvs() {
   esp_err_t err = nvs_flash_init();
   if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
     // NVS partition was truncated and needs to be erased
@@ -147,7 +147,7 @@ esp_err_t init_nvs() {
 }
 
 // Function to initialize settings object, reading from NVS
-esp_err_t init_settings() {
+esp_err_t settings_init() {
   ESP_LOGI(TAG, "Initializing settings...");
   esp_err_t err = init_nvs();
   if (err != ESP_OK) {

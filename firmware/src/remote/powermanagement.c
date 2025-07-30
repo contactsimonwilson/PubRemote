@@ -127,7 +127,7 @@ static void power_button_long_press_hold(void *arg, void *usr_data) {
   }
 
   // Immediately turn off screen but wait for release before sleep
-  set_bl_level(0);
+  display_set_bl_level(0);
 
   while (get_button_pressed()) {
     vTaskDelay(pdMS_TO_TICKS(10));
@@ -146,9 +146,9 @@ void unbind_power_button() {
 
 static void power_button_initial_release(void *arg, void *usr_data) {
   unregister_primary_button_cb(BUTTON_PRESS_UP);
-  external_pull_t resistor = detect_gpio_external_pull(PRIMARY_BUTTON);
-  deinit_buttons();
-  init_buttons(); // Reinit buttons after detect to ensure correct gpio config
+  external_pull_t resistor = gpio_detect_external_pull(PRIMARY_BUTTON);
+  debuttons_init();
+  buttons_init(); // Reinit buttons after detect to ensure correct gpio config
 
   if (resistor == EXTERNAL_PULL_NONE || (resistor == EXTERNAL_PULL_DOWN && !JOYSTICK_BUTTON_LEVEL) ||
       (resistor == EXTERNAL_PULL_UP && JOYSTICK_BUTTON_LEVEL)) {
@@ -179,7 +179,7 @@ static void await_pmu_int_reset() {
 
 void enter_sleep() {
   // Disable some things so they don't run during wake check
-  update_connection_state(CONNECTION_STATE_DISCONNECTED);
+  connection_update_state(CONNECTION_STATE_DISCONNECTED);
   unbind_power_button();
 
 #if PMU_SY6970
@@ -187,8 +187,8 @@ void enter_sleep() {
 #endif
 
   // Turn off screen before sleep
-  disp_off();
-  set_led_brightness(0);
+  display_off();
+  led_set_brightness(0);
   enable_wake();
   vTaskDelay(50); // Allow gpio level to settle before going into sleep
 
@@ -299,7 +299,7 @@ void power_management_task(void *pvParameters) {
         last_time = esp_timer_get_time(); // Update last time in milliseconds
 
         if (is_power_connected != last_power_connected) {
-          set_buzzer_tone(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
+          buzzer_set_tone(is_power_connected ? NOTE_SUCCESS : NOTE_ERROR, 300);
         }
       }
     }
@@ -333,12 +333,12 @@ static bool check_pmu_should_wake(bool last_powered) {
   await_pmu_int_reset();
   power_state_update();
   if (is_power_connected && !last_powered) {
-    set_buzzer_tone(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
+    buzzer_set_tone(NOTE_SUCCESS, PMU_INT_NOTE_DURATION);
     // Power was connected after last sleep - continue to normal operation
   }
   else {
     if (!is_power_connected && last_powered) {
-      set_buzzer_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+      buzzer_set_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
     }
     enter_sleep();
     return false;
@@ -347,7 +347,7 @@ static bool check_pmu_should_wake(bool last_powered) {
 }
 #endif
 
-void init_power_management() {
+void power_management_init() {
   bool power_was_connected = is_power_connected;
   ESP_ERROR_CHECK(charge_driver_init());
   init_sleep_timer();

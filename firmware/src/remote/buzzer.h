@@ -10,9 +10,9 @@ typedef enum {
   BUZZER_PATTERN_SOLID,
 } BuzzerPatttern;
 
-void init_buzzer();
-void set_buzzer_pattern(BuzzerPatttern pattern);
-void set_buzzer_tone(BuzzerToneFrequency note, int duration);
-void stop_buzzer();
+void buzzer_init();
+void buzzer_set_pattern(BuzzerPatttern pattern);
+void buzzer_set_tone(BuzzerToneFrequency note, int duration);
+void buzzer_stop();
 
 #endif

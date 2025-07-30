@@ -86,19 +86,19 @@ static void process_data(esp_now_event_t evt) {
   case REM_PAIR_INIT:
     if (is_pairing_start) {
       ESP_LOGI(TAG, "Process: Pairing init");
-      process_pairing_init(data, len, evt);
+      pairing_process_init_event(data, len, evt);
     }
     break;
   case REM_PAIR_BOND:
     if (pairing_state == PAIRING_STATE_PAIRING && is_pairing_screen_active()) {
       ESP_LOGI(TAG, "Process: Pairing bond");
-      process_pairing_bond(data, len);
+      pairing_process_bond_event(data, len);
     }
     break;
   case REM_PAIR_COMPLETE:
     if (pairing_state == PAIRING_STATE_PENDING && is_pairing_screen_active()) {
       ESP_LOGI(TAG, "Process: Pairing complete");
-      process_pairing_complete(data, len);
+      pairing_process_completion_event(data, len);
     }
     break;
   case REM_SET_CORE_DATA:
@@ -117,14 +117,14 @@ static void process_data(esp_now_event_t evt) {
 // Mutex to protect channel switching
 static SemaphoreHandle_t channel_mutex;
 
-bool channel_lock() {
+bool receiver_lock_channel() {
   if (channel_mutex == NULL) {
     channel_mutex = xSemaphoreCreateMutex();
   }
   return xSemaphoreTake(channel_mutex, pdMS_TO_TICKS(1000)) == pdTRUE;
 }
 
-void channel_unlock() {
+void receiver_unlock_channel() {
   if (channel_mutex == NULL) {
     channel_mutex = xSemaphoreCreateMutex();
   }
@@ -134,7 +134,7 @@ void channel_unlock() {
 
 static void change_channel(uint8_t chan, bool is_pairing) {
   ESP_LOGI(TAG, "Switching to channel %d", chan);
-  channel_lock();
+  receiver_lock_channel();
 
   esp_wifi_set_channel(chan, WIFI_SECOND_CHAN_NONE);
   pairing_settings.channel = chan;
@@ -154,7 +154,7 @@ static void change_channel(uint8_t chan, bool is_pairing) {
     esp_now_add_peer(&peerInfo);
   }
 
-  channel_unlock();
+  receiver_unlock_channel();
 }
 
 static void receiver_task(void *pvParameters) {
@@ -202,7 +202,7 @@ static void receiver_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
-void init_receiver() {
+void receiver_init() {
   ESP_LOGI(TAG, "Starting receiver task");
   xTaskCreatePinnedToCore(receiver_task, "receiver_task", 4096, NULL, 20, NULL, 0);
 }

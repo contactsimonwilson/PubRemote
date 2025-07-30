@@ -170,7 +170,7 @@ static void thumbstick_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
-void init_thumbstick() {
+void thumbstick_init() {
 #if (JOYSTICK_Y_ENABLED || JOYSTICK_X_ENABLED)
   xTaskCreatePinnedToCore(thumbstick_task, "thumbstick_task", 4096, NULL, 20, NULL, 0);
 #endif
@@ -199,14 +199,14 @@ void reset_button_state() {
   remote_data.bt_c = 0;
 }
 
-void deinit_buttons() {
+void debuttons_init() {
   if (gpio_btn_handle) {
     iot_button_delete(gpio_btn_handle);
     gpio_btn_handle = NULL;
   }
 }
 
-void init_buttons() {
+void buttons_init() {
 #if JOYSTICK_BUTTON_ENABLED
   // create gpio button
   button_config_t gpio_btn_cfg = {
