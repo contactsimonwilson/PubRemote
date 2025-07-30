@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 void espnow_init();
-void deespnow_init();
+void deinit_espnow();
 
 // Structure to hold ESP-NOW data
 typedef struct {
