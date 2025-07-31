@@ -21,6 +21,7 @@ static const char *TAG = "PUBREMOTE-SETTINGS";
 static const AutoOffOptions DEFAULT_AUTO_OFF_TIME = AUTO_OFF_5_MINUTES;
 static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 static const DarkTextOptions DEFAULT_DARK_TEXT = DARK_TEXT_DISABLED;
+static const SwapAdcsOptions DEFAULT_SWAP_ADCS = SWAP_ADCS_DISABLED;
 static const BoardBatteryDisplayOption DEFAULT_BATTERY_DISPLAY = BATTERY_DISPLAY_PERCENT;
 static const PocketModeOptions DEFAULT_POCKET_MODE = POCKET_MODE_DISABLED;
 
@@ -33,6 +34,7 @@ DeviceSettings device_settings = {
     .startup_sound = STARTUP_SOUND_BEEP,
     .theme_color = COLOR_PRIMARY,
     .dark_text = DEFAULT_DARK_TEXT,
+    .swap_adcs = DEFAULT_SWAP_ADCS,
     .battery_display = DEFAULT_BATTERY_DISPLAY,
     .pocket_mode = DEFAULT_POCKET_MODE,
 };
@@ -93,6 +95,7 @@ void save_device_settings() {
   nvs_write_int("startup_sound", device_settings.startup_sound);
   nvs_write_int("theme_color", device_settings.theme_color);
   nvs_write_int("dark_text", device_settings.dark_text);
+  nvs_write_int("swap_adcs", device_settings.swap_adcs);
   nvs_write_int("battery_display", device_settings.battery_display);
   nvs_write_int("pocket_mode", device_settings.pocket_mode);
 }
@@ -184,6 +187,9 @@ esp_err_t settings_init() {
 
   device_settings.dark_text =
       nvs_read_int("dark_text", &temp_setting_value) == ESP_OK ? (bool)temp_setting_value : DARK_TEXT_DISABLED;
+
+  device_settings.swap_adcs =
+      nvs_read_int("swap_adcs", &temp_setting_value) == ESP_OK ? (bool)temp_setting_value : SWAP_ADCS_DISABLED;
 
   device_settings.battery_display = nvs_read_int("battery_display", &temp_setting_value) == ESP_OK
                                         ? (BoardBatteryDisplayOption)temp_setting_value

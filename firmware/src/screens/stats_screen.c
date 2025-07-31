@@ -469,26 +469,17 @@ static void update_footpad_display() {
     return;
   }
 
-  switch (remoteStats.switchState) {
-  case SWITCH_STATE_OFF:
-    lv_arc_set_value(ui_LeftSensor, 0);
-    lv_arc_set_value(ui_RightSensor, 0);
-    break;
-  case SWITCH_STATE_LEFT:
-    lv_arc_set_value(ui_LeftSensor, 1);
-    lv_arc_set_value(ui_RightSensor, 0);
-    break;
-  case SWITCH_STATE_RIGHT:
-    lv_arc_set_value(ui_LeftSensor, 0);
-    lv_arc_set_value(ui_RightSensor, 1);
-    break;
-  case SWITCH_STATE_BOTH:
-    lv_arc_set_value(ui_LeftSensor, 1);
-    lv_arc_set_value(ui_RightSensor, 1);
-    break;
-  default:
-    break;
-  }
+  SwitchState state = remoteStats.switchState;
+  bool swapped = device_settings.swap_adcs;
+
+  int left_switch = (state == SWITCH_STATE_BOTH || (!swapped && state == SWITCH_STATE_LEFT) ||
+                     (swapped && state == SWITCH_STATE_RIGHT));
+
+  int right_switch = (state == SWITCH_STATE_BOTH || (!swapped && state == SWITCH_STATE_RIGHT) ||
+                      (swapped && state == SWITCH_STATE_LEFT));
+
+  lv_arc_set_value(ui_LeftSensor, left_switch);
+  lv_arc_set_value(ui_RightSensor, right_switch);
 
   last_value = remoteStats.switchState;
 }

@@ -61,6 +61,11 @@ typedef enum {
 } DarkTextOptions;
 
 typedef enum {
+  SWAP_ADCS_DISABLED,
+  SWAP_ADCS_ENABLED,
+} SwapAdcsOptions;
+
+typedef enum {
   BATTERY_DISPLAY_PERCENT,
   BATTERY_DISPLAY_VOLTAGE,
   BATTERY_DISPLAY_ALL,
@@ -100,6 +105,7 @@ typedef struct {
   StartupSoundOptions startup_sound;
   uint32_t theme_color;
   bool dark_text;
+  bool swap_adcs;
   BoardBatteryDisplayOption battery_display;
   PocketModeOptions pocket_mode;
 } DeviceSettings;

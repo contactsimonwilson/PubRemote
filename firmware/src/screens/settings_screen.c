@@ -48,6 +48,11 @@ void settings_screen_load_start(lv_event_t *e) {
       lv_obj_add_state(ui_DarkText, LV_STATE_CHECKED);
     }
 
+    // Swap ADCs
+    if (device_settings.swap_adcs == SWAP_ADCS_ENABLED) {
+      lv_obj_add_state(ui_SwapAdcs, LV_STATE_CHECKED);
+    }
+
     lv_obj_add_event_cb(ui_SettingsBody, paged_scroll_event_cb, LV_EVENT_SCROLL, ui_SettingsHeader);
     add_page_scroll_indicators(ui_SettingsHeader, ui_SettingsBody);
 
@@ -120,6 +125,11 @@ void dark_text_switch_change(lv_event_t *e) {
 
   // Scroll to the current setting
   lv_obj_scroll_to(ui_SettingsBody, scroll_x, 0, LV_ANIM_OFF); // No animation
+}
+
+void swap_adcs_switch_change(lv_event_t *e) {
+  // Toggle dark text setting
+  device_settings.swap_adcs = device_settings.swap_adcs ? SWAP_ADCS_DISABLED : SWAP_ADCS_ENABLED;
 }
 
 void screen_rotation_change(lv_event_t *e) {
