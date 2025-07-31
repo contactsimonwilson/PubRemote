@@ -26658,7 +26658,6 @@
                       },
                       {
                         "nid": -59568247,
-                        "flags": 1048576,
                         "strtype": "OBJECT/Flags",
                         "InheritedType": 1
                       },
@@ -26806,7 +26805,6 @@
                   },
                   {
                     "nid": 1709497317,
-                    "flags": 1048576,
                     "strtype": "OBJECT/Flags",
                     "InheritedType": 1
                   },
@@ -26818,15 +26816,8 @@
                   },
                   {
                     "nid": 225,
-                    "flags": 1048576,
                     "strtype": "OBJECT/Scrolling",
                     "InheritedType": 1
-                  },
-                  {
-                    "nid": 1137885900,
-                    "strtype": "OBJECT/Scrollable",
-                    "strval": "False",
-                    "InheritedType": 2
                   },
                   {
                     "nid": -885320794,
@@ -26837,7 +26828,7 @@
                   {
                     "nid": -1090043913,
                     "strtype": "OBJECT/Scroll_direction",
-                    "strval": "ALL",
+                    "strval": "VER",
                     "InheritedType": 3
                   },
                   {
@@ -26854,7 +26845,6 @@
                   },
                   {
                     "nid": 1336642849,
-                    "flags": 1048576,
                     "strtype": "OBJECT/States",
                     "InheritedType": 1
                   },
@@ -29380,7 +29370,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1423,
+    "backup_cnt": 1426,
     "autosave_cnt": 0,
     "group_color_cnt": 0,
     "lvgl_version": "8.3.11",

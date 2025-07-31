@@ -97,7 +97,8 @@ void ui_UpdateScreen_screen_init(void) {
   lv_obj_set_align(ui_UpdateBody, LV_ALIGN_CENTER);
   lv_obj_set_flex_flow(ui_UpdateBody, LV_FLEX_FLOW_COLUMN);
   lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-  lv_obj_clear_flag(ui_UpdateBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
+  lv_obj_clear_flag(ui_UpdateBody, LV_OBJ_FLAG_CLICKABLE); /// Flags
+  lv_obj_set_scroll_dir(ui_UpdateBody, LV_DIR_VER);
   lv_obj_set_style_pad_left(ui_UpdateBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_right(ui_UpdateBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_top(ui_UpdateBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
