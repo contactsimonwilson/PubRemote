@@ -265,18 +265,19 @@ static void load_current_calibration_data() {
 // Event handlers
 void calibration_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Calibration screen load start");
+  calibration_step = 0;
 
   if (LVGL_lock(0)) {
     apply_ui_scale(NULL);
     create_navigation_group(ui_CalibrationFooter);
     LVGL_unlock();
   }
+  update_calibration_screen();
 }
 
 void calibration_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Calibration screen loaded");
 
-  calibration_step = 0;
   load_current_calibration_data();
   reset_min_max_data();
   deadband = STICK_DEADBAND;
@@ -287,11 +288,8 @@ void calibration_screen_loaded(lv_event_t *e) {
   xTaskCreate(calibration_task, "calibration_task", 4096, NULL, 2, NULL);
 }
 
-void calibration_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Calibration screen unloaded");
-
-  calibration_step = 0;
-  update_calibration_screen();
+void calibration_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Calibration screen unload start");
 }
 
 // Event handlers
@@ -335,7 +333,7 @@ void calibration_settings_primary_button_press(lv_event_t *e) {
 }
 
 void calibration_settings_secondary_button_press(lv_event_t *e) {
-  // empty - already handled by screen switch
+  // change to menu screen with 200ms move left animation
 }
 
 void expo_slider_change(lv_event_t *e) {

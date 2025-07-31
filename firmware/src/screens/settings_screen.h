@@ -6,7 +6,7 @@ bool is_settings_screen_active();
 
 void settings_screen_load_start(lv_event_t *e);
 void settings_screen_loaded(lv_event_t *e);
-void settings_screen_unloaded(lv_event_t *e);
+void settings_screen_unload_start(lv_event_t *e);
 void brightness_slider_change(lv_event_t *e);
 void auto_off_select_change(lv_event_t *e);
 void temp_units_select_change(lv_event_t *e);
