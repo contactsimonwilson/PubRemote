@@ -230,3 +230,7 @@ def charge_screen_unloaded(event_struct):
 def pairing_screen_unload_start(event_struct):
     return
 
+
+def swap_adcs_switch_change(event_struct):
+    return
+
