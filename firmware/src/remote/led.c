@@ -283,7 +283,7 @@ void led_init() {
   led_power_on();
   configure_led();
   is_initialized = true;
-  xTaskCreate(led_task, "led_task", 4096, NULL, 2, NULL);
+  xTaskCreate(led_task, "led_task", 2048, NULL, 2, NULL);
   register_startup_cb(play_startup_effect);
 #endif
 }

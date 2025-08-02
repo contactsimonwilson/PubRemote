@@ -93,18 +93,18 @@ static void wifi_password_constructor(const lv_obj_class_t *class_p, lv_obj_t *o
   lv_obj_clear_flag(wifi_pwd->container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_style_bg_opa(wifi_pwd->container, LV_OPA_0, 0);     // Transparent background
   lv_obj_set_style_border_opa(wifi_pwd->container, LV_OPA_0, 0); // No border
-  lv_obj_set_style_pad_all(wifi_pwd->container, 0, 0);           // Remove all outer padding
-  lv_obj_set_style_pad_gap(wifi_pwd->container, 8, 0);           // Small gap between password field and nav buttons
+  // lv_obj_set_style_pad_all(wifi_pwd->container, 0, 0);           // Remove all outer padding
+  // lv_obj_set_style_pad_gap(wifi_pwd->container, 2, 0);           // Small gap between password field and nav buttons
 
   // Create password display container
   lv_obj_t *pwd_container = lv_obj_create(wifi_pwd->container);
-  lv_obj_set_size(pwd_container, LV_PCT(95), 35); // Use 95% of parent width, fixed height
+  lv_obj_set_size(pwd_container, LV_PCT(100), 35); // Use 95% of parent width, fixed height
   lv_obj_set_flex_flow(pwd_container, LV_FLEX_FLOW_ROW);
   lv_obj_set_flex_align(pwd_container, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER,
                         LV_FLEX_ALIGN_CENTER); // Distribute evenly
   lv_obj_clear_flag(pwd_container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_style_border_width(pwd_container, 1, 0);
-  lv_obj_set_style_border_color(pwd_container, lv_color_hex(0x888888), 0);
+  lv_obj_set_style_border_color(pwd_container, lv_color_hex(0xFFFFFF), 0);
   lv_obj_set_style_radius(pwd_container, 3, 0);
   lv_obj_set_style_bg_opa(pwd_container, LV_OPA_0, 0); // Transparent background
   lv_obj_set_style_pad_all(pwd_container, 4, 0);       // Smaller padding

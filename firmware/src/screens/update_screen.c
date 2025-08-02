@@ -47,12 +47,14 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateHeaderLabel, "Update");
     lv_label_set_text(ui_UpdateBodyLabel, "Click next to scan for networks");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_SCANNING:
     lv_label_set_text(ui_UpdateHeaderLabel, "Network Scan");
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
+    lv_obj_add_flag(ui_UpdatePrimaryActionButtonLabel, LV_OBJ_FLAG_HIDDEN);
     lv_label_set_text(ui_UpdateBodyLabel, "Scanning...");
+    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_ENTER_PASSWORD:
@@ -60,21 +62,23 @@ void update_status_label() {
     lv_label_set_text_fmt(ui_UpdateBodyLabel, "Enter password for  %s", selected_network_ssid);
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Next");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     create_wifi_password_screen(ui_UpdateBody);
     break;
   case UPDATE_STEP_CONNECTING:
     lv_label_set_text(ui_UpdateHeaderLabel, "Connecting");
     lv_label_set_text(ui_UpdateBodyLabel, "Connecting to the network...");
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_CHECKING_UPDATE:
     lv_label_set_text(ui_UpdateHeaderLabel, "Checking");
     lv_label_set_text(ui_UpdateBodyLabel, "Checking for updates...");
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
+    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_UPDATE_AVAILABLE:
@@ -82,6 +86,7 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "Update available! Click next to download.");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Next");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_NO_UPDATE:
@@ -89,13 +94,15 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "No updates available.");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Exit");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_DOWNLOADING:
     lv_label_set_text(ui_UpdateHeaderLabel, "Download");
     lv_label_set_text(ui_UpdateBodyLabel, "Downloading update...");
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
+    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_VALIDATE:
@@ -103,6 +110,7 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "Validating downloaded update...");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_INSTALLING:
@@ -110,6 +118,7 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "Installing update...");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_COMPLETE:
@@ -117,6 +126,7 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "Update complete! Restarting...");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Reboot");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_ERROR:
@@ -124,14 +134,17 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "An error occurred during the update process.");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Retry");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   default:
     lv_label_set_text(ui_UpdateBodyLabel, "Unknown update step.");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   }
+  resize_footer_buttons(ui_UpdateFooter); // Resize footer buttons
 }
 
 static void clean_body() {

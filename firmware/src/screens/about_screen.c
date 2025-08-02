@@ -76,7 +76,7 @@ void about_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen loaded");
 
   // Start task to update UI
-  xTaskCreate(about_task, "about_task", 4096, NULL, 2, NULL);
+  xTaskCreate(about_task, "about_task", 2048, NULL, 2, NULL);
 }
 
 void about_screen_unload_start(lv_event_t *e) {
