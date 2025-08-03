@@ -121,8 +121,8 @@ void ui_AboutScreen_screen_init(void) {
   lv_obj_set_height(ui_UpdateButton, 32);
   lv_obj_set_width(ui_UpdateButton, lv_pct(100));
   lv_obj_set_align(ui_UpdateButton, LV_ALIGN_CENTER);
-  lv_obj_add_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
-  lv_obj_clear_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+  lv_obj_add_flag(ui_UpdateButton, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+  lv_obj_clear_flag(ui_UpdateButton, LV_OBJ_FLAG_SCROLLABLE);                         /// Flags
   lv_obj_set_style_bg_color(ui_UpdateButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_opa(ui_UpdateButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_border_color(ui_UpdateButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
