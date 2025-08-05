@@ -5,7 +5,9 @@
 
 #define BASE_RES 240
 
-#define UI_SHAPE (LV_HOR_RES == LV_VER_RES)
+#ifndef UI_SHAPE
+  #define UI_SHAPE (LV_HOR_RES == LV_VER_RES ? 0 : 1)
+#endif
 
 #ifndef SCALE_UI
   #define SCALE_UI 1
