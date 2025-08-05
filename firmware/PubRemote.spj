@@ -860,11 +860,11 @@
               },
               {
                 "nid": 889012823,
-                "flags": 34,
+                "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  100,
-                  100
+                  240,
+                  240
                 ],
                 "InheritedType": 7
               },

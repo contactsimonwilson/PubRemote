@@ -118,8 +118,8 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_style_bg_opa(ui_SpeedBar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_UtilizationDial = lv_arc_create(ui_StatsScreen);
-  lv_obj_set_width(ui_UtilizationDial, lv_pct(100));
-  lv_obj_set_height(ui_UtilizationDial, lv_pct(100));
+  lv_obj_set_width(ui_UtilizationDial, 240);
+  lv_obj_set_height(ui_UtilizationDial, 240);
   lv_obj_set_align(ui_UtilizationDial, LV_ALIGN_CENTER);
   lv_arc_set_range(ui_UtilizationDial, 0, 95);
   lv_arc_set_value(ui_UtilizationDial, 0);
