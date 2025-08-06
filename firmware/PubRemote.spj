@@ -445,11 +445,11 @@
               },
               {
                 "nid": 146886161,
-                "flags": 34,
+                "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  100,
-                  100
+                  240,
+                  240
                 ],
                 "InheritedType": 7
               },
@@ -27324,7 +27324,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1380,
+    "backup_cnt": 1382,
     "autosave_cnt": 0,
     "group_color_cnt": 0,
     "lvgl_version": "8.3.11",
