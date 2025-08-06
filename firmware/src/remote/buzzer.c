@@ -79,6 +79,7 @@ static void process_current_note() {
 #endif
 }
 
+#if BUZZER_ENABLED
 static void process_melody() {
   const int melody_length = sizeof(melody) / sizeof(melody[0]);
   int current_time = 0;
@@ -101,6 +102,7 @@ static void process_melody() {
 
   current_frequency = frequency;
 }
+#endif
 
 void buzzer_set_pattern(BuzzerPatttern pattern) {
 #if BUZZER_ENABLED
