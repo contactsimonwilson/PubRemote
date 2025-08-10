@@ -178,10 +178,10 @@ static void await_pmu_int_reset() {
 #endif
 
 void acc_power_enable(bool enable) {
-#ifdef ACC_POWER_PIN
-  gpio_reset_pin(ACC_POWER_PIN); // Initialize the pin
-  gpio_set_direction(ACC_POWER_PIN, GPIO_MODE_OUTPUT);
-  gpio_set_level(ACC_POWER_PIN, enable); // Turn on/off the accessory power
+#ifdef ACC_POWER
+  gpio_reset_pin(ACC_POWER); // Initialize the pin
+  gpio_set_direction(ACC_POWER, GPIO_MODE_OUTPUT);
+  gpio_set_level(ACC_POWER, enable); // Turn on/off the accessory power
 #endif
 }
 
