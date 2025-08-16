@@ -182,7 +182,7 @@ static esp_err_t set_power_mode(esp_lcd_touch_handle_t tp, ft3186_power_mode_t m
 }
 
 static esp_err_t enter_sleep(esp_lcd_touch_handle_t tp) {
-  return set_power_mode(tp, FT3168_PMODE_DEEPSLEEP), TAG, "Failed to set power mode to DEEPSLEEP");
+  ESP_RETURN_ON_ERROR(set_power_mode(tp, FT3168_PMODE_DEEPSLEEP), TAG, "Failed to set power mode to DEEPSLEEP");
 
   return ESP_OK;
 }
