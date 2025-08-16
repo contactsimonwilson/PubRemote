@@ -182,15 +182,7 @@ static esp_err_t set_power_mode(esp_lcd_touch_handle_t tp, ft3186_power_mode_t m
 }
 
 static esp_err_t enter_sleep(esp_lcd_touch_handle_t tp) {
-  ESP_RETURN_ON_ERROR(set_power_mode(tp, FT3168_PMODE_DEEPSLEEP), TAG, "Failed to set power mode to DEEPSLEEP");
-
-  // if (tp->config.rst_gpio_num != GPIO_NUM_NC) {
-  //   ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, tp->config.levels.reset), TAG, "GPIO set level
-  //   failed"); vTaskDelay(pdMS_TO_TICKS(200)); ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num,
-  //   !tp->config.levels.reset), TAG,
-  //                       "GPIO set level failed");
-  //   vTaskDelay(pdMS_TO_TICKS(200));
-  // }
+  return set_power_mode(tp, FT3168_PMODE_DEEPSLEEP), TAG, "Failed to set power mode to DEEPSLEEP");
 
   return ESP_OK;
 }
