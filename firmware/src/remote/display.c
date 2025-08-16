@@ -568,10 +568,14 @@ void display_init() {
 }
 
 void display_off() {
-  // Turn off backlight
   ESP_LOGI(TAG, "Display sleep");
   // Turn off display
   if (lcd_panel) {
     esp_lcd_panel_disp_on_off(lcd_panel, false);
+    esp_lcd_panel_disp_sleep(lcd_panel, true);
+  }
+
+  if (touch_handle) {
+    esp_lcd_touch_enter_sleep(touch_handle);
   }
 }

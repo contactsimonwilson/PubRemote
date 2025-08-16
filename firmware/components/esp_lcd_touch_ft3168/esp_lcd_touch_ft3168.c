@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "esp_lcd_touch_ft3168.h"
 #include "driver/gpio.h"
 #include "esp_check.h"
 #include "esp_err.h"
@@ -24,6 +25,7 @@
 #define TOUCH1_X_L_REG 0x04
 #define TOUCH1_Y_H_REG 0x05
 #define TOUCH1_Y_L_REG 0x06
+#define POWER_MODE_REG 0xA5
 
 #define FT3168_EVENT_FLAG_MASK 0xC0 // Bits 7:6
 #define FT3168_COORD_MASK 0x0F      // Bits 3:0
@@ -44,7 +46,11 @@ static esp_err_t del(esp_lcd_touch_handle_t tp);
 
 static esp_err_t i2c_read_bytes(esp_lcd_touch_handle_t tp, uint16_t reg, uint8_t *data, uint8_t len);
 
+static esp_err_t i2c_write_bytes(esp_lcd_touch_handle_t tp, uint16_t reg, const uint8_t *data, uint8_t len);
+
 static esp_err_t reset(esp_lcd_touch_handle_t tp);
+
+static esp_err_t enter_sleep(esp_lcd_touch_handle_t tp);
 
 esp_err_t esp_lcd_touch_new_i2c_ft3168(const esp_lcd_panel_io_handle_t io, const esp_lcd_touch_config_t *config,
                                        esp_lcd_touch_handle_t *tp) {
@@ -63,6 +69,7 @@ esp_err_t esp_lcd_touch_new_i2c_ft3168(const esp_lcd_panel_io_handle_t io, const
   ft3168->read_data = read_data;
   ft3168->get_xy = get_xy;
   ft3168->del = del;
+  ft3168->enter_sleep = enter_sleep;
   /* Mutex */
   ft3168->data.lock.owner = portMUX_FREE_VAL;
   /* Save config */
@@ -169,6 +176,25 @@ static bool get_xy(esp_lcd_touch_handle_t tp, uint16_t *x, uint16_t *y, uint16_t
   return (*point_num > 0);
 }
 
+static esp_err_t set_power_mode(esp_lcd_touch_handle_t tp, ft3186_power_mode_t mode) {
+  uint8_t data[1] = {mode};
+  return i2c_write_bytes(tp, POWER_MODE_REG, data, 1);
+}
+
+static esp_err_t enter_sleep(esp_lcd_touch_handle_t tp) {
+  ESP_RETURN_ON_ERROR(set_power_mode(tp, FT3168_PMODE_DEEPSLEEP), TAG, "Failed to set power mode to DEEPSLEEP");
+
+  // if (tp->config.rst_gpio_num != GPIO_NUM_NC) {
+  //   ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, tp->config.levels.reset), TAG, "GPIO set level
+  //   failed"); vTaskDelay(pdMS_TO_TICKS(200)); ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num,
+  //   !tp->config.levels.reset), TAG,
+  //                       "GPIO set level failed");
+  //   vTaskDelay(pdMS_TO_TICKS(200));
+  // }
+
+  return ESP_OK;
+}
+
 static esp_err_t del(esp_lcd_touch_handle_t tp) {
   /* Reset GPIO pin settings */
   if (tp->config.int_gpio_num != GPIO_NUM_NC) {
@@ -202,4 +228,10 @@ static esp_err_t i2c_read_bytes(esp_lcd_touch_handle_t tp, uint16_t reg, uint8_t
   ESP_RETURN_ON_FALSE(data, ESP_ERR_INVALID_ARG, TAG, "Invalid data");
 
   return esp_lcd_panel_io_rx_param(tp->io, reg, data, len);
+}
+
+static esp_err_t i2c_write_bytes(esp_lcd_touch_handle_t tp, uint16_t reg, const uint8_t *data, uint8_t len) {
+  ESP_RETURN_ON_FALSE(data, ESP_ERR_INVALID_ARG, TAG, "Invalid data");
+
+  return esp_lcd_panel_io_tx_param(tp->io, reg, (void *)data, len);
 }
