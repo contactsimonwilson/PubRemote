@@ -18,6 +18,12 @@ extern "C"
 {
 #endif
 
+  typedef enum {
+    FT3168_PMODE_ACTIVE = 0,    // ~4mA
+    FT3168_PMODE_MONITOR = 1,   // ~3mA
+    FT3168_PMODE_DEEPSLEEP = 3, // ~100uA - The reset pin must be pulled down to wake up
+  } ft3186_power_mode_t;
+
   /**
    * @brief Create a new FT3168 touch driver
    *
