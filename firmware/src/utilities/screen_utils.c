@@ -370,17 +370,17 @@ void resize_footer_buttons(lv_obj_t *footer) {
     return;
   }
 
-  uint32_t butt_width = 80;
+  uint32_t butt_width = 80 * SCALE_FACTOR;
 
   switch (final_button_count) {
   case 1:
-    button_width = 80;
+    button_width = 80 * SCALE_FACTOR;
     break;
   case 2:
-    button_width = 60; // Add some space between buttons
+    button_width = 60 * SCALE_FACTOR; // Add some space between buttons
     break;
   case 3:
-    button_width = 40; // Add more space for three buttons
+    button_width = 40 * SCALE_FACTOR; // Add more space for three buttons
     break;
   default:
     button_width = lv_obj_get_width(footer) / final_button_count; // Default to equal width
