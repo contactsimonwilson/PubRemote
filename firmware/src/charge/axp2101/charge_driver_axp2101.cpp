@@ -74,7 +74,7 @@ extern "C" RemotePowerState axp2101_get_power_state() {
   PMU.clrWatchdog();
   RemotePowerState state = {.voltage = 0, .chargeState = CHARGE_STATE_UNKNOWN, .current = 0, .isPowered = false, .isFault = false};
   state.voltage = PMU.getBattVoltage();
-  state.current = PMU.getChargerStatus();
+  state.current = 0; // AXP2101 does not provide current reading directly
 
   xpowers_chg_status_t status = PMU.getChargerStatus();
 

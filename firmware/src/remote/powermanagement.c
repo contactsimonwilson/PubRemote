@@ -177,6 +177,14 @@ static void await_pmu_int_reset() {
 }
 #endif
 
+void acc_power_enable(bool enable) {
+#ifdef ACC_POWER
+  gpio_reset_pin(ACC_POWER); // Initialize the pin
+  gpio_set_direction(ACC_POWER, GPIO_MODE_OUTPUT);
+  gpio_set_level(ACC_POWER, enable); // Turn on/off the accessory power
+#endif
+}
+
 void enter_sleep() {
   // Disable some things so they don't run during wake check
   connection_update_state(CONNECTION_STATE_DISCONNECTED);
@@ -189,6 +197,7 @@ void enter_sleep() {
   // Turn off screen before sleep
   display_off();
   led_set_brightness(0);
+  acc_power_enable(false);
   enable_wake();
   vTaskDelay(50); // Allow gpio level to settle before going into sleep
 

@@ -32,6 +32,7 @@
 static const char *TAG = "PUBREMOTE-MAIN";
 
 void app_main(void) {
+  acc_power_enable(true);
   // Core setup
   init_i2c();
   settings_init();

@@ -520,16 +520,19 @@ void stats_screen_load_start(lv_event_t *e) {
   // Permanent screen - don't apply scale
 
   if (LVGL_lock(-1)) {
-#if UI_SHAPE
-    lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
-#else
+#if (UI_SHAPE == 1)
+    // Circle UI
     lv_obj_add_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+#else
+    // Rectangle UI
+    lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
+
 #endif
     create_navigation_group(ui_StatsContent);
     LVGL_unlock();

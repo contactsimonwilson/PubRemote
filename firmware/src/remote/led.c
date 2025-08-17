@@ -59,14 +59,6 @@ static void configure_led(void) {
   ESP_LOGI(TAG, "Created LED strip object with RMT backend");
 }
 
-static void led_power_on() {
-  #ifdef LED_POWER_PIN
-  gpio_reset_pin(LED_POWER_PIN); // Initialize the pin
-  gpio_set_direction(LED_POWER_PIN, GPIO_MODE_OUTPUT);
-  gpio_set_level(LED_POWER_PIN, 1); // Turn on the LED power
-  #endif
-}
-
 static RGB adjustBrightness(RGB originalColor, float brightnessScaling) {
   float gamma = 2.2; // Typical gamma value for WS2812 LEDs
 
@@ -280,7 +272,6 @@ void led_set_effect_none() {
 void led_init() {
 #if LED_ENABLED
   ESP_LOGI(TAG, "Initializing LED strip");
-  led_power_on();
   configure_led();
   is_initialized = true;
   xTaskCreate(led_task, "led_task", 2048, NULL, 2, NULL);

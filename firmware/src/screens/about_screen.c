@@ -33,7 +33,7 @@ static void update_battery_percentage_label() {
   asprintf(&formattedString, "Battery: %.2fV | %d%%\nState: %s", ((float)remoteStats.remoteBatteryVoltage / 1000.0f),
            remoteStats.remoteBatteryPercentage, charge_state_to_string(remoteStats.chargeState));
 
-  if (remoteStats.chargeState != CHARGE_STATE_NOT_CHARGING) {
+  if (remoteStats.chargeState != CHARGE_STATE_NOT_CHARGING && remoteStats.chargeCurrent > 0) {
     asprintf(&formattedString, "%s\nCurrent: %umA", formattedString, remoteStats.chargeCurrent);
   }
 
