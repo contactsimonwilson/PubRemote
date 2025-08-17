@@ -340,3 +340,59 @@ void paged_scroll_event_cb(lv_event_t *e) {
     LVGL_unlock();
   }
 }
+
+void resize_footer_buttons(lv_obj_t *footer) {
+  if (footer == NULL) {
+    return;
+  }
+
+  // Get the number of buttons in the footer
+  uint32_t button_count = lv_obj_get_child_cnt(footer);
+  if (button_count == 0) {
+    return;
+  }
+
+  // Calculate width for each button
+  lv_coord_t button_width = lv_obj_get_width(footer) / button_count;
+
+  uint32_t final_button_count = 0;
+  // Resize each button
+  for (uint32_t i = 0; i < button_count; i++) {
+    lv_obj_t *button = lv_obj_get_child(footer, i);
+    if (button != NULL && lv_obj_check_type(button, &lv_btn_class) &&
+        lv_obj_has_flag(button, LV_OBJ_FLAG_HIDDEN) == false) {
+      final_button_count++;
+    }
+  }
+
+  // If no buttons are visible, return early
+  if (final_button_count == 0) {
+    return;
+  }
+
+  uint32_t butt_width = 80 * SCALE_FACTOR;
+
+  switch (final_button_count) {
+  case 1:
+    button_width = 80 * SCALE_FACTOR;
+    break;
+  case 2:
+    button_width = 60 * SCALE_FACTOR; // Add some space between buttons
+    break;
+  case 3:
+    button_width = 40 * SCALE_FACTOR; // Add more space for three buttons
+    break;
+  default:
+    button_width = lv_obj_get_width(footer) / final_button_count; // Default to equal width
+    break;
+  }
+
+  // Resize each button again, now that we know the final count
+  for (uint32_t i = 0; i < button_count; i++) {
+    lv_obj_t *button = lv_obj_get_child(footer, i);
+    if (button != NULL && lv_obj_check_type(button, &lv_btn_class) &&
+        lv_obj_has_flag(button, LV_OBJ_FLAG_HIDDEN) == false) {
+      lv_obj_set_width(button, button_width);
+    }
+  }
+}
