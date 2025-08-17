@@ -49,7 +49,7 @@ static void about_task(void *pvParameters) {
       LVGL_unlock();
     }
 
-    vTaskDelay(pdMS_TO_TICKS(LV_DISP_DEF_REFR_PERIOD));
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 
   ESP_LOGI(TAG, "About task ended");
@@ -76,7 +76,7 @@ void about_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen loaded");
 
   // Start task to update UI
-  xTaskCreate(about_task, "about_task", 2048, NULL, 2, NULL);
+  xTaskCreate(about_task, "about_task", 3072, NULL, 2, NULL);
 }
 
 void about_screen_unload_start(lv_event_t *e) {
