@@ -189,8 +189,9 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_align(ui_StatsContent, LV_ALIGN_CENTER);
   lv_obj_set_flex_flow(ui_StatsContent, LV_FLEX_FLOW_COLUMN);
   lv_obj_set_flex_align(ui_StatsContent, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-  lv_obj_add_flag(ui_StatsContent, LV_OBJ_FLAG_SCROLL_ONE);                                 /// Flags
-  lv_obj_clear_flag(ui_StatsContent, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_MOMENTUM); /// Flags
+  lv_obj_add_flag(ui_StatsContent, LV_OBJ_FLAG_SCROLL_ONE); /// Flags
+  lv_obj_clear_flag(ui_StatsContent,
+                    LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_MOMENTUM); /// Flags
   lv_obj_set_style_pad_left(ui_StatsContent, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_right(ui_StatsContent, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_top(ui_StatsContent, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -206,7 +207,7 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_align(ui_StatsHeader, LV_ALIGN_CENTER);
   lv_obj_set_flex_flow(ui_StatsHeader, LV_FLEX_FLOW_COLUMN);
   lv_obj_set_flex_align(ui_StatsHeader, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-  lv_obj_clear_flag(ui_StatsHeader, LV_OBJ_FLAG_SCROLLABLE); /// Flags
+  lv_obj_clear_flag(ui_StatsHeader, LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
 
   ui_RemoteIndicatorContainer = lv_obj_create(ui_StatsHeader);
   lv_obj_remove_style_all(ui_RemoteIndicatorContainer);
@@ -320,7 +321,7 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_align(ui_StatsBody, LV_ALIGN_CENTER);
   lv_obj_set_flex_flow(ui_StatsBody, LV_FLEX_FLOW_COLUMN);
   lv_obj_set_flex_align(ui_StatsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-  lv_obj_clear_flag(ui_StatsBody, LV_OBJ_FLAG_SCROLLABLE); /// Flags
+  lv_obj_clear_flag(ui_StatsBody, LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
 
   ui_RemoteModeContainer = lv_obj_create(ui_StatsBody);
   lv_obj_remove_style_all(ui_RemoteModeContainer);
@@ -509,7 +510,7 @@ void ui_StatsScreen_screen_init(void) {
   lv_obj_set_align(ui_StatsFooter, LV_ALIGN_CENTER);
   lv_obj_set_flex_flow(ui_StatsFooter, LV_FLEX_FLOW_COLUMN);
   lv_obj_set_flex_align(ui_StatsFooter, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-  lv_obj_clear_flag(ui_StatsFooter, LV_OBJ_FLAG_SCROLLABLE); /// Flags
+  lv_obj_clear_flag(ui_StatsFooter, LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
   lv_obj_set_style_pad_left(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_right(ui_StatsFooter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_top(ui_StatsFooter, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
