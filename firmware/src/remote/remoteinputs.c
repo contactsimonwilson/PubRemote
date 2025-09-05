@@ -199,7 +199,7 @@ void reset_button_state() {
   remote_data.bt_c = 0;
 }
 
-void debuttons_init() {
+void buttons_deinit() {
   if (gpio_btn_handle) {
     iot_button_delete(gpio_btn_handle);
     gpio_btn_handle = NULL;

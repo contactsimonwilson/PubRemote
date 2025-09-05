@@ -1,3 +1,4 @@
+#include "config.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
@@ -32,18 +33,26 @@
 static const char *TAG = "PUBREMOTE-MAIN";
 
 void app_main(void) {
-  acc_power_enable(true);
+  // Enable power for core peripherals
+  acc1_power_set_level(1);
   // Core setup
   init_i2c();
   settings_init();
   init_adcs();
-  buttons_init(); // Required before power management for boot button detection
-  buzzer_init();  // Required before power management for buzzer control
-  haptic_init();  // Required before power management for haptic control
+  buttons_init();
+  buzzer_init();
+  haptic_init();
+  led_init();
   power_management_init();
 
+  // Fire startup callbacks once boot is confirmed
+  startup_cb();
+// Enable accessories after callbacks
+#ifdef ACC2_POWER_DEFAULT
+  acc2_power_set_level(ACC2_POWER_DEFAULT);
+#endif
+
   // Peripherals
-  led_init();
   thumbstick_init();
   display_init();
   vehicle_monitor_init();
@@ -54,8 +63,6 @@ void app_main(void) {
   receiver_init();
   transmitter_init();
   console_init();
-
-  startup_cb();
 
   ESP_LOGI(TAG, "Boot complete");
 }
