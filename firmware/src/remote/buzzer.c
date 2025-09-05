@@ -19,10 +19,6 @@
 static const char *TAG = "PUBREMOTE-BUZZER";
 
 static bool is_initialized = false;
-static BuzzerPatttern current_pattern = BUZZER_PATTERN_NONE;
-static int current_frequency = 0;
-static int current_time_left = 0;
-static int current_duty = 0;
 
 #if BUZZER_ENABLED
   #define BUZZER_DELAY_MS 50 // Delay for the buzzer task
@@ -33,6 +29,11 @@ static int current_duty = 0;
 #endif
 
 #if BUZZER_ENABLED
+static BuzzerPatttern current_pattern = BUZZER_PATTERN_NONE;
+static int current_frequency = 0;
+static int current_time_left = 0;
+static int current_duty = 0;
+
 // Note (hz), duration (ms)
 static const int melody[] = {NOTE_C4, 100, NOTE_D4, 100, NOTE_E4, 100, NOTE_F4, 100,
                              NOTE_G4, 100, NOTE_A4, 100, NOTE_B4, 100, NOTE_C5, 200};
@@ -81,6 +82,7 @@ static void process_current_note() {
 
 #if BUZZER_ENABLED
 static void process_melody() {
+  #if BUZZER_ENABLED
   const int melody_length = sizeof(melody) / sizeof(melody[0]);
   int current_time = 0;
   int elapsed_time_ms = melody_duration - current_time_left;
@@ -101,6 +103,7 @@ static void process_melody() {
   }
 
   current_frequency = frequency;
+  #endif
 }
 #endif
 
@@ -216,7 +219,7 @@ void buzzer_init() {
   };
   ledc_channel_config(&channel_conf);
   is_initialized = true;
-  xTaskCreate(buzzer_task, "buzzer_task", 4096, NULL, 2, NULL);
+  xTaskCreate(buzzer_task, "buzzer_task", 1024, NULL, 2, NULL);
   register_startup_cb(play_startup_effect);
 #endif
 }

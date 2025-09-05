@@ -178,10 +178,16 @@ static void await_pmu_int_reset() {
 #endif
 
 void acc_power_enable(bool enable) {
-#ifdef ACC_POWER
-  gpio_reset_pin(ACC_POWER); // Initialize the pin
-  gpio_set_direction(ACC_POWER, GPIO_MODE_OUTPUT);
-  gpio_set_level(ACC_POWER, enable); // Turn on/off the accessory power
+#ifdef ACC1_POWER
+  gpio_reset_pin(ACC1_POWER);
+  gpio_set_direction(ACC1_POWER, GPIO_MODE_OUTPUT);
+  gpio_set_level(ACC1_POWER, ACC1_POWER_ON_LEVEL ? enable : !enable);
+#endif
+
+#ifdef ACC2_POWER
+  gpio_reset_pin(ACC2_POWER);
+  gpio_set_direction(ACC2_POWER, GPIO_MODE_OUTPUT);
+  gpio_set_level(ACC2_POWER, ACC2_POWER_ON_LEVEL ? enable : !enable);
 #endif
 }
 
@@ -199,7 +205,7 @@ void enter_sleep() {
   led_set_brightness(0);
   acc_power_enable(false);
   enable_wake();
-  vTaskDelay(50); // Allow gpio level to settle before going into sleep
+  vTaskDelay(pdMS_TO_TICKS(50)); // Allow gpio level to settle before going into sleep
 
 #ifdef PMU_INT
   await_pmu_int_reset();
@@ -447,5 +453,5 @@ void power_management_init() {
   gpio_isr_handler_add(PMU_INT, pmu_isr_handler, (void *)PMU_INT);
 #endif
 
-  xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
+  xTaskCreate(power_management_task, "power_management_task", 2048, NULL, 2, NULL);
 }
