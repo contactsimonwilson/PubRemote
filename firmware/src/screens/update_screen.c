@@ -1,6 +1,5 @@
 #include "config.h"
 #include "esp_log.h"
-#include "lvgl_elements/password_input.h"
 #include "remote/connection.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
@@ -16,7 +15,6 @@ static const char *TAG = "PUBREMOTE-UPDATE_SCREEN";
 typedef enum {
   UPDATE_STEP_START,
   UPDATE_SCANNING,
-  UPDATE_STEP_ENTER_PASSWORD,
   UPDATE_STEP_CONNECTING,
   UPDATE_STEP_CHECKING_UPDATE,
   UPDATE_STEP_UPDATE_AVAILABLE,
@@ -56,15 +54,6 @@ void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "Scanning...");
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    break;
-  case UPDATE_STEP_ENTER_PASSWORD:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Authentication");
-    lv_label_set_text_fmt(ui_UpdateBodyLabel, "Enter password for  %s", selected_network_ssid);
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Next");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    create_wifi_password_screen(ui_UpdateBody);
     break;
   case UPDATE_STEP_CONNECTING:
     lv_label_set_text(ui_UpdateHeaderLabel, "Connecting");
@@ -158,25 +147,6 @@ static void clean_body() {
   }
 }
 
-static void network_button_clicked(lv_event_t *e) {
-  char *ssid = (char *)lv_event_get_user_data(e);
-  ESP_LOGI(TAG, "Selected network: %s", ssid);
-
-  strncpy(selected_network_ssid, ssid, sizeof(selected_network_ssid) - 1);
-  selected_network_ssid[sizeof(selected_network_ssid) - 1] = '\0';
-
-  free(ssid);
-
-  current_update_step = UPDATE_STEP_ENTER_PASSWORD;
-
-  // Force immediate UI update
-  if (LVGL_lock(0)) {
-    clean_body();          // Clear the network buttons
-    update_status_label(); // Update the UI immediately
-    LVGL_unlock();
-  }
-}
-
 void update_task(void *pvParameters) {
   connection_update_state(CONNECTION_STATE_DISCONNECTED);
   if (espnow_is_initialized()) {
@@ -235,45 +205,43 @@ void update_task(void *pvParameters) {
             }
           }
 
-          if (LVGL_lock(0)) {
-            clean_body();
+          // if (LVGL_lock(0)) {
+          //   clean_body();
 
-            // Add buttons with details of each network
-            for (int i = 0; i < network_count; i++) {
-              lv_obj_t *network_button = lv_btn_create(ui_UpdateBody);
-              lv_obj_set_size(network_button, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-              lv_obj_set_style_bg_color(network_button, lv_color_hex(0xFFFFFF), 0);
-              lv_obj_set_width(network_button, lv_pct(100));
-              lv_obj_set_style_border_color(network_button, lv_color_hex(0xCCCCCC), 0);
-              lv_obj_set_style_border_width(network_button, 1, 0);
-              lv_obj_set_style_radius(network_button, 5, 0);
-              lv_obj_set_style_pad_all(network_button, 5, 0);
+          //   // Add buttons with details of each network
+          //   for (int i = 0; i < network_count; i++) {
+          //     lv_obj_t *network_button = lv_btn_create(ui_UpdateBody);
+          //     lv_obj_set_size(network_button, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+          //     lv_obj_set_style_bg_color(network_button, lv_color_hex(0xFFFFFF), 0);
+          //     lv_obj_set_width(network_button, lv_pct(100));
+          //     lv_obj_set_style_border_color(network_button, lv_color_hex(0xCCCCCC), 0);
+          //     lv_obj_set_style_border_width(network_button, 1, 0);
+          //     lv_obj_set_style_radius(network_button, 5 * SCALE_FACTOR, 0);
+          //     lv_obj_set_style_pad_all(network_button, 5 * SCALE_FACTOR, 0);
 
-              lv_obj_t *network_label = lv_label_create(network_button);
-              lv_label_set_text_fmt(network_label, "%s (%d dBm)", networks[i].ssid, networks[i].rssi);
-              lv_obj_set_style_text_color(network_label, lv_color_hex(0x000000), 0);
+          //     lv_obj_t *network_label = lv_label_create(network_button);
+          //     lv_label_set_text_fmt(network_label, "%s (%d dBm)", networks[i].ssid, networks[i].rssi);
+          //     lv_obj_set_style_text_color(network_label, lv_color_hex(0x000000), 0);
 
-              char *ssid_copy = malloc(strlen(networks[i].ssid) + 1);
-              strcpy(ssid_copy, networks[i].ssid);
-              lv_obj_add_event_cb(network_button, network_button_clicked, LV_EVENT_CLICKED, ssid_copy);
-              lv_obj_align(network_button, LV_ALIGN_TOP_MID, 0, i * 40);
-            }
+          //     char *ssid_copy = malloc(strlen(networks[i].ssid) + 1);
+          //     strcpy(ssid_copy, networks[i].ssid);
+          //     lv_obj_add_event_cb(network_button, network_button_clicked, LV_EVENT_CLICKED, ssid_copy);
+          //     lv_obj_align(network_button, LV_ALIGN_TOP_MID, 0, i * 40 * SCALE_FACTOR);
+          //   }
 
-            if (network_count > 0) {
-              lv_obj_add_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-              lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-            }
-            else {
-              lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-              lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-            }
-            LVGL_unlock();
-          }
+          //   if (network_count > 0) {
+          //     lv_obj_add_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+          //     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+          //   }
+          //   else {
+          //     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+          //     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+          //   }
+          //   LVGL_unlock();
+          // }
         }
         last_scan_time = current_time;
       }
-      break;
-    case UPDATE_STEP_ENTER_PASSWORD:
       break;
     case UPDATE_STEP_CONNECTING:
       // Start connecting
@@ -460,9 +428,6 @@ void update_primary_button_press(lv_event_t *e) {
   switch (current_update_step) {
   case UPDATE_STEP_START:
     current_update_step = UPDATE_SCANNING;
-    break;
-  case UPDATE_STEP_ENTER_PASSWORD:
-    current_update_step = UPDATE_STEP_CONNECTING;
     break;
   case UPDATE_STEP_CONNECTING:
     current_update_step = UPDATE_STEP_CHECKING_UPDATE;

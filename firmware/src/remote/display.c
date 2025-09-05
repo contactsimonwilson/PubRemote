@@ -575,7 +575,9 @@ void display_off() {
     esp_lcd_panel_disp_sleep(lcd_panel, true);
   }
 
+#if TOUCH_ENABLED
   if (touch_handle) {
     esp_lcd_touch_enter_sleep(touch_handle);
   }
+#endif
 }

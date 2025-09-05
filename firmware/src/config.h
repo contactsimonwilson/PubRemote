@@ -15,6 +15,14 @@
 #define MIN_BATTERY_VOLTAGE 3000
 #define MAX_BATTERY_VOLTAGE 4200
 
+#if defined(ACC1_POWER) && !defined(ACC1_POWER_ON_LEVEL)
+  #define ACC1_POWER_ON_LEVEL 1
+#endif
+
+#if defined(ACC2_POWER) && !defined(ACC2_POWER_ON_LEVEL)
+  #define ACC2_POWER_ON_LEVEL 1
+#endif
+
 // i2c configuration
 #if (!defined(I2C_SDA) || !defined(I2C_SCL))
   #error "I2C_SDA and I2C_SCL must be defined for I2C communication. Please define them in your build flags."
