@@ -58,6 +58,10 @@
   #define TOUCH_ENABLED 0
 #endif
 
+#ifndef TP_RST
+  #define TP_RST -1
+#endif
+
 // Led configuration
 #if defined(LED_DATA)
   #define LED_ENABLED 1

@@ -69,7 +69,10 @@ esp_err_t esp_lcd_touch_new_i2c_ft3168(const esp_lcd_panel_io_handle_t io, const
   ft3168->read_data = read_data;
   ft3168->get_xy = get_xy;
   ft3168->del = del;
-  ft3168->enter_sleep = enter_sleep;
+
+  if (config->rst_gpio_num != GPIO_NUM_NC) {
+    ft3168->enter_sleep = enter_sleep; // Needs reset pin to wake up from sleep
+  }
   /* Mutex */
   ft3168->data.lock.owner = portMUX_FREE_VAL;
   /* Save config */
