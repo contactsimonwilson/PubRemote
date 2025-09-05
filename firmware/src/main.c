@@ -39,13 +39,17 @@ void app_main(void) {
   init_i2c();
   settings_init();
   init_adcs();
-  buttons_init(); // Required before power management for boot button detection
-  buzzer_init();  // Required before power management for buzzer control
-  haptic_init();  // Required before power management for haptic control
+  buttons_init();
+  buzzer_init();
+  haptic_init();
+  led_init();
   power_management_init();
 
+  startup_cb();
+  // Enable accessories after callbacks
+  acc2_power_set_level(ACC2_POWER_DEFAULT);
+
   // Peripherals
-  led_init();
   thumbstick_init();
   display_init();
   vehicle_monitor_init();
@@ -56,10 +60,6 @@ void app_main(void) {
   receiver_init();
   transmitter_init();
   console_init();
-
-  startup_cb();
-  // Enable accessories after callbacks
-  acc2_power_set_level(ACC2_POWER_DEFAULT);
 
   ESP_LOGI(TAG, "Boot complete");
 }

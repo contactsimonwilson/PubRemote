@@ -11,7 +11,7 @@
 
 void thumbstick_init();
 void buttons_init();
-void debuttons_init();
+void buttons_deinit();
 void register_primary_button_cb(button_event_t event, button_cb_t cb);
 void unregister_primary_button_cb(button_event_t event);
 

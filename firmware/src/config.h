@@ -7,11 +7,6 @@
   #define RELEASE_VARIANT "dev"
 #endif
 
-// Power configuration
-#ifndef FORCE_LIGHT_SLEEP
-  #define FORCE_LIGHT_SLEEP 0
-#endif
-
 #define MIN_BATTERY_VOLTAGE 3000
 #define MAX_BATTERY_VOLTAGE 4200
 
