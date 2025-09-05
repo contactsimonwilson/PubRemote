@@ -178,17 +178,33 @@ static void await_pmu_int_reset() {
 #endif
 
 void acc_power_enable(bool enable) {
+  static bool is_initialized = false;
+
 #ifdef ACC1_POWER
-  gpio_reset_pin(ACC1_POWER);
-  gpio_set_direction(ACC1_POWER, GPIO_MODE_OUTPUT);
+  if (!is_initialized) {
+    gpio_config_t io_conf = {.pin_bit_mask = (1ULL << ACC1_POWER),
+                             .mode = GPIO_MODE_OUTPUT,
+                             .pull_up_en = GPIO_PULLUP_DISABLE,
+                             .pull_down_en = GPIO_PULLDOWN_DISABLE,
+                             .intr_type = GPIO_INTR_DISABLE};
+    gpio_config(&io_conf);
+  }
   gpio_set_level(ACC1_POWER, ACC1_POWER_ON_LEVEL ? enable : !enable);
 #endif
 
 #ifdef ACC2_POWER
-  gpio_reset_pin(ACC2_POWER);
-  gpio_set_direction(ACC2_POWER, GPIO_MODE_OUTPUT);
+  if (!is_initialized) {
+    gpio_config_t io_conf = {.pin_bit_mask = (1ULL << ACC2_POWER),
+                             .mode = GPIO_MODE_OUTPUT,
+                             .pull_up_en = GPIO_PULLUP_DISABLE,
+                             .pull_down_en = GPIO_PULLDOWN_DISABLE,
+                             .intr_type = GPIO_INTR_DISABLE};
+    gpio_config(&io_conf);
+  }
   gpio_set_level(ACC2_POWER, ACC2_POWER_ON_LEVEL ? enable : !enable);
 #endif
+
+  is_initialized = true;
 }
 
 void enter_sleep() {
