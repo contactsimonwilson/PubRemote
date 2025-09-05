@@ -38,10 +38,10 @@ static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 #endif
 
 RTC_DATA_ATTR bool is_power_connected = false; // Store power state across deep sleep
+static bool shutdown_initiated = false;        // Flag for triggering shutdown sequence
 
 #ifdef PMU_INT
 static QueueHandle_t pmu_evt_queue = NULL;
-static bool shutdown_initiated = false;
 
 // Interrupt handler function (runs in IRAM)
 static void IRAM_ATTR pmu_isr_handler(void *arg) {
