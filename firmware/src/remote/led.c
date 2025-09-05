@@ -74,8 +74,19 @@ static RGB adjustBrightness(RGB originalColor, float brightnessScaling) {
 }
 
 static void led_off() {
-  ESP_ERROR_CHECK(led_strip_clear(led_strip));
-  ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+  esp_err_t err = ESP_OK;
+  err = led_strip_clear(led_strip);
+
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to clear LED strip: %s", esp_err_to_name(err));
+    return;
+  }
+
+  err = led_strip_refresh(led_strip);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to refresh LED strip: %s", esp_err_to_name(err));
+    return;
+  }
 }
 
 static void apply_led_effect() {
@@ -86,11 +97,21 @@ static void apply_led_effect() {
 
   RGB new_col = adjustBrightness(rgb, current_brightness / 255.0);
 
+  esp_err_t err = ESP_OK;
+
   for (int i = 0; i < LED_COUNT; i++) {
-    ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, new_col.r, new_col.g, new_col.b));
+    esp_err_t new_err = led_strip_set_pixel(led_strip, i, new_col.r, new_col.g, new_col.b);
+    if (new_err != ESP_OK) {
+      err = new_err; // Capture the last error
+    }
+  }
+
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to set LED color: %s", esp_err_to_name(err));
+    return;
   }
   /* Refresh the strip to send data */
-  ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+  led_strip_refresh(led_strip);
 }
 
 static RGB hex_to_rgb(uint32_t hex) {

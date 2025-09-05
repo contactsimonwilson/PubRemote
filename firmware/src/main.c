@@ -1,3 +1,4 @@
+#include "config.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
@@ -32,7 +33,8 @@
 static const char *TAG = "PUBREMOTE-MAIN";
 
 void app_main(void) {
-  acc_power_enable(true);
+  // Enable power for core peripherals
+  acc1_power_set_level(1);
   // Core setup
   init_i2c();
   settings_init();
@@ -56,6 +58,8 @@ void app_main(void) {
   console_init();
 
   startup_cb();
+  // Enable accessories after callbacks
+  acc2_power_set_level(ACC2_POWER_DEFAULT);
 
   ESP_LOGI(TAG, "Boot complete");
 }

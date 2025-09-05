@@ -17,6 +17,7 @@
 #include "settings.h"
 #include "stats.h"
 #include "utilities/number_utils.h"
+#include <driver/ledc.h>
 #include <esp_adc/adc_oneshot.h>
 #include <esp_err.h>
 #include <esp_sleep.h>
@@ -177,10 +178,10 @@ static void await_pmu_int_reset() {
 }
 #endif
 
-void acc_power_enable(bool enable) {
+void acc1_power_set_level(bool enable) {
+#ifdef ACC1_POWER
   static bool is_initialized = false;
 
-#ifdef ACC1_POWER
   if (!is_initialized) {
     gpio_config_t io_conf = {.pin_bit_mask = (1ULL << ACC1_POWER),
                              .mode = GPIO_MODE_OUTPUT,
@@ -188,23 +189,55 @@ void acc_power_enable(bool enable) {
                              .pull_down_en = GPIO_PULLDOWN_DISABLE,
                              .intr_type = GPIO_INTR_DISABLE};
     gpio_config(&io_conf);
+    is_initialized = true;
   }
+
   gpio_set_level(ACC1_POWER, ACC1_POWER_ON_LEVEL ? enable : !enable);
 #endif
+}
 
+// Sets the power level of ACC2 using PWM for brightness control
+// Level should be between 0 (off) and 100 (full power)
+void acc2_power_set_level(uint8_t level) {
 #ifdef ACC2_POWER
-  if (!is_initialized) {
-    gpio_config_t io_conf = {.pin_bit_mask = (1ULL << ACC2_POWER),
-                             .mode = GPIO_MODE_OUTPUT,
-                             .pull_up_en = GPIO_PULLUP_DISABLE,
-                             .pull_down_en = GPIO_PULLDOWN_DISABLE,
-                             .intr_type = GPIO_INTR_DISABLE};
-    gpio_config(&io_conf);
-  }
-  gpio_set_level(ACC2_POWER, ACC2_POWER_ON_LEVEL ? enable : !enable);
-#endif
+  #define POWER_LEDC_CHANNEL LEDC_CHANNEL_3
+  #define POWER_LEDC_TIMER LEDC_TIMER_3
+  #define POWER_TIMER LEDC_TIMER_3
+  #define POWER_RESOLUTION LEDC_TIMER_8_BIT
+  #define POWER_MAX_DUTY ((1 << 8) - 1)
 
-  is_initialized = true;
+  static bool is_initialized = false;
+
+  if (!is_initialized) {
+    ledc_timer_config_t timer_conf = {.speed_mode = LEDC_LOW_SPEED_MODE,
+                                      .timer_num = POWER_LEDC_TIMER,
+                                      .duty_resolution = POWER_RESOLUTION,
+                                      .freq_hz = 1000,
+                                      .clk_cfg = LEDC_AUTO_CLK};
+    ledc_timer_config(&timer_conf);
+
+    ledc_channel_config_t channel_conf = {
+        .gpio_num = ACC2_POWER,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = POWER_LEDC_CHANNEL,
+        .intr_type = LEDC_INTR_DISABLE,
+        .timer_sel = POWER_TIMER,
+        .duty = 0, // Initially off
+    };
+    ledc_channel_config(&channel_conf);
+    is_initialized = true;
+  }
+
+  uint8_t final_duty = level > 100 ? 100 : level;
+  final_duty = (final_duty * POWER_MAX_DUTY) / 100;
+
+  #if !ACC2_POWER_ON_LEVEL
+  final_duty = POWER_MAX_DUTY - final_duty;
+  #endif
+
+  ledc_set_duty(LEDC_LOW_SPEED_MODE, POWER_LEDC_CHANNEL, final_duty);
+  ledc_update_duty(LEDC_LOW_SPEED_MODE, POWER_LEDC_CHANNEL);
+#endif
 }
 
 void enter_sleep() {
@@ -219,7 +252,8 @@ void enter_sleep() {
   // Turn off screen before sleep
   display_off();
   led_set_brightness(0);
-  acc_power_enable(false);
+  acc1_power_set_level(0);
+  acc2_power_set_level(0);
   enable_wake();
   vTaskDelay(pdMS_TO_TICKS(50)); // Allow gpio level to settle before going into sleep
 

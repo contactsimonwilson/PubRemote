@@ -23,6 +23,10 @@
   #define ACC2_POWER_ON_LEVEL 1
 #endif
 
+#if defined(ACC2_POWER) && !defined(ACC2_POWER_DEFAULT_LEVEL)
+  #define ACC2_POWER_DEFAULT 60 // Default to 60% brightness
+#endif
+
 // i2c configuration
 #if (!defined(I2C_SDA) || !defined(I2C_SCL))
   #error "I2C_SDA and I2C_SCL must be defined for I2C communication. Please define them in your build flags."
@@ -80,8 +84,8 @@
   #define BUZZER_ENABLED 0
 #endif
 
-#ifndef BUZZER_INVERT
-  #define BUZZER_INVERT 0
+#ifndef BUZZER_LEVEL
+  #define BUZZER_LEVEL 1
 #endif
 
 // Haptic configuration
