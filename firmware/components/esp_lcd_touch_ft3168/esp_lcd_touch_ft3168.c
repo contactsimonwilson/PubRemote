@@ -70,9 +70,6 @@ esp_err_t esp_lcd_touch_new_i2c_ft3168(const esp_lcd_panel_io_handle_t io, const
   ft3168->get_xy = get_xy;
   ft3168->del = del;
 
-  if (config->rst_gpio_num != GPIO_NUM_NC) {
-    ft3168->enter_sleep = enter_sleep; // Needs reset pin to wake up from sleep
-  }
   /* Mutex */
   ft3168->data.lock.owner = portMUX_FREE_VAL;
   /* Save config */
@@ -96,6 +93,7 @@ esp_err_t esp_lcd_touch_new_i2c_ft3168(const esp_lcd_panel_io_handle_t io, const
     const gpio_config_t rst_gpio_config = {.mode = GPIO_MODE_OUTPUT,
                                            .pin_bit_mask = BIT64(ft3168->config.rst_gpio_num)};
     ESP_GOTO_ON_ERROR(gpio_config(&rst_gpio_config), err, TAG, "GPIO reset config failed");
+    ft3168->enter_sleep = enter_sleep; // Needs reset pin to wake up from sleep
   }
   /* Reset controller */
   ESP_GOTO_ON_ERROR(reset(ft3168), err, TAG, "Reset failed");

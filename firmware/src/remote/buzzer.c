@@ -43,8 +43,8 @@ static const int melody_duration = 900;
 
 void buzzer_stop() {
 #if BUZZER_ENABLED
-  int duty = BUZZER_INVERT ? BUZZER_MAX_DUTY : 0; // Invert duty if needed
-  current_pattern = BUZZER_PATTERN_NONE;          // Reset pattern
+  int duty = BUZZER_LEVEL ? 0 : BUZZER_MAX_DUTY; // Invert duty if needed
+  current_pattern = BUZZER_PATTERN_NONE;         // Reset pattern
 
   if (duty == current_duty) {
     return;
@@ -82,7 +82,7 @@ static void process_current_note() {
 
 #if BUZZER_ENABLED
 static void process_melody() {
-#if BUZZER_ENABLED
+  #if BUZZER_ENABLED
   const int melody_length = sizeof(melody) / sizeof(melody[0]);
   int current_time = 0;
   int elapsed_time_ms = melody_duration - current_time_left;
@@ -103,7 +103,7 @@ static void process_melody() {
   }
 
   current_frequency = frequency;
-#endif
+  #endif
 }
 #endif
 
@@ -210,12 +210,11 @@ void buzzer_init() {
       .channel = BUZZER_CHANNEL,
       .intr_type = LEDC_INTR_DISABLE,
       .timer_sel = BUZZER_TIMER,
-  #if BUZZER_INVERT
-      .duty = BUZZER_MAX_DUTY,
+  #if BUZZER_LEVEL
+      .duty = 0,
   #else
-      .duty = 0, // Initially off
+      .duty = BUZZER_MAX_DUTY,
   #endif
-      .hpoint = 0,
   };
   ledc_channel_config(&channel_conf);
   is_initialized = true;

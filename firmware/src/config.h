@@ -7,11 +7,6 @@
   #define RELEASE_VARIANT "dev"
 #endif
 
-// Power configuration
-#ifndef FORCE_LIGHT_SLEEP
-  #define FORCE_LIGHT_SLEEP 0
-#endif
-
 #define MIN_BATTERY_VOLTAGE 3000
 #define MAX_BATTERY_VOLTAGE 4200
 
@@ -21,6 +16,10 @@
 
 #if defined(ACC2_POWER) && !defined(ACC2_POWER_ON_LEVEL)
   #define ACC2_POWER_ON_LEVEL 1
+#endif
+
+#if defined(ACC2_POWER) && !defined(ACC2_POWER_DEFAULT_LEVEL)
+  #define ACC2_POWER_DEFAULT 60 // Default to 60% brightness
 #endif
 
 // i2c configuration
@@ -80,8 +79,8 @@
   #define BUZZER_ENABLED 0
 #endif
 
-#ifndef BUZZER_INVERT
-  #define BUZZER_INVERT 0
+#ifndef BUZZER_LEVEL
+  #define BUZZER_LEVEL 1
 #endif
 
 // Haptic configuration

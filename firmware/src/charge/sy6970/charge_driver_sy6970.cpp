@@ -77,17 +77,17 @@ static esp_err_t sy6970_init() {
   }
 
   PPM.init();
-  PPM.setInputCurrentLimit(2048);
-  PPM.disableCurrentLimitPin();
+  PPM.enableWatchdog(PowersSY6970::TIMER_OUT_40SEC);
+  PPM.setSysPowerDownVoltage(3500); // Default
+  PPM.setInputCurrentLimit(1500);
   PPM.setChargeTargetVoltage(4208);
-  PPM.setPrechargeCurr(512);
+  PPM.setPrechargeCurr(640);
   PPM.setChargerConstantCurr(2048);
   PPM.enableAutoDetectionDPDM(); // Enable DPDM auto-detection
   PPM.enableHVDCP(); // Enable HVDCP detection
   PPM.setHighVoltageRequestedRange(PowersSY6970::REQUEST_9V); // Set high voltage request to 9V
   PPM.enableMeasure(); // ADC must be enabled before reading voltages
   PPM.enableCharge();
-  PPM.enableWatchdog(PowersSY6970::TIMER_OUT_40SEC);
   set_ir_compensation(60, 96); // 60mΩ, 96mV clamp
 
   ESP_LOGI(TAG, "SY6970 initialized successfully");
