@@ -45,6 +45,7 @@ void app_main(void) {
   led_init();
   power_management_init();
 
+  // Fire startup callbacks once boot is confirmed
   startup_cb();
 // Enable accessories after callbacks
 #ifdef ACC2_POWER_DEFAULT
