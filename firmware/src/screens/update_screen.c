@@ -42,11 +42,14 @@ bool is_update_screen_active() {
 void update_status_label() {
   switch (current_update_step) {
   case UPDATE_STEP_START:
+
+    char wifi_ssid[33] = {0};
     lv_label_set_text(ui_UpdateHeaderLabel, "Update");
     lv_label_set_text(ui_UpdateBodyLabel, "Click next to scan for networks");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
     break;
   case UPDATE_SCANNING:
     lv_label_set_text(ui_UpdateHeaderLabel, "Network Scan");
