@@ -46,8 +46,10 @@ void app_main(void) {
   power_management_init();
 
   startup_cb();
-  // Enable accessories after callbacks
+// Enable accessories after callbacks
+#ifdef ACC2_POWER_DEFAULT
   acc2_power_set_level(ACC2_POWER_DEFAULT);
+#endif
 
   // Peripherals
   thumbstick_init();
