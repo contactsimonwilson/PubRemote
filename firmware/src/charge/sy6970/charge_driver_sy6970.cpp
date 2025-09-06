@@ -31,6 +31,38 @@ static int sy6970_write_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t *data
   return (result == ESP_OK) ? 0 : -1; // XPowersLib expects 0=success, -1=failure
 }
 
+static esp_err_t set_ir_compensation(uint8_t resistance_mohm, uint8_t clamp_mv) {
+    // Validate inputs
+    if (resistance_mohm > 140) {
+        ESP_LOGE(TAG, "Error: Resistance too high, max 140mΩ");
+        return ESP_FAIL;
+    }
+    if (clamp_mv > 224) {
+        ESP_LOGE(TAG, "Error: Clamp too high, max 224mV"); 
+        return ESP_FAIL;
+    }
+    
+    // Calculate register values
+    uint8_t bat_comp = resistance_mohm / 20;
+    uint8_t vclamp = clamp_mv / 32;
+    uint8_t treg = 3; // Keep 120°C default
+    
+    // Read current register to preserve other settings
+    uint8_t current_reg08 = PPM.readRegister(0x08);
+    
+    // Update only the IR compensation bits
+    uint8_t new_reg08 = (current_reg08 & 0x03) | (bat_comp << 5) | (vclamp << 2);
+    
+    // Write back
+    bool success = PPM.writeRegister(0x08, new_reg08);
+    
+    if (success) {
+        ESP_LOGI(TAG, "IR Compensation set: %dmΩ, Clamp: %dmV\n", 
+                     bat_comp * 20, vclamp * 32);
+    }
+    
+    return success ? ESP_OK : ESP_FAIL;
+}
 
 /**
  * @brief Initialize the SY6970 power management chip
@@ -55,6 +87,8 @@ static esp_err_t sy6970_init() {
   PPM.setHighVoltageRequestedRange(PowersSY6970::REQUEST_9V); // Set high voltage request to 9V
   PPM.enableMeasure(); // ADC must be enabled before reading voltages
   PPM.enableCharge();
+  set_ir_compensation(60, 96); // Set IR compensation to 60mOhm and 96mV clamp
+
 
   ESP_LOGI(TAG, "SY6970 initialized successfully");
   return ESP_OK;
