@@ -37,8 +37,8 @@ static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
   #define PMU_INT_NOTE_DURATION 100
 #endif
 
-RTC_DATA_ATTR bool is_power_connected = false; // Store power state across deep sleep
-static bool shutdown_initiated = false;        // Flag for triggering shutdown sequence
+RTC_DATA_ATTR bool is_power_connected = false;   // Store power state across deep sleep
+static volatile bool shutdown_initiated = false; // Flag for triggering shutdown sequence
 
 #ifdef PMU_INT
 static QueueHandle_t pmu_evt_queue = NULL;
@@ -453,5 +453,5 @@ void power_management_init() {
   gpio_isr_handler_add(PMU_INT, pmu_isr_handler, (void *)PMU_INT);
 #endif
 
-  xTaskCreate(power_management_task, "power_management_task", 2048, NULL, 2, NULL);
+  xTaskCreate(power_management_task, "power_management_task", 4096, NULL, 2, NULL);
 }
