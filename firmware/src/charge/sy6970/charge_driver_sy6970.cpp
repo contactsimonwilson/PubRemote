@@ -64,7 +64,6 @@ static esp_err_t set_ir_compensation(uint8_t resistance_mohm, uint8_t clamp_mv) 
     return success ? ESP_OK : ESP_FAIL;
 }
 
-
 /**
  * @brief Initialize the SY6970 power management chip
  */
@@ -88,7 +87,7 @@ static esp_err_t sy6970_init() {
   PPM.setHighVoltageRequestedRange(PowersSY6970::REQUEST_9V); // Set high voltage request to 9V
   PPM.enableMeasure(); // ADC must be enabled before reading voltages
   PPM.enableCharge();
-  set_ir_compensation(60, 96); // 60mΩ, 96mV clamp
+  set_ir_compensation(60, 96); // Set IR compensation to 60mOhm and 96mV clamp
 
   ESP_LOGI(TAG, "SY6970 initialized successfully");
   return ESP_OK;
