@@ -296,24 +296,18 @@ void save_device_settings() {
   nvs_write_int("pocket_mode", device_settings.pocket_mode);
 }
 
-esp_err_t save_wifi_credentials(const char *ssid, const char *password) {
-  ESP_LOGI(TAG, "Saving Wi-Fi credentials...");
+esp_err_t save_wifi_ssid(const char *ssid) {
+  ESP_LOGI(TAG, "Saving Wi-Fi SSID: %s", ssid);
   int ssid_length = strlen(ssid);
-  int password_length = strlen(password);
 
   esp_err_t err = ESP_OK;
 
-  if (ssid_length > 31 || password_length > 63) {
-    ESP_LOGE(TAG, "SSID must be up to 31 characters and password up to 63 characters.");
+  if (ssid_length > 32) {
+    ESP_LOGE(TAG, "SSID must be less than 33 characters");
     return ESP_ERR_INVALID_ARG;
   }
 
-  if (ssid_length == 0 || password_length == 0) {
-    ESP_LOGE(TAG, "SSID and password cannot be empty.");
-    return ESP_ERR_INVALID_ARG;
-  }
-
-  err = nvs_write_str("ssid", ssid);
+  err = nvs_write_str("wifi_ssid", ssid);
   if (err != ESP_OK) {
     ESP_LOGE(TAG, "Error saving SSID! SSID: %s", ssid);
     return err;
@@ -323,6 +317,21 @@ esp_err_t save_wifi_credentials(const char *ssid, const char *password) {
   if (err != ESP_OK) {
     ESP_LOGE(TAG, "Error saving SSID length! Length: %d", ssid_length);
     return err;
+  }
+
+  ESP_LOGI(TAG, "Wi-Fi credentials saved successfully.");
+
+  return ESP_OK;
+}
+
+esp_err_t save_wifi_password(const char *password) {
+  ESP_LOGI(TAG, "Saving Wi-Fi password: %s", password);
+  int password_length = strlen(password);
+  esp_err_t err = ESP_OK;
+
+  if (password_length > 64) {
+    ESP_LOGE(TAG, "SSID must be less than 65 characters");
+    return ESP_ERR_INVALID_ARG;
   }
 
   err = nvs_write_str("wifi_password", password);
@@ -338,13 +347,14 @@ esp_err_t save_wifi_credentials(const char *ssid, const char *password) {
   }
 
   ESP_LOGI(TAG, "Wi-Fi credentials saved successfully.");
+
   return ESP_OK;
 }
 
 char *get_wifi_ssid() {
   int ssid_length = 0;
   esp_err_t err = nvs_read_int("wifi_ssid_l", (uint32_t *)&ssid_length);
-  if (err != ESP_OK || ssid_length <= 0 || ssid_length > 31) {
+  if (err != ESP_OK || ssid_length <= 0 || ssid_length > 32) {
     ESP_LOGE(TAG, "Error reading SSID length: %s", esp_err_to_name(err));
     return NULL;
   }
@@ -371,7 +381,7 @@ char *get_wifi_ssid() {
 char *get_wifi_password() {
   int password_length = 0;
   esp_err_t err = nvs_read_int("wifi_key_l", (uint32_t *)&password_length);
-  if (err != ESP_OK || password_length <= 0 || password_length > 63) {
+  if (err != ESP_OK || password_length <= 0 || password_length > 64) {
     ESP_LOGE(TAG, "Error reading password length: %s", esp_err_to_name(err));
     return NULL;
   }

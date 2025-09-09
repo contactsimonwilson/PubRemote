@@ -36,7 +36,9 @@ esp_err_t save_pairing_data();
 
 esp_err_t reset_all_settings();
 
-esp_err_t save_wifi_credentials(const char *ssid, const char *password);
+esp_err_t save_wifi_ssid(const char *ssid);
+
+esp_err_t save_wifi_password(const char *password);
 
 char *get_wifi_ssid();
 

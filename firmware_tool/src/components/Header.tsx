@@ -1,7 +1,8 @@
 import { Cpu } from 'lucide-react'
 import { HeaderLinksSelector } from './HeaderLinksSelector'
 
-export function Header() {
+const Header: React.FC = () => {
+
   return (
     <header className="bg-gray-900">
       <div className="container flex justify-between mx-auto px-4 py-4">
@@ -12,7 +13,6 @@ export function Header() {
             <p className="text-sm text-gray-400">Diagnostic tool and firmware updater</p>
           </div>
         </div>
-        
         <div className="flex items-center gap-3">
           <HeaderLinksSelector></HeaderLinksSelector>
         </div>
@@ -20,3 +20,6 @@ export function Header() {
     </header>
   );
 }
+
+
+export default Header;

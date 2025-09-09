@@ -52,7 +52,7 @@ const getEspLogInfo = (
 };
 
 // Return true if the listener handled the log, false to ignore it
-type LogListener = (data: string, type: LogEntry["type"]) => boolean;
+export type LogListener = (data: string, type: LogEntry["type"]) => boolean;
 
 export class ESPService {
   private espLoader: ESPLoader | null = null;
@@ -74,15 +74,15 @@ export class ESPService {
     this.terminal = terminal;
   }
 
-  private addLogListener = (listener: LogListener) => {
+  public addLogListener = (listener: LogListener) => {
     this.logListeners.unshift(listener);
   }
 
-  private removeLogListener = (listener: LogListener) => {
+  public removeLogListener = (listener: LogListener) => {
     this.logListeners = this.logListeners.filter((l) => l !== listener);
   }
 
-  private log = (message: string, type: "info" | "error" | "success" = "info") => {
+  public log = (message: string, type: "info" | "error" | "success" = "info") => {
     this.terminal?.writeLine(message, type);
   }
 
@@ -136,26 +136,21 @@ export class ESPService {
       const versionLogListener: LogListener = (data) => {
         if (data.toLocaleLowerCase().startsWith("version:")) {
           // regex to match variant
-          version = data.toLowerCase()
-            .replace(/^version:\s*/i, "")
-            .trim();
+          version = data.replace(/^version:\s*/i, "").trim();
         }
 
         if (data.toLowerCase().startsWith("variant:")) {
-          variant = data.toLowerCase()
-            .replace(/^variant:\s*/i, "")
-            .trim();
+          variant = data.replace(/^variant:\s*/i, "").trim();
         }
 
         if (data.toLowerCase().startsWith("hardware:")) {
-          hardware = data.toLowerCase()
-            .replace(/^hardware:\s*/i, "")
-            .trim();
+          hardware = data.replace(/^hardware:\s*/i, "").trim();
         }
 
         if (data === 'pubconsole>' && version && variant && hardware) {
           clearTimeout(timeoutId);
           this.removeLogListener(versionLogListener);
+          this.log("Version info successfully loaded");
           resolve({ version, variant, hardware });
         }
 
