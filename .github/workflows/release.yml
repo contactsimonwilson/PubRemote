@@ -150,7 +150,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with: 
         tag_name: ${{ needs.check_version_update.outputs.version_tag }}
-        files: "*.zip"
+        files: "*.zip *.bin"
         prerelease: true
         fail_on_unmatched_files: true
         generate_release_notes: true

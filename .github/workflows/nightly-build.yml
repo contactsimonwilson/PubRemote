@@ -139,7 +139,7 @@ jobs:
       - name: Attach ZIPs and Publish
         uses: softprops/action-gh-release@v2
         with:
-          files: "*.zip"
+          files: "*.zip *.bin"
           name: "${{ steps.get_date.outputs.TODAY }} Nightly Build"
           prerelease: true
           tag_name: "nightly"
