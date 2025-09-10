@@ -21,8 +21,8 @@
 
 static const char *TAG = "PUBREMOTE-LED";
 
-static bool is_initialized = false;
 static LedEffect current_effect = LED_EFFECT_NONE;
+static TaskHandle_t led_task_handle = NULL;
 
 #if LED_ENABLED
   #define LEDC_CHANNEL LEDC_CHANNEL_2
@@ -228,7 +228,7 @@ static void play_startup_effect() {
 }
 
 static void led_task(void *pvParameters) {
-  while (is_initialized) {
+  while (true) {
     if (current_effect == LED_EFFECT_PULSE) {
       pulse_effect();
       continue;
@@ -255,7 +255,6 @@ static void led_task(void *pvParameters) {
     apply_led_effect();
     vTaskDelay(pdMS_TO_TICKS(ANIMATION_DELAY_MS));
   }
-  led_off();
   vTaskDelete(NULL);
 }
 #endif
@@ -294,9 +293,24 @@ void led_init() {
 #if LED_ENABLED
   ESP_LOGI(TAG, "Initializing LED strip");
   configure_led();
-  is_initialized = true;
   xTaskCreate(led_task, "led_task", 2048, NULL, 2, NULL);
   register_startup_cb(play_startup_effect);
+#endif
+}
+
+void led_deinit() {
+#if LED_ENABLED
+  if (led_task_handle != NULL) {
+    vTaskDelete(led_task_handle);
+    led_task_handle = NULL;
+  }
+
+  if (led_strip != NULL) {
+    led_off();
+    led_strip_del(led_strip);
+    led_strip = NULL;
+  }
+  ESP_LOGI(TAG, "LED strip deinitialized");
 #endif
 }
 

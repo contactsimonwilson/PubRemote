@@ -11,6 +11,8 @@ static const char *TAG = "PUBREMOTE-VEHICLE_STATE";
 #define VEHICLE_STATE_LOOP_TIME_MS 100
 #define VEHICLE_STATE_DEBUG 0
 
+static TaskHandle_t monitor_task_handle = NULL;
+
 DutyStatus get_duty_status(uint8_t duty) {
   if (duty >= DUTY_THRESHOLD_CRITICAL) {
     return DUTY_STATUS_CRITICAL;
@@ -111,6 +113,13 @@ static void monitor_task(void *pvParameters) {
 }
 
 void vehicle_monitor_init() {
-  xTaskCreate(monitor_task, "monitor_task", 1024, NULL, 5, NULL);
+  xTaskCreate(monitor_task, "monitor_task", 1024, NULL, 5, &monitor_task_handle);
   ESP_LOGI("VEHICLE_STATE", "Vehicle state monitor initialized");
+}
+
+void vehicle_monitor_deinit() {
+  if (monitor_task_handle != NULL) {
+    vTaskDelete(monitor_task_handle);
+    monitor_task_handle = NULL;
+  }
 }

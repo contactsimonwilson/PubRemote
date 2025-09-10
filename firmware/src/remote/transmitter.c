@@ -20,6 +20,7 @@ static const char *TAG = "PUBREMOTE-TRANSMITTER";
 #define COMMAND_TIMEOUT 1000
 
 static int64_t last_send_time = 0;
+static TaskHandle_t transmitter_task_handle = NULL;
 
 static void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // This callback runs in WiFi task context!
@@ -148,6 +149,14 @@ static void transmitter_task(void *pvParameters) {
   ESP_LOGI(TAG, "TX task ended");
   vTaskDelete(NULL);
 }
+
 void transmitter_init() {
-  xTaskCreatePinnedToCore(transmitter_task, "transmitter_task", 4096, NULL, 20, NULL, 0);
+  xTaskCreatePinnedToCore(transmitter_task, "transmitter_task", 4096, NULL, 20, &transmitter_task_handle, 0);
+}
+
+void transmitter_deinit() {
+  if (transmitter_task_handle != NULL) {
+    vTaskDelete(transmitter_task_handle);
+    transmitter_task_handle = NULL;
+  }
 }

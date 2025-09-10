@@ -17,5 +17,6 @@ typedef struct {
 } LatencyTestResults;
 
 void transmitter_init();
+void transmitter_deinit();
 
 #endif

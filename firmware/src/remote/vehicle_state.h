@@ -26,5 +26,6 @@ typedef enum {
 DutyStatus get_duty_status(uint8_t duty);
 DutyStatusColor get_duty_color(DutyStatus status);
 void vehicle_monitor_init();
+void vehicle_monitor_deinit();
 
 #endif

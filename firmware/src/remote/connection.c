@@ -23,6 +23,7 @@ static const char *TAG = "PUBREMOTE-CONNECTION";
 #define RECONNECTING_DURATION_MS 1000
 #define TIMEOUT_DURATION_MS 30000
 
+static TaskHandle_t connection_task_handle = NULL;
 ConnectionState connection_state = CONNECTION_STATE_DISCONNECTED;
 PairingState pairing_state = PAIRING_STATE_UNPAIRED;
 static int64_t last_connection_state_change = 0;
@@ -126,5 +127,12 @@ void connection_init() {
     connection_connect_to_default_peer();
   }
 
-  xTaskCreatePinnedToCore(connection_task, "connection_task", 4096, NULL, 20, NULL, 0);
+  xTaskCreatePinnedToCore(connection_task, "connection_task", 4096, NULL, 20, &connection_task_handle, 0);
+}
+
+void connection_deinit() {
+  if (connection_task_handle != NULL) {
+    vTaskDelete(connection_task_handle);
+    connection_task_handle = NULL;
+  }
 }
