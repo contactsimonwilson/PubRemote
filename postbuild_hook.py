@@ -2,6 +2,7 @@ Import("env")
 import os
 import time
 import zipfile
+import shutil
 
 def zip_build_files(source, target, env):
     # Define relevant paths
@@ -52,6 +53,13 @@ def zip_build_files(source, target, env):
 
     # Close stream
     ZipFile.close()
+    
+    # Copy firmware.bin to versioned filename
+    firmware_source = os.path.join(build_dir, env['PIOENV'], "firmware.bin")
+    firmware_dest = f"{project_dir}{os.sep}{env['PIOENV']}-{version_string}.bin"
+    
+    print(f"Copying firmware.bin to: {env['PIOENV']}-{version_string}.bin")
+    shutil.copy(firmware_source, firmware_dest)
 
 # Add postbuild call
 env.AddPostAction("$BUILD_DIR/firmware.bin", zip_build_files)
