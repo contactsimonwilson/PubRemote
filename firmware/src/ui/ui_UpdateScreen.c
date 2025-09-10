@@ -113,6 +113,7 @@ void ui_UpdateScreen_screen_init(void) {
   lv_obj_set_y(ui_UpdateBodyLabel, 38);
   lv_obj_set_align(ui_UpdateBodyLabel, LV_ALIGN_CENTER);
   lv_label_set_text(ui_UpdateBodyLabel, "Click next to scan for networks");
+  lv_obj_set_style_text_align(ui_UpdateBodyLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   ui_UpdateFooter = lv_obj_create(ui_UpdateContent);
   lv_obj_remove_style_all(ui_UpdateFooter);

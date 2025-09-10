@@ -116,3 +116,9 @@ void enable_watchdog() {
   ESP_LOGW(TAG, "Watchdog not supported by ADC driver");
 #endif
 }
+
+void enter_protection_mode() {
+#if PMU_SY6970
+  sy6970_enter_protection_mode();
+#endif
+}

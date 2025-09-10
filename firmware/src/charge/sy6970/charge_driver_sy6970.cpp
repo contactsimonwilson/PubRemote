@@ -64,6 +64,12 @@ static esp_err_t set_ir_compensation(uint8_t resistance_mohm, uint8_t clamp_mv) 
     return success ? ESP_OK : ESP_FAIL;
 }
 
+esp_err_t sy6970_enter_protection_mode() {
+    ESP_LOGI(TAG, "Entering shipping mode (power down)");
+    PPM.shutdown();
+    return ESP_OK;
+}
+
 /**
  * @brief Initialize the SY6970 power management chip
  */

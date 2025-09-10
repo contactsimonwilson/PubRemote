@@ -182,6 +182,9 @@ esp_err_t wifi_init(void) {
     ESP_LOGI(TAG, "WiFi already started from ESP-NOW, continuing...");
   }
 
+  esp_wifi_set_ps(WIFI_PS_NONE); // No power save for ESP-NOW (better performance)
+  esp_wifi_set_max_tx_power(52); // ~14 dBm for balanced power and range
+
   ESP_LOGI(TAG, "WiFi station initialization completed after ESP-NOW transition");
   is_initialized = true;
   return ESP_OK;

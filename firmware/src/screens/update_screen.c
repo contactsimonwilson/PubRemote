@@ -1,8 +1,11 @@
 #include "config.h"
+#include "esp_https_ota.h"
 #include "esp_log.h"
+#include "ota/release_client.h"
 #include "remote/connection.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
+#include "remote/settings.h"
 #include "remote/wifi.h"
 #include "utilities/screen_utils.h"
 #include "utilities/string_utils.h"
@@ -12,9 +15,10 @@
 
 static const char *TAG = "PUBREMOTE-UPDATE_SCREEN";
 
+#define FORCE_UPDATE 1
+
 typedef enum {
   UPDATE_STEP_START,
-  UPDATE_SCANNING,
   UPDATE_STEP_CONNECTING,
   UPDATE_STEP_CHECKING_UPDATE,
   UPDATE_STEP_UPDATE_AVAILABLE,
@@ -23,44 +27,62 @@ typedef enum {
   UPDATE_STEP_VALIDATE,
   UPDATE_STEP_INSTALLING,
   UPDATE_STEP_COMPLETE,
+  UPDATE_STEP_NO_WIFI,
   UPDATE_STEP_ERROR
 } UpdateStep;
 
+typedef enum {
+  UPDATE_TYPE_STABLE,
+  UPDATE_TYPE_PRERELEASE,
+  UPDATE_TYPE_NIGHTLY
+} UpdateType;
+
+typedef struct {
+  UpdateType type;
+  char tag_name[32];
+  char name[64];
+  char download_url[256];
+} ReleaseInfo;
+
 static UpdateStep current_update_step = UPDATE_STEP_START;
 static TaskHandle_t update_task_handle = NULL;
-static wifi_network_info_t *networks = NULL;
-static uint16_t network_count = 0;
-static char selected_network_ssid[33] = {0}; // Fixed: Use array instead of pointer
-static TickType_t last_scan_time = 0;
-static const TickType_t SCAN_INTERVAL = pdMS_TO_TICKS(3000); // Scan every 3 seconds
+static ReleaseInfo available_updates[3]; // Stable, Prerelease, Nightly
+static int available_update_count = 0;
+static UpdateType selected_update_type = UPDATE_TYPE_STABLE;
 
 bool is_update_screen_active() {
   lv_obj_t *active_screen = lv_scr_act();
   return active_screen == ui_UpdateScreen;
 }
 
-void update_status_label() {
+static void change_update_selection(lv_event_t *e) {
+  lv_obj_t *obj = lv_event_get_target(e);
+  int selected = lv_dropdown_get_selected(obj);
+
+  if (selected < 0 || selected >= available_update_count) {
+    ESP_LOGW(TAG, "Invalid update selection index: %d", selected);
+    return;
+  }
+  selected_update_type = available_updates[selected].type;
+  ESP_LOGI(TAG, "Selected update type: %d", selected_update_type);
+}
+
+static void update_status_label() {
+  ESP_LOGI(TAG, "Updating status label for step %d", current_update_step);
+  static char *wifi_ssid;
   switch (current_update_step) {
   case UPDATE_STEP_START:
-
-    char wifi_ssid[33] = {0};
+    wifi_ssid = get_wifi_ssid();
     lv_label_set_text(ui_UpdateHeaderLabel, "Update");
-    lv_label_set_text(ui_UpdateBodyLabel, "Click next to scan for networks");
+    lv_label_set_text_fmt(ui_UpdateBodyLabel, "Click next to connect to %s", wifi_ssid);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    break;
-  case UPDATE_SCANNING:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Network Scan");
-    lv_obj_add_flag(ui_UpdatePrimaryActionButtonLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_label_set_text(ui_UpdateBodyLabel, "Scanning...");
-    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_CONNECTING:
+    wifi_ssid = get_wifi_ssid();
     lv_label_set_text(ui_UpdateHeaderLabel, "Connecting");
-    lv_label_set_text(ui_UpdateBodyLabel, "Connecting to the network...");
+    lv_label_set_text_fmt(ui_UpdateBodyLabel, "Connecting to %s...", wifi_ssid);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -75,8 +97,42 @@ void update_status_label() {
     break;
   case UPDATE_STEP_UPDATE_AVAILABLE:
     lv_label_set_text(ui_UpdateHeaderLabel, "Update Available");
-    lv_label_set_text(ui_UpdateBodyLabel, "Update available! Click next to download.");
+    lv_label_set_text(ui_UpdateBodyLabel, "Choose from available updates");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Next");
+    // Add lvgl dropdown
+    lv_obj_t *update_dropdown = lv_dropdown_create(ui_UpdateBody);
+    char *available_options = strdup("");
+
+    for (int i = 0; i < available_update_count; i++) {
+      char *old = available_options;
+
+      if (asprintf(&available_options, "%s%s%s", old,
+                   (i > 0) ? "\n" : "", // Add newline if not first
+                   available_updates[i].name) == -1) {
+        free(old);
+        return;
+      }
+
+      free(old);
+    }
+
+    lv_dropdown_set_options(update_dropdown, available_options);
+    free(available_options);
+    lv_obj_set_width(update_dropdown, lv_pct(100));
+    lv_obj_set_height(update_dropdown, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_align(update_dropdown, LV_ALIGN_CENTER);
+    lv_obj_add_flag(update_dropdown, LV_OBJ_FLAG_SCROLL_ON_FOCUS);  /// Flags
+    lv_obj_clear_flag(update_dropdown, LV_OBJ_FLAG_GESTURE_BUBBLE); /// Flags
+    lv_obj_set_style_text_font(update_dropdown, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(update_dropdown, &lv_font_montserrat_14, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(lv_dropdown_get_list(update_dropdown), &ui_font_Inter_14,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(lv_dropdown_get_list(update_dropdown), &ui_font_Inter_14,
+                               LV_PART_SELECTED | LV_STATE_DEFAULT);
+
+    // set change callback to change_update_selection
+    lv_obj_add_event_cb(update_dropdown, change_update_selection, LV_EVENT_VALUE_CHANGED, NULL);
+
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -129,6 +185,15 @@ void update_status_label() {
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
+  case UPDATE_STEP_NO_WIFI:
+    lv_label_set_text(ui_UpdateHeaderLabel, "No WiFi");
+    lv_label_set_text(ui_UpdateBodyLabel,
+                      "No WiFi credentials found. Please configure them at https://pubmote.techfoundry.nz");
+    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Exit");
+    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    break;
   default:
     lv_label_set_text(ui_UpdateBodyLabel, "Unknown update step.");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
@@ -160,16 +225,14 @@ void update_task(void *pvParameters) {
   }
 
   UpdateStep last_step = current_update_step;
-  bool is_first_run = true;
-
+  char *wifi_ssid = get_wifi_ssid();
+  char *wifi_password = get_wifi_password();
+  update_status_label();
   while (is_update_screen_active()) {
-    bool step_has_changed = (current_update_step != last_step || is_first_run);
+    bool step_has_changed = (current_update_step != last_step);
     if (step_has_changed) {
-      is_first_run = false;
+      last_step = current_update_step;
       ESP_LOGI(TAG, "Update step changed: %d", current_update_step);
-    }
-
-    if (step_has_changed) {
       if (LVGL_lock(0)) {
         update_status_label();
         LVGL_unlock();
@@ -178,86 +241,111 @@ void update_task(void *pvParameters) {
 
     switch (current_update_step) {
     case UPDATE_STEP_START:
-      break;
-    case UPDATE_SCANNING:
-      // Continuous scanning with interval control
-      TickType_t current_time = xTaskGetTickCount();
-      if (step_has_changed || (current_time - last_scan_time) >= SCAN_INTERVAL) {
-        ESP_LOGI(TAG, "Network count: %d", network_count);
-
-        // Free previous scan results
-        if (networks != NULL) {
-          wifi_free_network_list(networks);
-          networks = NULL;
-          network_count = 0;
-        }
-
-        // Start scanning for networks
-        esp_err_t scan_ret = wifi_scan_networks(&networks, &network_count);
-        if (scan_ret == ESP_OK && networks != NULL && current_update_step == UPDATE_SCANNING) {
-          ESP_LOGI(TAG, "Processing %d scanned networks:", network_count);
-
-          // Sort by highest RSSI first
-          for (int i = 0; i < network_count - 1; i++) {
-            for (int j = i + 1; j < network_count; j++) {
-              if (networks[i].rssi < networks[j].rssi) {
-                wifi_network_info_t temp = networks[i];
-                networks[i] = networks[j];
-                networks[j] = temp;
-              }
-            }
-          }
-
-          // if (LVGL_lock(0)) {
-          //   clean_body();
-
-          //   // Add buttons with details of each network
-          //   for (int i = 0; i < network_count; i++) {
-          //     lv_obj_t *network_button = lv_btn_create(ui_UpdateBody);
-          //     lv_obj_set_size(network_button, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-          //     lv_obj_set_style_bg_color(network_button, lv_color_hex(0xFFFFFF), 0);
-          //     lv_obj_set_width(network_button, lv_pct(100));
-          //     lv_obj_set_style_border_color(network_button, lv_color_hex(0xCCCCCC), 0);
-          //     lv_obj_set_style_border_width(network_button, 1, 0);
-          //     lv_obj_set_style_radius(network_button, 5 * SCALE_FACTOR, 0);
-          //     lv_obj_set_style_pad_all(network_button, 5 * SCALE_FACTOR, 0);
-
-          //     lv_obj_t *network_label = lv_label_create(network_button);
-          //     lv_label_set_text_fmt(network_label, "%s (%d dBm)", networks[i].ssid, networks[i].rssi);
-          //     lv_obj_set_style_text_color(network_label, lv_color_hex(0x000000), 0);
-
-          //     char *ssid_copy = malloc(strlen(networks[i].ssid) + 1);
-          //     strcpy(ssid_copy, networks[i].ssid);
-          //     lv_obj_add_event_cb(network_button, network_button_clicked, LV_EVENT_CLICKED, ssid_copy);
-          //     lv_obj_align(network_button, LV_ALIGN_TOP_MID, 0, i * 40 * SCALE_FACTOR);
-          //   }
-
-          //   if (network_count > 0) {
-          //     lv_obj_add_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-          //     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-          //   }
-          //   else {
-          //     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-          //     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-          //   }
-          //   LVGL_unlock();
-          // }
-        }
-        last_scan_time = current_time;
+      if (wifi_ssid == NULL || strlen(wifi_ssid) == 0) {
+        current_update_step = UPDATE_STEP_NO_WIFI;
       }
+
       break;
     case UPDATE_STEP_CONNECTING:
-      // Start connecting
+      esp_err_t wifi_err = ESP_OK;
+      // check if already connected
+      if (wifi_get_connection_state() != WIFI_STATE_CONNECTED) {
+        wifi_err = wifi_connect_to_network(wifi_ssid, wifi_password);
+      }
+      if (wifi_get_connection_state() != WIFI_STATE_CONNECTED || wifi_err != ESP_OK) {
+        current_update_step = UPDATE_STEP_ERROR;
+      }
+      else {
+        current_update_step = UPDATE_STEP_CHECKING_UPDATE;
+      }
       break;
     case UPDATE_STEP_CHECKING_UPDATE:
       // Check for updates
+      // Fetch releases from GitHub
+      // If update available, current_update_step = UPDATE_STEP_UPDATE_AVAILABLE
+      // Else current_update_step = UPDATE_STEP_NO_UPDATE
+      const char *asset_name = HW_TYPE;
+      github_asset_urls_t result = {};
+      esp_err_t err = fetch_all_asset_urls(asset_name, &result);
+
+      if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error fetching asset URLs: %s", esp_err_to_name(err));
+        current_update_step = UPDATE_STEP_ERROR;
+        break;
+      }
+
+#if FORCE_UPDATE
+      bool has_stable_update = result.stable_found;
+      bool has_prerelease_update = result.prerelease_found;
+#else
+      firmware_version_t stable_version = parse_version_string(result.stable_tag);
+      firmware_version_t prerelease_version = parse_version_string(result.prerelease_tag);
+      firmware_version_t current_version = {.major = VERSION_MAJOR, .minor = VERSION_MINOR, .patch = VERSION_PATCH};
+      bool has_stable_update = result.stable_found && is_version_greater(&stable_version, &current_version);
+      bool has_prerelease_update = result.prerelease_found && is_version_greater(&prerelease_version, &current_version);
+#endif
+
+      if (has_stable_update) {
+        ReleaseInfo stable_info = {
+            .type = UPDATE_TYPE_STABLE,
+        };
+        strncpy(stable_info.tag_name, result.stable_tag, sizeof(stable_info.tag_name) - 1);
+        snprintf(stable_info.name, sizeof(stable_info.name), "%s", result.stable_tag);
+        strncpy(stable_info.download_url, result.stable_url, sizeof(stable_info.download_url) - 1);
+        available_updates[available_update_count++] = stable_info;
+      }
+
+      if (has_prerelease_update) {
+        ReleaseInfo prerelease_info = {
+            .type = UPDATE_TYPE_PRERELEASE,
+        };
+        strncpy(prerelease_info.tag_name, result.prerelease_tag, sizeof(prerelease_info.tag_name) - 1);
+        snprintf(prerelease_info.name, sizeof(prerelease_info.name), "%s (Prerelease)", result.prerelease_tag);
+        strncpy(prerelease_info.download_url, result.prerelease_url, sizeof(prerelease_info.download_url) - 1);
+        available_updates[available_update_count++] = prerelease_info;
+      }
+
+      ESP_LOGI(TAG, "Available updates count: %d", available_update_count);
+      for (int i = 0; i < available_update_count; i++) {
+        ESP_LOGI(TAG, "Update %d: Type=%d, Tag=%s, URL=%s", i, available_updates[i].type, available_updates[i].tag_name,
+                 available_updates[i].download_url);
+      }
+
+      if (has_stable_update || has_prerelease_update) {
+        current_update_step = UPDATE_STEP_UPDATE_AVAILABLE;
+      }
+      else {
+        current_update_step = UPDATE_STEP_NO_UPDATE;
+      }
+
       break;
     case UPDATE_STEP_UPDATE_AVAILABLE:
+      // Do nothing
       break;
     case UPDATE_STEP_NO_UPDATE:
+      // Do nothing
       break;
     case UPDATE_STEP_DOWNLOADING:
       // Start downloading update
+      esp_http_client_config_t config = {
+          .url = available_updates[selected_update_type].download_url,
+          .skip_cert_common_name_check = true,
+          .use_global_ca_store = false,
+          .cert_pem = NULL,
+          .client_cert_pem = NULL,
+          .client_key_pem = NULL,
+      };
+      esp_https_ota_config_t ota_config = {
+          .http_config = &config,
+      };
+      esp_err_t ret = esp_https_ota(&ota_config);
+      if (ret == ESP_OK) {
+        esp_restart();
+      }
+      else {
+        ESP_LOGE(TAG, "OTA update failed: %s", esp_err_to_name(ret));
+        current_update_step = UPDATE_STEP_ERROR;
+      }
       break;
     case UPDATE_STEP_VALIDATE:
       // Validate downloaded update
@@ -267,12 +355,15 @@ void update_task(void *pvParameters) {
       break;
     case UPDATE_STEP_COMPLETE:
       break;
+    case UPDATE_STEP_NO_WIFI:
+      // Handle no WiFi case
+      break;
     case UPDATE_STEP_ERROR:
       // Handle error case
       break;
+    default:
+      break;
     }
-
-    last_step = current_update_step;
     vTaskDelay(pdMS_TO_TICKS(LV_DISP_DEF_REFR_PERIOD));
   }
 
@@ -282,12 +373,6 @@ void update_task(void *pvParameters) {
   }
   if (!espnow_is_initialized()) {
     espnow_init();
-  }
-
-  if (networks != NULL) {
-    wifi_free_network_list(networks);
-    networks = NULL;
-    network_count = 0;
   }
 
   ESP_LOGI(TAG, "Update task ended");
@@ -309,128 +394,17 @@ void update_screen_load_start(lv_event_t *e) {
 
 void update_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Update screen loaded");
-  xTaskCreate(update_task, "update_task", 4096, NULL, 2, NULL);
+  xTaskCreate(update_task, "update_task", 8192, NULL, 2, NULL);
 }
 
 void update_screen_unload_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Update screen unload start");
 }
 
-static void update_button_press2(lv_event_t *e) {
-  ESP_LOGI(TAG, "Update button pressed");
-  ESP_LOGI(TAG, "Current state: %s", wifi_get_connection_state_string());
-
-  // Step 3: Scan for available networks
-  wifi_network_info_t *networks = NULL;
-  uint16_t network_count = 0;
-
-  esp_err_t scan_ret = wifi_scan_networks(&networks, &network_count);
-  if (scan_ret == ESP_OK && networks != NULL) {
-    ESP_LOGI(TAG, "Processing %d scanned networks:", network_count);
-
-    // Example: Find the strongest open network
-    int strongest_open_rssi = -100;
-    char strongest_open_ssid[33] = "";
-
-    for (int i = 0; i < network_count; i++) {
-      if (!networks[i].password_protected && networks[i].rssi > strongest_open_rssi) {
-        strongest_open_rssi = networks[i].rssi;
-        strncpy(strongest_open_ssid, networks[i].ssid, sizeof(strongest_open_ssid) - 1);
-        strongest_open_ssid[sizeof(strongest_open_ssid) - 1] = '\0';
-      }
-    }
-
-    if (strlen(strongest_open_ssid) > 0) {
-      ESP_LOGI(TAG, "Strongest open network: %s (RSSI: %d)", strongest_open_ssid, strongest_open_rssi);
-    }
-    else {
-      ESP_LOGI(TAG, "No open networks found");
-    }
-
-    // Example: List all networks with their security status
-    ESP_LOGI(TAG, "All scanned networks:");
-    for (int i = 0; i < network_count; i++) {
-      ESP_LOGI(TAG, "  %s (RSSI: %d, %s)", networks[i].ssid, networks[i].rssi,
-               networks[i].password_protected ? "Protected" : "Open");
-    }
-
-    // Don't forget to free the network list when done
-    wifi_free_network_list(networks);
-  }
-
-  // Wait a bit before connecting
-  vTaskDelay(pdMS_TO_TICKS(2000));
-
-  // Step 4: Connect to a network (replace with your credentials)
-  const char *ssid = "SiWi";
-  const char *password = "internetgo";
-
-  ESP_LOGI(TAG, "Auto-reconnect enabled: %s", wifi_is_auto_reconnect_enabled() ? "Yes" : "No");
-  ESP_LOGI(TAG, "Current state: %s", wifi_get_connection_state_string());
-
-  esp_err_t ret = wifi_connect_to_network(ssid, password);
-  if (ret == ESP_OK) {
-    ESP_LOGI(TAG, "Successfully connected to WiFi");
-    ESP_LOGI(TAG, "Current state: %s", wifi_get_connection_state_string());
-
-    // Demonstrate state monitoring during connection
-    for (int i = 0; i < 20; i++) {
-      ESP_LOGI(TAG, "State check %d: %s", i + 1, wifi_get_connection_state_string());
-      vTaskDelay(pdMS_TO_TICKS(1000));
-
-      // Simulate checking connection state in your application
-      wifi_connection_state_t current_state = wifi_get_connection_state();
-      if (current_state == WIFI_STATE_CONNECTED) {
-        ESP_LOGI(TAG, "WiFi is connected - can proceed with network operations");
-
-        // Example: You could start your network tasks here
-        // xTaskCreate(http_client_task, "http_client", 4096, NULL, 5, NULL);
-      }
-      else if (current_state == WIFI_STATE_RECONNECTING) {
-        ESP_LOGI(TAG, "WiFi is reconnecting - network operations should wait");
-      }
-    }
-
-    // Step 5: Demonstrate manual disconnect
-    ESP_LOGI(TAG, "Initiating manual disconnect...");
-    wifi_disconnect();
-    ESP_LOGI(TAG, "Current state: %s", wifi_get_connection_state_string());
-
-    // Wait and monitor state after disconnect
-    for (int i = 0; i < 5; i++) {
-      vTaskDelay(pdMS_TO_TICKS(1000));
-      ESP_LOGI(TAG, "Post-disconnect state: %s", wifi_get_connection_state_string());
-    }
-  }
-  else {
-    ESP_LOGE(TAG, "Failed to connect to WiFi");
-    ESP_LOGI(TAG, "Current state: %s", wifi_get_connection_state_string());
-  }
-
-  // Step 6: Demonstrate auto-reconnect control
-  ESP_LOGI(TAG, "Testing auto-reconnect control...");
-  wifi_set_auto_reconnect(false);
-  ESP_LOGI(TAG, "Auto-reconnect disabled");
-
-  vTaskDelay(pdMS_TO_TICKS(1000));
-
-  wifi_set_auto_reconnect(true);
-  ESP_LOGI(TAG, "Auto-reconnect re-enabled");
-
-  vTaskDelay(pdMS_TO_TICKS(1000));
-
-  // Step 7: Final cleanup
-  ESP_LOGI(TAG, "Starting WiFi cleanup...");
-  wifi_uninit();
-  ESP_LOGI(TAG, "Final state: %s", wifi_get_connection_state_string());
-
-  ESP_LOGI(TAG, "WiFi example completed successfully");
-}
-
 void update_primary_button_press(lv_event_t *e) {
   switch (current_update_step) {
   case UPDATE_STEP_START:
-    current_update_step = UPDATE_SCANNING;
+    current_update_step = UPDATE_STEP_CONNECTING;
     break;
   case UPDATE_STEP_CONNECTING:
     current_update_step = UPDATE_STEP_CHECKING_UPDATE;

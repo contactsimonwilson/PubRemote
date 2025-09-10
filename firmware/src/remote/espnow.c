@@ -69,6 +69,10 @@ void espnow_init() {
     ESP_LOGW(TAG, "WiFi already started (unexpected after wifi_uninit())");
   }
 
+  esp_wifi_set_ps(WIFI_PS_NONE); // No power save for ESP-NOW (better performance)
+  esp_wifi_set_max_tx_power(52); // ~14 dBm for balanced power and range
+  ESP_LOGI(TAG, "ESP-NOW power settings configured");
+
   // Set WiFi channel for ESP-NOW
   ESP_ERROR_CHECK(esp_wifi_set_channel(pairing_settings.channel, WIFI_SECOND_CHAN_NONE));
 

@@ -319,6 +319,7 @@ void power_management_task(void *pvParameters) {
         ESP_LOGD(TAG, "PMU interrupt received on GPIO %lu", io_num);
         bool last_power_connected = is_power_connected;
         power_state_update();
+
         last_time = esp_timer_get_time(); // Update last time in milliseconds
 
         if (is_power_connected != last_power_connected) {
@@ -332,6 +333,13 @@ void power_management_task(void *pvParameters) {
     if (current_time - last_time > POWER_MANAGEMENT_MAX_DELAY) {
       power_state_update();
       last_time = current_time;
+    }
+
+    if (remoteStats.remoteBatteryVoltage < MIN_BATTERY_VOLTAGE && !is_power_connected) {
+      ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
+      play_note(NOTE_ERROR, 1000);
+      // If battery is too low, enter sleep immediately
+      enter_protection_mode();
     }
 
     // Todo - Check battery voltage and enter sleep if too low
