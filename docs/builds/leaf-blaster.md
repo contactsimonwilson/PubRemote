@@ -2,6 +2,8 @@
 
 By ZiNc
 
+![](leaf-blaster-assembly.png)
+
 ## Parts
 
 - [WaveShare 1.43in Amoled display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm?sku=30106)
@@ -20,12 +22,12 @@ By ZiNc
 
 ## Instructions
 
-1. Print all require case parts
+1. Print all required case parts
   - Install 5 x M3 heat set inserts into lid
 2. Solder PS5 hall effect joystick according to Leaf Blaster configuration (see following), having all wires terminated with 1.27mm header pins
   - Y AXIS ADC -> IO2
   - BTN ADC -> IO16
-  - BTN ADC -> 10k Ohm (Pull-Up) -> 3V3
+  - BTN ADC -> 10k-20k Ohm (Pull-Up) -> 3V3
   - BTN VCC -> 3V3
   - BTN GND -> GND
 

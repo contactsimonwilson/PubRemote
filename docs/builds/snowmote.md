@@ -2,6 +2,8 @@
 
 By ZiNc
 
+![](snowmote-7.png)
+
 ## Parts
 
 - The ["Cowmote"](https://cowpowersystems.com/product/1) from ExcessRaccoon uses the [LilyGo T-Display S3 Amoled (1.43in)](https://lilygo.cc/products/t-display-s3-amoled-1-64?variant=44507650556085)
@@ -15,7 +17,7 @@ By ZiNc
 
 ## Instructions
 
-1. Print all require case parts!
+1. Print all required case parts
 2. Place battery into its case (if desired) and zip tie this to the Floor piece
 
 ![](snowmote-1.png)
