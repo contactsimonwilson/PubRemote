@@ -2,6 +2,8 @@
 
 By ZiNc
 
+![](snowmote2-assembly.png)
+
 ## Parts
 
 - [WaveShare ESP32-S3 1.43in Amoled Display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm)

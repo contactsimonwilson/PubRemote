@@ -2,6 +2,8 @@
 
 By ZiNc
 
+![](leaf-blaster-assembly.png)
+
 ## Parts
 
 - [WaveShare 1.43in Amoled display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm?sku=30106)
