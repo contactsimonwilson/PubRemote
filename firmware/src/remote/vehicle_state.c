@@ -111,6 +111,6 @@ static void monitor_task(void *pvParameters) {
 }
 
 void vehicle_monitor_init() {
-  xTaskCreate(monitor_task, "monitor_task", 1024, NULL, 5, NULL);
+  xTaskCreate(monitor_task, "monitor_task", 4096, NULL, 5, NULL);
   ESP_LOGI("VEHICLE_STATE", "Vehicle state monitor initialized");
 }
