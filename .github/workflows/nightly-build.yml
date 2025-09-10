@@ -136,7 +136,7 @@ jobs:
         id: get_date
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-      - name: Attach ZIPs and Publish
+      - name: Attach Files and Publish
         uses: softprops/action-gh-release@v2
         with:
           files: "*.zip *.bin"
