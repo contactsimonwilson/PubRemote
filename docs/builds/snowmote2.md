@@ -33,6 +33,7 @@ By ZiNc
 
 ![](snowmote2-pinout.png)
 ![](snowmote2-wiring.png)
+![](snowmote2-battery.png)
 
 5. Connect 1.25mm JST battery to display
   - Install battery and route wires similarly
@@ -40,10 +41,9 @@ By ZiNc
 
 6. Snap the floor into the lid piece and organize the wires as you see fit
 
-![](snowmote2-battery.png)
-
 7. Carefully lay the display into the seat in the lid and install the 2 x M2 screws through the floor into the posts on the display
-  - Be very, very gentle with the display posts. They are not very strong. The moment the screw has resistance in the display posts, stop tightening.
+  - Be very, very gentle when screwing into the threaded display posts. They are not very strong. The moment the screw has resistance in the display posts, stop tightening.
+  - If you happen to break one off, a little superglue or other adhesive can bond it back in, with some care.
 
 8. Install a lanyard and thumbstick if you like!
 
