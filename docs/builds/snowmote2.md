@@ -28,25 +28,25 @@ By ZiNc
 3. Install prepared PS5 joystick into floor piece, setting it into the receiving seat.
   - Use silicone or glue as you see fit to fix the joystick in place in the floor piece
 
-3. Connect PS5 hall effect joystick to WaveShare display GPIO headers (see image)
+4. Connect PS5 hall effect joystick to WaveShare display GPIO headers (see image)
   - Run wires from the back of the lid through the front, into the display GPIO headers. This allows the display to sit in the lid
 
 ![](snowmote2-pinout.png)
 ![](snowmote2-wiring.png)
 
-4. Connect 1.25mm JST battery to display
+5. Connect 1.25mm JST battery to display
   - Install battery and route wires similarly
   - The battery will sit underneath of the PS5 joystick wires and display
 
-5. Snap the floor into the lid piece and organize the wires as you see fit
+6. Snap the floor into the lid piece and organize the wires as you see fit
 
 ![](snowmote2-battery.png)
 
-6. Carefully lay the display into the seat in the lid and install the 2 x M2 screws through the floor into the posts on the display
+7. Carefully lay the display into the seat in the lid and install the 2 x M2 screws through the floor into the posts on the display
   - Be very, very gentle with the display posts. They are not very strong. The moment the screw has resistance in the display posts, stop tightening.
 
-7. Install a lanyard and thumbstick if you like!
+8. Install a lanyard and thumbstick if you like!
 
 ![](snowmote2-assembly.png)
 
-8. You're ready to start [setting up your Pubmote software](/docs/quick-start.md)!
+9. You're ready to start [setting up your Pubmote software](/docs/quick-start.md)!
