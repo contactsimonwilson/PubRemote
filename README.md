@@ -18,6 +18,7 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 
 #### ESP32S3-based controller with a display, and a case. Options:
 - **Recommended:** [WaveShare 1.43in Amoled display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm?sku=30106) (see: [example build](/docs/builds/leaf-blaster.md))
+    - [ZiNc Snowmote 2](/docs/builds/snowmote2.md) by ZiNc
     - [ZiNc Leaf Blaster remix case](https://www.printables.com/model/1265591) by ZiNc
     - [Leaf Blaster case](https://www.printables.com/model/1191785) by Markoblaster
 - [WaveShare 1.28in LCD display](https://www.waveshare.com/esp32-s3-touch-lcd-1.28.htm)

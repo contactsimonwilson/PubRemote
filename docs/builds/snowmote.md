@@ -15,7 +15,7 @@ By ZiNc
 
 ## Instructions
 
-1. Print all require case parts!
+1. Print all required case parts
 2. Place battery into its case (if desired) and zip tie this to the Floor piece
 
 ![](snowmote-1.png)
