@@ -1,4 +1,4 @@
-# Snowmote example build
+# Snowmote 2 example build
 
 By ZiNc
 
