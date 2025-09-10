@@ -16,6 +16,12 @@ esp_err_t nvs_write_int(const char *key, uint32_t value);
 // Function to read an integer from NVS
 esp_err_t nvs_read_int(const char *key, uint32_t *value);
 
+// Function to write a string to NVS
+esp_err_t nvs_write_str(const char *key, const char *value);
+
+// Function to read a string from NVS
+esp_err_t nvs_read_str(const char *key, char *out_value, size_t *length);
+
 // Function to write a byte array to NVS
 esp_err_t nvs_write_blob(const char *key, void *value, size_t length);
 
@@ -29,6 +35,14 @@ void save_calibration();
 esp_err_t save_pairing_data();
 
 esp_err_t reset_all_settings();
+
+esp_err_t save_wifi_ssid(const char *ssid);
+
+esp_err_t save_wifi_password(const char *password);
+
+char *get_wifi_ssid();
+
+char *get_wifi_password();
 
 typedef enum {
   AUTO_OFF_DISABLED,
