@@ -9,6 +9,9 @@ Pubmote is a feature-rich, ESP-NOW based remote control for VESC based onewheels
 > [!TIP]
 > Want an easy way to update firmware or flash a new device? Head over to the firmware tool at [https://pubmote.techfoundry.nz](https://pubmote.techfoundry.nz)
 
+<img width="787" height="721" alt="image" src="https://github.com/user-attachments/assets/419fa512-16eb-4ff9-93be-6c0b65ef92af" />
+
+
 ## Getting started
 
 ### Hardware Prerequisites
