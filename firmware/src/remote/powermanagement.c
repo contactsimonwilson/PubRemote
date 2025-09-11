@@ -337,7 +337,9 @@ void power_management_task(void *pvParameters) {
 
     if (remoteStats.remoteBatteryVoltage < MIN_BATTERY_VOLTAGE && !is_power_connected) {
       ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
-      play_note(NOTE_ERROR, 1000);
+      buzzer_set_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+      vTaskDelay(pdMS_TO_TICKS(PMU_INT_NOTE_DURATION)); // Allow time for the note to play
+
       // If battery is too low, enter sleep immediately
       enter_protection_mode();
     }
@@ -369,6 +371,7 @@ static bool check_pmu_should_wake(bool last_powered) {
   else {
     if (!is_power_connected && last_powered) {
       buzzer_set_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+      vTaskDelay(pdMS_TO_TICKS(PMU_INT_NOTE_DURATION)); // Allow time for the note to play
     }
     enter_sleep_internal();
     return false;

@@ -1,6 +1,8 @@
-#include <ui/ui.h>
+
 #ifndef __UPDATE_SCREEN_H
-  #define __UPDATE_SCREEN_H
+#define __UPDATE_SCREEN_H
+#include "lvgl.h"
+#include <stdbool.h>
 
 bool is_update_screen_active();
 

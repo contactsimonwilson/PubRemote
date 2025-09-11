@@ -1,7 +1,9 @@
+#include "update_screen.h"
 #include "config.h"
+#include "esp_crt_bundle.h"
 #include "esp_https_ota.h"
 #include "esp_log.h"
-#include "ota/release_client.h"
+#include "ota/update_client.h"
 #include "remote/connection.h"
 #include "remote/display.h"
 #include "remote/espnow.h"
@@ -15,7 +17,7 @@
 
 static const char *TAG = "PUBREMOTE-UPDATE_SCREEN";
 
-#define FORCE_UPDATE 1
+#define FORCE_UPDATE 0
 
 typedef enum {
   UPDATE_STEP_START,
@@ -50,6 +52,17 @@ static ReleaseInfo available_updates[3]; // Stable, Prerelease, Nightly
 static int available_update_count = 0;
 static UpdateType selected_update_type = UPDATE_TYPE_STABLE;
 
+static void clean_body() {
+  // Iterate backwards to avoid index shifting issues when deleting
+  uint32_t child_cnt = lv_obj_get_child_cnt(ui_UpdateBody);
+  for (int32_t i = child_cnt - 1; i >= 0; i--) {
+    lv_obj_t *child = lv_obj_get_child(ui_UpdateBody, i);
+    if (child != ui_UpdateBodyLabel && child != NULL) {
+      lv_obj_del(child);
+    }
+  }
+}
+
 bool is_update_screen_active() {
   lv_obj_t *active_screen = lv_scr_act();
   return active_screen == ui_UpdateScreen;
@@ -67,9 +80,15 @@ static void change_update_selection(lv_event_t *e) {
   ESP_LOGI(TAG, "Selected update type: %d", selected_update_type);
 }
 
+static void reboot_device(lv_event_t *e) {
+  ESP_LOGI(TAG, "Rebooting device...");
+  esp_restart();
+}
+
 static void update_status_label() {
   ESP_LOGI(TAG, "Updating status label for step %d", current_update_step);
   static char *wifi_ssid;
+  clean_body();
   switch (current_update_step) {
   case UPDATE_STEP_START:
     wifi_ssid = get_wifi_ssid();
@@ -174,6 +193,7 @@ static void update_status_label() {
     lv_label_set_text(ui_UpdateBodyLabel, "Update complete! Restarting...");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Reboot");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_event_cb(ui_UpdatePrimaryActionButton, reboot_device, LV_EVENT_CLICKED, NULL);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
@@ -202,17 +222,6 @@ static void update_status_label() {
     break;
   }
   resize_footer_buttons(ui_UpdateFooter); // Resize footer buttons
-}
-
-static void clean_body() {
-  // Iterate backwards to avoid index shifting issues when deleting
-  uint32_t child_cnt = lv_obj_get_child_cnt(ui_UpdateBody);
-  for (int32_t i = child_cnt - 1; i >= 0; i--) {
-    lv_obj_t *child = lv_obj_get_child(ui_UpdateBody, i);
-    if (child != ui_UpdateBodyLabel && child != NULL) {
-      lv_obj_del(child);
-    }
-  }
 }
 
 void update_task(void *pvParameters) {
@@ -326,21 +335,26 @@ void update_task(void *pvParameters) {
       // Do nothing
       break;
     case UPDATE_STEP_DOWNLOADING:
+
+      ESP_LOGI(TAG, "Starting OTA update for type %d with URL: %s", selected_update_type,
+               available_updates[selected_update_type].download_url);
+
       // Start downloading update
       esp_http_client_config_t config = {
           .url = available_updates[selected_update_type].download_url,
-          .skip_cert_common_name_check = true,
-          .use_global_ca_store = false,
-          .cert_pem = NULL,
-          .client_cert_pem = NULL,
-          .client_key_pem = NULL,
+          .crt_bundle_attach = esp_crt_bundle_attach,
+          .timeout_ms = 120000,
+          .buffer_size = 8192,    // Increase from default (4096)
+          .buffer_size_tx = 4096, // Increase TX buffer if needed
       };
+
       esp_https_ota_config_t ota_config = {
           .http_config = &config,
       };
       esp_err_t ret = esp_https_ota(&ota_config);
       if (ret == ESP_OK) {
-        esp_restart();
+        current_update_step = UPDATE_STEP_COMPLETE;
+        ESP_LOGI(TAG, "OTA update successful");
       }
       else {
         ESP_LOGE(TAG, "OTA update failed: %s", esp_err_to_name(ret));

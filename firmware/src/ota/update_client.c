@@ -1,5 +1,6 @@
-#include "release_client.h"
+#include "update_client.h"
 #include "cJSON.h"
+#include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include <esp_err.h>
 #include <esp_log.h>
@@ -45,6 +46,31 @@ static const char *GITHUB_ASSET_QUERY =
 // Buffer to store HTTP response
 static char *http_response_buffer = NULL;
 static int http_response_len = 0;
+
+// Helper function to check if asset is a .bin file
+static bool is_bin_file(const char *filename) {
+  if (filename == NULL) {
+    return false;
+  }
+
+  int len = strlen(filename);
+  if (len < 4) {
+    return false;
+  }
+
+  // Check if filename ends with ".bin"
+  return strcmp(filename + len - 4, ".bin") == 0;
+}
+
+// Helper function to match asset name and type
+static bool matches_asset_criteria(const char *filename, const char *asset_name) {
+  if (filename == NULL || asset_name == NULL) {
+    return false;
+  }
+
+  // Must contain the asset name AND be a .bin file
+  return (strstr(filename, asset_name) != NULL) && is_bin_file(filename);
+}
 
 // HTTP event handler
 static esp_err_t http_event_handler(esp_http_client_event_t *evt) {
@@ -119,7 +145,8 @@ esp_err_t fetch_all_asset_urls(const char *asset_name, github_asset_urls_t *resu
   // Initialize result structure
   memset(result, 0, sizeof(github_asset_urls_t));
 
-  ESP_LOGI(TAG, "Searching for asset: '%s' in all release types", asset_name);
+  ESP_LOGI(TAG, "Searching for .bin asset: '%s' in all release types", asset_name);
+  ESP_LOGI(TAG, "Note: .zip files will be ignored, only .bin files returned");
 
   const char *graphql_url = "https://api.github.com/graphql";
 
@@ -136,15 +163,8 @@ esp_err_t fetch_all_asset_urls(const char *asset_name, github_asset_urls_t *resu
       .timeout_ms = 15000,
       .buffer_size = 4096,
       .buffer_size_tx = 4096,
-      .transport_type = HTTP_TRANSPORT_OVER_SSL,
       .method = HTTP_METHOD_POST,
-      .disable_auto_redirect = false,
-      // TODO - fix security
-      .skip_cert_common_name_check = true,
-      .use_global_ca_store = false,
-      .cert_pem = NULL,
-      .client_cert_pem = NULL,
-      .client_key_pem = NULL,
+      .crt_bundle_attach = esp_crt_bundle_attach, // This enables certificate verification
   };
 
   esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -189,7 +209,7 @@ esp_err_t fetch_all_asset_urls(const char *asset_name, github_asset_urls_t *resu
                   cJSON *download_url = cJSON_GetObjectItem(asset, "downloadUrl");
 
                   if (cJSON_IsString(name) && cJSON_IsString(download_url)) {
-                    if (strstr(name->valuestring, asset_name) != NULL) {
+                    if (matches_asset_criteria(name->valuestring, asset_name)) {
                       ESP_LOGI(TAG, "Found asset in stable: %s", name->valuestring);
 
                       strncpy(result->stable_url, download_url->valuestring, sizeof(result->stable_url) - 1);
@@ -235,7 +255,7 @@ esp_err_t fetch_all_asset_urls(const char *asset_name, github_asset_urls_t *resu
                       cJSON *download_url = cJSON_GetObjectItem(asset, "downloadUrl");
 
                       if (cJSON_IsString(name) && cJSON_IsString(download_url)) {
-                        if (strstr(name->valuestring, asset_name) != NULL) {
+                        if (matches_asset_criteria(name->valuestring, asset_name)) {
 
                           // Categorize the release
                           if (is_nightly && !result->nightly_found) {
