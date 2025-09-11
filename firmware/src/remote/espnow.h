@@ -6,6 +6,7 @@
 
 void espnow_init();
 void espnow_deinit();
+bool espnow_is_initialized();
 
 // Structure to hold ESP-NOW data
 typedef struct {

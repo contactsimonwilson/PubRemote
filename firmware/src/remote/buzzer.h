@@ -11,6 +11,7 @@ typedef enum {
 } BuzzerPatttern;
 
 void buzzer_init();
+void buzzer_deinit();
 void buzzer_set_pattern(BuzzerPatttern pattern);
 void buzzer_set_tone(BuzzerToneFrequency note, int duration);
 void buzzer_stop();

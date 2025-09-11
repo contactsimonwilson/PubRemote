@@ -24,6 +24,7 @@
 static const char *TAG = "PUBREMOTE-RECEIVER";
 #define RX_QUEUE_SIZE 10
 
+static TaskHandle_t receiver_task_handle = NULL;
 static QueueHandle_t espnow_queue;
 
 static void on_data_recv(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len) {
@@ -204,5 +205,17 @@ static void receiver_task(void *pvParameters) {
 
 void receiver_init() {
   ESP_LOGI(TAG, "Starting receiver task");
-  xTaskCreatePinnedToCore(receiver_task, "receiver_task", 4096, NULL, 20, NULL, 0);
+  xTaskCreatePinnedToCore(receiver_task, "receiver_task", 4096, NULL, 20, &receiver_task_handle, 0);
+}
+
+void receiver_deinit() {
+  if (receiver_task_handle != NULL) {
+    vTaskDelete(receiver_task_handle);
+    receiver_task_handle = NULL;
+  }
+
+  if (espnow_queue != NULL) {
+    vQueueDelete(espnow_queue);
+    espnow_queue = NULL;
+  }
 }

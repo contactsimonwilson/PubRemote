@@ -61,8 +61,8 @@ void settings_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen loaded");
 }
 
-void settings_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Settings screen unloaded");
+void settings_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Settings screen unload start");
   lv_obj_remove_event_cb(ui_SettingsBody, paged_scroll_event_cb);
 }
 

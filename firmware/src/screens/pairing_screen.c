@@ -34,11 +34,3 @@ void pairing_screen_unload_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Pairing screen unload start");
   led_set_effect_none();
 }
-
-void pairing_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Pairing screen unloaded");
-  if (LVGL_lock(0)) {
-    lv_label_set_text(ui_PairingCode, "0000");
-    LVGL_unlock();
-  }
-}

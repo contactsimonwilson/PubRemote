@@ -18,7 +18,7 @@
 
 static const char *TAG = "PUBREMOTE-BUZZER";
 
-static bool is_initialized = false;
+static TaskHandle_t buzzer_task_handle = NULL;
 
 #if BUZZER_ENABLED
   #define BUZZER_DELAY_MS 50 // Delay for the buzzer task
@@ -181,7 +181,7 @@ static void play_startup_effect() {
 // task to play melody
 static void buzzer_task(void *pvParameters) {
 
-  while (is_initialized) {
+  while (true) {
     if (current_time_left == 0 || current_pattern == BUZZER_PATTERN_NONE) {
       current_pattern = BUZZER_PATTERN_NONE; // Reset pattern
       current_time_left = 0;                 // Reset time left
@@ -217,8 +217,18 @@ void buzzer_init() {
   #endif
   };
   ledc_channel_config(&channel_conf);
-  is_initialized = true;
-  xTaskCreate(buzzer_task, "buzzer_task", 1024, NULL, 2, NULL);
+  xTaskCreate(buzzer_task, "buzzer_task", 1024, NULL, 2, &buzzer_task_handle);
   register_startup_cb(play_startup_effect);
+#endif
+}
+
+void buzzer_deinit() {
+#if BUZZER_ENABLED
+  buzzer_stop();
+  if (buzzer_task_handle != NULL) {
+    vTaskDelete(buzzer_task_handle);
+    buzzer_task_handle = NULL;
+  }
+  buzzer_stop();
 #endif
 }

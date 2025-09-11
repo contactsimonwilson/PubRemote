@@ -64,6 +64,12 @@ static esp_err_t set_ir_compensation(uint8_t resistance_mohm, uint8_t clamp_mv) 
     return success ? ESP_OK : ESP_FAIL;
 }
 
+esp_err_t sy6970_enter_protection_mode() {
+    ESP_LOGI(TAG, "Entering shipping mode (power down)");
+    PPM.shutdown();
+    return ESP_OK;
+}
+
 /**
  * @brief Initialize the SY6970 power management chip
  */
@@ -88,7 +94,6 @@ static esp_err_t sy6970_init() {
   PPM.enableMeasure(); // ADC must be enabled before reading voltages
   PPM.enableCharge();
   set_ir_compensation(60, 96); // Set IR compensation to 60mOhm and 96mV clamp
-
 
   ESP_LOGI(TAG, "SY6970 initialized successfully");
   return ESP_OK;

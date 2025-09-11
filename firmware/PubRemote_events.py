@@ -230,3 +230,47 @@ def charge_screen_unloaded(event_struct):
 def pairing_screen_unload_start(event_struct):
     return
 
+
+def about_screen_unload_start(event_struct):
+    return
+
+
+def charge_screen_unload_start(event_struct):
+    return
+
+
+def stats_screen_unload_start(event_struct):
+    return
+
+
+def menu_screen_unload_start(event_struct):
+    return
+
+
+def settings_screen_unload_start(event_struct):
+    return
+
+
+def calibration_screen_unload_start(event_struct):
+    return
+
+
+def update_screen_loaded(event_struct):
+    return
+
+
+def update_screen_load_start(event_struct):
+    return
+
+
+def update_screen_unload_start(event_struct):
+    return
+
+
+def update_primary_button_press(event_struct):
+    return
+
+
+def update_secondary_button_press(event_struct):
+    return
+

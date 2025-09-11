@@ -33,5 +33,6 @@ typedef enum {
 bool receiver_lock_channel();
 void receiver_unlock_channel();
 void receiver_init();
+void receiver_deinit();
 
 #endif

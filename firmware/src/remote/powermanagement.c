@@ -32,13 +32,14 @@
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
 #define INT_SETTLE_TIME_MS 200
+#define ERROR_NOTE_DURATION 500
 
 #ifdef PMU_INT
   #define PMU_INT_NOTE_DURATION 100
 #endif
 
-RTC_DATA_ATTR bool is_power_connected = false; // Store power state across deep sleep
-static bool shutdown_initiated = false;        // Flag for triggering shutdown sequence
+RTC_DATA_ATTR bool is_power_connected = false;   // Store power state across deep sleep
+static volatile bool shutdown_initiated = false; // Flag for triggering shutdown sequence
 
 #ifdef PMU_INT
 static QueueHandle_t pmu_evt_queue = NULL;
@@ -319,6 +320,7 @@ void power_management_task(void *pvParameters) {
         ESP_LOGD(TAG, "PMU interrupt received on GPIO %lu", io_num);
         bool last_power_connected = is_power_connected;
         power_state_update();
+
         last_time = esp_timer_get_time(); // Update last time in milliseconds
 
         if (is_power_connected != last_power_connected) {
@@ -332,6 +334,15 @@ void power_management_task(void *pvParameters) {
     if (current_time - last_time > POWER_MANAGEMENT_MAX_DELAY) {
       power_state_update();
       last_time = current_time;
+    }
+
+    if (remoteStats.remoteBatteryVoltage < MIN_BATTERY_VOLTAGE && !is_power_connected) {
+      ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
+      buzzer_set_tone(NOTE_ERROR, ERROR_NOTE_DURATION);
+      vTaskDelay(pdMS_TO_TICKS(ERROR_NOTE_DURATION)); // Allow time for the note to play
+
+      // If battery is too low, enter sleep immediately
+      enter_protection_mode();
     }
 
     // Todo - Check battery voltage and enter sleep if too low
@@ -361,6 +372,7 @@ static bool check_pmu_should_wake(bool last_powered) {
   else {
     if (!is_power_connected && last_powered) {
       buzzer_set_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
+      vTaskDelay(pdMS_TO_TICKS(PMU_INT_NOTE_DURATION)); // Allow time for the note to play
     }
     enter_sleep_internal();
     return false;
