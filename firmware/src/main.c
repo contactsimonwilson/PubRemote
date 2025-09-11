@@ -1,3 +1,4 @@
+#include "config.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
@@ -18,42 +19,63 @@
 #include "remote/peers.h"
 #include "remote/powermanagement.h"
 #include "remote/receiver.h"
-#include "remote/remote.h"
 #include "remote/remoteinputs.h"
 #include "remote/screen.h"
 #include "remote/settings.h"
+#include "remote/startup.h"
 #include "remote/stats.h"
 #include "remote/time.h"
 #include "remote/transmitter.h"
+#include "remote/vehicle_state.h"
 #include "ui/ui.h"
 #include <stdio.h>
 #include <string.h>
 
 static const char *TAG = "PUBREMOTE-MAIN";
 
+#define DEBUG_MEMORY 0
+
 void app_main(void) {
+  // Enable power for core peripherals
+  acc1_power_set_level(1);
   // Core setup
   init_i2c();
-  init_settings();
+  settings_init();
   init_adcs();
-  init_buttons(); // Required before power management for boot button detection
-  init_buzzer();  // Required before power management for buzzer control
-  init_haptic();  // Required before power management for haptic control
-  init_power_management();
+  buttons_init();
+  buzzer_init();
+  haptic_init();
+  led_init();
+  power_management_init();
+
+  // Fire startup callbacks once boot is confirmed
+  startup_cb();
+// Enable accessories after callbacks
+#ifdef ACC2_POWER_DEFAULT
+  acc2_power_set_level(ACC2_POWER_DEFAULT);
+#endif
 
   // Peripherals
-  init_led();
-  init_thumbstick();
-  init_display();
-  init_imu();
+  thumbstick_init();
+  display_init();
+  imu_init();
+  vehicle_monitor_init();
 
   // Comms
-  init_espnow();
-  init_connection();
-  init_receiver();
-  init_transmitter();
-  init_console();
+  espnow_init();
+  connection_init();
+  receiver_init();
+  transmitter_init();
+  console_init();
 
-  play_startup_sound();
   ESP_LOGI(TAG, "Boot complete");
+
+#if DEBUG_MEMORY
+  while (1) {
+    size_t free_heap = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+    size_t min_heap = heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL);
+    ESP_LOGI(TAG, "Free heap before update: %d bytes (min ever: %d bytes)", free_heap, min_heap);
+    vTaskDelay(pdMS_TO_TICKS(2000));
+  }
+#endif
 }

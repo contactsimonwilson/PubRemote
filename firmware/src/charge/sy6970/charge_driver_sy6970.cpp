@@ -31,15 +31,43 @@ static int sy6970_write_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t *data
   return (result == ESP_OK) ? 0 : -1; // XPowersLib expects 0=success, -1=failure
 }
 
-static void configure_min_system_voltage() {
-    // Set system voltage target
-  uint8_t reg03_value = PPM.readRegister(POWERS_PPM_REG_03H);
-  reg03_value = (reg03_value & 0xF1) | (0x05 << 1);
-  // 3.0V: (reg03_value & 0xF1) | (0x00 << 1)
-  // 3.3V: (reg03_value & 0xF1) | (0x03 << 1)
-  // 3.5V: (reg03_value & 0xF1) | (0x05 << 1) (default)
-  // 3.7V: (reg03_value & 0xF1) | (0x07 << 1)
-  PPM.writeRegister(POWERS_PPM_REG_03H, reg03_value);
+static esp_err_t set_ir_compensation(uint8_t resistance_mohm, uint8_t clamp_mv) {
+    // Validate inputs
+    if (resistance_mohm > 140) {
+        ESP_LOGE(TAG, "Error: Resistance too high, max 140mΩ");
+        return ESP_FAIL;
+    }
+    if (clamp_mv > 224) {
+        ESP_LOGE(TAG, "Error: Clamp too high, max 224mV"); 
+        return ESP_FAIL;
+    }
+    
+    // Calculate register values
+    uint8_t bat_comp = resistance_mohm / 20;
+    uint8_t vclamp = clamp_mv / 32;
+    uint8_t treg = 3; // Keep 120°C default
+    
+    // Read current register to preserve other settings
+    uint8_t current_reg08 = PPM.readRegister(0x08);
+    
+    // Update only the IR compensation bits
+    uint8_t new_reg08 = (current_reg08 & 0x03) | (bat_comp << 5) | (vclamp << 2);
+    
+    // Write back
+    bool success = PPM.writeRegister(0x08, new_reg08);
+    
+    if (success) {
+        ESP_LOGI(TAG, "IR Compensation set: %dmΩ, Clamp: %dmV\n", 
+                     bat_comp * 20, vclamp * 32);
+    }
+    
+    return success ? ESP_OK : ESP_FAIL;
+}
+
+esp_err_t sy6970_enter_protection_mode() {
+    ESP_LOGI(TAG, "Entering shipping mode (power down)");
+    PPM.shutdown();
+    return ESP_OK;
 }
 
 /**
@@ -54,10 +82,10 @@ static esp_err_t sy6970_init() {
   }
 
   PPM.init();
-  PPM.setSysPowerDownVoltage(MIN_BATTERY_VOLTAGE); // Low voltage protection
+  PPM.enableWatchdog(PowersSY6970::TIMER_OUT_40SEC);
+  PPM.setSysPowerDownVoltage(3500); // Default
   PPM.setInputCurrentLimit(1500);
-  PPM.disableCurrentLimitPin();
-  PPM.setChargeTargetVoltage(4224);
+  PPM.setChargeTargetVoltage(4208);
   PPM.setPrechargeCurr(640);
   PPM.setChargerConstantCurr(2048);
   PPM.enableAutoDetectionDPDM(); // Enable DPDM auto-detection
@@ -65,8 +93,7 @@ static esp_err_t sy6970_init() {
   PPM.setHighVoltageRequestedRange(PowersSY6970::REQUEST_9V); // Set high voltage request to 9V
   PPM.enableMeasure(); // ADC must be enabled before reading voltages
   PPM.enableCharge();
-  PPM.enableWatchdog(PowersSY6970::TIMER_OUT_40SEC);
-  configure_min_system_voltage(); // Set minimum system voltage to 3.0V
+  set_ir_compensation(60, 96); // Set IR compensation to 60mOhm and 96mV clamp
 
   ESP_LOGI(TAG, "SY6970 initialized successfully");
   return ESP_OK;

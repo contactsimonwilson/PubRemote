@@ -1,6 +1,9 @@
 #include "config.h"
 #include "esp_log.h"
+#include "remote/connection.h"
 #include "remote/display.h"
+#include "remote/espnow.h"
+#include "remote/wifi.h"
 #include "utilities/screen_utils.h"
 #include "utilities/string_utils.h"
 #include <remote/remoteinputs.h>
@@ -17,7 +20,7 @@ bool is_about_screen_active() {
 }
 
 // Set version label string
-void update_version_info_label() {
+static void update_version_info_label() {
   char *formattedString;
   asprintf(&formattedString, "Version: %d.%d.%d.%s\nHW: %s\nHash: %s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH,
            RELEASE_VARIANT, HW_TYPE, BUILD_ID);
@@ -25,12 +28,12 @@ void update_version_info_label() {
   free(formattedString);
 }
 
-void update_battery_percentage_label() {
+static void update_battery_percentage_label() {
   char *formattedString;
   asprintf(&formattedString, "Battery: %.2fV | %d%%\nState: %s", ((float)remoteStats.remoteBatteryVoltage / 1000.0f),
            remoteStats.remoteBatteryPercentage, charge_state_to_string(remoteStats.chargeState));
 
-  if (remoteStats.chargeState != CHARGE_STATE_NOT_CHARGING) {
+  if (remoteStats.chargeState != CHARGE_STATE_NOT_CHARGING && remoteStats.chargeCurrent > 0) {
     asprintf(&formattedString, "%s\nCurrent: %umA", formattedString, remoteStats.chargeCurrent);
   }
 
@@ -38,7 +41,7 @@ void update_battery_percentage_label() {
   free(formattedString);
 }
 
-void about_task(void *pvParameters) {
+static void about_task(void *pvParameters) {
   while (is_about_screen_active()) {
     if (LVGL_lock(-1)) {
       update_battery_percentage_label();
@@ -46,7 +49,7 @@ void about_task(void *pvParameters) {
       LVGL_unlock();
     }
 
-    vTaskDelay(pdMS_TO_TICKS(LV_DISP_DEF_REFR_PERIOD));
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 
   ESP_LOGI(TAG, "About task ended");
@@ -73,14 +76,10 @@ void about_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "About screen loaded");
 
   // Start task to update UI
-  xTaskCreate(about_task, "about_task", 4096, NULL, 2, NULL);
+  xTaskCreate(about_task, "about_task", 3072, NULL, 2, NULL);
 }
 
-void about_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "About screen unloaded");
+void about_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "About screen unload start");
   lv_obj_remove_event_cb(ui_AboutBody, paged_scroll_event_cb);
-}
-
-void update_button_press(lv_event_t *e) {
-  ESP_LOGI(TAG, "Update button pressed");
 }

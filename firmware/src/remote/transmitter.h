@@ -16,6 +16,7 @@ typedef struct {
   uint16_t *results;
 } LatencyTestResults;
 
-void init_transmitter();
+void transmitter_init();
+void transmitter_deinit();
 
 #endif

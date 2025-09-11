@@ -30,5 +30,6 @@ RemotePowerState get_power_state();
 uint8_t battery_mv_to_percent(uint16_t voltage_mv);
 void disable_watchdog();
 void enable_watchdog();
+void enter_protection_mode();
 
 #endif

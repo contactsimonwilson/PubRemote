@@ -11,9 +11,9 @@
 #define RSSI_BAR_OFF 0x717171
 
 // Status colors
-#define COLOR_DANGER 0xFF6369
-#define COLOR_ALERT 0xFF8B3E
-#define COLOR_WARNING 0xFFC145
-#define COLOR_ACTIVE 0x676767 // Color structure lightened 20%
+#define COLOR_CAUTION 0xFFC145  // LEVEL 1
+#define COLOR_WARNING 0xFF8B3E  // LEVEL 2
+#define COLOR_CRITICAL 0xFF6369 // LEVEL 3
+#define COLOR_ACTIVE 0x676767   // Color structure lightened 20%
 #define COLOR_SUCCESS 0x0EAD69
 #endif

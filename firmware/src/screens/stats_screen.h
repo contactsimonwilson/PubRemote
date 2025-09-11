@@ -23,11 +23,10 @@ typedef enum {
 
 extern StatsScreenDisplayOptions stat_display_options;
 bool is_stats_screen_active();
-void update_stats_screen_display();
 
 void stats_screen_load_start(lv_event_t *e);
 void stats_screen_loaded(lv_event_t *e);
-void stats_screen_unloaded(lv_event_t *e);
+void stats_screen_unload_start(lv_event_t *e);
 void stat_long_press(lv_event_t *e);
 void stat_swipe_left(lv_event_t *e);
 void stat_swipe_right(lv_event_t *e);

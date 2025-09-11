@@ -21,10 +21,18 @@ esp_err_t haptic_driver_init() {
 #endif
 }
 
-void haptic_play_vibration(HapticFeedbackPattern pattern) {
+void haptic_driver_play_vibration(HapticFeedbackPattern pattern) {
 #if HAPTIC_DRV2605
   // Play vibration using the DRV2605 driver
   ESP_LOGI(TAG, "Playing vibration pattern: %d", pattern);
   drv2605_haptic_play_vibration(pattern);
+#endif
+}
+
+void haptic_driver_stop_vibration() {
+#if HAPTIC_DRV2605
+  // Stop vibration using the DRV2605 driver
+  ESP_LOGI(TAG, "Stopping vibration");
+  drv2605_haptic_stop();
 #endif
 }

@@ -55,7 +55,7 @@ static i2c_master_dev_handle_t get_device_handle(uint8_t device_addr) {
   return NULL;
 }
 
-i2c_master_bus_handle_t get_i2c_bus_handle() {
+i2c_master_bus_handle_t i2c_get_bus_handle() {
   if (i2c_bus_handle == NULL) {
     ESP_LOGE(TAG, "I2C bus handle is not initialized");
     return NULL;
@@ -207,7 +207,7 @@ void init_i2c() {
       .scl_io_num = I2C_SCL,
       .sda_io_num = I2C_SDA,
       .glitch_ignore_cnt = 7,
-      .flags.enable_internal_pullup = false, // External pullups as you mentioned
+      .flags.enable_internal_pullup = false,
   };
 
   ESP_LOGI(TAG, "Initializing I2C for display touch");

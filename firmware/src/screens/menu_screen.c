@@ -71,8 +71,8 @@ void menu_screen_loaded(lv_event_t *e) {
   }
 }
 
-void menu_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Menu screen unloaded");
+void menu_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Menu screen unload start");
 }
 
 void enter_deep_sleep(lv_event_t *e) {
@@ -83,10 +83,10 @@ void menu_connect_press(lv_event_t *e) {
   ESP_LOGI(TAG, "Connect button pressed");
 
   if (connection_state == CONNECTION_STATE_DISCONNECTED) {
-    connect_to_default_peer();
+    connection_connect_to_default_peer();
   }
   else {
-    update_connection_state(CONNECTION_STATE_DISCONNECTED);
+    connection_update_state(CONNECTION_STATE_DISCONNECTED);
   }
 
   if (LVGL_lock(0)) {

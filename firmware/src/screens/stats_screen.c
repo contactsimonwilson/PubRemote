@@ -1,6 +1,7 @@
 #include "screens/stats_screen.h"
 #include "esp_log.h"
 #include "remote/display.h"
+#include "remote/vehicle_state.h"
 #include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>
@@ -74,14 +75,10 @@ static void update_utilization_dial_display() {
   // set arc color
   lv_color_t color = lv_color_hex(COLOR_ACTIVE);
 
-  if (remoteStats.dutyCycle > 90) {
-    color = lv_color_hex(COLOR_DANGER);
-  }
-  else if (remoteStats.dutyCycle > 80) {
-    color = lv_color_hex(COLOR_ALERT);
-  }
-  else if (remoteStats.dutyCycle > 70) {
-    color = lv_color_hex(COLOR_WARNING);
+  DutyStatus duty_status = get_duty_status(remoteStats.dutyCycle);
+
+  if (duty_status != DUTY_STATUS_NONE) {
+    color = lv_color_hex(get_duty_color(duty_status));
   }
 
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -496,7 +493,7 @@ static void update_footpad_display() {
   last_value = remoteStats.switchState;
 }
 
-void update_stats_screen_display() {
+static void stats_update_screen_display() {
   if (LVGL_lock(-1)) {
     if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
       lv_label_set_text(ui_PrimaryStatUnit, KILOMETERS_PER_HOUR_LABEL);
@@ -523,25 +520,30 @@ void stats_screen_load_start(lv_event_t *e) {
   // Permanent screen - don't apply scale
 
   if (LVGL_lock(-1)) {
-#if UI_SHAPE
-    lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
-#else
+#if (UI_SHAPE == 1)
+    // Circle UI
     lv_obj_add_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+#else
+    // Rectangle UI
+    lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
+
 #endif
     create_navigation_group(ui_StatsContent);
     LVGL_unlock();
   }
+
+  stats_register_update_cb(stats_update_screen_display);
 }
 
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
-  update_stats_screen_display();
+  stats_update_screen_display();
 
   if (LVGL_lock(-1)) {
     lv_obj_set_scroll_snap_x(ui_SecondaryStatContainer, LV_SCROLL_SNAP_CENTER);
@@ -549,8 +551,9 @@ void stats_screen_loaded(lv_event_t *e) {
   }
 }
 
-void stats_screen_unloaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Stats screen unloaded");
+void stats_screen_unload_start(lv_event_t *e) {
+  ESP_LOGI(TAG, "Stats screen unload start");
+  stats_unregister_update_cb(stats_update_screen_display);
 }
 
 void stat_long_press(lv_event_t *e) {

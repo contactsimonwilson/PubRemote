@@ -5,7 +5,9 @@
 
 #define BASE_RES 240
 
-#define UI_SHAPE (LV_HOR_RES == LV_VER_RES)
+#ifndef UI_SHAPE
+  #define UI_SHAPE (LV_HOR_RES == LV_VER_RES ? 0 : 1)
+#endif
 
 #ifndef SCALE_UI
   #define SCALE_UI 1
@@ -32,11 +34,11 @@ void display_task(void *pvParameters);
 
 bool LVGL_lock(int timeout_ms);
 void LVGL_unlock();
-void init_display();
-void deinit_display();
-uint8_t get_bl_level();
-void set_bl_level(uint8_t level);
-void set_rotation(ScreenRotation rot);
+void display_init();
+void display_deinit();
+uint8_t display_get_bl_level();
+void display_set_bl_level(uint8_t level);
+void display_set_rotation(ScreenRotation rot);
 lv_indev_t *get_encoder();
-void disp_off();
+void display_off();
 #endif

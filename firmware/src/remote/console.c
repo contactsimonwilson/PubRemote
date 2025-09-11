@@ -13,11 +13,11 @@ static const char *TAG = "PUBREMOTE-CONSOLE";
 #define PROMPT_STR "pubconsole"
 
 static int get_version() {
-  printf("Version: %d.%d.%d\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
-  printf("Variant: %s\n", RELEASE_VARIANT);
-  printf("Hardware: %s\n", HW_TYPE);
-  printf("Build date: %s %s\n", __DATE__, __TIME__);
-  printf("Build ID: %s\n", BUILD_ID);
+  printf("version: %d.%d.%d\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+  printf("variant: %s\n", RELEASE_VARIANT);
+  printf("hardware: %s\n", HW_TYPE);
+  printf("build_date: %s %s\n", __DATE__, __TIME__);
+  printf("build_id: %s\n", BUILD_ID);
   return 0;
 }
 
@@ -41,7 +41,7 @@ static int reboot_command() {
 static void register_reboot_command() {
   esp_console_cmd_t cmd = {
       .command = "reboot",
-      .help = "Reboot the device.",
+      .help = "Reboot the device",
       .hint = NULL,
       .func = &reboot_command,
   };
@@ -56,7 +56,7 @@ static int shutdown_command() {
 static void register_shutdown_command() {
   esp_console_cmd_t cmd = {
       .command = "shutdown",
-      .help = "Shutdown the device and enter sleep mode.",
+      .help = "Shutdown the device and enter sleep mode",
       .hint = NULL,
       .func = &shutdown_command,
   };
@@ -78,14 +78,109 @@ static int erase_command() {
 static void register_erase_command() {
   esp_console_cmd_t cmd = {
       .command = "erase",
-      .help = "Erase the flash memory.",
+      .help = "Erase the flash memory",
       .hint = NULL,
       .func = &erase_command,
   };
   ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
 
-void init_console() {
+static int get_settings(int argc, char **argv) {
+  if (argc > 1) {
+    ESP_LOGE(TAG, "Usage: settings");
+    return -1;
+  }
+  else {
+    char *current_ssid = get_wifi_ssid();
+    char *current_password = get_wifi_password();
+
+    if (current_ssid == NULL) {
+      current_ssid = "\0";
+    }
+    if (current_password == NULL) {
+      current_password = "\0";
+    }
+
+    printf("WiFi Credentials:\n");
+    printf("wifi_ssid: %s\n", current_ssid);
+    printf("wifi_password: %s\n", current_password);
+  }
+
+  return 0;
+}
+
+static void register_get_settings_command() {
+  esp_console_cmd_t cmd = {
+      .command = "settings",
+      .help = "Get current device settings",
+      .hint = NULL,
+      .func = &get_settings,
+  };
+  ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
+
+static int save_settings_command(int argc, char **argv) {
+  if (argc < 3 || argc % 2 == 0) {
+    ESP_LOGE(TAG, "Usage: save_settings <SETTING1> <VALUE2> <SETTING2> <VALUE2>...");
+    return -1;
+  }
+  else {
+    int setting_count = (argc - 1) / 2;
+    for (int i = 0; i < setting_count; i++) {
+      const char *setting = argv[1 + i * 2];
+      const char *value = argv[2 + i * 2];
+      if (strcmp(setting, "wifi_ssid") == 0) {
+        if (strlen(value) > 32) {
+          ESP_LOGE(TAG, "SSID must be less than 33 characters.");
+          return -1;
+        }
+        else {
+          ESP_LOGI(TAG, "Saving Wifi SSID: %s", value);
+          esp_err_t err = save_wifi_ssid(value);
+          if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to save WiFi SSID: %s", esp_err_to_name(err));
+            return -1;
+          }
+          ESP_LOGI(TAG, "Setting SSID: %s", value);
+          // save_settings wifi_ssid SiWi wifi_password internetgo
+        }
+      }
+      else if (strcmp(setting, "wifi_password") == 0) {
+        if (strlen(value) > 64) {
+          ESP_LOGE(TAG, "Password must be less than 65 characters.");
+          return -1;
+        }
+        else {
+          ESP_LOGI(TAG, "Saving WiFi Password: %s", value);
+          esp_err_t err = save_wifi_password(value);
+          if (err != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to save WiFi password: %s", esp_err_to_name(err));
+            return -1;
+          }
+          ESP_LOGI(TAG, "Setting Password: %s", value);
+        }
+      }
+      else {
+        ESP_LOGE(TAG, "Unknown setting: %s", setting);
+        return -1;
+      }
+    }
+
+    return 0;
+  }
+}
+
+static void register_save_settings_command() {
+  esp_console_cmd_t cmd = {
+      .command = "save_settings",
+      .help = "Save remote settings",
+      .hint = "save_settings <SETTING1> <VALUE1> <SETTING2> <VALUE2>...",
+      .func = &save_settings_command,
+  };
+  ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
+
+void console_init() {
   ESP_LOGI(TAG, "Initializing console");
   esp_console_repl_t *repl = NULL;
   esp_console_repl_config_t repl_config = ESP_CONSOLE_REPL_CONFIG_DEFAULT();
@@ -99,6 +194,8 @@ void init_console() {
   register_reboot_command();
   register_shutdown_command();
   register_erase_command();
+  register_get_settings_command();
+  register_save_settings_command();
 
 #if defined(CONFIG_ESP_CONSOLE_UART_DEFAULT) || defined(CONFIG_ESP_CONSOLE_UART_CUSTOM)
   esp_console_dev_uart_config_t hw_config = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();

@@ -25,7 +25,7 @@ static const char *TAG = "PUBREMOTE-REMOTEINPUTS";
   #error "JOYSTICK_BUTTON_LEVEL must be defined"
 #endif
 
-RemoteDataUnion remote_data;
+RemoteData remote_data;
 JoystickData joystick_data;
 static button_handle_t gpio_btn_handle = NULL;
 
@@ -122,10 +122,10 @@ static void thumbstick_task(void *pvParameters) {
     if (read_err == ESP_OK) {
       joystick_data.x = x_value;
       float new_x = convert_adc_to_axis(x_value, x_min, x_center, x_max, deadband, expo, false);
-      float curr_x = remote_data.data.js_x;
+      float curr_x = remote_data.js_x;
 
       if (new_x != curr_x) {
-        remote_data.data.js_x = new_x;
+        remote_data.js_x = new_x;
         trigger_sleep_disrupt = true;
       }
     }
@@ -143,10 +143,10 @@ static void thumbstick_task(void *pvParameters) {
 
       joystick_data.y = y_value;
       float new_y = convert_adc_to_axis(y_value, y_min, y_center, y_max, deadband, expo, invert_y);
-      float curr_y = remote_data.data.js_y;
+      float curr_y = remote_data.js_y;
 
       if (new_y != curr_y) {
-        remote_data.data.js_y = new_y;
+        remote_data.js_y = new_y;
         trigger_sleep_disrupt = true;
       }
     }
@@ -170,7 +170,7 @@ static void thumbstick_task(void *pvParameters) {
   vTaskDelete(NULL);
 }
 
-void init_thumbstick() {
+void thumbstick_init() {
 #if (JOYSTICK_Y_ENABLED || JOYSTICK_X_ENABLED)
   xTaskCreatePinnedToCore(thumbstick_task, "thumbstick_task", 4096, NULL, 20, NULL, 0);
 #endif
@@ -183,12 +183,12 @@ static void button_single_click_cb(void *arg, void *usr_data) {
 
 static void button_down_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOWN");
-  remote_data.data.bt_c = 1;
+  remote_data.bt_c = 1;
 }
 
 static void button_up_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON UP");
-  remote_data.data.bt_c = 0;
+  remote_data.bt_c = 0;
 }
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
@@ -196,17 +196,17 @@ static void button_double_click_cb(void *arg, void *usr_data) {
 }
 
 void reset_button_state() {
-  remote_data.data.bt_c = 0;
+  remote_data.bt_c = 0;
 }
 
-void deinit_buttons() {
+void buttons_deinit() {
   if (gpio_btn_handle) {
     iot_button_delete(gpio_btn_handle);
     gpio_btn_handle = NULL;
   }
 }
 
-void init_buttons() {
+void buttons_init() {
 #if JOYSTICK_BUTTON_ENABLED
   // create gpio button
   button_config_t gpio_btn_cfg = {
@@ -215,7 +215,7 @@ void init_buttons() {
       .short_press_time = CONFIG_BUTTON_SHORT_PRESS_TIME_MS,
       .gpio_button_config =
           {
-              .gpio_num = JOYSTICK_BUTTON_PIN,
+              .gpio_num = PRIMARY_BUTTON,
               .active_level = JOYSTICK_BUTTON_LEVEL,
           },
   };

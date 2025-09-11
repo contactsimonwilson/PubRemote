@@ -2,6 +2,7 @@
 #ifndef __STATS_H
 #define __STATS_H
 #include "receiver.h"
+#include "utilities/callback_registry.h"
 #include <charge/charge_driver.h>
 #include <stdio.h>
 
@@ -61,7 +62,9 @@ typedef struct {
 
 extern RemoteStats remoteStats;
 
-void update_stats_display();
-void init_stats();
+void stats_update();
+void stats_init();
+void stats_register_update_cb(callback_t callback);
+void stats_unregister_update_cb(callback_t callback);
 
 #endif

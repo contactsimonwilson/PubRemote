@@ -7,13 +7,20 @@
   #define RELEASE_VARIANT "dev"
 #endif
 
-// Power configuration
-#ifndef FORCE_LIGHT_SLEEP
-  #define FORCE_LIGHT_SLEEP 0
-#endif
-
 #define MIN_BATTERY_VOLTAGE 3000
 #define MAX_BATTERY_VOLTAGE 4200
+
+#if defined(ACC1_POWER) && !defined(ACC1_POWER_ON_LEVEL)
+  #define ACC1_POWER_ON_LEVEL 1
+#endif
+
+#if defined(ACC2_POWER) && !defined(ACC2_POWER_ON_LEVEL)
+  #define ACC2_POWER_ON_LEVEL 1
+#endif
+
+#if defined(ACC2_POWER) && !defined(ACC2_POWER_DEFAULT_LEVEL)
+  #define ACC2_POWER_DEFAULT 60 // Default to 60% brightness
+#endif
 
 // i2c configuration
 #if (!defined(I2C_SDA) || !defined(I2C_SCL))
@@ -23,7 +30,7 @@
 #define I2C_SCL_FREQ_HZ 100000
 
 // Joystick configuration
-#ifdef JOYSTICK_BUTTON_PIN
+#ifdef PRIMARY_BUTTON
   #define JOYSTICK_BUTTON_ENABLED 1
 #else
   #define JOYSTICK_BUTTON_ENABLED 0
@@ -44,16 +51,18 @@
 #define JOYSTICK_ENABLED (JOYSTICK_X_ENABLED || JOYSTICK_Y_ENABLED)
 
 // Display configuration
-#if TP_CST816S
-  #define TOUCH_ENABLED 1
-#elif TP_FT3168
+#if defined(TP_CST816S) || defined(TP_FT3168) || defined(TP_CST9217)
   #define TOUCH_ENABLED 1
 #else
   #define TOUCH_ENABLED 0
 #endif
 
+#ifndef TP_RST
+  #define TP_RST -1
+#endif
+
 // Led configuration
-#if defined(LED_DATA_PIN)
+#if defined(LED_DATA)
   #define LED_ENABLED 1
 #else
   #define LED_ENABLED 0
@@ -70,8 +79,8 @@
   #define BUZZER_ENABLED 0
 #endif
 
-#ifndef BUZZER_INVERT
-  #define BUZZER_INVERT 0
+#ifndef BUZZER_LEVEL
+  #define BUZZER_LEVEL 1
 #endif
 
 // Haptic configuration

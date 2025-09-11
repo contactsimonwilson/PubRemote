@@ -29,6 +29,8 @@
   #include "esp_lcd_touch_cst816s.h"
 #elif TP_FT3168
   #include "esp_lcd_touch_ft3168.h"
+#elif TP_CST9217
+  #include "esp_lcd_touch_cst9217.h"
 #endif
 
 // https://github.com/espressif/esp-idf/blob/master/examples/peripherals/lcd/spi_lcd_touch/main/spi_lcd_touch_example_main.c
@@ -67,7 +69,7 @@ static const char *TAG = "PUBREMOTE-DISPLAY";
 #define LVGL_TASK_CPU_AFFINITY (portNUM_PROCESSORS - 1)
 #define LVGL_TASK_STACK_SIZE (6 * 1024)
 #define LVGL_TASK_PRIORITY 20
-#define BUFFER_LINES ((int)(LV_VER_RES / 8))
+#define BUFFER_LINES ((int)(LV_VER_RES / 10))
 #define BUFFER_SIZE (LV_HOR_RES * BUFFER_LINES)
 #define MAX_TRAN_SIZE ((int)LV_HOR_RES * BUFFER_LINES * sizeof(uint16_t))
 
@@ -130,12 +132,12 @@ static void encoder_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
   static uint32_t last_time = 0;
   uint32_t current_time = lv_tick_get();
   int16_t enc_diff = 0;
-  data->state = remote_data.data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+  data->state = remote_data.bt_c ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
-  if (remote_data.data.js_y > 0.5) {
+  if (remote_data.js_y > 0.5) {
     enc_diff = -1;
   }
-  else if (remote_data.data.js_y < -0.5) {
+  else if (remote_data.js_y < -0.5) {
     enc_diff = 1;
   }
 
@@ -169,11 +171,11 @@ void LVGL_unlock(void) {
 
 static uint8_t bl_level = 0;
 
-uint8_t get_bl_level() {
+uint8_t display_get_bl_level() {
   return bl_level;
 }
 
-void set_bl_level(uint8_t level) {
+void display_set_bl_level(uint8_t level) {
   if (is_initialized) {
     bl_level = level;
     set_display_brightness(lcd_io, bl_level);
@@ -299,18 +301,18 @@ static esp_err_t app_touch_init(void) {
   esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_CST816S_CONFIG();
   #elif TP_FT3168
   esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_FT3168_CONFIG();
+  #elif TP_CST9217
+  esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_CST9217_CONFIG();
   #endif
 
   tp_io_config.scl_speed_hz = I2C_SCL_FREQ_HZ;
   // Attach the TOUCH to the I2C bus
-  ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c_v2(get_i2c_bus_handle(), &tp_io_config, &tp_io_handle));
+  ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c_v2(i2c_get_bus_handle(), &tp_io_config, &tp_io_handle));
 
   const esp_lcd_touch_config_t tp_cfg = {
       .x_max = LV_HOR_RES,
       .y_max = LV_VER_RES,
-  #ifdef TP_RST
       .rst_gpio_num = TP_RST,
-  #endif
   #ifdef TP_INT
       .int_gpio_num = TP_INT,
   #endif
@@ -328,6 +330,9 @@ static esp_err_t app_touch_init(void) {
   #elif TP_FT3168
   ESP_LOGI(TAG, "Initialize touch controller FT3168");
   ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_ft3168(tp_io_handle, &tp_cfg, &touch_handle));
+  #elif TP_CST9217
+  ESP_LOGI(TAG, "Initialize touch controller CST9217");
+  ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_cst9217(tp_io_handle, &tp_cfg, &touch_handle));
   #endif
 
   return ESP_OK;
@@ -357,7 +362,7 @@ static void lv_touch_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
 
 #endif // TOUCH_ENABLED
 
-void set_rotation(ScreenRotation rot) {
+void display_set_rotation(ScreenRotation rot) {
   lv_disp_set_rotation(lvgl_disp, (lv_disp_rot_t)rot);
 }
 
@@ -421,7 +426,7 @@ static esp_err_t app_lvgl_init(void) {
   lvgl_disp->driver->rounder_cb = LVGL_port_rounder_callback;
 #endif
 
-  set_rotation(device_settings.screen_rotation);
+  display_set_rotation(device_settings.screen_rotation);
 
 #if TOUCH_ENABLED
   const lvgl_port_touch_cfg_t touch_cfg = {
@@ -513,15 +518,15 @@ static esp_err_t display_ui() {
     LVGL_unlock();
     // Delay backlight turn on to avoid flickering
     vTaskDelay(pdMS_TO_TICKS(250));
-    set_bl_level(device_settings.bl_level);
+    display_set_bl_level(device_settings.bl_level);
     return ESP_OK;
   }
   return ESP_FAIL;
 }
 
-void deinit_display() {
+void display_deinit() {
   ESP_LOGI(TAG, "Deinit display");
-  set_bl_level(0);
+  display_set_bl_level(0);
 
   if (lv_is_initialized()) {
 
@@ -546,7 +551,7 @@ void deinit_display() {
   }
 }
 
-void init_display() {
+void display_init() {
   ESP_LOGI(TAG, "Create LVGL conf");
   /* LCD HW initialization */
   ESP_ERROR_CHECK(app_lcd_init());
@@ -560,11 +565,17 @@ void init_display() {
   ESP_ERROR_CHECK(display_ui());
 }
 
-void disp_off() {
-  // Turn off backlight
+void display_off() {
   ESP_LOGI(TAG, "Display sleep");
   // Turn off display
   if (lcd_panel) {
     esp_lcd_panel_disp_on_off(lcd_panel, false);
+    esp_lcd_panel_disp_sleep(lcd_panel, true);
   }
+
+#if TOUCH_ENABLED
+  if (touch_handle) {
+    esp_lcd_touch_enter_sleep(touch_handle);
+  }
+#endif
 }

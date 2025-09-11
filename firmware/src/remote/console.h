@@ -3,6 +3,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void init_console();
+void console_init();
 
 #endif

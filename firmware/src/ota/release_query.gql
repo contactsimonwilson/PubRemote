@@ -1,0 +1,27 @@
+{
+  repository(owner: "contactsimonwilson", name: "PubRemote") {
+    stable: latestRelease {  # Latest stable release
+      name
+      tagName
+      assets: releaseAssets(first: 50) {
+        nodes {
+          name
+          downloadUrl
+        }
+      }
+    }
+    prerelease: releases(first: 2, orderBy: {field: CREATED_AT, direction: DESC}) {
+      nodes {
+        name
+        tagName
+        isPrerelease
+        assets: releaseAssets(first: 50) {
+          nodes {
+            name
+            downloadUrl
+          }
+        }
+      }
+    }
+  }
+}

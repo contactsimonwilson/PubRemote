@@ -1,18 +1,18 @@
 import React, { useRef, useState } from "react";
-import { Usb } from "lucide-react";
-import { DeviceInfo } from "./components/DeviceInfo";
-import { FirmwareSelector } from "./components/FirmwareSelector";
-import { FlashProgress } from "./components/FlashProgress";
-import { FloatAccessoriesSelector } from "./components/FloatAccessoriesSelector";
-import { Header } from "./components/Header";
+import Header from "./components/Header";
 import { ESPService } from "./services/espService";
 import { TerminalService } from "./services/terminal";
-import { DeviceInfoData, FirmwareFiles, FlashProgress as FlashProgressType } from "./types";
+import { DeviceInfoData, FlashProgress as FlashProgressType } from "./types";
+import SettingsPage from "./components/SettingsPage";
+import FirmwarePage from "./components/FirmwarePage";
+import DeviceInfoPage from "./components/DeviceInfoPage";
+import { DeviceToolsProvider } from "./context/DeviceToolsContext";
+import { DeviceInfo } from "./components/DeviceInfo";
 
-function App() {
+const App = () => {
   const terminal = useRef<TerminalService>(new TerminalService()).current;
   const espService = useRef<ESPService>(new ESPService(terminal)).current;
-  const [selectedFirmware, setSelectedFirmware] = useState<FirmwareFiles| null>(null);
+  const [activeTab, setActiveTab] = useState(0);
   const [flashProgress, setFlashProgress] = useState<FlashProgressType>({
     status: "idle",
     progress: 0,
@@ -20,7 +20,17 @@ function App() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfoData>({
     connected: false,
   });
-  const [eraseFlash, setEraseFlash] = useState<boolean>(false);
+
+  const handleSendTerminalCommand = React.useCallback(
+    async (command: string) => {
+      try {
+        await espService.sendCommand(command);
+      } catch (error) {
+        console.error("Command error:", error);
+      }
+    },
+    [espService]
+  );
 
   const handleConnect = async () => {
     try {
@@ -42,110 +52,67 @@ function App() {
     setDeviceInfo({ connected: false });
   };
 
-  const handleSendCommand = async (command: string) => {
-    try {
-      await espService.sendCommand(command);
-    } catch (error) {
-      console.error("Command error:", error);
-    }
-  };
-
-  const handleFlash = async () => {
-    if (!selectedFirmware) return;
-
-    try {
-      if (!espService.isConnected()) {
-        setFlashProgress({ status: "connecting", progress: 0 });
-        await handleConnect();
-      }
-
-      if (eraseFlash) {
-        setFlashProgress({ status: "erasing", progress: 20 });
-      }
-
-      const currentProgress = 20;
-
-      await espService.flash(selectedFirmware, eraseFlash, (status) => {
-        setFlashProgress({
-          status: "flashing",
-          progress: Math.round(
-            currentProgress + status.progress * (100 - currentProgress)
-          ),
-        });
-      });
-
-      setFlashProgress({ status: "complete", progress: 100 });
-      handleDisconnect();
-    } catch (error) {
-      console.error("Flash error:", error);
-      setFlashProgress({
-        status: "error",
-        progress: 0,
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      });
-    }
-  };
+  const tabs = [
+    {
+      label: "Home",
+      content: <DeviceInfoPage />,
+    },
+    {
+      label: "Firmware",
+      content: <FirmwarePage />,
+    },
+    {
+      label: "Settings",
+      content: <SettingsPage />,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <Header />
-
-      <main className="container mx-auto px-4 py-8">
+      <div className="container flex justify-center mx-auto px-4 pt-2">
+        <nav className="flex space-x-8" aria-label="Tabs">
+          {tabs.map((tab, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveTab(index)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === index
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+              aria-selected={activeTab === index}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+      <main className="container mx-auto px-4 pb-8 pt-4">
         <div className="mx-auto max-w-4xl space-y-8">
-          <DeviceInfo
-            deviceInfo={deviceInfo}
-            onConnect={handleConnect}
-            onDisconnect={handleDisconnect}
-            onSendCommand={handleSendCommand}
+          <DeviceToolsProvider
             terminal={terminal}
-          />
-
-          <div className="rounded-lg bg-gray-900 p-6">
-            <FirmwareSelector onSelectFirmware={setSelectedFirmware} deviceInfo={deviceInfo} />
-          </div>
-
-          <div className="rounded-lg bg-gray-900 p-6">
-            <h2 className="mb-6 text-xl font-semibold">Flash Firmware</h2>
-
-            <div className="flex items-center justify-between mb-6">
-              <p>
-                Finally, flash your selected firmware to the connected device. Enable erase flash if you want to clear the device's existing data before flashing the new firmware.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <FlashProgress
-                progress={flashProgress}
-                isDeviceConnected={deviceInfo.connected}
-                eraseFlash={eraseFlash}
-                onEraseFlashChange={setEraseFlash}
-              />
-
-              <button
-                onClick={handleFlash}
-                disabled={
-                  !selectedFirmware ||
-                  !deviceInfo.connected ||
-                  !["complete", "idle"].includes(flashProgress.status)
-                }
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-700"
-              >
-                <Usb className="h-5 w-5" />
-                Flash Device
-              </button>
-            </div>
-          </div>
-
-          <hr />
-
-          <div className="rounded-lg bg-gray-900 p-6">
-            <FloatAccessoriesSelector />
-          </div>
+            espService={espService}
+            deviceInfo={deviceInfo}
+            setDeviceInfo={setDeviceInfo}
+            flashProgress={flashProgress}
+            setFlashProgress={setFlashProgress}
+            sendTerminalCommand={handleSendTerminalCommand}
+            disconnect={handleDisconnect}
+          >
+            <DeviceInfo
+              deviceInfo={deviceInfo}
+              onConnect={handleConnect}
+              onDisconnect={handleDisconnect}
+              onSendCommand={handleSendTerminalCommand}
+              terminal={terminal}
+            />
+            {tabs[activeTab].content}
+          </DeviceToolsProvider>
         </div>
       </main>
     </div>
   );
-}
+};
 
 export default App;
