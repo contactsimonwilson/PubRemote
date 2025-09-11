@@ -25,9 +25,7 @@ typedef enum {
   UPDATE_STEP_CHECKING_UPDATE,
   UPDATE_STEP_UPDATE_AVAILABLE,
   UPDATE_STEP_NO_UPDATE,
-  UPDATE_STEP_DOWNLOADING,
-  UPDATE_STEP_VALIDATE,
-  UPDATE_STEP_INSTALLING,
+  UPDATE_STEP_IN_PROGRESS,
   UPDATE_STEP_COMPLETE,
   UPDATE_STEP_NO_WIFI,
   UPDATE_STEP_ERROR
@@ -52,17 +50,6 @@ static ReleaseInfo available_updates[3]; // Stable, Prerelease, Nightly
 static int available_update_count = 0;
 static UpdateType selected_update_type = UPDATE_TYPE_STABLE;
 
-static void clean_body() {
-  // Iterate backwards to avoid index shifting issues when deleting
-  uint32_t child_cnt = lv_obj_get_child_cnt(ui_UpdateBody);
-  for (int32_t i = child_cnt - 1; i >= 0; i--) {
-    lv_obj_t *child = lv_obj_get_child(ui_UpdateBody, i);
-    if (child != ui_UpdateBodyLabel && child != NULL) {
-      lv_obj_del(child);
-    }
-  }
-}
-
 bool is_update_screen_active() {
   lv_obj_t *active_screen = lv_scr_act();
   return active_screen == ui_UpdateScreen;
@@ -80,34 +67,33 @@ static void change_update_selection(lv_event_t *e) {
   ESP_LOGI(TAG, "Selected update type: %d", selected_update_type);
 }
 
-static void reboot_device(lv_event_t *e) {
-  ESP_LOGI(TAG, "Rebooting device...");
-  esp_restart();
-}
-
 static void update_status_label() {
   ESP_LOGI(TAG, "Updating status label for step %d", current_update_step);
   static char *wifi_ssid;
-  clean_body();
+
+  if (current_update_step == UPDATE_STEP_UPDATE_AVAILABLE) {
+    // Show dropdown
+    lv_obj_clear_flag(ui_UpdateBodyDropdown, LV_OBJ_FLAG_HIDDEN);
+  }
+  else {
+    // Hide dropdown
+    lv_obj_add_flag(ui_UpdateBodyDropdown, LV_OBJ_FLAG_HIDDEN);
+  }
+
   switch (current_update_step) {
   case UPDATE_STEP_START:
     wifi_ssid = get_wifi_ssid();
-    lv_label_set_text(ui_UpdateHeaderLabel, "Update");
     lv_label_set_text_fmt(ui_UpdateBodyLabel, "Click next to connect to %s", wifi_ssid);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_CONNECTING:
     wifi_ssid = get_wifi_ssid();
-    lv_label_set_text(ui_UpdateHeaderLabel, "Connecting");
     lv_label_set_text_fmt(ui_UpdateBodyLabel, "Connecting to %s...", wifi_ssid);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_CHECKING_UPDATE:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Checking");
     lv_label_set_text(ui_UpdateBodyLabel, "Checking for updates...");
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
@@ -115,11 +101,9 @@ static void update_status_label() {
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_UPDATE_AVAILABLE:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Update Available");
-    lv_label_set_text(ui_UpdateBodyLabel, "Choose from available updates");
+    lv_label_set_text(ui_UpdateBodyLabel, "Choose update");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Next");
     // Add lvgl dropdown
-    lv_obj_t *update_dropdown = lv_dropdown_create(ui_UpdateBody);
     char *available_options = strdup("");
 
     for (int i = 0; i < available_update_count; i++) {
@@ -135,96 +119,64 @@ static void update_status_label() {
       free(old);
     }
 
-    lv_dropdown_set_options(update_dropdown, available_options);
+    lv_dropdown_set_options(ui_UpdateBodyDropdown, available_options);
     free(available_options);
-    lv_obj_set_width(update_dropdown, lv_pct(100));
-    lv_obj_set_height(update_dropdown, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_align(update_dropdown, LV_ALIGN_CENTER);
-    lv_obj_add_flag(update_dropdown, LV_OBJ_FLAG_SCROLL_ON_FOCUS);  /// Flags
-    lv_obj_clear_flag(update_dropdown, LV_OBJ_FLAG_GESTURE_BUBBLE); /// Flags
-    lv_obj_set_style_text_font(update_dropdown, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(update_dropdown, &lv_font_montserrat_14, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(lv_dropdown_get_list(update_dropdown), &ui_font_Inter_14,
-                               LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(lv_dropdown_get_list(update_dropdown), &ui_font_Inter_14,
-                               LV_PART_SELECTED | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(ui_UpdateBodyDropdown, LV_OBJ_FLAG_GESTURE_BUBBLE); /// Flags
 
     // set change callback to change_update_selection
-    lv_obj_add_event_cb(update_dropdown, change_update_selection, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ui_UpdateBodyDropdown, change_update_selection, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_NO_UPDATE:
-    lv_label_set_text(ui_UpdateHeaderLabel, "No Update");
-    lv_label_set_text(ui_UpdateBodyLabel, "No updates available.");
+    lv_label_set_text(ui_UpdateBodyLabel, "No updates available");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Exit");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
-  case UPDATE_STEP_DOWNLOADING:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Download");
+  case UPDATE_STEP_IN_PROGRESS:
     lv_label_set_text(ui_UpdateBodyLabel, "Downloading update...");
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    break;
-  case UPDATE_STEP_VALIDATE:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Validation");
-    lv_label_set_text(ui_UpdateBodyLabel, "Validating downloaded update...");
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    break;
-  case UPDATE_STEP_INSTALLING:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Installing");
-    lv_label_set_text(ui_UpdateBodyLabel, "Installing update...");
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Stop");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_COMPLETE:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Complete");
-    lv_label_set_text(ui_UpdateBodyLabel, "Update complete! Restarting...");
+    lv_label_set_text(ui_UpdateBodyLabel, "Update complete");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Reboot");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_event_cb(ui_UpdatePrimaryActionButton, reboot_device, LV_EVENT_CLICKED, NULL);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_ERROR:
-    lv_label_set_text(ui_UpdateHeaderLabel, "Error");
-    lv_label_set_text(ui_UpdateBodyLabel, "An error occurred during the update process.");
+    lv_label_set_text(ui_UpdateBodyLabel, "An error occurred during the update process");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Retry");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_NO_WIFI:
-    lv_label_set_text(ui_UpdateHeaderLabel, "No WiFi");
     lv_label_set_text(ui_UpdateBodyLabel,
                       "No WiFi credentials found. Please configure them at https://pubmote.techfoundry.nz");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Exit");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   default:
-    lv_label_set_text(ui_UpdateBodyLabel, "Unknown update step.");
+    lv_label_set_text(ui_UpdateBodyLabel, "Unknown update step");
     lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   }
   resize_footer_buttons(ui_UpdateFooter); // Resize footer buttons
 }
 
-void update_task(void *pvParameters) {
+static void simple_progress_callback(const char *status) {
+  if (LVGL_lock(0)) {
+    lv_label_set_text(ui_UpdateBodyLabel, status);
+    LVGL_unlock();
+  }
+}
+
+static void update_task(void *pvParameters) {
   connection_update_state(CONNECTION_STATE_DISCONNECTED);
   if (espnow_is_initialized()) {
     espnow_deinit();
@@ -334,24 +286,12 @@ void update_task(void *pvParameters) {
     case UPDATE_STEP_NO_UPDATE:
       // Do nothing
       break;
-    case UPDATE_STEP_DOWNLOADING:
+    case UPDATE_STEP_IN_PROGRESS:
 
       ESP_LOGI(TAG, "Starting OTA update for type %d with URL: %s", selected_update_type,
                available_updates[selected_update_type].download_url);
 
-      // Start downloading update
-      esp_http_client_config_t config = {
-          .url = available_updates[selected_update_type].download_url,
-          .crt_bundle_attach = esp_crt_bundle_attach,
-          .timeout_ms = 120000,
-          .buffer_size = 8192,    // Increase from default (4096)
-          .buffer_size_tx = 4096, // Increase TX buffer if needed
-      };
-
-      esp_https_ota_config_t ota_config = {
-          .http_config = &config,
-      };
-      esp_err_t ret = esp_https_ota(&ota_config);
+      esp_err_t ret = apply_ota(available_updates[selected_update_type].download_url, simple_progress_callback);
       if (ret == ESP_OK) {
         current_update_step = UPDATE_STEP_COMPLETE;
         ESP_LOGI(TAG, "OTA update successful");
@@ -360,12 +300,6 @@ void update_task(void *pvParameters) {
         ESP_LOGE(TAG, "OTA update failed: %s", esp_err_to_name(ret));
         current_update_step = UPDATE_STEP_ERROR;
       }
-      break;
-    case UPDATE_STEP_VALIDATE:
-      // Validate downloaded update
-      break;
-    case UPDATE_STEP_INSTALLING:
-      // Start installing update
       break;
     case UPDATE_STEP_COMPLETE:
       break;
@@ -427,7 +361,7 @@ void update_primary_button_press(lv_event_t *e) {
     current_update_step = UPDATE_STEP_UPDATE_AVAILABLE;
     break;
   case UPDATE_STEP_UPDATE_AVAILABLE:
-    current_update_step = UPDATE_STEP_DOWNLOADING;
+    current_update_step = UPDATE_STEP_IN_PROGRESS;
     break;
   case UPDATE_STEP_NO_UPDATE:
     if (LVGL_lock(0)) {
@@ -435,17 +369,8 @@ void update_primary_button_press(lv_event_t *e) {
       LVGL_unlock();
     }
     break;
-  case UPDATE_STEP_DOWNLOADING:
-    current_update_step = UPDATE_STEP_UPDATE_AVAILABLE;
-    break;
-  case UPDATE_STEP_VALIDATE:
-    current_update_step = UPDATE_STEP_UPDATE_AVAILABLE;
-    break;
-  case UPDATE_STEP_INSTALLING:
-    current_update_step = UPDATE_STEP_UPDATE_AVAILABLE;
-    break;
   case UPDATE_STEP_COMPLETE:
-    // Set timer for 5 second delay before restart
+    esp_restart();
     break;
   case UPDATE_STEP_ERROR:
     current_update_step = UPDATE_STEP_START;

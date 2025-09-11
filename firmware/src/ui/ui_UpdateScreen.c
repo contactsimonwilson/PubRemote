@@ -8,9 +8,9 @@
 lv_obj_t *ui_UpdateScreen = NULL;
 lv_obj_t *ui_UpdateContent = NULL;
 lv_obj_t *ui_UpdateHeader = NULL;
-lv_obj_t *ui_UpdateHeaderLabel = NULL;
 lv_obj_t *ui_UpdateBody = NULL;
 lv_obj_t *ui_UpdateBodyLabel = NULL;
+lv_obj_t *ui_UpdateBodyDropdown = NULL;
 lv_obj_t *ui_UpdateFooter = NULL;
 lv_obj_t *ui_UpdateSecondaryActionButton = NULL;
 lv_obj_t *ui_UpdateSecondaryActionButtonLabel = NULL;
@@ -81,15 +81,6 @@ void ui_UpdateScreen_screen_init(void) {
   lv_obj_set_style_pad_top(ui_UpdateHeader, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_pad_bottom(ui_UpdateHeader, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  ui_UpdateHeaderLabel = lv_label_create(ui_UpdateHeader);
-  lv_obj_set_width(ui_UpdateHeaderLabel, LV_SIZE_CONTENT);  /// 1
-  lv_obj_set_height(ui_UpdateHeaderLabel, LV_SIZE_CONTENT); /// 1
-  lv_obj_set_x(ui_UpdateHeaderLabel, 31);
-  lv_obj_set_y(ui_UpdateHeaderLabel, -102);
-  lv_obj_set_align(ui_UpdateHeaderLabel, LV_ALIGN_CENTER);
-  lv_label_set_text(ui_UpdateHeaderLabel, "Update");
-  lv_obj_set_style_text_font(ui_UpdateHeaderLabel, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
-
   ui_UpdateBody = lv_obj_create(ui_UpdateContent);
   lv_obj_remove_style_all(ui_UpdateBody);
   lv_obj_set_width(ui_UpdateBody, lv_pct(100));
@@ -114,6 +105,14 @@ void ui_UpdateScreen_screen_init(void) {
   lv_obj_set_align(ui_UpdateBodyLabel, LV_ALIGN_CENTER);
   lv_label_set_text(ui_UpdateBodyLabel, "Click next to scan for networks");
   lv_obj_set_style_text_align(ui_UpdateBodyLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+  ui_UpdateBodyDropdown = lv_dropdown_create(ui_UpdateBody);
+  lv_obj_set_width(ui_UpdateBodyDropdown, lv_pct(100));
+  lv_obj_set_height(ui_UpdateBodyDropdown, LV_SIZE_CONTENT); /// 1
+  lv_obj_set_align(ui_UpdateBodyDropdown, LV_ALIGN_CENTER);
+  lv_obj_add_flag(ui_UpdateBodyDropdown, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+
+  lv_obj_set_style_text_font(ui_UpdateBodyDropdown, &lv_font_montserrat_14, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
   ui_UpdateFooter = lv_obj_create(ui_UpdateContent);
   lv_obj_remove_style_all(ui_UpdateFooter);
@@ -167,9 +166,9 @@ void ui_UpdateScreen_screen_destroy(void) {
   ui_UpdateScreen = NULL;
   ui_UpdateContent = NULL;
   ui_UpdateHeader = NULL;
-  ui_UpdateHeaderLabel = NULL;
   ui_UpdateBody = NULL;
   ui_UpdateBodyLabel = NULL;
+  ui_UpdateBodyDropdown = NULL;
   ui_UpdateFooter = NULL;
   ui_UpdateSecondaryActionButton = NULL;
   ui_UpdateSecondaryActionButtonLabel = NULL;

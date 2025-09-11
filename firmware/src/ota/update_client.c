@@ -2,10 +2,12 @@
 #include "cJSON.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
+#include "esp_ota_ops.h"
 #include <esp_err.h>
+#include <esp_https_ota.h>
 #include <esp_log.h>
 
-static const char *TAG = "PUBMOTE-GITHUB_FETCH";
+static const char *TAG = "PUBMOTE-OTA";
 
 #define GITHUB_API "https://api.github.com"
 #define GITHUB_REPO "contactsimonwilson/pubremote"
@@ -391,4 +393,116 @@ bool is_version_greater(const firmware_version_t *a, const firmware_version_t *b
     return a->minor > b->minor;
   }
   return a->patch > b->patch;
+}
+
+typedef void (*ota_progress_callback_t)(const char *status);
+
+esp_err_t apply_ota(const char *url, ota_progress_callback_t progress_callback) {
+  ESP_LOGI(TAG, "Starting advanced HTTPS OTA update");
+  if (progress_callback) {
+    progress_callback("Initializing OTA...");
+  }
+
+  esp_http_client_config_t config = {
+      .url = url,
+      .crt_bundle_attach = esp_crt_bundle_attach,
+      .timeout_ms = 120000,
+      .keep_alive_enable = true,
+      .buffer_size = 8192,
+      .buffer_size_tx = 4096,
+  };
+
+  esp_https_ota_config_t ota_config = {
+      .http_config = &config,
+  };
+
+  esp_https_ota_handle_t https_ota_handle = NULL;
+  esp_err_t err = esp_https_ota_begin(&ota_config, &https_ota_handle);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "ESP HTTPS OTA Begin failed: %s", esp_err_to_name(err));
+    return err;
+  }
+
+  if (progress_callback) {
+    progress_callback("Connected to server...");
+  }
+
+  // Get and validate new firmware info
+  esp_app_desc_t app_desc;
+  err = esp_https_ota_get_img_desc(https_ota_handle, &app_desc);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "esp_https_ota_read_img_desc failed: %s", esp_err_to_name(err));
+    return err;
+  }
+
+  ESP_LOGI(TAG, "New firmware info:");
+  ESP_LOGI(TAG, "Project name: %s", app_desc.project_name);
+  ESP_LOGI(TAG, "Version: %s", app_desc.version);
+  ESP_LOGI(TAG, "Compiled: %s %s", app_desc.date, app_desc.time);
+  ESP_LOGI(TAG, "ESP-IDF: %s", app_desc.idf_ver);
+
+  // Download and flash firmware with progress
+  int image_size = esp_https_ota_get_image_size(https_ota_handle);
+  ESP_LOGI(TAG, "Image size: %d bytes", image_size);
+
+  if (progress_callback) {
+    progress_callback("Starting download...");
+  }
+
+  int last_reported_progress = -1; // Track to avoid spamming callback
+
+  while (1) {
+    err = esp_https_ota_perform(https_ota_handle);
+    if (err != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
+      break;
+    }
+
+    // Show download progress
+    int data_read = esp_https_ota_get_image_len_read(https_ota_handle);
+    int progress = 0;
+    if (image_size > 0) {
+      progress = (data_read * 100) / image_size;
+      ESP_LOGI(TAG, "Downloading update... %d%% (%d/%d bytes)", progress, data_read, image_size);
+    }
+    else {
+      ESP_LOGI(TAG, "Downloaded: %d bytes", data_read);
+    }
+
+    // Call progress callback (only if progress changed to avoid spam)
+    if (progress_callback && progress != last_reported_progress) {
+      char status_update[100];
+      int data_read_kb = data_read / 1024;
+      int image_size_kb = image_size / 1024;
+      snprintf(status_update, sizeof(status_update), "Downloading...\n%d%%\n%d/%d KB", progress, data_read_kb,
+               image_size_kb);
+      progress_callback(status_update);
+      last_reported_progress = progress;
+    }
+
+    // Small delay to avoid flooding logs
+    vTaskDelay(pdMS_TO_TICKS(100));
+  }
+
+  if (progress_callback) {
+    progress_callback("Download complete\nValidating...");
+  }
+
+  if (esp_https_ota_is_complete_data_received(https_ota_handle) != true) {
+    ESP_LOGE(TAG, "Complete data was not received.");
+    err = ESP_FAIL;
+  }
+  else {
+    err = esp_https_ota_finish(https_ota_handle);
+    if (err == ESP_OK) {
+      ESP_LOGI(TAG, "OTA upgrade successful");
+      return ESP_OK;
+    }
+    else {
+      if (err == ESP_ERR_OTA_VALIDATE_FAILED) {
+        ESP_LOGE(TAG, "Image validation failed - image is corrupted");
+      }
+      ESP_LOGE(TAG, "ESP HTTPS OTA upgrade failed: %s", esp_err_to_name(err));
+    }
+  }
+  return err;
 }

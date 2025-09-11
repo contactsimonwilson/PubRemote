@@ -18,9 +18,9 @@ extern "C"
   extern lv_obj_t *ui_UpdateScreen;
   extern lv_obj_t *ui_UpdateContent;
   extern lv_obj_t *ui_UpdateHeader;
-  extern lv_obj_t *ui_UpdateHeaderLabel;
   extern lv_obj_t *ui_UpdateBody;
   extern lv_obj_t *ui_UpdateBodyLabel;
+  extern lv_obj_t *ui_UpdateBodyDropdown;
   extern lv_obj_t *ui_UpdateFooter;
   extern void ui_event_UpdateSecondaryActionButton(lv_event_t *e);
   extern lv_obj_t *ui_UpdateSecondaryActionButton;

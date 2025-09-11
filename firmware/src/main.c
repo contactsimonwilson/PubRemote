@@ -32,6 +32,8 @@
 
 static const char *TAG = "PUBREMOTE-MAIN";
 
+#define DEBUG_MEMORY 0
+
 void app_main(void) {
   // Enable power for core peripherals
   acc1_power_set_level(1);
@@ -66,11 +68,12 @@ void app_main(void) {
 
   ESP_LOGI(TAG, "Boot complete");
 
+#if DEBUG_MEMORY
   while (1) {
-    // Main loop does nothing - everything is handled in tasks
     size_t free_heap = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
     size_t min_heap = heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL);
     ESP_LOGI(TAG, "Free heap before update: %d bytes (min ever: %d bytes)", free_heap, min_heap);
     vTaskDelay(pdMS_TO_TICKS(2000));
   }
+#endif
 }

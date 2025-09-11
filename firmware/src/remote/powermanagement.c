@@ -32,6 +32,7 @@
 static const char *TAG = "PUBREMOTE-POWERMANAGEMENT";
 
 #define INT_SETTLE_TIME_MS 200
+#define ERROR_NOTE_DURATION 500
 
 #ifdef PMU_INT
   #define PMU_INT_NOTE_DURATION 100
@@ -337,8 +338,8 @@ void power_management_task(void *pvParameters) {
 
     if (remoteStats.remoteBatteryVoltage < MIN_BATTERY_VOLTAGE && !is_power_connected) {
       ESP_LOGW(TAG, "Battery voltage too low: %d mV", remoteStats.remoteBatteryVoltage);
-      buzzer_set_tone(NOTE_ERROR, PMU_INT_NOTE_DURATION);
-      vTaskDelay(pdMS_TO_TICKS(PMU_INT_NOTE_DURATION)); // Allow time for the note to play
+      buzzer_set_tone(NOTE_ERROR, ERROR_NOTE_DURATION);
+      vTaskDelay(pdMS_TO_TICKS(ERROR_NOTE_DURATION)); // Allow time for the note to play
 
       // If battery is too low, enter sleep immediately
       enter_protection_mode();
