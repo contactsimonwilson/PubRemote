@@ -5,13 +5,9 @@
 #include "SensorQMI8658.hpp"
 #include "remote/i2c.h"
 #include <driver/gpio.h>
+#include "config.h"
 
 static const char *TAG = "PUBREMOTE-IMU_DRIVER_QMI8658";
-
-// QMI8658 I2C address
-#ifndef QMI8658_ADDR
-    #define QMI8658_ADDR                0x6B
-#endif
 
 // #define QMI8658_L_SLAVE_ADDRESS                 (0x6B)
 // #define QMI8658_H_SLAVE_ADDRESS                 (0x6A)

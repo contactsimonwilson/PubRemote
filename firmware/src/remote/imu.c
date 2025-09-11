@@ -15,7 +15,7 @@
 
 static const char *TAG = "PUBREMOTE-IMU";
 
-void init_imu() {
+void imu_init() {
 #if IMU_ENABLED
   imu_driver_init();
 #endif

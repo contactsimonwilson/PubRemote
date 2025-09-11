@@ -2,6 +2,6 @@
 #define __IMU_H
 #include "imu/imu_driver.h"
 
-void init_imu();
+void imu_init();
 
 #endif

@@ -97,4 +97,9 @@
   #define HAPTIC_ENABLED 0
 #endif
 
+// QMI8658 I2C address
+#if defined(IMU_QMI8658) && !defined(QMI8658_ADDR)
+  #define QMI8658_ADDR 0x6B
+#endif
+
 #endif
