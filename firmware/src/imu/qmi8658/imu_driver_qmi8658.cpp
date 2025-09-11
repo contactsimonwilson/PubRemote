@@ -9,8 +9,7 @@
 
 static const char *TAG = "PUBREMOTE-IMU_DRIVER_QMI8658";
 
-// #define QMI8658_L_SLAVE_ADDRESS                 (0x6B)
-// #define QMI8658_H_SLAVE_ADDRESS                 (0x6A)
+// QMI8658 I2C address is either 0x6A or 0x6B depending on the state of the SA0 pin
 
 static SensorQMI8658 imu;
 static bool imu_initialized = false;
@@ -41,8 +40,8 @@ static esp_err_t qmi8658_init()
     // Enable pin configuration
     gpio_reset_pin((gpio_num_t)IMU_EN);
     gpio_set_direction((gpio_num_t)IMU_EN, GPIO_MODE_OUTPUT);
-    gpio_set_level((gpio_num_t)IMU_EN, 1); // Enable haptic driver power
-    ESP_LOGI(TAG, "Haptic enable pin configured and activated");
+    gpio_set_level((gpio_num_t)IMU_EN, 1); // Activate IMU enable pin
+    ESP_LOGI(TAG, "IMU enable pin configured and activated");
     
     // Small delay to allow power stabilization
     vTaskDelay(pdMS_TO_TICKS(50));
@@ -74,7 +73,7 @@ esp_err_t qmi8658_imu_driver_init() {
     return ESP_OK;
 }
 
-void drv2605_imu_driver_deinit() {
+void qmi8658_imu_driver_deinit() {
     ESP_LOGI(TAG, "Deinitializing QMI8658 IMU driver");
     
     imu.stop();

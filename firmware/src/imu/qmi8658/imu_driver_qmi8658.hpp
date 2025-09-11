@@ -8,9 +8,9 @@
 extern "C" {
 #endif
 
-esp_err_t qmi8658_imu_driver_init(void);
-void qmi8658_imu_driver_deinit(void);
-bool qmi8658_is_active(void);
+esp_err_t qmi8658_imu_driver_init();
+void qmi8658_imu_driver_deinit();
+bool qmi8658_is_active();
 
 #ifdef __cplusplus
 }
