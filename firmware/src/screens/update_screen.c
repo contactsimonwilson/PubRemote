@@ -71,6 +71,13 @@ static void update_status_label() {
   ESP_LOGI(TAG, "Updating status label for step %d", current_update_step);
   static char *wifi_ssid;
 
+  // Reset visibility
+  lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_clear_flag(ui_UpdateSecondaryActionButton, LV_OBJ_FLAG_HIDDEN);
+  lv_label_set_text(ui_UpdateSecondaryActionButtonLabel, "Cancel");
+  lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Next");
+  lv_label_set_text(ui_UpdateBodyLabel, "");
+
   if (current_update_step == UPDATE_STEP_UPDATE_AVAILABLE) {
     // Show dropdown
     lv_obj_clear_flag(ui_UpdateBodyDropdown, LV_OBJ_FLAG_HIDDEN);
@@ -84,21 +91,15 @@ static void update_status_label() {
   case UPDATE_STEP_START:
     wifi_ssid = get_wifi_ssid();
     lv_label_set_text_fmt(ui_UpdateBodyLabel, "Click next to connect to %s", wifi_ssid);
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     break;
   case UPDATE_STEP_CONNECTING:
     wifi_ssid = get_wifi_ssid();
     lv_label_set_text_fmt(ui_UpdateBodyLabel, "Connecting to %s...", wifi_ssid);
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     break;
   case UPDATE_STEP_CHECKING_UPDATE:
     lv_label_set_text(ui_UpdateBodyLabel, "Checking for updates...");
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_UPDATE_AVAILABLE:
     lv_label_set_text(ui_UpdateBodyLabel, "Choose update");
@@ -121,49 +122,35 @@ static void update_status_label() {
 
     lv_dropdown_set_options(ui_UpdateBodyDropdown, available_options);
     free(available_options);
-    lv_obj_clear_flag(ui_UpdateBodyDropdown, LV_OBJ_FLAG_GESTURE_BUBBLE); /// Flags
-
     // set change callback to change_update_selection
     lv_obj_add_event_cb(ui_UpdateBodyDropdown, change_update_selection, LV_EVENT_VALUE_CHANGED, NULL);
-
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_flex_align(ui_UpdateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     break;
   case UPDATE_STEP_NO_UPDATE:
     lv_label_set_text(ui_UpdateBodyLabel, "No updates available");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Exit");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UpdateSecondaryActionButton, LV_OBJ_FLAG_HIDDEN);
     break;
   case UPDATE_STEP_IN_PROGRESS:
     lv_label_set_text(ui_UpdateBodyLabel, "Downloading update...");
     lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
     break;
   case UPDATE_STEP_COMPLETE:
     lv_label_set_text(ui_UpdateBodyLabel, "Update complete");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Reboot");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UpdateSecondaryActionButton, LV_OBJ_FLAG_HIDDEN);
     break;
   case UPDATE_STEP_ERROR:
     lv_label_set_text(ui_UpdateBodyLabel, "An error occurred during the update process");
     lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Retry");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     break;
   case UPDATE_STEP_NO_WIFI:
     lv_label_set_text(ui_UpdateBodyLabel,
                       "No WiFi credentials found. Please configure them at https://pubmote.techfoundry.nz");
-    lv_label_set_text(ui_UpdatePrimaryActionButtonLabel, "Exit");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
+    lv_label_set_text(ui_UpdateSecondaryActionButtonLabel, "Exit");
     break;
   default:
     lv_label_set_text(ui_UpdateBodyLabel, "Unknown update step");
-    lv_obj_clear_flag(ui_UpdateBodyLabel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UpdatePrimaryActionButton, LV_OBJ_FLAG_HIDDEN);
     break;
   }
   resize_footer_buttons(ui_UpdateFooter); // Resize footer buttons
@@ -188,6 +175,11 @@ static void update_task(void *pvParameters) {
   UpdateStep last_step = current_update_step;
   char *wifi_ssid = get_wifi_ssid();
   char *wifi_password = get_wifi_password();
+
+  if (wifi_ssid == NULL || strlen(wifi_ssid) == 0 || wifi_password == NULL || strlen(wifi_password) == 0) {
+    current_update_step = UPDATE_STEP_NO_WIFI;
+  }
+
   update_status_label();
   while (is_update_screen_active()) {
     bool step_has_changed = (current_update_step != last_step);
@@ -202,10 +194,6 @@ static void update_task(void *pvParameters) {
 
     switch (current_update_step) {
     case UPDATE_STEP_START:
-      if (wifi_ssid == NULL || strlen(wifi_ssid) == 0) {
-        current_update_step = UPDATE_STEP_NO_WIFI;
-      }
-
       break;
     case UPDATE_STEP_CONNECTING:
       esp_err_t wifi_err = ESP_OK;
