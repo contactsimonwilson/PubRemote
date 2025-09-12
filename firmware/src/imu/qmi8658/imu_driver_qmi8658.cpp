@@ -1,3 +1,4 @@
+#include <cmath>
 #include "imu_driver_qmi8658.hpp"
 #include "esp_log.h"
 #include "esp_err.h"
@@ -22,10 +23,11 @@ static bool qmi8658_write_reg(uint8_t reg_addr, const uint8_t *data, size_t len)
     return (result == ESP_OK);
 }
 
-bool qmi8658_read_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t* data, size_t len) {
+static bool qmi8658_read_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t* data, size_t len) {
     esp_err_t result = i2c_read_with_mutex(device_addr, reg_addr, data, len, 500);
     return (result == ESP_OK);
 }
+
 static bool qmi8658_reg_cb(uint8_t addr, uint8_t reg, uint8_t *buf, size_t len, bool writeReg, bool isWrite) {
     if (isWrite) {
         return qmi8658_write_reg(reg, buf, len);
@@ -33,6 +35,79 @@ static bool qmi8658_reg_cb(uint8_t addr, uint8_t reg, uint8_t *buf, size_t len, 
         return qmi8658_read_reg(addr, reg, buf, len);
     }
 }
+
+static uint32_t hal_callback(SensorCommCustomHal::Operation op, void *param1, void *param2)
+{
+    switch (op) {
+        case SensorCommCustomHal::OP_PINMODE:
+        {
+            uint8_t pin = reinterpret_cast<uintptr_t>(param1);
+            uint8_t mode = reinterpret_cast<uintptr_t>(param2);
+            
+            // Convert Arduino pin modes to ESP-IDF GPIO modes
+            gpio_mode_t gpio_mode;
+            switch (mode) {
+                case 0: // INPUT
+                    gpio_mode = GPIO_MODE_INPUT;
+                    gpio_set_direction((gpio_num_t)pin, gpio_mode);
+                    gpio_set_pull_mode((gpio_num_t)pin, GPIO_PULLUP_ONLY);
+                    break;
+                case 1: // OUTPUT
+                    gpio_mode = GPIO_MODE_OUTPUT;
+                    gpio_set_direction((gpio_num_t)pin, gpio_mode);
+                    break;
+                case 2: // INPUT_PULLUP
+                    gpio_mode = GPIO_MODE_INPUT;
+                    gpio_set_direction((gpio_num_t)pin, gpio_mode);
+                    gpio_set_pull_mode((gpio_num_t)pin, GPIO_PULLUP_ONLY);
+                    break;
+                default:
+                    gpio_mode = GPIO_MODE_INPUT;
+                    gpio_set_direction((gpio_num_t)pin, gpio_mode);
+                    break;
+            }
+            break;
+        }
+        
+        case SensorCommCustomHal::OP_DIGITALWRITE:
+        {
+            uint8_t pin = reinterpret_cast<uintptr_t>(param1);
+            uint8_t level = reinterpret_cast<uintptr_t>(param2);
+            gpio_set_level((gpio_num_t)pin, level);
+            break;
+        }
+        
+        case SensorCommCustomHal::OP_DIGITALREAD:
+        {
+            uint8_t pin = reinterpret_cast<uintptr_t>(param1);
+            return gpio_get_level((gpio_num_t)pin);
+        }
+        
+        case SensorCommCustomHal::OP_MILLIS:
+            return (uint32_t)(esp_timer_get_time() / 1000);
+            
+        case SensorCommCustomHal::OP_DELAY:
+        {
+            if (param1) {
+                uint32_t ms = reinterpret_cast<uintptr_t>(param1);
+                vTaskDelay(pdMS_TO_TICKS(ms));
+            }
+            break;
+        }
+        
+        case SensorCommCustomHal::OP_DELAYMICROSECONDS:
+        {
+            uint32_t us = reinterpret_cast<uintptr_t>(param1);
+            esp_rom_delay_us(us);
+            break;
+        }
+        
+        default:
+            break;
+    }
+    return 0;
+}
+
 
 static esp_err_t qmi8658_init()
 {
@@ -48,7 +123,14 @@ static esp_err_t qmi8658_init()
     #endif
 
     // begin QMI8658 sensor
-    imu.begin(qmi8658_reg_cb);
+    bool success = imu.begin(qmi8658_reg_cb, hal_callback, QMI8658_ADDR);
+
+    if (!success) {
+        ESP_LOGE(TAG, "Failed to initialize QMI8658 sensor");
+        return ESP_FAIL;
+    }
+
+    ESP_LOGI(TAG, "QMI8658 I2C communication established. Device ID: 0x%02X", imu.getChipID());
 
     return ESP_OK;
 }
@@ -76,11 +158,11 @@ esp_err_t qmi8658_imu_driver_init() {
 void qmi8658_imu_driver_deinit() {
     ESP_LOGI(TAG, "Deinitializing QMI8658 IMU driver");
     
-    imu.stop();
+    imu.reset(false);
     imu_initialized = false;
     
     #ifdef IMU_EN
-    gpio_set_level((gpio_num_t)IMU_EN, 0); // Disable haptic driver power
+    gpio_set_level((gpio_num_t)IMU_EN, 0); // Disable IMU
     #endif
     
     ESP_LOGI(TAG, "QMI8658 IMU driver deinitialized");

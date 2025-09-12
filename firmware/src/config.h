@@ -92,9 +92,9 @@
 
 // IMU configuration
 #if defined(IMU_QMI8658) || defined(IMU_BHI260)
-  #define HAPTIC_ENABLED 1
+  #define IMU_ENABLED 1
 #else
-  #define HAPTIC_ENABLED 0
+  #define IMU_ENABLED 0
 #endif
 
 // QMI8658 I2C address

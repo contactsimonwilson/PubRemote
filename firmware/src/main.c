@@ -57,8 +57,8 @@ void app_main(void) {
 
   // Peripherals
   thumbstick_init();
-  display_init();
   imu_init();
+  display_init();
   vehicle_monitor_init();
 
   // Comms
