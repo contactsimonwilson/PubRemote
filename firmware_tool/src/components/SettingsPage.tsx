@@ -202,9 +202,9 @@ const SettingsPage: React.FC<unknown> = () => {
           <button
             onClick={() => {
               sendTerminalCommand(
-                `save_settings wifi_ssid ${
-                  settings.wifi_ssid ?? "/0"
-                } wifi_password ${settings.wifi_password ?? "/0"}`
+                `save_settings wifi_ssid "${
+                  settings.wifi_ssid ?? ""
+                }" wifi_password "${settings.wifi_password ?? ''}"`
               );
             }}
             disabled={disabled}
