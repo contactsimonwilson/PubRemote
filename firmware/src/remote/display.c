@@ -351,12 +351,13 @@ static void lv_touch_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
       }
 
       was_pressed = was_press;
+      i2c_unlock();
     }
     else {
       ESP_LOGE(TAG, "Original read callback is NULL");
+      i2c_unlock();
       return;
     }
-    i2c_unlock();
   }
 }
 
