@@ -38,6 +38,7 @@ static const char *TAG = "PUBREMOTE-MAIN";
 void app_main(void) {
   // Enable power for core peripherals
   acc1_power_set_level(1);
+  gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
   // Core setup
   init_i2c();
   settings_init();

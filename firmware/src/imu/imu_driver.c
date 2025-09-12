@@ -21,3 +21,19 @@ esp_err_t imu_driver_init() {
   return ESP_ERR_NOT_SUPPORTED;
 #endif
 }
+
+esp_err_t imu_driver_deinit() {
+#if IMU_QMI8658
+  qmi8658_imu_driver_deinit();
+  return ESP_OK;
+#endif
+  return ESP_ERR_NOT_SUPPORTED;
+}
+
+void imu_driver_get_data(imu_data_t *data) {
+#if IMU_QMI8658
+  qmi8658_get_data(data);
+#elif IMU_BHI260
+  // bhi260_get_data(data);
+#endif
+}

@@ -7,6 +7,7 @@
 #include "remote/i2c.h"
 #include <driver/gpio.h>
 #include "config.h"
+#include "imu/imu_datatypes.h"
 
 static const char *TAG = "PUBREMOTE-IMU_DRIVER_QMI8658";
 
@@ -14,8 +15,6 @@ static const char *TAG = "PUBREMOTE-IMU_DRIVER_QMI8658";
 
 static SensorQMI8658 imu;
 static bool imu_initialized = false;
-static IMUdata acc;
-static IMUdata gyr;
 
 static bool qmi8658_write_reg(uint8_t reg_addr, const uint8_t *data, size_t len)
 {
@@ -124,13 +123,32 @@ static esp_err_t qmi8658_init()
 
     // begin QMI8658 sensor
     bool success = imu.begin(qmi8658_reg_cb, hal_callback, QMI8658_ADDR);
-
     if (!success) {
         ESP_LOGE(TAG, "Failed to initialize QMI8658 sensor");
         return ESP_FAIL;
     }
-
     ESP_LOGI(TAG, "QMI8658 I2C communication established. Device ID: 0x%02X", imu.getChipID());
+
+    success = imu.enableAccelerometer();
+    if (!success) {
+        ESP_LOGE(TAG, "Failed to enable accelerometer");
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "Accelerometer enabled");
+
+    success = imu.enableGyroscope();
+    if (!success) {
+        ESP_LOGE(TAG, "Failed to enable gyroscope");
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "Gyroscope enabled");
+
+    success = imu.configWakeOnMotion();
+    if (!success) {
+        ESP_LOGE(TAG, "Failed to configure QMI8658 Wake-On-Motion");
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "QMI8658 Wake-On-Motion configured");
 
     return ESP_OK;
 }
@@ -141,6 +159,51 @@ bool qmi8658_is_active() {
     return  imu_initialized;
 }
 
+void qmi8658_get_data(imu_data_t *data) {
+    if (!imu_initialized) {
+        ESP_LOGW(TAG, "IMU not initialized");
+        return;
+    }
+
+    if (data == nullptr) {
+        ESP_LOGE(TAG, "Invalid data pointer");
+        return;
+    }
+
+    uint8_t status =  imu.getStatusRegister();
+
+    if (status) {
+    switch (status) {
+        case  SensorQMI8658::EVENT_WOM_MOTION:
+            data->event = IMU_EVENT_WOM_MOTION;
+            break;
+        case  SensorQMI8658::EVENT_TAP_MOTION:
+            data->event = IMU_EVENT_TAP;
+            break;
+        default:
+            data->event = IMU_EVENT_NONE;
+            break;
+    }
+} else {
+    data->event = IMU_EVENT_NONE;
+}
+
+    IMUdata acc, gyr;
+    // Read accelerometer data
+    imu.getAccelerometer(acc.x, acc.y, acc.z);
+    data->accel_x = acc.x;
+    data->accel_y = acc.y;
+    data->accel_z = acc.z;
+
+    // Read gyroscope data
+    imu.getGyroscope(gyr.x, gyr.y, gyr.z);
+    data->gyro_x = gyr.x;
+    data->gyro_y = gyr.y;
+    data->gyro_z = gyr.z;
+}
+
+
+
 esp_err_t qmi8658_imu_driver_init() {
     ESP_LOGI(TAG, "Initializing QMI8658 IMU driver");
     
@@ -150,6 +213,8 @@ esp_err_t qmi8658_imu_driver_init() {
         imu_initialized = false;
         return ret;
     }
+
+    imu_initialized = true;
     
     ESP_LOGI(TAG, "QMI8658 IMU driver initialized successfully");
     return ESP_OK;
