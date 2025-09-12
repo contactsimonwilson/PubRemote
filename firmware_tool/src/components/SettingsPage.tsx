@@ -6,7 +6,7 @@ import { LogListener } from "../services/espService";
 type SettingsState = {
   wifi_ssid: string;
   wifi_password: string;
-}
+};
 
 const DEFAULT_SETTINGS: SettingsState = {
   wifi_ssid: "",
@@ -27,7 +27,10 @@ const SettingsPage: React.FC<unknown> = () => {
   const [showWifiPassword, setshowWifiPassword] =
     React.useState<boolean>(false);
   const [settings, setSettings] = React.useState(DEFAULT_SETTINGS);
-  const disabled = !deviceInfo.connected || flashProgress.status !== "idle" || settingsIsLoading;
+  const disabled =
+    !deviceInfo.connected ||
+    flashProgress.status !== "idle" ||
+    settingsIsLoading;
 
   const retrieveSettings = React.useCallback(async (): Promise<
     Record<string, string>
@@ -201,11 +204,12 @@ const SettingsPage: React.FC<unknown> = () => {
           </button>
           <button
             onClick={() => {
-              sendTerminalCommand(
-                `save_settings wifi_ssid ${
-                  settings.wifi_ssid ?? "/0"
-                } wifi_password ${settings.wifi_password ?? "/0"}`
-              );
+              let saveValuesString = "save_settings";
+              Object.entries(settings).forEach(([key, value]) => {
+                saveValuesString += ` ${key} "${value}"`;
+              });
+
+              sendTerminalCommand(saveValuesString);
             }}
             disabled={disabled}
             className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
