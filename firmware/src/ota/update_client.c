@@ -174,6 +174,9 @@ esp_err_t fetch_all_asset_urls(const char *asset_name, github_asset_urls_t *resu
   esp_http_client_set_header(client, "Accept", "application/json");
   esp_http_client_set_header(client, "Content-Type", "application/json");
   esp_http_client_set_header(client, "User-Agent", "ESP32-GitHub-Client");
+#ifdef RELEASES_AUTH_TOKEN
+  esp_http_client_set_header(client, "Authorization", "Bearer " RELEASES_AUTH_TOKEN);
+#endif
   esp_http_client_set_post_field(client, GITHUB_ASSET_QUERY, strlen(GITHUB_ASSET_QUERY));
 
   esp_err_t err = esp_http_client_perform(client);
