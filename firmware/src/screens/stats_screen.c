@@ -1,15 +1,17 @@
 #include "screens/stats_screen.h"
+#include "core/lv_obj_event.h"
 #include "esp_log.h"
 #include "remote/display.h"
 #include "remote/vehicle_state.h"
 #include "utilities/screen_utils.h"
 #include <colors.h>
-#include <core/lv_event.h>
 #include <math.h>
 #include <remote/connection.h>
 #include <remote/settings.h>
 #include <remote/stats.h>
+#include <string.h>
 #include <utilities/conversion_utils.h>
+
 static const char *TAG = "PUBREMOTE-STATS_SCREEN";
 
 StatsScreenDisplayOptions stat_display_options = {
