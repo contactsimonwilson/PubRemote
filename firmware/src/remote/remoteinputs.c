@@ -10,6 +10,7 @@
 #include "iot_button.h"
 #include "powermanagement.h"
 #include "rom/gpio.h"
+#include "screens/stats_screen.h"
 #include "settings.h"
 #include "time.h"
 #include <freertos/FreeRTOS.h>
@@ -192,6 +193,12 @@ static void button_up_cb(void *arg, void *usr_data) {
 }
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
+
+  // If stats screen is active, open main menu
+  if (is_stats_screen_active()) {
+    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_MenuScreen_screen_init);
+  }
+
   reset_sleep_timer();
 }
 
