@@ -494,7 +494,7 @@ static void update_footpad_display() {
 }
 
 static void stats_update_screen_display() {
-  if (LVGL_lock(-1)) {
+  if (LVGL_lock(LV_DISP_DEF_REFR_PERIOD)) {
     if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
       lv_label_set_text(ui_PrimaryStatUnit, KILOMETERS_PER_HOUR_LABEL);
     }
