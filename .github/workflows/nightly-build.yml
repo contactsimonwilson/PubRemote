@@ -131,8 +131,8 @@ jobs:
         run: pio run
         env:
           PLATFORMIO_BUILD_FLAGS: >-
-            -D RELEASE_VARIANT=\"nightly\"
-            -D RELEASES_AUTH_TOKEN=\"${{ secrets.RELEASES_AUTH_TOKEN }}\"
+            -D RELEASE_VARIANT=\"nightly\" 
+            -D RELEASES_AUTH_TOKEN=\"${{ secrets.RELEASES_AUTH_TOKEN }}\" 
 
       - name: Get Current Date
         id: get_date

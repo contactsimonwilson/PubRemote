@@ -42,5 +42,5 @@ jobs:
         run: pio run -e leafblaster_esp32s3_touch_amoled_143_co5300
         env:
           PLATFORMIO_BUILD_FLAGS: >-
-            -D RELEASE_VARIANT=\"release\"
-            -D RELEASES_AUTH_TOKEN=\"${{ secrets.RELEASES_AUTH_TOKEN }}\"
+            -D RELEASE_VARIANT=\"release\" 
+            -D RELEASES_AUTH_TOKEN=\"${{ secrets.RELEASES_AUTH_TOKEN }}\" 
