@@ -36,7 +36,8 @@ def zip_build_files(source, target, env):
         
         # Only process flags that start with our allowed prefixes
         for allowed_flag in ALLOWED_FLAGS.keys():
-            # Only check the two formats you want: -DFLAG= and -D FLAG=
+            # ONLY check the two formats you want: -DFLAG= and -D FLAG=
+            # Do NOT match flags without -D prefix to prevent secrets leakage
             if flag_str.startswith(f"-D{allowed_flag}=") or flag_str.startswith(f"-D {allowed_flag}="):
                 # Extract the value after the equals sign
                 if "=" in flag_str:
