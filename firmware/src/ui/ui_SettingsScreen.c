@@ -12,9 +12,15 @@ lv_obj_t * ui_SettingsBody = NULL;
 lv_obj_t * ui_BrightnessBody = NULL;
 lv_obj_t * ui_BrightnessSlider = NULL;
 lv_obj_t * ui_BrightnessLabel = NULL;
-lv_obj_t * ui_ActionsBody = NULL;
+lv_obj_t * ui_SinglePressActionsBody = NULL;
+lv_obj_t * ui_SinglePressAction = NULL;
+lv_obj_t * ui_SinglePressActionLabel = NULL;
+lv_obj_t * ui_DoublePressActionsBody = NULL;
 lv_obj_t * ui_DoublePressAction = NULL;
-lv_obj_t * ui_ActionsLabel = NULL;
+lv_obj_t * ui_DoublePressActionLabel = NULL;
+lv_obj_t * ui_LongPressActionsBody = NULL;
+lv_obj_t * ui_LongPressAction = NULL;
+lv_obj_t * ui_LongPressActionLabel = NULL;
 lv_obj_t * ui_RotationBody = NULL;
 lv_obj_t * ui_Rotation = NULL;
 lv_obj_t * ui_RotationLabel = NULL;
@@ -64,12 +70,30 @@ void ui_event_BrightnessSlider(lv_event_t * e)
     }
 }
 
+void ui_event_SinglePressAction(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        single_press_action_select_change(e);
+    }
+}
+
 void ui_event_DoublePressAction(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_VALUE_CHANGED) {
         double_press_action_select_change(e);
+    }
+}
+
+void ui_event_LongPressAction(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        long_press_action_select_change(e);
     }
 }
 
@@ -229,26 +253,71 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_align(ui_BrightnessLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_BrightnessLabel, "Screen brightness");
 
-    ui_ActionsBody = lv_obj_create(ui_SettingsBody);
-    lv_obj_remove_style_all(ui_ActionsBody);
-    lv_obj_set_width(ui_ActionsBody, lv_pct(100));
-    lv_obj_set_height(ui_ActionsBody, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_ActionsBody, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_ActionsBody, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_ActionsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_ActionsBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
-    lv_obj_clear_flag(ui_ActionsBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
-                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_style_pad_left(ui_ActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_ActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_ActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_ActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_row(ui_ActionsBody, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_ActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_SinglePressActionsBody = lv_obj_create(ui_SettingsBody);
+    lv_obj_remove_style_all(ui_SinglePressActionsBody);
+    lv_obj_set_width(ui_SinglePressActionsBody, lv_pct(100));
+    lv_obj_set_height(ui_SinglePressActionsBody, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_SinglePressActionsBody, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_SinglePressActionsBody, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_SinglePressActionsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SinglePressActionsBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_clear_flag(ui_SinglePressActionsBody,
+                      LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE |
+                      LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    lv_obj_set_style_pad_left(ui_SinglePressActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_SinglePressActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_SinglePressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_SinglePressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_SinglePressActionsBody, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_SinglePressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_DoublePressAction = lv_dropdown_create(ui_ActionsBody);
-    lv_dropdown_set_options(ui_DoublePressAction, "None\nOpen menu\nDim display");
+    ui_SinglePressAction = lv_dropdown_create(ui_SinglePressActionsBody);
+    lv_dropdown_set_options(ui_SinglePressAction,
+                            "None\nShutdown\nOpen menu\nDim display\nToggle pocket mode\nCycle secondary stat\nBoard battery display");
+    lv_obj_set_width(ui_SinglePressAction, lv_pct(100));
+    lv_obj_set_height(ui_SinglePressAction, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_SinglePressAction, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SinglePressAction, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_SinglePressAction, LV_OBJ_FLAG_GESTURE_BUBBLE);      /// Flags
+    lv_obj_set_style_text_font(ui_SinglePressAction, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(ui_SinglePressAction, &lv_font_montserrat_14, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_SinglePressAction), &ui_font_Inter_14,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_SinglePressAction), &ui_font_Inter_14,
+                               LV_PART_SELECTED | LV_STATE_DEFAULT);
+
+    ui_SinglePressActionLabel = lv_label_create(ui_SinglePressActionsBody);
+    lv_obj_set_width(ui_SinglePressActionLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_SinglePressActionLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_SinglePressActionLabel, 19);
+    lv_obj_set_y(ui_SinglePressActionLabel, 38);
+    lv_obj_set_align(ui_SinglePressActionLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_SinglePressActionLabel, "Single-press action");
+
+    ui_DoublePressActionsBody = lv_obj_create(ui_SettingsBody);
+    lv_obj_remove_style_all(ui_DoublePressActionsBody);
+    lv_obj_set_width(ui_DoublePressActionsBody, lv_pct(100));
+    lv_obj_set_height(ui_DoublePressActionsBody, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_DoublePressActionsBody, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_DoublePressActionsBody, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_DoublePressActionsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_DoublePressActionsBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_clear_flag(ui_DoublePressActionsBody,
+                      LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE |
+                      LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    lv_obj_set_style_pad_left(ui_DoublePressActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_DoublePressActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_DoublePressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_DoublePressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_DoublePressActionsBody, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_DoublePressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_DoublePressAction = lv_dropdown_create(ui_DoublePressActionsBody);
+    lv_dropdown_set_options(ui_DoublePressAction,
+                            "None\nShutdown\nOpen menu\nDim display\nToggle pocket mode\nCycle secondary stat\nBoard battery display");
     lv_obj_set_width(ui_DoublePressAction, lv_pct(100));
     lv_obj_set_height(ui_DoublePressAction, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_DoublePressAction, LV_ALIGN_CENTER);
@@ -264,13 +333,57 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_set_style_text_font(lv_dropdown_get_list(ui_DoublePressAction), &ui_font_Inter_14,
                                LV_PART_SELECTED | LV_STATE_DEFAULT);
 
-    ui_ActionsLabel = lv_label_create(ui_ActionsBody);
-    lv_obj_set_width(ui_ActionsLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_ActionsLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_ActionsLabel, 19);
-    lv_obj_set_y(ui_ActionsLabel, 38);
-    lv_obj_set_align(ui_ActionsLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_ActionsLabel, "Double-press action");
+    ui_DoublePressActionLabel = lv_label_create(ui_DoublePressActionsBody);
+    lv_obj_set_width(ui_DoublePressActionLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_DoublePressActionLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_DoublePressActionLabel, 19);
+    lv_obj_set_y(ui_DoublePressActionLabel, 38);
+    lv_obj_set_align(ui_DoublePressActionLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_DoublePressActionLabel, "Double-press action");
+
+    ui_LongPressActionsBody = lv_obj_create(ui_SettingsBody);
+    lv_obj_remove_style_all(ui_LongPressActionsBody);
+    lv_obj_set_width(ui_LongPressActionsBody, lv_pct(100));
+    lv_obj_set_height(ui_LongPressActionsBody, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_LongPressActionsBody, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_LongPressActionsBody, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_LongPressActionsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(ui_LongPressActionsBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
+    lv_obj_clear_flag(ui_LongPressActionsBody,
+                      LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE |
+                      LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    lv_obj_set_style_pad_left(ui_LongPressActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_LongPressActionsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_LongPressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_LongPressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_row(ui_LongPressActionsBody, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_column(ui_LongPressActionsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_LongPressAction = lv_dropdown_create(ui_LongPressActionsBody);
+    lv_dropdown_set_options(ui_LongPressAction,
+                            "None\nShutdown\nOpen menu\nDim display\nToggle pocket mode\nCycle secondary stat\nBoard battery display");
+    lv_obj_set_width(ui_LongPressAction, lv_pct(100));
+    lv_obj_set_height(ui_LongPressAction, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_LongPressAction, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_LongPressAction, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_LongPressAction, LV_OBJ_FLAG_GESTURE_BUBBLE);      /// Flags
+    lv_obj_set_style_text_font(ui_LongPressAction, &ui_font_Inter_Bold_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(ui_LongPressAction, &lv_font_montserrat_14, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_LongPressAction), &ui_font_Inter_14,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_LongPressAction), &ui_font_Inter_14,
+                               LV_PART_SELECTED | LV_STATE_DEFAULT);
+
+    ui_LongPressActionLabel = lv_label_create(ui_LongPressActionsBody);
+    lv_obj_set_width(ui_LongPressActionLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LongPressActionLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LongPressActionLabel, 19);
+    lv_obj_set_y(ui_LongPressActionLabel, 38);
+    lv_obj_set_align(ui_LongPressActionLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LongPressActionLabel, "Long press action");
 
     ui_RotationBody = lv_obj_create(ui_SettingsBody);
     lv_obj_remove_style_all(ui_RotationBody);
@@ -570,7 +683,9 @@ void ui_SettingsScreen_screen_init(void)
     lv_label_set_text(ui_SettingsMainActionButtonLabel, "Save");
 
     lv_obj_add_event_cb(ui_BrightnessSlider, ui_event_BrightnessSlider, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SinglePressAction, ui_event_SinglePressAction, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_DoublePressAction, ui_event_DoublePressAction, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_LongPressAction, ui_event_LongPressAction, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Rotation, ui_event_Rotation, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_AutoOffTime, ui_event_AutoOffTime, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_TempUnits, ui_event_TempUnits, LV_EVENT_ALL, NULL);
@@ -595,9 +710,15 @@ void ui_SettingsScreen_screen_destroy(void)
     ui_BrightnessBody = NULL;
     ui_BrightnessSlider = NULL;
     ui_BrightnessLabel = NULL;
-    ui_ActionsBody = NULL;
+    ui_SinglePressActionsBody = NULL;
+    ui_SinglePressAction = NULL;
+    ui_SinglePressActionLabel = NULL;
+    ui_DoublePressActionsBody = NULL;
     ui_DoublePressAction = NULL;
-    ui_ActionsLabel = NULL;
+    ui_DoublePressActionLabel = NULL;
+    ui_LongPressActionsBody = NULL;
+    ui_LongPressAction = NULL;
+    ui_LongPressActionLabel = NULL;
     ui_RotationBody = NULL;
     ui_Rotation = NULL;
     ui_RotationLabel = NULL;

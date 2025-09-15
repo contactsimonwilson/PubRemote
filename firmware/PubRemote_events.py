@@ -282,3 +282,11 @@ def double_press_action_select_change(event_struct):
 def stats_screen_gesture_down(event_struct):
     return
 
+
+def single_press_action_select_change(event_struct):
+    return
+
+
+def long_press_action_select_change(event_struct):
+    return
+

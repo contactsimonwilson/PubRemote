@@ -16,10 +16,14 @@ bool is_pairing_screen_active() {
 // Event handlers
 void pairing_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Pairing screen load start");
+
   led_set_effect_rainbow();
+
   if (LVGL_lock(0)) {
     apply_ui_scale(NULL);
+
     create_navigation_group(ui_PairingFooter);
+
     LVGL_unlock();
   }
 }
