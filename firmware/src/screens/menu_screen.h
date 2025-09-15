@@ -4,6 +4,7 @@
 
 bool is_menu_screen_active();
 
+void toggle_pocket_mode();
 void add_main_menu_navigation_buttons(lv_obj_t *body_item);
 void menu_screen_load_start(lv_event_t *e);
 void menu_screen_loaded(lv_event_t *e);
