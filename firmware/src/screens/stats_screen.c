@@ -542,10 +542,30 @@ void stats_screen_load_start(lv_event_t *e) {
   stats_register_update_cb(stats_update_screen_display);
 }
 
+static bool display_dimmed = false;
+
 static bool double_press_handler() {
+  // Open menu
   if (device_settings.double_press_action == DOUBLE_PRESS_ACTION_OPEN_MENU) {
     // Open the main menu
-    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_MenuScreen_screen_init);
+    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_MenuScreen_screen_init);
+  }
+
+  // Dim display
+  else if (device_settings.double_press_action == DOUBLE_PRESS_ACTION_TOGGLE_DISPLAY) {
+    if (display_dimmed) {
+      display_set_bl_level(device_settings.bl_level);
+      display_dimmed = false;
+    }
+    else {
+      display_set_bl_level(0);
+      display_dimmed = true;
+    }
+  }
+
+  // No action assigned
+  else {
+    return false;
   }
 
   return true;
@@ -562,6 +582,19 @@ void stats_screen_loaded(lv_event_t *e) {
   }
 }
 
+void stats_screen_gesture_down(lv_event_t *e) {
+  // Go to menu screen if the display is not dimmed
+  if (!display_dimmed) {
+    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_MenuScreen_screen_init);
+  }
+
+  // Otherwise, light the display
+  else {
+    display_set_bl_level(device_settings.bl_level);
+    display_dimmed = false;
+  }
+}
+
 void stats_screen_unload_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen unload start");
   stats_unregister_update_cb(stats_update_screen_display);
@@ -569,17 +602,45 @@ void stats_screen_unload_start(lv_event_t *e) {
 }
 
 void stat_long_press(lv_event_t *e) {
-  change_stat_display(1);
+  if (!display_dimmed) {
+    change_stat_display(1);
+  }
+
+  else {
+    display_set_bl_level(device_settings.bl_level);
+    display_dimmed = false;
+  }
 }
 
 void stat_swipe_left(lv_event_t *e) {
-  change_stat_display(1);
+  if (!display_dimmed) {
+    change_stat_display(1);
+  }
+
+  else {
+    display_set_bl_level(device_settings.bl_level);
+    display_dimmed = false;
+  }
 }
 
 void stat_swipe_right(lv_event_t *e) {
-  change_stat_display(-1);
+  if (!display_dimmed) {
+    change_stat_display(-1);
+  }
+
+  else {
+    display_set_bl_level(device_settings.bl_level);
+    display_dimmed = false;
+  }
 }
 
 void stats_footer_long_press(lv_event_t *e) {
-  change_board_battery_display();
+  if (!display_dimmed) {
+    change_board_battery_display();
+  }
+
+  else {
+    display_set_bl_level(device_settings.bl_level);
+    display_dimmed = false;
+  }
 }

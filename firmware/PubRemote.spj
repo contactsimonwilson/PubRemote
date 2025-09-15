@@ -6579,50 +6579,39 @@
                 "InheritedType": 10
               },
               {
-                "nid": -1951197010,
+                "nid": 1000429,
                 "strtype": "_event/action",
-                "strval": "CHANGE SCREEN",
+                "strval": "CALL FUNCTION",
                 "childs": [
                   {
-                    "nid": -350846453,
-                    "strtype": "CHANGE SCREEN/Name",
-                    "strval": "CHANGE SCREEN",
+                    "nid": 1000430,
+                    "strtype": "CALL FUNCTION/Name",
+                    "strval": "CALL FUNCTION",
                     "InheritedType": 10
                   },
                   {
-                    "nid": 289002282,
-                    "strtype": "CHANGE SCREEN/Call",
-                    "strval": "ChangeScreen( <{Screen_to}>, lv.SCR_LOAD_ANIM.<{Fade_mode}>, <{Speed}>, <{Delay}>)",
+                    "nid": 1000431,
+                    "strtype": "CALL FUNCTION/Call",
+                    "strval": "<{Function_name}>( event_struct )",
                     "InheritedType": 10
                   },
                   {
-                    "nid": -1932362503,
-                    "strtype": "CHANGE SCREEN/CallC",
-                    "strval": "_ui_screen_change( &<{Screen_to}>, LV_SCR_LOAD_ANIM_<{Fade_mode}>, <{Speed}>, <{Delay}>, &<{Screen_to}>_screen_init);",
+                    "nid": 1000432,
+                    "strtype": "CALL FUNCTION/CallC",
+                    "strval": "<{Function_name}>( e );",
                     "InheritedType": 10
                   },
                   {
-                    "nid": 1957923584,
-                    "strtype": "CHANGE SCREEN/Screen_to",
-                    "strval": "GUID96807463-926932S376370",
-                    "InheritedType": 9
+                    "nid": 1000433,
+                    "strtype": "CALL FUNCTION/Function_name",
+                    "strval": "stats_screen_gesture_down",
+                    "InheritedType": 10
                   },
                   {
-                    "nid": 555489659,
-                    "strtype": "CHANGE SCREEN/Fade_mode",
-                    "strval": "OVER_BOTTOM",
-                    "InheritedType": 3
-                  },
-                  {
-                    "nid": -2005820167,
-                    "strtype": "CHANGE SCREEN/Speed",
-                    "integer": 200,
-                    "InheritedType": 6
-                  },
-                  {
-                    "nid": -328810422,
-                    "strtype": "CHANGE SCREEN/Delay",
-                    "InheritedType": 6
+                    "nid": 1000434,
+                    "strtype": "CALL FUNCTION/Dont_export_function",
+                    "strval": "True",
+                    "InheritedType": 2
                   }
                 ],
                 "InheritedType": 10
@@ -11275,7 +11264,7 @@
                           {
                             "nid": 1363302350,
                             "strtype": "DROPDOWN/Options",
-                            "strval": "None\\nOpen menu",
+                            "strval": "None\\nOpen menu\\nDim display",
                             "InheritedType": 10
                           },
                           {
@@ -11813,8 +11802,7 @@
                         "InheritedType": 11
                       }
                     ],
-                    "saved_objtypeKey": "CONTAINER",
-                    "tree_closed": true
+                    "saved_objtypeKey": "CONTAINER"
                   },
                   {
                     "guid": "GUID88300006-837294S310452",
@@ -29745,7 +29733,7 @@
     "uiExportFolderPath": "...\\src\\ui",
     "projectExportFolderPath": ".../",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 1438,
+    "backup_cnt": 1439,
     "autosave_cnt": 0,
     "group_color_cnt": 0,
     "lvgl_version": "8.3.11",
@@ -29763,7 +29751,7 @@
     "naming": "Name",
     "naming_force_lowercase": false,
     "naming_add_subcomponent": false,
-    "nidcnt": 1000429,
+    "nidcnt": 1000435,
     "BitDepth": 16,
     "Name": "SquareLine_Project"
   }
