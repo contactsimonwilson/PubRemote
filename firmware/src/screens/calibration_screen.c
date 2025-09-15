@@ -269,7 +269,9 @@ void calibration_screen_load_start(lv_event_t *e) {
 
   if (LVGL_lock(0)) {
     apply_ui_scale(NULL);
+
     create_navigation_group(ui_CalibrationFooter);
+
     LVGL_unlock();
   }
   update_calibration_screen();

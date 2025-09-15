@@ -21,16 +21,13 @@ void stats_footer_long_press(lv_event_t * e);
 void menu_screen_loaded(lv_event_t * e);
 void menu_screen_unload_start(lv_event_t * e);
 void menu_screen_load_start(lv_event_t * e);
-void menu_connect_press(lv_event_t * e);
-void menu_pocket_mode_press(lv_event_t * e);
-void shutdown_button_press(lv_event_t * e);
-void shutdown_button_long_press(lv_event_t * e);
-void shutdown_button_down(lv_event_t * e);
 void settings_screen_loaded(lv_event_t * e);
 void settings_screen_unload_start(lv_event_t * e);
 void settings_screen_load_start(lv_event_t * e);
 void brightness_slider_change(lv_event_t * e);
+void single_press_action_select_change(lv_event_t * e);
 void double_press_action_select_change(lv_event_t * e);
+void long_press_action_select_change(lv_event_t * e);
 void screen_rotation_change(lv_event_t * e);
 void auto_off_select_change(lv_event_t * e);
 void temp_units_select_change(lv_event_t * e);
@@ -56,9 +53,6 @@ void update_screen_load_start(lv_event_t * e);
 void update_screen_unload_start(lv_event_t * e);
 void update_secondary_button_press(lv_event_t * e);
 void update_primary_button_press(lv_event_t * e);
-void charge_screen_load_start(lv_event_t * e);
-void charge_screen_loaded(lv_event_t * e);
-void charge_screen_unload_start(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

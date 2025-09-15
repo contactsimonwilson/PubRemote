@@ -8,6 +8,7 @@
 #include <core/lv_event.h>
 #include <math.h>
 #include <remote/connection.h>
+#include <remote/powermanagement.h>
 #include <remote/settings.h>
 #include <remote/stats.h>
 #include <utilities/conversion_utils.h>
@@ -544,15 +545,25 @@ void stats_screen_load_start(lv_event_t *e) {
 
 static bool display_dimmed = false;
 
-static bool double_press_handler() {
+static bool handle_button_action(StatsButtonPressAction action) {
+  // No action assigned
+  if (action == BUTTON_PRESS_ACTION_NONE) {
+    return false;
+  }
+
+  // Shutdown
+  else if (action == BUTTON_PRESS_ACTION_SHUTDOWN) {
+    enter_sleep();
+  }
+
   // Open menu
-  if (device_settings.double_press_action == DOUBLE_PRESS_ACTION_OPEN_MENU) {
+  else if (action == BUTTON_PRESS_ACTION_OPEN_MENU) {
     // Open the main menu
     _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_MenuScreen_screen_init);
   }
 
   // Dim display
-  else if (device_settings.double_press_action == DOUBLE_PRESS_ACTION_TOGGLE_DISPLAY) {
+  else if (action == BUTTON_PRESS_ACTION_TOGGLE_DISPLAY) {
     if (display_dimmed) {
       display_set_bl_level(device_settings.bl_level);
       display_dimmed = false;
@@ -563,35 +574,41 @@ static bool double_press_handler() {
     }
   }
 
-  // No action assigned
-  else {
-    return false;
+  // Cycle secondary stat
+  else if (action == BUTTON_PRESS_ACTION_CYCLE_SECONDARY_STAT) {
+    change_stat_display(1);
+  }
+
+  // Cycle board battery display
+  else if (action == BUTTON_PRESS_ACTION_CYCLE_BOARD_BATTERY_DISPLAY) {
+    change_board_battery_display();
   }
 
   return true;
 }
 
+static bool single_press_handler() {
+  return handle_button_action(device_settings.single_press_action);
+}
+
+static bool double_press_handler() {
+  return handle_button_action(device_settings.double_press_action);
+}
+
+static bool long_press_handler() {
+  return handle_button_action(device_settings.long_press_action);
+}
+
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
   stats_update_screen_display();
+  register_primary_button_cb(BUTTON_EVENT_PRESS, single_press_handler);
   register_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS, double_press_handler);
+  register_primary_button_cb(BUTTON_EVENT_LONG_PRESS_HOLD, long_press_handler);
 
   if (LVGL_lock(-1)) {
     lv_obj_set_scroll_snap_x(ui_SecondaryStatContainer, LV_SCROLL_SNAP_CENTER);
     LVGL_unlock();
-  }
-}
-
-void stats_screen_gesture_down(lv_event_t *e) {
-  // Go to menu screen if the display is not dimmed
-  if (!display_dimmed) {
-    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_MenuScreen_screen_init);
-  }
-
-  // Otherwise, light the display
-  else {
-    display_set_bl_level(device_settings.bl_level);
-    display_dimmed = false;
   }
 }
 
@@ -601,46 +618,46 @@ void stats_screen_unload_start(lv_event_t *e) {
   unregister_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS);
 }
 
-void stat_long_press(lv_event_t *e) {
-  if (!display_dimmed) {
-    change_stat_display(1);
-  }
-
-  else {
+bool proceed_with_gesture() {
+  // If the display is dimmed, light it and ignore the gesture
+  if (display_dimmed) {
     display_set_bl_level(device_settings.bl_level);
     display_dimmed = false;
+    return false;
+  }
+
+  // Otherwise, proceed with the gesture
+  else {
+    return true;
+  }
+}
+
+void stats_screen_gesture_down(lv_event_t *e) {
+  if (proceed_with_gesture()) {
+    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 0, &ui_MenuScreen_screen_init);
+  }
+}
+
+void stat_long_press(lv_event_t *e) {
+  if (proceed_with_gesture()) {
+    change_stat_display(1);
   }
 }
 
 void stat_swipe_left(lv_event_t *e) {
-  if (!display_dimmed) {
+  if (proceed_with_gesture()) {
     change_stat_display(1);
-  }
-
-  else {
-    display_set_bl_level(device_settings.bl_level);
-    display_dimmed = false;
   }
 }
 
 void stat_swipe_right(lv_event_t *e) {
-  if (!display_dimmed) {
+  if (proceed_with_gesture()) {
     change_stat_display(-1);
-  }
-
-  else {
-    display_set_bl_level(device_settings.bl_level);
-    display_dimmed = false;
   }
 }
 
 void stats_footer_long_press(lv_event_t *e) {
-  if (!display_dimmed) {
+  if (proceed_with_gesture()) {
     change_board_battery_display();
-  }
-
-  else {
-    display_set_bl_level(device_settings.bl_level);
-    display_dimmed = false;
   }
 }

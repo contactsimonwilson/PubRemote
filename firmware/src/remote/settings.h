@@ -86,10 +86,14 @@ typedef enum {
 } PocketModeOptions;
 
 typedef enum {
-  DOUBLE_PRESS_ACTION_NONE,
-  DOUBLE_PRESS_ACTION_OPEN_MENU,
-  DOUBLE_PRESS_ACTION_TOGGLE_DISPLAY,
-} StatsDoublePressAction;
+  BUTTON_PRESS_ACTION_NONE,
+  BUTTON_PRESS_ACTION_SHUTDOWN,
+  BUTTON_PRESS_ACTION_OPEN_MENU,
+  BUTTON_PRESS_ACTION_TOGGLE_DISPLAY,
+  BUTTON_PRESS_ACTION_TOGGLE_POCKET_MODE,
+  BUTTON_PRESS_ACTION_CYCLE_SECONDARY_STAT,
+  BUTTON_PRESS_ACTION_CYCLE_BOARD_BATTERY_DISPLAY,
+} StatsButtonPressAction;
 
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
@@ -122,7 +126,9 @@ typedef struct {
   bool dark_text;
   BoardBatteryDisplayOption battery_display;
   PocketModeOptions pocket_mode;
-  StatsDoublePressAction double_press_action;
+  StatsButtonPressAction single_press_action;
+  StatsButtonPressAction double_press_action;
+  StatsButtonPressAction long_press_action;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();

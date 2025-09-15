@@ -62,6 +62,7 @@ void about_screen_load_start(lv_event_t *e) {
 
   if (LVGL_lock(0)) {
     apply_ui_scale(NULL);
+
     update_version_info_label();
     update_battery_percentage_label();
     lv_obj_add_event_cb(ui_AboutBody, paged_scroll_event_cb, LV_EVENT_SCROLL, ui_AboutHeader);

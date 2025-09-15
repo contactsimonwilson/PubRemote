@@ -356,6 +356,7 @@ void resize_footer_buttons(lv_obj_t *footer) {
   lv_coord_t button_width = lv_obj_get_width(footer) / button_count;
 
   uint32_t final_button_count = 0;
+
   // Resize each button
   for (uint32_t i = 0; i < button_count; i++) {
     lv_obj_t *button = lv_obj_get_child(footer, i);

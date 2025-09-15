@@ -15,6 +15,7 @@ bool is_settings_screen_active() {
 // Event handlers
 void settings_screen_load_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Settings screen load start");
+
   if (LVGL_lock(-1)) {
     apply_ui_scale(NULL);
 
@@ -25,8 +26,14 @@ void settings_screen_load_start(lv_event_t *e) {
     // Brightness
     lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
 
+    // Single press action
+    lv_dropdown_set_selected(ui_SinglePressAction, device_settings.single_press_action);
+
     // Double press action
     lv_dropdown_set_selected(ui_DoublePressAction, device_settings.double_press_action);
+
+    // Long press action
+    lv_dropdown_set_selected(ui_LongPressAction, device_settings.long_press_action);
 
     // Screen rotation
     lv_dropdown_set_selected(ui_Rotation, device_settings.screen_rotation);
@@ -75,9 +82,19 @@ void brightness_slider_change(lv_event_t *e) {
   display_set_bl_level(device_settings.bl_level);
 }
 
+void single_press_action_select_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_SinglePressAction);
+  device_settings.single_press_action = (StatsButtonPressAction)(val & 0xFF);
+}
+
 void double_press_action_select_change(lv_event_t *e) {
   int val = lv_dropdown_get_selected(ui_DoublePressAction);
-  device_settings.double_press_action = (StatsDoublePressAction)(val & 0xFF);
+  device_settings.double_press_action = (StatsButtonPressAction)(val & 0xFF);
+}
+
+void long_press_action_select_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_LongPressAction);
+  device_settings.long_press_action = (StatsButtonPressAction)(val & 0xFF);
 }
 
 void auto_off_select_change(lv_event_t *e) {
