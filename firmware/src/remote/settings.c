@@ -23,7 +23,7 @@ static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 static const DarkTextOptions DEFAULT_DARK_TEXT = DARK_TEXT_DISABLED;
 static const BoardBatteryDisplayOption DEFAULT_BATTERY_DISPLAY = BATTERY_DISPLAY_PERCENT;
 static const PocketModeOptions DEFAULT_POCKET_MODE = POCKET_MODE_DISABLED;
-static const StatsDoublePressAction DEFAULT_DOUBLE_PRESS_ACTION = DOUBLE_PRESS_ACTION_NONE;
+static const StatsDoublePressAction DEFAULT_DOUBLE_PRESS_ACTION = DOUBLE_PRESS_ACTION_OPEN_MENU;
 
 DeviceSettings device_settings = {
     .bl_level = BL_LEVEL_DEFAULT,
