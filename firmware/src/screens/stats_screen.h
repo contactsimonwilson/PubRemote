@@ -4,14 +4,20 @@
 
 typedef enum {
   STAT_DISPLAY_SPEED,
+  // STAT_DISPLAY_DUTY,
+  // STAT_DISPLAY_POWER,
+  // STAT_DISPLAY_TEMP,
+} PrimaryStatDisplayOption;
+
+typedef enum {
   STAT_DISPLAY_DUTY,
-  STAT_DISPLAY_POWER,
   STAT_DISPLAY_TEMP,
-} StatsDisplayOption;
+  STAT_DISPLAY_TRIP,
+} SecondaryStatDisplayOption;
 
 typedef struct {
-  StatsDisplayOption primary_stat;
-  StatsDisplayOption secondary_stat;
+  PrimaryStatDisplayOption primary_stat;
+  SecondaryStatDisplayOption secondary_stat;
 } StatsScreenDisplayOptions;
 
 typedef enum {

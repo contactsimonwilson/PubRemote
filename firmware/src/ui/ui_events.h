@@ -14,9 +14,12 @@ void stats_screen_gesture_down(lv_event_t * e);
 void stats_screen_loaded(lv_event_t * e);
 void stats_screen_unload_start(lv_event_t * e);
 void stats_screen_load_start(lv_event_t * e);
-void stat_long_press(lv_event_t * e);
-void stat_swipe_left(lv_event_t * e);
-void stat_swipe_right(lv_event_t * e);
+void primary_stat_long_press(lv_event_t * e);
+void primary_stat_swipe_left(lv_event_t * e);
+void primary_stat_swipe_right(lv_event_t * e);
+void secondary_stat_long_press(lv_event_t * e);
+void secondary_stat_swipe_left(lv_event_t * e);
+void secondary_stat_swipe_right(lv_event_t * e);
 void stats_footer_long_press(lv_event_t * e);
 void menu_screen_loaded(lv_event_t * e);
 void menu_screen_unload_start(lv_event_t * e);
@@ -53,6 +56,9 @@ void update_screen_load_start(lv_event_t * e);
 void update_screen_unload_start(lv_event_t * e);
 void update_secondary_button_press(lv_event_t * e);
 void update_primary_button_press(lv_event_t * e);
+void charge_screen_load_start(lv_event_t * e);
+void charge_screen_loaded(lv_event_t * e);
+void charge_screen_unload_start(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

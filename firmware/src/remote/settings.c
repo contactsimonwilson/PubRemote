@@ -23,7 +23,7 @@ static const uint8_t DEFAULT_PEER_ADDR[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 static const DarkTextOptions DEFAULT_DARK_TEXT = DARK_TEXT_DISABLED;
 static const BoardBatteryDisplayOption DEFAULT_BATTERY_DISPLAY = BATTERY_DISPLAY_PERCENT;
 static const PocketModeOptions DEFAULT_POCKET_MODE = POCKET_MODE_DISABLED;
-static const StatsButtonPressAction DEFAULT_SINGLE_PRESS_ACTION = BUTTON_PRESS_ACTION_NONE;
+static const StatsButtonPressAction DEFAULT_SINGLE_PRESS_ACTION = BUTTON_PRESS_ACTION_CYCLE_SECONDARY_STAT;
 static const StatsButtonPressAction DEFAULT_DOUBLE_PRESS_ACTION = BUTTON_PRESS_ACTION_OPEN_MENU;
 static const StatsButtonPressAction DEFAULT_LONG_PRESS_ACTION = BUTTON_PRESS_ACTION_SHUTDOWN;
 
@@ -300,9 +300,9 @@ void save_device_settings() {
   nvs_write_int("dark_text", device_settings.dark_text);
   nvs_write_int("battery_display", device_settings.battery_display);
   nvs_write_int("pocket_mode", device_settings.pocket_mode);
-  nvs_write_int("stats_single_press", device_settings.single_press_action);
-  nvs_write_int("stats_double_press", device_settings.double_press_action);
-  nvs_write_int("stats_long_press", device_settings.long_press_action);
+  nvs_write_int("stats_sp", device_settings.single_press_action);
+  nvs_write_int("stats_dp", device_settings.double_press_action);
+  nvs_write_int("stats_lp", device_settings.long_press_action);
 }
 
 esp_err_t save_wifi_ssid(const char *ssid) {
@@ -509,15 +509,15 @@ esp_err_t settings_init() {
   device_settings.pocket_mode =
       nvs_read_int("pocket_mode", &temp_setting_value) == ESP_OK ? (bool)temp_setting_value : POCKET_MODE_DISABLED;
 
-  device_settings.single_press_action = nvs_read_int("stats_single_press", &temp_setting_value) == ESP_OK
+  device_settings.single_press_action = nvs_read_int("stats_sp", &temp_setting_value) == ESP_OK
                                             ? (StatsButtonPressAction)temp_setting_value
                                             : DEFAULT_SINGLE_PRESS_ACTION;
 
-  device_settings.double_press_action = nvs_read_int("stats_double_press", &temp_setting_value) == ESP_OK
+  device_settings.double_press_action = nvs_read_int("stats_dp", &temp_setting_value) == ESP_OK
                                             ? (StatsButtonPressAction)temp_setting_value
                                             : DEFAULT_DOUBLE_PRESS_ACTION;
 
-  device_settings.long_press_action = nvs_read_int("stats_long_press", &temp_setting_value) == ESP_OK
+  device_settings.long_press_action = nvs_read_int("stats_lp", &temp_setting_value) == ESP_OK
                                           ? (StatsButtonPressAction)temp_setting_value
                                           : DEFAULT_LONG_PRESS_ACTION;
 

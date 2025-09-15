@@ -290,3 +290,27 @@ def single_press_action_select_change(event_struct):
 def long_press_action_select_change(event_struct):
     return
 
+
+def primary_stat_long_press(event_struct):
+    return
+
+
+def primary_stat_swipe_left(event_struct):
+    return
+
+
+def primary_stat_swipe_right(event_struct):
+    return
+
+
+def secondary_stat_swipe_left(event_struct):
+    return
+
+
+def secondary_stat_swipe_right(event_struct):
+    return
+
+
+def secondary_stat_long_press(event_struct):
+    return
+
