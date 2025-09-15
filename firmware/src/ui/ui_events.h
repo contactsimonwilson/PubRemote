@@ -30,6 +30,7 @@ extern "C"
   void settings_screen_unload_start(lv_event_t *e);
   void settings_screen_load_start(lv_event_t *e);
   void brightness_slider_change(lv_event_t *e);
+  void double_press_action_select_change(lv_event_t *e);
   void screen_rotation_change(lv_event_t *e);
   void auto_off_select_change(lv_event_t *e);
   void temp_units_select_change(lv_event_t *e);

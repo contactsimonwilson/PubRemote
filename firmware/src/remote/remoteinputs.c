@@ -176,33 +176,68 @@ void thumbstick_init() {
 #endif
 }
 
+static button_callback_t registered_single_click_cb = NULL;
 static void button_single_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON SINGLE CLICK");
-  reset_sleep_timer();
+  bool handled = false;
+
+  if (registered_single_click_cb) {
+    handled = registered_single_click_cb();
+  }
+
+  if (!handled) {
+    reset_sleep_timer();
+  }
 }
 
+static button_callback_t registered_button_down_cb = NULL;
 static void button_down_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOWN");
-  remote_data.bt_c = 1;
+  bool handled = false;
+
+  if (registered_button_down_cb) {
+    handled = registered_button_down_cb();
+  }
+
+  if (!handled) {
+    remote_data.bt_c = 1;
+  }
 }
 
+static button_callback_t registered_button_up_cb = NULL;
 static void button_up_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON UP");
-  remote_data.bt_c = 0;
+  bool handled = false;
+  if (registered_button_up_cb) {
+    handled = registered_button_up_cb();
+  }
+
+  if (!handled) {
+    remote_data.bt_c = 0;
+  }
 }
+
+static button_callback_t registered_double_click_cb = NULL;
 static void button_double_click_cb(void *arg, void *usr_data) {
   ESP_LOGI(TAG, "BUTTON DOUBLE CLICK");
-  reset_sleep_timer();
+  bool handled = false;
+
+  if (registered_double_click_cb) {
+    handled = registered_double_click_cb();
+  }
+
+  if (!handled) {
+    reset_sleep_timer();
+  }
 }
 
-void reset_button_state() {
-  remote_data.bt_c = 0;
-}
+static button_callback_t registered_long_press_hold_cb = NULL;
+static void button_long_press_hold_cb(void *arg, void *usr_data) {
+  ESP_LOGI(TAG, "BUTTON LONG PRESS HOLD");
+  bool handled = false;
 
-void buttons_deinit() {
-  if (gpio_btn_handle) {
-    iot_button_delete(gpio_btn_handle);
-    gpio_btn_handle = NULL;
+  if (registered_long_press_hold_cb) {
+    handled = registered_long_press_hold_cb();
   }
 }
 
@@ -234,13 +269,59 @@ void buttons_init() {
   iot_button_register_cb(gpio_btn_handle, BUTTON_PRESS_UP, button_up_cb, NULL);
   iot_button_register_cb(gpio_btn_handle, BUTTON_SINGLE_CLICK, button_single_click_cb, NULL);
   iot_button_register_cb(gpio_btn_handle, BUTTON_DOUBLE_CLICK, button_double_click_cb, NULL);
+  iot_button_register_cb(gpio_btn_handle, BUTTON_LONG_PRESS_HOLD, button_long_press_hold_cb, NULL);
 #endif
 }
 
-void register_primary_button_cb(button_event_t event, button_cb_t cb) {
-  iot_button_register_cb(gpio_btn_handle, event, cb, NULL);
+void buttons_deinit() {
+  if (gpio_btn_handle) {
+    iot_button_delete(gpio_btn_handle);
+    gpio_btn_handle = NULL;
+  }
+}
+void register_primary_button_cb(ButtonEvent event, button_callback_t cb) {
+  switch (event) {
+  case BUTTON_EVENT_DOWN:
+    registered_button_down_cb = cb;
+    break;
+  case BUTTON_EVENT_UP:
+    registered_button_up_cb = cb;
+    break;
+  case BUTTON_EVENT_PRESS:
+    registered_single_click_cb = cb;
+    break;
+  case BUTTON_EVENT_DOUBLE_PRESS:
+    registered_double_click_cb = cb;
+    break;
+  case BUTTON_EVENT_LONG_PRESS_HOLD:
+    registered_long_press_hold_cb = cb;
+    break;
+
+  default:
+    ESP_LOGW(TAG, "Unknown button event type");
+    break;
+  }
 }
 
-void unregister_primary_button_cb(button_event_t event) {
-  iot_button_unregister_cb(gpio_btn_handle, event);
+void unregister_primary_button_cb(ButtonEvent event) {
+  switch (event) {
+  case BUTTON_EVENT_DOWN:
+    registered_button_down_cb = NULL;
+    break;
+  case BUTTON_EVENT_UP:
+    registered_button_up_cb = NULL;
+    break;
+  case BUTTON_EVENT_PRESS:
+    registered_single_click_cb = NULL;
+    break;
+  case BUTTON_EVENT_DOUBLE_PRESS:
+    registered_double_click_cb = NULL;
+    break;
+  case BUTTON_EVENT_LONG_PRESS_HOLD:
+    registered_long_press_hold_cb = NULL;
+    break;
+  default:
+    ESP_LOGW(TAG, "Unknown button event type");
+    break;
+  }
 }

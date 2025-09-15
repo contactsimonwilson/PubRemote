@@ -7,8 +7,6 @@ void acc2_power_set_level(uint8_t level);
 void reset_sleep_timer();
 void power_management_init();
 void enter_sleep();
-void bind_power_button();
-void unbind_power_button();
 
 typedef enum {
   CHARGING,

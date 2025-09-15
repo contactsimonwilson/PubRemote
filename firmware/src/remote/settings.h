@@ -85,6 +85,11 @@ typedef enum {
   POCKET_MODE_ENABLED,
 } PocketModeOptions;
 
+typedef enum {
+  DOUBLE_PRESS_ACTION_NONE,
+  DOUBLE_PRESS_ACTION_OPEN_MENU,
+} StatsDoublePressAction;
+
 #define DEFAULT_PAIRING_SECRET_CODE -1
 
 typedef struct {
@@ -116,6 +121,7 @@ typedef struct {
   bool dark_text;
   BoardBatteryDisplayOption battery_display;
   PocketModeOptions pocket_mode;
+  StatsDoublePressAction double_press_action;
 } DeviceSettings;
 
 uint64_t get_auto_off_ms();
