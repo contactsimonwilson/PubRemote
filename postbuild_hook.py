@@ -32,17 +32,23 @@ def zip_build_files(source, target, env):
     extracted_values = {}
     
     for flag in build_flags:
+        flag_str = str(flag)  # Ensure it's a string
+        
         # Only process flags that start with our allowed prefixes
         for allowed_flag in ALLOWED_FLAGS.keys():
-            flag_prefix = f"{allowed_flag}="
-            if flag.startswith(f"-D{flag_prefix}") or flag.startswith(f"-D {flag_prefix}") or flag.startswith(flag_prefix):
+            # Only check the two formats you want: -DFLAG= and -D FLAG=
+            if flag_str.startswith(f"-D{allowed_flag}=") or flag_str.startswith(f"-D {allowed_flag}="):
                 # Extract the value after the equals sign
-                if "=" in flag:
-                    value = flag.split("=", 1)[1].strip('\\"\'')
+                if "=" in flag_str:
+                    value = flag_str.split("=", 1)[1].strip('\\"\'')
                     # Sanitize the value to prevent path injection or other issues
                     value = re.sub(r'[^\w\-\.]', '', value)
-                    extracted_values[allowed_flag] = value
-                    break
+                    if value:  # Only use non-empty values
+                        extracted_values[allowed_flag] = value
+                        print(f"Debug - Extracted {allowed_flag}={value} from flag: {repr(flag_str)}")
+                break
+
+    print(f"Debug - Final extracted values: {extracted_values}")
 
     # Use extracted values or defaults
     release_variant = extracted_values.get('RELEASE_VARIANT', ALLOWED_FLAGS['RELEASE_VARIANT'])
