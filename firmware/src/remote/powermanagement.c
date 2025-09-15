@@ -13,6 +13,7 @@
 #include "gpio_detection.h"
 #include "remote/tones.h"
 #include "remoteinputs.h"
+#include "screens/charge_screen.h"
 #include "settings.h"
 #include "stats.h"
 #include "utilities/number_utils.h"
