@@ -273,7 +273,7 @@ void ui_SettingsScreen_screen_init(void)
 
     ui_SinglePressAction = lv_dropdown_create(ui_SinglePressActionsBody);
     lv_dropdown_set_options(ui_SinglePressAction,
-                            "None\nShutdown\nOpen menu\nDim display\nToggle pocket mode\nCycle secondary stat\nBoard battery display");
+                            "None\nShutdown\nOpen menu\nDim display\nPocket mode\nCycle secondary stat\nCycle board battery");
     lv_obj_set_width(ui_SinglePressAction, lv_pct(100));
     lv_obj_set_height(ui_SinglePressAction, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_SinglePressAction, LV_ALIGN_CENTER);
@@ -317,7 +317,7 @@ void ui_SettingsScreen_screen_init(void)
 
     ui_DoublePressAction = lv_dropdown_create(ui_DoublePressActionsBody);
     lv_dropdown_set_options(ui_DoublePressAction,
-                            "None\nShutdown\nOpen menu\nDim display\nToggle pocket mode\nCycle secondary stat\nBoard battery display");
+                            "None\nShutdown\nOpen menu\nDim display\nPocket mode\nCycle secondary stat\nCycle board battery");
     lv_obj_set_width(ui_DoublePressAction, lv_pct(100));
     lv_obj_set_height(ui_DoublePressAction, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_DoublePressAction, LV_ALIGN_CENTER);
@@ -361,7 +361,7 @@ void ui_SettingsScreen_screen_init(void)
 
     ui_LongPressAction = lv_dropdown_create(ui_LongPressActionsBody);
     lv_dropdown_set_options(ui_LongPressAction,
-                            "None\nShutdown\nOpen menu\nDim display\nToggle pocket mode\nCycle secondary stat\nBoard battery display");
+                            "None\nShutdown\nOpen menu\nDim display\nPocket mode\nCycle secondary stat\nCycle board battery");
     lv_obj_set_width(ui_LongPressAction, lv_pct(100));
     lv_obj_set_height(ui_LongPressAction, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LongPressAction, LV_ALIGN_CENTER);

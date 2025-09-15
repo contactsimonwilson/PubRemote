@@ -28,15 +28,7 @@ lv_obj_t * ui_RemoteModeText = NULL;
 lv_obj_t * ui_PrimaryStat = NULL;
 lv_obj_t * ui_PrimaryStatUnit = NULL;
 lv_obj_t * ui_SecondaryStatPaddingContainer = NULL;
-lv_obj_t * ui_SecondaryStatContainer = NULL;
-lv_obj_t * ui_ConnectionStateBody = NULL;
-lv_obj_t * ui_ConnectionStateLabel = NULL;
-lv_obj_t * ui_DutyCycleBody = NULL;
-lv_obj_t * ui_DutyCycleLabel = NULL;
-lv_obj_t * ui_TempsBody = NULL;
-lv_obj_t * ui_TempsLabel = NULL;
-lv_obj_t * ui_TripBody = NULL;
-lv_obj_t * ui_TripLabel = NULL;
+lv_obj_t * ui_SecondaryStat = NULL;
 lv_obj_t * ui_StatsFooter = NULL;
 lv_obj_t * ui_BoardBatteryDisplay = NULL;
 // event funtions
@@ -64,15 +56,32 @@ void ui_event_PrimaryStat(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_LONG_PRESSED) {
-        stat_long_press(e);
+        primary_stat_long_press(e);
     }
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
         lv_indev_wait_release(lv_indev_get_act());
-        stat_swipe_left(e);
+        primary_stat_swipe_left(e);
     }
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
-        stat_swipe_right(e);
+        primary_stat_swipe_right(e);
+    }
+}
+
+void ui_event_SecondaryStatPaddingContainer(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_LONG_PRESSED) {
+        secondary_stat_long_press(e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        secondary_stat_swipe_left(e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        secondary_stat_swipe_right(e);
     }
 }
 
@@ -358,128 +367,15 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_clear_flag(ui_SecondaryStatPaddingContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_pad_left(ui_SecondaryStatPaddingContainer, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui_SecondaryStatPaddingContainer, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_SecondaryStatPaddingContainer, -10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_SecondaryStatPaddingContainer, -20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_SecondaryStatPaddingContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_SecondaryStatPaddingContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_SecondaryStatContainer = lv_obj_create(ui_SecondaryStatPaddingContainer);
-    lv_obj_remove_style_all(ui_SecondaryStatContainer);
-    lv_obj_set_width(ui_SecondaryStatContainer, lv_pct(100));
-    lv_obj_set_height(ui_SecondaryStatContainer, LV_SIZE_CONTENT);    /// 50
-    lv_obj_set_align(ui_SecondaryStatContainer, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_SecondaryStatContainer, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ui_SecondaryStatContainer, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_SecondaryStatContainer, LV_OBJ_FLAG_SCROLL_ONE);     /// Flags
-    lv_obj_clear_flag(ui_SecondaryStatContainer, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SCROLL_MOMENTUM);      /// Flags
-    lv_obj_set_scrollbar_mode(ui_SecondaryStatContainer, LV_SCROLLBAR_MODE_ACTIVE);
-    lv_obj_set_scroll_dir(ui_SecondaryStatContainer, LV_DIR_HOR);
-    lv_obj_set_style_pad_left(ui_SecondaryStatContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_SecondaryStatContainer, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_SecondaryStatContainer, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_SecondaryStatContainer, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_ConnectionStateBody = lv_obj_create(ui_SecondaryStatContainer);
-    lv_obj_remove_style_all(ui_ConnectionStateBody);
-    lv_obj_set_width(ui_ConnectionStateBody, lv_pct(100));
-    lv_obj_set_height(ui_ConnectionStateBody, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_ConnectionStateBody, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_ConnectionStateBody, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_ConnectionStateBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_ConnectionStateBody, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
-    lv_obj_clear_flag(ui_ConnectionStateBody,
-                      LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE |
-                      LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_style_pad_left(ui_ConnectionStateBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_ConnectionStateBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_ConnectionStateBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_ConnectionStateBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_row(ui_ConnectionStateBody, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_ConnectionStateBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_ConnectionStateLabel = lv_label_create(ui_ConnectionStateBody);
-    lv_obj_set_width(ui_ConnectionStateLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_ConnectionStateLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_ConnectionStateLabel, 19);
-    lv_obj_set_y(ui_ConnectionStateLabel, 38);
-    lv_obj_set_align(ui_ConnectionStateLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_ConnectionStateLabel, "Disconnected");
-
-    ui_DutyCycleBody = lv_obj_create(ui_SecondaryStatContainer);
-    lv_obj_remove_style_all(ui_DutyCycleBody);
-    lv_obj_set_width(ui_DutyCycleBody, lv_pct(100));
-    lv_obj_set_height(ui_DutyCycleBody, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_DutyCycleBody, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_DutyCycleBody, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_DutyCycleBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_DutyCycleBody, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_DutyCycleBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
-                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_style_pad_left(ui_DutyCycleBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_DutyCycleBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_DutyCycleBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_DutyCycleBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_row(ui_DutyCycleBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_DutyCycleBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_DutyCycleLabel = lv_label_create(ui_DutyCycleBody);
-    lv_obj_set_width(ui_DutyCycleLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_DutyCycleLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_DutyCycleLabel, 19);
-    lv_obj_set_y(ui_DutyCycleLabel, 38);
-    lv_obj_set_align(ui_DutyCycleLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_DutyCycleLabel, "Duty Cycle: 0%");
-
-    ui_TempsBody = lv_obj_create(ui_SecondaryStatContainer);
-    lv_obj_remove_style_all(ui_TempsBody);
-    lv_obj_set_width(ui_TempsBody, lv_pct(100));
-    lv_obj_set_height(ui_TempsBody, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_TempsBody, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_TempsBody, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_TempsBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_TempsBody, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_TempsBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
-                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_style_pad_left(ui_TempsBody, 49, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_TempsBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_TempsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_TempsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_row(ui_TempsBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_TempsBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_TempsLabel = lv_label_create(ui_TempsBody);
-    lv_obj_set_width(ui_TempsLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_TempsLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_TempsLabel, 19);
-    lv_obj_set_y(ui_TempsLabel, 38);
-    lv_obj_set_align(ui_TempsLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_TempsLabel, "M: 0°C | C: 0°C");
-
-    ui_TripBody = lv_obj_create(ui_SecondaryStatContainer);
-    lv_obj_remove_style_all(ui_TripBody);
-    lv_obj_set_width(ui_TripBody, lv_pct(100));
-    lv_obj_set_height(ui_TripBody, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_TripBody, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_TripBody, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(ui_TripBody, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(ui_TripBody, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_clear_flag(ui_TripBody, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
-                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
-    lv_obj_set_style_pad_left(ui_TripBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_TripBody, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_TripBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_TripBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_row(ui_TripBody, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_column(ui_TripBody, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_TripLabel = lv_label_create(ui_TripBody);
-    lv_obj_set_width(ui_TripLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_TripLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_TripLabel, 19);
-    lv_obj_set_y(ui_TripLabel, 38);
-    lv_obj_set_align(ui_TripLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_TripLabel, "Trip: -");
+    ui_SecondaryStat = lv_label_create(ui_SecondaryStatPaddingContainer);
+    lv_obj_set_width(ui_SecondaryStat, lv_pct(100));
+    lv_obj_set_height(ui_SecondaryStat, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_SecondaryStat, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_SecondaryStat, "Disconnected");
+    lv_obj_set_style_text_align(ui_SecondaryStat, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_StatsFooter = lv_obj_create(ui_StatsContent);
     lv_obj_remove_style_all(ui_StatsFooter);
@@ -511,6 +407,7 @@ void ui_StatsScreen_screen_init(void)
     lv_obj_set_style_pad_bottom(ui_BoardBatteryDisplay, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_PrimaryStat, ui_event_PrimaryStat, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SecondaryStatPaddingContainer, ui_event_SecondaryStatPaddingContainer, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsFooter, ui_event_StatsFooter, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_StatsScreen, ui_event_StatsScreen, LV_EVENT_ALL, NULL);
 
@@ -544,15 +441,7 @@ void ui_StatsScreen_screen_destroy(void)
     ui_PrimaryStat = NULL;
     ui_PrimaryStatUnit = NULL;
     ui_SecondaryStatPaddingContainer = NULL;
-    ui_SecondaryStatContainer = NULL;
-    ui_ConnectionStateBody = NULL;
-    ui_ConnectionStateLabel = NULL;
-    ui_DutyCycleBody = NULL;
-    ui_DutyCycleLabel = NULL;
-    ui_TempsBody = NULL;
-    ui_TempsLabel = NULL;
-    ui_TripBody = NULL;
-    ui_TripLabel = NULL;
+    ui_SecondaryStat = NULL;
     ui_StatsFooter = NULL;
     ui_BoardBatteryDisplay = NULL;
 

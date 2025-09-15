@@ -20,15 +20,15 @@ extern lv_obj_t * ui_AboutHeader;
 extern lv_obj_t * ui_AboutBody;
 extern lv_obj_t * ui_VersionInfoContainer;
 extern lv_obj_t * ui_VersionInfoLabel;
-extern void ui_event_UpdateButton(lv_event_t * e);
-extern lv_obj_t * ui_UpdateButton;
-extern lv_obj_t * ui_UpdateButtonLabel;
 extern lv_obj_t * ui_DebugInfoContainer;
 extern lv_obj_t * ui_DebugInfoLabel;
 extern lv_obj_t * ui_AboutFooter;
 extern void ui_event_AboutMainActionButton(lv_event_t * e);
 extern lv_obj_t * ui_AboutMainActionButton;
 extern lv_obj_t * ui_AboutMainActionButtonLabel;
+extern void ui_event_UpdateButton(lv_event_t * e);
+extern lv_obj_t * ui_UpdateButton;
+extern lv_obj_t * ui_UpdateButtonLabel;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus
