@@ -278,3 +278,7 @@ def update_secondary_button_press(event_struct):
 def double_press_action_select_change(event_struct):
     return
 
+
+def stats_screen_gesture_down(event_struct):
+    return
+
