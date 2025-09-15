@@ -26,7 +26,6 @@ extern "C" {
 #include "ui_CalibrationScreen.h"
 #include "ui_AboutScreen.h"
 #include "ui_UpdateScreen.h"
-#include "ui_ChargeScreen.h"
 
 ///////////////////// VARIABLES ////////////////////
 
