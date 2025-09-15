@@ -21,6 +21,18 @@ lv_obj_t *ui_MenuBackButton = NULL, *ui_MenuBackButtonLabel = NULL, *ui_MenuConn
 
 static bool confirm_reset = false;
 
+void toggle_pocket_mode() {
+  // Toggle pocket mode
+  if (device_settings.pocket_mode == POCKET_MODE_DISABLED) {
+    device_settings.pocket_mode = POCKET_MODE_ENABLED;
+  }
+  else {
+    device_settings.pocket_mode = POCKET_MODE_DISABLED;
+  }
+
+  save_device_settings();
+}
+
 static void set_reset_mode(bool mode) {
   confirm_reset = mode;
 
@@ -203,15 +215,7 @@ void menu_connect_press(lv_event_t *e) {
 void menu_pocket_mode_press(lv_event_t *e) {
   ESP_LOGI(TAG, "Pocket mode button pressed");
 
-  // Toggle pocket mode
-  if (device_settings.pocket_mode == POCKET_MODE_DISABLED) {
-    device_settings.pocket_mode = POCKET_MODE_ENABLED;
-  }
-  else {
-    device_settings.pocket_mode = POCKET_MODE_DISABLED;
-  }
-
-  save_device_settings();
+  toggle_pocket_mode();
 
   if (LVGL_lock(0)) {
     _ui_screen_change(&ui_StatsScreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_StatsScreen_screen_init);

@@ -3,6 +3,7 @@
 #include "remote/display.h"
 #include "remote/remoteinputs.h"
 #include "remote/vehicle_state.h"
+#include "screens/menu_screen.h"
 #include "utilities/screen_utils.h"
 #include <colors.h>
 #include <core/lv_event.h>
@@ -559,6 +560,11 @@ static bool handle_button_action(StatsButtonPressAction action) {
     }
   }
 
+  // Dim display
+  else if (action == BUTTON_PRESS_ACTION_TOGGLE_POCKET_MODE) {
+    toggle_pocket_mode();
+  }
+
   // Cycle secondary stat
   else if (action == BUTTON_PRESS_ACTION_CYCLE_SECONDARY_STAT) {
     update_secondary_stat(1);
@@ -572,31 +578,46 @@ static bool handle_button_action(StatsButtonPressAction action) {
   return true;
 }
 
-static bool single_press_handler() {
+static bool button_single_press_handler() {
   ESP_LOGI(TAG, "Stats screen button single press");
 
   return handle_button_action(device_settings.single_press_action);
 }
 
-static bool double_press_handler() {
+static bool button_double_press_handler() {
   ESP_LOGI(TAG, "Stats screen button double press");
 
   return handle_button_action(device_settings.double_press_action);
 }
 
-static bool long_press_handler() {
-  ESP_LOGI(TAG, "Stats screen button long press");
+static bool long_press_handled = false;
 
-  return handle_button_action(device_settings.long_press_action);
+static bool button_long_press_handler() {
+  if (!long_press_handled) {
+    ESP_LOGI(TAG, "Stats screen button long press");
+    long_press_handled = true;
+    return handle_button_action(device_settings.long_press_action);
+  }
+  else {
+    ESP_LOGI(TAG, "Ignoring repeated long press event");
+    return false;
+  }
+}
+
+static bool button_up_handler() {
+  ESP_LOGI(TAG, "Stats screen button up");
+  long_press_handled = false;
+  return true;
 }
 
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
 
   stats_update_screen_display();
-  register_primary_button_cb(BUTTON_EVENT_PRESS, single_press_handler);
-  register_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS, double_press_handler);
-  register_primary_button_cb(BUTTON_EVENT_LONG_PRESS_HOLD, long_press_handler);
+  register_primary_button_cb(BUTTON_EVENT_PRESS, button_single_press_handler);
+  register_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS, button_double_press_handler);
+  register_primary_button_cb(BUTTON_EVENT_LONG_PRESS_HOLD, button_long_press_handler);
+  register_primary_button_cb(BUTTON_EVENT_UP, button_up_handler);
 
   if (LVGL_lock(-1)) {
     LVGL_unlock();
