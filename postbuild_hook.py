@@ -35,7 +35,7 @@ def zip_build_files(source, target, env):
         # Only process flags that start with our allowed prefixes
         for allowed_flag in ALLOWED_FLAGS.keys():
             flag_prefix = f"{allowed_flag}="
-            if flag.startswith(f"-D{flag_prefix}") or flag.startswith(flag_prefix):
+            if flag.startswith(f"-D{flag_prefix}") or flag.startswith(f"-D {flag_prefix}") or flag.startswith(flag_prefix):
                 # Extract the value after the equals sign
                 if "=" in flag:
                     value = flag.split("=", 1)[1].strip('\\"\'')
