@@ -78,8 +78,10 @@ void add_main_menu_navigation_buttons(lv_obj_t *body_item) {
 
   for (uint32_t i = 0; i < total_buttons; i++) {
     lv_obj_t *item = NULL;
+
     if (lv_obj_get_child_cnt(body_item) > i) {
       item = lv_obj_get_child(body_item, i);
+
       if (item == NULL) {
         item = lv_btn_create(body_item);
       }
@@ -104,20 +106,24 @@ void add_main_menu_navigation_buttons(lv_obj_t *body_item) {
     if (button_entries[i].short_press) {
       lv_obj_add_event_cb(item, button_entries[i].short_press, LV_EVENT_CLICKED, NULL);
     }
+
     if (button_entries[i].long_press) {
       lv_obj_add_event_cb(item, button_entries[i].long_press, LV_EVENT_LONG_PRESSED, NULL);
     }
+
     if (button_entries[i].down) {
       lv_obj_add_event_cb(item, button_entries[i].down, LV_EVENT_PRESSED, NULL);
     }
 
     lv_obj_t *label = NULL;
+
     if (lv_obj_get_child_cnt(item) > 0) {
       label = lv_obj_get_child(item, 0);
     }
     else {
       label = lv_label_create(item);
     }
+
     lv_obj_set_width(label, LV_SIZE_CONTENT);
     lv_obj_set_height(label, LV_SIZE_CONTENT);
     lv_obj_set_align(label, LV_ALIGN_CENTER);

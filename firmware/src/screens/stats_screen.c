@@ -609,7 +609,9 @@ static bool button_long_press_handler() {
 
 static bool button_up_handler() {
   ESP_LOGI(TAG, "Stats screen button up");
+
   long_press_handled = false;
+
   return true;
 }
 
@@ -645,10 +647,13 @@ void stats_screen_loaded(lv_event_t *e) {
 
 void stats_screen_unload_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen unload start");
+
   stats_unregister_update_cb(stats_update_screen_display);
+
   unregister_primary_button_cb(BUTTON_EVENT_PRESS);
   unregister_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS);
   unregister_primary_button_cb(BUTTON_EVENT_LONG_PRESS_HOLD);
+  unregister_primary_button_cb(BUTTON_EVENT_UP);
 }
 
 bool proceed_with_gesture() {
