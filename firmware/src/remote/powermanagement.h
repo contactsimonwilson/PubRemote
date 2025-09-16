@@ -2,6 +2,7 @@
 #define __POWERMANAGEMENT_H
 #include "lvgl.h"
 
+bool get_button_pressed();
 void acc1_power_set_level(bool enable);
 void acc2_power_set_level(uint8_t level);
 void reset_sleep_timer();

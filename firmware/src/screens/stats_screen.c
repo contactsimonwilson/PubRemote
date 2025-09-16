@@ -613,14 +613,30 @@ static bool button_up_handler() {
   return true;
 }
 
-void stats_screen_loaded(lv_event_t *e) {
-  ESP_LOGI(TAG, "Stats screen loaded");
+static bool initial_button_up_handler() {
+  // Unbind the button up handler
+  unregister_primary_button_cb(BUTTON_EVENT_UP);
 
-  stats_update_screen_display();
+  // Bind the others
   register_primary_button_cb(BUTTON_EVENT_PRESS, button_single_press_handler);
   register_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS, button_double_press_handler);
   register_primary_button_cb(BUTTON_EVENT_LONG_PRESS_HOLD, button_long_press_handler);
   register_primary_button_cb(BUTTON_EVENT_UP, button_up_handler);
+  return true;
+}
+
+void stats_screen_loaded(lv_event_t *e) {
+  ESP_LOGI(TAG, "Stats screen loaded");
+
+  stats_update_screen_display();
+
+  if (get_button_pressed()) {
+    // Enable the button events once released if it wasn't already
+    register_primary_button_cb(BUTTON_EVENT_UP, initial_button_up_handler);
+  }
+  else {
+    initial_button_up_handler();
+  }
 
   if (LVGL_lock(-1)) {
     LVGL_unlock();

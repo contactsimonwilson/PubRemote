@@ -279,8 +279,10 @@ lv_group_t *create_navigation_group(lv_obj_t *container) {
   // Iterate children of container and add them to the group
   uint32_t childrenCount = lv_obj_get_child_cnt(container);
   lv_obj_t *firstChild = NULL;
+
   for (uint32_t i = 0; i < childrenCount; i++) {
     lv_obj_t *child = lv_obj_get_child(container, i);
+
     if (child != NULL) {
       lv_group_add_obj(navigation_group, child);
 
