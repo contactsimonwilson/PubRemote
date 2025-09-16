@@ -545,7 +545,10 @@ void stats_screen_load_start(lv_event_t *e) {
 static bool double_press_handler() {
   if (device_settings.double_press_action == DOUBLE_PRESS_ACTION_OPEN_MENU) {
     // Open the main menu
-    _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_MenuScreen_screen_init);
+    if (LVGL_lock(-1)) {
+      _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_MenuScreen_screen_init);
+      LVGL_unlock();
+    }
   }
 
   return true;
