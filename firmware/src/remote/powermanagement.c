@@ -61,7 +61,7 @@ static void power_state_update() {
   is_power_connected = powerState.isPowered;
 }
 
-static bool get_button_pressed() {
+bool get_button_pressed() {
   return gpio_get_level(PRIMARY_BUTTON) == JOYSTICK_BUTTON_LEVEL;
 }
 
@@ -441,7 +441,9 @@ void power_management_init() {
     ESP_LOGI(TAG, "Not a deep sleep wakeup or other wake-up sources.");
     break;
   }
+
   reset_sleep_timer();
+
   if (get_button_pressed()) {
     // Enable the power button once released if it wasn't already
     register_primary_button_cb(BUTTON_EVENT_UP, power_button_initial_release);
