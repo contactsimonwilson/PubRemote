@@ -301,6 +301,8 @@ void add_page_scroll_indicators(lv_obj_t *header_item, lv_obj_t *body_item) {
   // How many scroll icons already exist
   uint32_t total_scroll_icons = lv_obj_get_child_cnt(header_item);
   uint32_t total_settings = lv_obj_get_child_cnt(body_item);
+  // Set spacing between icons
+  lv_obj_set_style_pad_column(header_item, 3 * SCALE_FACTOR, LV_PART_MAIN | LV_STATE_DEFAULT);
 
   for (uint32_t i = 0; i < total_settings; i++) {
     uint8_t bg_opacity = i == 0 ? 255 : 100;
@@ -309,11 +311,11 @@ void add_page_scroll_indicators(lv_obj_t *header_item, lv_obj_t *body_item) {
     lv_obj_t *item = total_scroll_icons == 0 ? lv_obj_create(header_item) : lv_obj_get_child(header_item, i);
 
     lv_obj_remove_style_all(item);
-    lv_obj_set_width(item, 10 * SCALE_FACTOR);
-    lv_obj_set_height(item, 10 * SCALE_FACTOR);
+    lv_obj_set_width(item, 6 * SCALE_FACTOR);
+    lv_obj_set_height(item, 6 * SCALE_FACTOR);
     lv_obj_set_align(item, LV_ALIGN_CENTER);
     lv_obj_clear_flag(item, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE); /// Flags
-    lv_obj_set_style_radius(item, 5 * SCALE_FACTOR, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(item, 3 * SCALE_FACTOR, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(item, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(item, bg_opacity, LV_PART_MAIN | LV_STATE_DEFAULT);
   }
