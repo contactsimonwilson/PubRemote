@@ -279,6 +279,7 @@ void buttons_deinit() {
     gpio_btn_handle = NULL;
   }
 }
+
 void register_primary_button_cb(ButtonEvent event, button_callback_t cb) {
   switch (event) {
   case BUTTON_EVENT_DOWN:
