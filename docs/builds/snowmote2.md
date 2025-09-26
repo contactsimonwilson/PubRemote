@@ -7,13 +7,15 @@ By ZiNc
 ## Parts
 
 - [WaveShare ESP32-S3 1.43in Amoled Display](https://www.waveshare.com/esp32-s3-touch-amoled-1.43.htm)
-- [PS5 joystick](https://www.aliexpress.us/item/3256806823053436.html)
+- [PS5 hall joystick](https://www.aliexpress.us/item/3256806823053436.html)
 - Battery
   - [1500mAh Lipo battery](https://www.amazon.com/dp/B09DPNCLQZ)
   - [1.25mm JST connectors](https://www.amazon.com/dp/B088NQBF3V)
 - Case
   - [SnowMote 2 case](https://www.printables.com/model/1410737) by ZiNc
   - 2 x M2x8 screws (or M2x12 screws, depending on your printer tolerances)
+  - 4 x 1.27mm header pins
+  - 1 x 10k Ohm resistor
 
 ## Instructions
 

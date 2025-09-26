@@ -18,7 +18,7 @@ By ZiNc
   - 3 x M3x20 countersunk screws
   - 2 x M3x8 cap head screws
   - 6 x 1.27mm header pins
-  - 1 x 10k Ohm resistor (TBD)
+  - 1 x 10k Ohm resistor
 
 ## Instructions
 
