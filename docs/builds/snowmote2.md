@@ -35,13 +35,15 @@ By ZiNc
 5. Secure WaveShare display into the lid
   - Tackle this however you see fit... but in my experience, sliding it into the FRONT of the lid piece at an angle and slowly working the lid lip over the display in a circular fashion was successful
   - The display should have just enough room to wiggle around and set the direction once it's been slotted into the lid
+  
+![](snowmote2-display.jpg)
 
 6. Connect PS5 hall effect joystick to WaveShare display GPIO headers (see image)
   - Run wires from the back of the lid through the front, into the display GPIO headers. This allows the display to sit in the lid
 
 ![](snowmote2-pinout.png)
 ![](snowmote2-wiring.png)
-![](snowmote2-battery.png)
+![](snowmote2-battery.jpg)
 
 7. Connect 1.25mm JST battery to display
   - Install battery and route wires similarly
@@ -55,6 +57,6 @@ By ZiNc
 
 10. Install a lanyard and thumb stick cover as you like!
 
-![](snowmote2-assembly.png)
+![](snowmote2-assembly.jpg)
 
 11. You're ready to start [setting up your Pubmote software](/docs/quick-start.md)!
