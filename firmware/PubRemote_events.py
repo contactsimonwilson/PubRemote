@@ -278,3 +278,39 @@ def update_secondary_button_press(event_struct):
 def double_press_action_select_change(event_struct):
     return
 
+
+def stats_screen_gesture_down(event_struct):
+    return
+
+
+def single_press_action_select_change(event_struct):
+    return
+
+
+def long_press_action_select_change(event_struct):
+    return
+
+
+def primary_stat_long_press(event_struct):
+    return
+
+
+def primary_stat_swipe_left(event_struct):
+    return
+
+
+def primary_stat_swipe_right(event_struct):
+    return
+
+
+def secondary_stat_swipe_left(event_struct):
+    return
+
+
+def secondary_stat_swipe_right(event_struct):
+    return
+
+
+def secondary_stat_long_press(event_struct):
+    return
+

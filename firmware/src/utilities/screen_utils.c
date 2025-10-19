@@ -279,8 +279,10 @@ lv_group_t *create_navigation_group(lv_obj_t *container) {
   // Iterate children of container and add them to the group
   uint32_t childrenCount = lv_obj_get_child_cnt(container);
   lv_obj_t *firstChild = NULL;
+
   for (uint32_t i = 0; i < childrenCount; i++) {
     lv_obj_t *child = lv_obj_get_child(container, i);
+
     if (child != NULL) {
       lv_group_add_obj(navigation_group, child);
 
@@ -358,6 +360,7 @@ void resize_footer_buttons(lv_obj_t *footer) {
   lv_coord_t button_width = lv_obj_get_width(footer) / button_count;
 
   uint32_t final_button_count = 0;
+
   // Resize each button
   for (uint32_t i = 0; i < button_count; i++) {
     lv_obj_t *button = lv_obj_get_child(footer, i);
