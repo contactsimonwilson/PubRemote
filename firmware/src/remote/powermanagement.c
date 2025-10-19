@@ -96,31 +96,30 @@ static esp_err_t enable_wake() {
   return res;
 }
 
-static void power_button_long_press_hold(void *arg, void *usr_data) {
+static bool power_button_long_press_hold() {
   BoardState state = remoteStats.state;
   if (state == BOARD_STATE_RUNNING || state == BOARD_STATE_RUNNING_FLYWHEEL || state == BOARD_STATE_RUNNING_TILTBACK ||
       state == BOARD_STATE_RUNNING_UPSIDEDOWN || state == BOARD_STATE_RUNNING_WHEELSLIP) {
     ESP_LOGI(TAG, "Power button long press hold detected. Ignoring.");
-    return;
+    return false;
   }
 
   shutdown_initiated = true;
+  return true;
 }
 
 void bind_power_button() {
-  register_primary_button_cb(BUTTON_LONG_PRESS_HOLD, power_button_long_press_hold);
+  register_primary_button_cb(BUTTON_EVENT_LONG_PRESS_HOLD, power_button_long_press_hold);
 }
 
 void unbind_power_button() {
-  unregister_primary_button_cb(BUTTON_LONG_PRESS_HOLD);
+  unregister_primary_button_cb(BUTTON_EVENT_LONG_PRESS_HOLD);
 }
 
-static void power_button_initial_release(void *arg, void *usr_data) {
-  unregister_primary_button_cb(BUTTON_PRESS_UP);
-  buttons_deinit();
-  buttons_init(); // Reinit buttons after detect to ensure correct gpio config
-
+static bool power_button_initial_release() {
+  unregister_primary_button_cb(BUTTON_EVENT_UP);
   bind_power_button();
+  return true;
 }
 
 #ifdef PMU_INT
@@ -445,10 +444,10 @@ void power_management_init() {
   reset_sleep_timer();
   if (get_button_pressed()) {
     // Enable the power button once released if it wasn't already
-    register_primary_button_cb(BUTTON_PRESS_UP, power_button_initial_release);
+    register_primary_button_cb(BUTTON_EVENT_UP, power_button_initial_release);
   }
   else {
-    power_button_initial_release(NULL, NULL);
+    power_button_initial_release();
   }
 
 #ifdef PMU_INT

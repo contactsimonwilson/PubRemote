@@ -2,6 +2,7 @@
 #include "core/lv_obj_event.h"
 #include "esp_log.h"
 #include "remote/display.h"
+#include "remote/remoteinputs.h"
 #include "remote/vehicle_state.h"
 #include "utilities/screen_utils.h"
 #include <colors.h>
@@ -53,11 +54,11 @@ static void update_speed_dial_display() {
     // Set range based on max speed
 
     lv_arc_set_range(ui_SpeedDial, 0, max_speed);
-    lv_bar_set_range(ui_SpeedBar, 0, max_speed);
+    // lv_bar_set_range(ui_SpeedBar, 0, max_speed);
   }
 
   lv_arc_set_value(ui_SpeedDial, remoteStats.speed);
-  lv_bar_set_value(ui_SpeedBar, remoteStats.speed, LV_ANIM_OFF);
+  // lv_bar_set_value(ui_SpeedBar, remoteStats.speed, LV_ANIM_OFF);
 
   // Update the last value
   last_value = remoteStats.speed;
@@ -72,7 +73,6 @@ static void update_utilization_dial_display() {
   }
 
   lv_arc_set_value(ui_UtilizationDial, remoteStats.dutyCycle);
-  lv_bar_set_value(ui_UtilizationBar, remoteStats.dutyCycle, LV_ANIM_OFF);
 
   // set arc color
   lv_color_t color = lv_color_hex(COLOR_ACTIVE);
@@ -84,7 +84,6 @@ static void update_utilization_dial_display() {
   }
 
   lv_obj_set_style_arc_color(ui_UtilizationDial, color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-  lv_obj_set_style_bg_color(ui_UtilizationBar, lv_color_hex(0x282828), LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
   // Update the last value
   last_value = remoteStats.dutyCycle;
@@ -496,7 +495,7 @@ static void update_footpad_display() {
 }
 
 static void stats_update_screen_display() {
-  if (LVGL_lock(-1)) {
+  if (LVGL_lock(LV_DISP_DEF_REFR_PERIOD)) {
     if (device_settings.distance_units == DISTANCE_UNITS_METRIC) {
       lv_label_set_text(ui_PrimaryStatUnit, KILOMETERS_PER_HOUR_LABEL);
     }
@@ -523,15 +522,16 @@ void stats_screen_load_start(lv_event_t *e) {
 
   if (LVGL_lock(-1)) {
 #if (UI_SHAPE == 1)
-    // Circle UI
-    lv_obj_add_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+  // Rectangle UI
+  // lv_obj_add_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
+  // lv_obj_add_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
+  // lv_obj_clear_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
+  // lv_obj_clear_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+  #error "Rectangle UI not supported"
 #else
-    // Rectangle UI
-    lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
+    // Circle UI
+    // lv_obj_add_flag(ui_SpeedBar, LV_OBJ_FLAG_HIDDEN);
+    // lv_obj_add_flag(ui_UtilizationBar, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_SpeedDial, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(ui_UtilizationDial, LV_OBJ_FLAG_HIDDEN);
 
@@ -543,9 +543,22 @@ void stats_screen_load_start(lv_event_t *e) {
   stats_register_update_cb(stats_update_screen_display);
 }
 
+static bool double_press_handler() {
+  if (device_settings.double_press_action == DOUBLE_PRESS_ACTION_OPEN_MENU) {
+    // Open the main menu
+    if (LVGL_lock(-1)) {
+      _ui_screen_change(&ui_MenuScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 200, 0, &ui_MenuScreen_screen_init);
+      LVGL_unlock();
+    }
+  }
+
+  return true;
+}
+
 void stats_screen_loaded(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen loaded");
   stats_update_screen_display();
+  register_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS, double_press_handler);
 
   if (LVGL_lock(-1)) {
     lv_obj_set_scroll_snap_x(ui_SecondaryStatContainer, LV_SCROLL_SNAP_CENTER);
@@ -556,6 +569,7 @@ void stats_screen_loaded(lv_event_t *e) {
 void stats_screen_unload_start(lv_event_t *e) {
   ESP_LOGI(TAG, "Stats screen unload start");
   stats_unregister_update_cb(stats_update_screen_display);
+  unregister_primary_button_cb(BUTTON_EVENT_DOUBLE_PRESS);
 }
 
 void stat_long_press(lv_event_t *e) {

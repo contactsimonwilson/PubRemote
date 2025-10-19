@@ -25,6 +25,9 @@ void settings_screen_load_start(lv_event_t *e) {
     // Brightness
     lv_slider_set_value(ui_BrightnessSlider, device_settings.bl_level, LV_ANIM_OFF);
 
+    // Double press action
+    lv_dropdown_set_selected(ui_DoublePressAction, device_settings.double_press_action);
+
     // Screen rotation
     lv_dropdown_set_selected(ui_Rotation, device_settings.screen_rotation);
 
@@ -70,6 +73,11 @@ void brightness_slider_change(lv_event_t *e) {
   int val = lv_slider_get_value(ui_BrightnessSlider);
   device_settings.bl_level = (uint8_t)val;
   display_set_bl_level(device_settings.bl_level);
+}
+
+void double_press_action_select_change(lv_event_t *e) {
+  int val = lv_dropdown_get_selected(ui_DoublePressAction);
+  device_settings.double_press_action = (StatsDoublePressAction)(val & 0xFF);
 }
 
 void auto_off_select_change(lv_event_t *e) {
